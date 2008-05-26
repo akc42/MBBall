@@ -29,7 +29,7 @@ require_once('db.php');
 $groups =& $user_info['groups'];
 $uid = $ID_MEMBER;
 $name =& $user_info['name'];
-$role = (in_array(SMF_CHAT_LEAD, $groups))? (($user_info['is_admin'])? 'A' : 'L') :   // which role 
+$role = (in_array(SMF_LEAD, $groups))? (($user_info['is_admin'])? 'A' : 'L') :   // which role 
 			((in_array(SMF_BABY, $groups))? 'B' :(
 			(in_array(SMF_MELINDA, $groups))?'H' :(
 			(in_array(SMF_HONORARY, $groups))? 'G' :'R'))) ;
