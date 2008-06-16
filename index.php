@@ -17,24 +17,36 @@ if($user_info['is_guest']) {
 };
 
 // SMF membergroup IDs for the groups that we have used to define characteristics which control Chat Group
-define('SMF_BABY',		10);
-define('SMF_LEAD',		9);
-define('SMF_MELINDA',		13);
-define('SMF_HONORARY',		20);
-
+define('SMF_FOOTBALL',		21);  //Group that can administer 
 define('MBBALL_ICON_PATH', '/football/images/');
 
-define ('BALL',1);   //defined so we can control access to some of the files.
-require_once('db.php');
 $groups =& $user_info['groups'];
 $uid = $ID_MEMBER;
 $name =& $user_info['name'];
-$role = (in_array(SMF_LEAD, $groups))? (($user_info['is_admin'])? 'A' : 'L') :   // which role 
-			((in_array(SMF_BABY, $groups))? 'B' :(
-			(in_array(SMF_MELINDA, $groups))?'H' :(
-			(in_array(SMF_HONORARY, $groups))? 'G' :'R'))) ;
 
+define ('BALL',1);   //defined so we can control access to some of the files.
+require_once('db.php');
 
+if(isset($_GET['cid']) {
+	$cid = $_GET['cid'];
+} else {
+	$result = dbQuery('SELECT cid FROM default_competition;');
+	if(pg_num_rows($result) != 0 ) {
+		$row=pg_fetch_assoc($result);
+		$cid = $row['cid'];
+	} else {
+		if(in_array(SMF_FOOTBALL,$groups)) {
+			header( 'Location: http://www.melindasbackups.com/football/admin.php' ) ;
+		} else {
+			header( 'Location: http://www.melindasbackups.com/football/nostart.html' ) ;
+		};
+		exit;
+	}	
+}
+
+if(in_array(SMF_FOOTBALL,$groups)) {
+// Add Admin Link to menu section - this whole if clause has to move into menu area
+};
 
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
@@ -55,7 +67,6 @@ $role = (in_array(SMF_LEAD, $groups))? (($user_info['is_admin'])? 'A' : 'L') :  
 window.addEvent('domready', function() {
 	MBball.init({uid: <?php echo $uid;?>, 
 				name: '<?php echo $name ; ?>',
-				 role: '<?php echo $role; ?>',
 				password : '<?php echo sha1("Key".$uid); ?>'});
 });	
 window.addEvent('unload', function() {
