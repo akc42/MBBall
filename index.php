@@ -31,8 +31,8 @@ if(isset($_GET['cid']) {
 	$cid = $_GET['cid'];
 } else {
 	$result = dbQuery('SELECT cid FROM default_competition;');
-	if(pg_num_rows($result) != 0 ) {
-		$row=pg_fetch_assoc($result);
+	if(dbNumRows($result) != 0 ) {
+		$row=dbFetchRow($result);
 		$cid = $row['cid'];
 	} else {
 		if(in_array(SMF_FOOTBALL,$groups)) {
@@ -41,8 +41,13 @@ if(isset($_GET['cid']) {
 			header( 'Location: http://www.melindasbackups.com/football/nostart.html' ) ;
 		};
 		exit;
-	}	
+	}
+	dbFree($result);	
 }
+
+$result = dbQuery('SELECT * FROM competition WHERE IS open AND IS NOT archived 
+
+
 
 if(in_array(SMF_FOOTBALL,$groups)) {
 // Add Admin Link to menu section - this whole if clause has to move into menu area
