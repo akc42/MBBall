@@ -23,6 +23,7 @@ define('MBBALL_ICON_PATH', '/football/images/');
 $groups =& $user_info['groups'];
 $uid = $ID_MEMBER;
 $name =& $user_info['name'];
+$password = ha1("Key".$uid);
 
 define ('BALL',1);   //defined so we can control access to some of the files.
 require_once('db.php');
@@ -36,7 +37,7 @@ if(isset($_GET['cid']) {
 		$cid = $row['cid'];
 	} else {
 		if(in_array(SMF_FOOTBALL,$groups)) {
-			header( 'Location: http://www.melindasbackups.com/football/admin.php' ) ;
+			header( 'Location: http://www.melindasbackups.com/football/admin.php?uid='.$uid.'&pass='.$password ) ; //No CID means general. 
 		} else {
 			header( 'Location: http://www.melindasbackups.com/football/nostart.html' ) ;
 		};
@@ -45,8 +46,32 @@ if(isset($_GET['cid']) {
 	dbFree($result);	
 }
 
-$result = dbQuery('SELECT * FROM competition WHERE IS open AND IS NOT archived 
+$result = dbQuery('SELECT * FROM Competition WHERE cid = '.dbMakeSafe($cid).';');
+if (dbNumRows($result) == 0) {
+	//This competition doesn't exist yet
+	if(in_array(SMF_FOOTBALL,$groups)) {
+		header( 'Location: http://www.melindasbackups.com/football/admin.php?uid='.$uid.'&pass='.$password.'&cid='.$cid.'&admin=true' ) ;
+	} else {
+		header( 'Location: http://www.melindasbackups.com/football/nostart.html' ) ;
+	};
+	exit;
+}	
 
+$row = dbFetchRow($result);
+if ($uid == $row['administrator']) {
+	//User is administrator of this competition
+	header( 'Location: http://www.melindasbackups.com/football/admin.php?uid='.$uid.'&pass='.$password.'&cid='.$cid );
+	exit;
+} 
+
+//Check if this competition is open and ready yet
+$result = dbQuery('SELECT * FROM Open_Competition WHERE cid = '.dbMakeSafe($cid).';');
+if (dbNumRows($result) == 0 ) {
+	//See if I am the adminisat
+	header( 'Location: http://www.melindasbackups.com/football/nostart.html' ) ;
+	exit;
+}
+	
 
 
 if(in_array(SMF_FOOTBALL,$groups)) {
@@ -62,7 +87,7 @@ if(in_array(SMF_FOOTBALL,$groups)) {
 	<!--[if lt IE 7]>
 		<link rel="stylesheet" type="text/css" href="chat-ie.css"/>
 	<![endif]-->
-	<script src="/static/scripts/mootools.js" type="text/javascript" charset="UTF-8"></script>
+	<script src="/static/scripts/mootools-1.2-core.js" type="text/javascript" charset="UTF-8"></script>
 	<script src="mbball.js" type="text/javascript" charset="UTF-8"></script>
 </head>
 <body>
