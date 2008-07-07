@@ -56,12 +56,11 @@ if (dbNumRows($result) == 0) {
 	};
 	exit;
 }	
-
+$admin = false;
 $row = dbFetchRow($result);
 if ($uid == $row['administrator']) {
 	//User is administrator of this competition
-	header( 'Location: http://www.melindasbackups.com/football/admin.php?uid='.$uid.'&pass='.$password.'&cid='.$cid );
-	exit;
+	$admin = true;
 }
 dbFree($result)
 
@@ -204,7 +203,17 @@ if(in_array(SMF_FOOTBALL,$groups)) {
 <?php
 		$menu=true;
 	}
-?>	<li><a href="admin.php?<?php echo 'uid='.$uid.'&pass='.$password.'&global=true';?>">Administration</a></li>
+?>	<li><a href="admin.php?<?php echo 'uid='.$uid.'&pass='.$password.'&cid='.dbMakeSafe($cid).;?>">Administration</a></li>
+<?php
+}
+if($admin) {
+// Am Administrator of this competition - let me also do Admin thinks
+	if (!$menu) {
+?><ul id="menu">
+<?php
+		$menu=true;
+	}
+?>	<li><a href="admin.php?<?php echo 'uid='.$uid.'&pass='.$password.'&global=true';?>">Global Admin</a></li>
 <?php 
 }
 
