@@ -110,6 +110,55 @@ COMMENT ON COLUMN competition.pp_deadline IS 'Playoff Prediction Deadline';
 
 
 --
+-- Name: competition_conference_wildcards; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
+--
+
+CREATE TABLE competition_conference_wildcards (
+    cid integer NOT NULL,
+    confid character(3) NOT NULL,
+    wild1 character(3),
+    wild2 character(3)
+);
+
+
+ALTER TABLE public.competition_conference_wildcards OWNER TO alan;
+
+--
+-- Name: TABLE competition_conference_wildcards; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON TABLE competition_conference_wildcards IS 'Defines who where the playoff whildcards';
+
+
+--
+-- Name: COLUMN competition_conference_wildcards.cid; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN competition_conference_wildcards.cid IS 'Competition ID';
+
+
+--
+-- Name: COLUMN competition_conference_wildcards.confid; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN competition_conference_wildcards.confid IS 'Conference ID';
+
+
+--
+-- Name: COLUMN competition_conference_wildcards.wild1; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN competition_conference_wildcards.wild1 IS 'Wild Team 1 making playoff';
+
+
+--
+-- Name: COLUMN competition_conference_wildcards.wild2; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN competition_conference_wildcards.wild2 IS 'Wild Team 2 making playoff';
+
+
+--
 -- Name: conference; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
 --
 
@@ -144,6 +193,112 @@ ALTER TABLE public.default_competition OWNER TO alan;
 --
 
 COMMENT ON TABLE default_competition IS 'This will have a single row containing the key of the default competition';
+
+
+--
+-- Name: div_winner; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
+--
+
+CREATE TABLE div_winner (
+    cid integer NOT NULL,
+    confid character(3) NOT NULL,
+    did character(1) NOT NULL,
+    tid character(3)
+);
+
+
+ALTER TABLE public.div_winner OWNER TO alan;
+
+--
+-- Name: TABLE div_winner; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON TABLE div_winner IS 'Winner of the division - makes the playoff';
+
+
+--
+-- Name: COLUMN div_winner.cid; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN div_winner.cid IS 'Competition ID';
+
+
+--
+-- Name: COLUMN div_winner.confid; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN div_winner.confid IS 'Conference ID';
+
+
+--
+-- Name: COLUMN div_winner.did; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN div_winner.did IS 'Divisional ID';
+
+
+--
+-- Name: COLUMN div_winner.tid; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN div_winner.tid IS 'Team ID';
+
+
+--
+-- Name: div_winner_pick; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
+--
+
+CREATE TABLE div_winner_pick (
+    cid integer NOT NULL,
+    confid character(3) NOT NULL,
+    divid character(1) NOT NULL,
+    team character(3),
+    uid integer NOT NULL
+);
+
+
+ALTER TABLE public.div_winner_pick OWNER TO alan;
+
+--
+-- Name: TABLE div_winner_pick; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON TABLE div_winner_pick IS 'User Pick of each division winner';
+
+
+--
+-- Name: COLUMN div_winner_pick.cid; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN div_winner_pick.cid IS 'Conference ID';
+
+
+--
+-- Name: COLUMN div_winner_pick.confid; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN div_winner_pick.confid IS 'Conference ID';
+
+
+--
+-- Name: COLUMN div_winner_pick.divid; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN div_winner_pick.divid IS 'Division ID';
+
+
+--
+-- Name: COLUMN div_winner_pick.team; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN div_winner_pick.team IS 'Team who will win division';
+
+
+--
+-- Name: COLUMN div_winner_pick.uid; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN div_winner_pick.uid IS 'User ID';
 
 
 --
@@ -338,87 +493,6 @@ COMMENT ON COLUMN pick.over IS 'true if over score is selected';
 
 
 --
--- Name: playoff_prediction; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
---
-
-CREATE TABLE playoff_prediction (
-    cid integer NOT NULL,
-    uid integer NOT NULL,
-    team1 character(3),
-    team2 character(3),
-    team3 character(3),
-    team4 character(3),
-    team5 character(3),
-    team6 character(3)
-);
-
-
-ALTER TABLE public.playoff_prediction OWNER TO alan;
-
---
--- Name: TABLE playoff_prediction; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON TABLE playoff_prediction IS 'Playoff Predictions';
-
-
---
--- Name: COLUMN playoff_prediction.cid; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN playoff_prediction.cid IS 'Competition ID';
-
-
---
--- Name: COLUMN playoff_prediction.uid; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN playoff_prediction.uid IS 'User UD';
-
-
---
--- Name: COLUMN playoff_prediction.team1; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN playoff_prediction.team1 IS 'Team selected for Playoff';
-
-
---
--- Name: COLUMN playoff_prediction.team2; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN playoff_prediction.team2 IS 'Team selected for Playoff';
-
-
---
--- Name: COLUMN playoff_prediction.team3; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN playoff_prediction.team3 IS 'Team selected for Playoff';
-
-
---
--- Name: COLUMN playoff_prediction.team4; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN playoff_prediction.team4 IS 'Team selected for Playoff';
-
-
---
--- Name: COLUMN playoff_prediction.team5; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN playoff_prediction.team5 IS 'Team selected for Playoff';
-
-
---
--- Name: COLUMN playoff_prediction.team6; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN playoff_prediction.team6 IS 'Team selected for Playoff';
-
-
---
 -- Name: question_option; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
 --
 
@@ -525,6 +599,13 @@ CREATE TABLE round (
 ALTER TABLE public.round OWNER TO alan;
 
 --
+-- Name: TABLE round; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON TABLE round IS 'Round in Competition';
+
+
+--
 -- Name: COLUMN round.rid; Type: COMMENT; Schema: public; Owner: alan
 --
 
@@ -629,6 +710,63 @@ CREATE TABLE "user" (
 ALTER TABLE public."user" OWNER TO alan;
 
 --
+-- Name: wildcard pick; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
+--
+
+CREATE TABLE "wildcard pick" (
+    cid integer NOT NULL,
+    confid character(3) NOT NULL,
+    uid integer NOT NULL,
+    wild1 character(3) NOT NULL,
+    wild2 character(3) NOT NULL
+);
+
+
+ALTER TABLE public."wildcard pick" OWNER TO alan;
+
+--
+-- Name: TABLE "wildcard pick"; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON TABLE "wildcard pick" IS 'user pick of teams making playoffs from the wildcard';
+
+
+--
+-- Name: COLUMN "wildcard pick".cid; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN "wildcard pick".cid IS 'Competition ID';
+
+
+--
+-- Name: COLUMN "wildcard pick".confid; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN "wildcard pick".confid IS 'Conference ID';
+
+
+--
+-- Name: COLUMN "wildcard pick".uid; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN "wildcard pick".uid IS 'User ID';
+
+
+--
+-- Name: COLUMN "wildcard pick".wild1; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN "wildcard pick".wild1 IS 'First Wildcard Pick';
+
+
+--
+-- Name: COLUMN "wildcard pick".wild2; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN "wildcard pick".wild2 IS 'Second Wildcard Pick';
+
+
+--
 -- Name: competition_cid_seq; Type: SEQUENCE; Schema: public; Owner: alan
 --
 
@@ -653,6 +791,34 @@ ALTER SEQUENCE competition_cid_seq OWNED BY competition.cid;
 --
 
 SELECT pg_catalog.setval('competition_cid_seq', 5, true);
+
+
+--
+-- Name: div_winner_pick_cid_seq; Type: SEQUENCE; Schema: public; Owner: alan
+--
+
+CREATE SEQUENCE div_winner_pick_cid_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.div_winner_pick_cid_seq OWNER TO alan;
+
+--
+-- Name: div_winner_pick_cid_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: alan
+--
+
+ALTER SEQUENCE div_winner_pick_cid_seq OWNED BY div_winner_pick.cid;
+
+
+--
+-- Name: div_winner_pick_cid_seq; Type: SEQUENCE SET; Schema: public; Owner: alan
+--
+
+SELECT pg_catalog.setval('div_winner_pick_cid_seq', 1, false);
 
 
 --
@@ -684,10 +850,73 @@ SELECT pg_catalog.setval('question_option_option_seq', 1, false);
 
 
 --
+-- Name: wildcard pick_wild1_seq; Type: SEQUENCE; Schema: public; Owner: alan
+--
+
+CREATE SEQUENCE "wildcard pick_wild1_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+ALTER TABLE public."wildcard pick_wild1_seq" OWNER TO alan;
+
+--
+-- Name: wildcard pick_wild1_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: alan
+--
+
+ALTER SEQUENCE "wildcard pick_wild1_seq" OWNED BY "wildcard pick".wild1;
+
+
+--
+-- Name: wildcard pick_wild1_seq; Type: SEQUENCE SET; Schema: public; Owner: alan
+--
+
+SELECT pg_catalog.setval('"wildcard pick_wild1_seq"', 1, false);
+
+
+--
+-- Name: wildcard pick_wild2_seq; Type: SEQUENCE; Schema: public; Owner: alan
+--
+
+CREATE SEQUENCE "wildcard pick_wild2_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+ALTER TABLE public."wildcard pick_wild2_seq" OWNER TO alan;
+
+--
+-- Name: wildcard pick_wild2_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: alan
+--
+
+ALTER SEQUENCE "wildcard pick_wild2_seq" OWNED BY "wildcard pick".wild2;
+
+
+--
+-- Name: wildcard pick_wild2_seq; Type: SEQUENCE SET; Schema: public; Owner: alan
+--
+
+SELECT pg_catalog.setval('"wildcard pick_wild2_seq"', 1, false);
+
+
+--
 -- Name: cid; Type: DEFAULT; Schema: public; Owner: alan
 --
 
 ALTER TABLE competition ALTER COLUMN cid SET DEFAULT nextval('competition_cid_seq'::regclass);
+
+
+--
+-- Name: cid; Type: DEFAULT; Schema: public; Owner: alan
+--
+
+ALTER TABLE div_winner_pick ALTER COLUMN cid SET DEFAULT nextval('div_winner_pick_cid_seq'::regclass);
 
 
 --
@@ -719,6 +948,14 @@ COPY competition (description, condition, administrator, open, cid, pp_deadline)
 
 
 --
+-- Data for Name: competition_conference_wildcards; Type: TABLE DATA; Schema: public; Owner: alan
+--
+
+COPY competition_conference_wildcards (cid, confid, wild1, wild2) FROM stdin;
+\.
+
+
+--
 -- Data for Name: conference; Type: TABLE DATA; Schema: public; Owner: alan
 --
 
@@ -733,6 +970,22 @@ NFC	National Football Conference
 --
 
 COPY default_competition (cid) FROM stdin;
+\.
+
+
+--
+-- Data for Name: div_winner; Type: TABLE DATA; Schema: public; Owner: alan
+--
+
+COPY div_winner (cid, confid, did, tid) FROM stdin;
+\.
+
+
+--
+-- Data for Name: div_winner_pick; Type: TABLE DATA; Schema: public; Owner: alan
+--
+
+COPY div_winner_pick (cid, confid, divid, team, uid) FROM stdin;
 \.
 
 
@@ -761,14 +1014,6 @@ COPY match (rid, hid, aid, match_time, comment, status, ascore, hscore, cid, com
 --
 
 COPY pick (uid, comment, submit_date, cid, rid, hid, pid, over) FROM stdin;
-\.
-
-
---
--- Data for Name: playoff_prediction; Type: TABLE DATA; Schema: public; Owner: alan
---
-
-COPY playoff_prediction (cid, uid, team1, team2, team3, team4, team5, team6) FROM stdin;
 \.
 
 
@@ -853,11 +1098,27 @@ COPY "user" (uid, name, email) FROM stdin;
 
 
 --
+-- Data for Name: wildcard pick; Type: TABLE DATA; Schema: public; Owner: alan
+--
+
+COPY "wildcard pick" (cid, confid, uid, wild1, wild2) FROM stdin;
+\.
+
+
+--
 -- Name: answer_pkey; Type: CONSTRAINT; Schema: public; Owner: alan; Tablespace: 
 --
 
 ALTER TABLE ONLY answer
     ADD CONSTRAINT answer_pkey PRIMARY KEY (cid, rid, oid, uid);
+
+
+--
+-- Name: competition_conference_wildcards_pkey; Type: CONSTRAINT; Schema: public; Owner: alan; Tablespace: 
+--
+
+ALTER TABLE ONLY competition_conference_wildcards
+    ADD CONSTRAINT competition_conference_wildcards_pkey PRIMARY KEY (cid, confid);
 
 
 --
@@ -874,6 +1135,22 @@ ALTER TABLE ONLY competition
 
 ALTER TABLE ONLY conference
     ADD CONSTRAINT conference_pkey PRIMARY KEY (confid);
+
+
+--
+-- Name: div_winner_pick_pkey; Type: CONSTRAINT; Schema: public; Owner: alan; Tablespace: 
+--
+
+ALTER TABLE ONLY div_winner_pick
+    ADD CONSTRAINT div_winner_pick_pkey PRIMARY KEY (cid, confid, divid, uid);
+
+
+--
+-- Name: div_winner_pkey; Type: CONSTRAINT; Schema: public; Owner: alan; Tablespace: 
+--
+
+ALTER TABLE ONLY div_winner
+    ADD CONSTRAINT div_winner_pkey PRIMARY KEY (cid, confid, did);
 
 
 --
@@ -898,14 +1175,6 @@ ALTER TABLE ONLY match
 
 ALTER TABLE ONLY pick
     ADD CONSTRAINT pick_pkey PRIMARY KEY (cid, rid, hid, uid);
-
-
---
--- Name: playoff_prediction_pkey; Type: CONSTRAINT; Schema: public; Owner: alan; Tablespace: 
---
-
-ALTER TABLE ONLY playoff_prediction
-    ADD CONSTRAINT playoff_prediction_pkey PRIMARY KEY (cid, uid);
 
 
 --
@@ -957,6 +1226,14 @@ ALTER TABLE ONLY "user"
 
 
 --
+-- Name: wildcard pick_pkey; Type: CONSTRAINT; Schema: public; Owner: alan; Tablespace: 
+--
+
+ALTER TABLE ONLY "wildcard pick"
+    ADD CONSTRAINT "wildcard pick_pkey" PRIMARY KEY (cid, confid, uid);
+
+
+--
 -- Name: answer_cid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
 --
 
@@ -973,11 +1250,91 @@ ALTER TABLE ONLY answer
 
 
 --
+-- Name: competition_conference_wildcards_cid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
+--
+
+ALTER TABLE ONLY competition_conference_wildcards
+    ADD CONSTRAINT competition_conference_wildcards_cid_fkey FOREIGN KEY (cid, wild1) REFERENCES team_in_competition(cid, tid) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: competition_conference_wildcards_cid_fkey1; Type: FK CONSTRAINT; Schema: public; Owner: alan
+--
+
+ALTER TABLE ONLY competition_conference_wildcards
+    ADD CONSTRAINT competition_conference_wildcards_cid_fkey1 FOREIGN KEY (cid, wild2) REFERENCES team_in_competition(cid, tid) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: competition_conference_wildcards_confid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
+--
+
+ALTER TABLE ONLY competition_conference_wildcards
+    ADD CONSTRAINT competition_conference_wildcards_confid_fkey FOREIGN KEY (confid) REFERENCES conference(confid) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
 -- Name: default_competition_cid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
 --
 
 ALTER TABLE ONLY default_competition
     ADD CONSTRAINT default_competition_cid_fkey FOREIGN KEY (cid) REFERENCES competition(cid) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: div_winner_cid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
+--
+
+ALTER TABLE ONLY div_winner
+    ADD CONSTRAINT div_winner_cid_fkey FOREIGN KEY (cid, tid) REFERENCES team_in_competition(cid, tid) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: div_winner_confid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
+--
+
+ALTER TABLE ONLY div_winner
+    ADD CONSTRAINT div_winner_confid_fkey FOREIGN KEY (confid) REFERENCES conference(confid) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: div_winner_did_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
+--
+
+ALTER TABLE ONLY div_winner
+    ADD CONSTRAINT div_winner_did_fkey FOREIGN KEY (did) REFERENCES division(divid) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: div_winner_pick_cid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
+--
+
+ALTER TABLE ONLY div_winner_pick
+    ADD CONSTRAINT div_winner_pick_cid_fkey FOREIGN KEY (cid, team) REFERENCES team_in_competition(cid, tid) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: div_winner_pick_confid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
+--
+
+ALTER TABLE ONLY div_winner_pick
+    ADD CONSTRAINT div_winner_pick_confid_fkey FOREIGN KEY (confid) REFERENCES conference(confid) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: div_winner_pick_divid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
+--
+
+ALTER TABLE ONLY div_winner_pick
+    ADD CONSTRAINT div_winner_pick_divid_fkey FOREIGN KEY (divid) REFERENCES division(divid) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: div_winner_pick_uid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
+--
+
+ALTER TABLE ONLY div_winner_pick
+    ADD CONSTRAINT div_winner_pick_uid_fkey FOREIGN KEY (uid) REFERENCES "user"(uid) ON UPDATE RESTRICT ON DELETE CASCADE;
 
 
 --
@@ -1018,62 +1375,6 @@ ALTER TABLE ONLY pick
 
 ALTER TABLE ONLY pick
     ADD CONSTRAINT pick_uid_fkey FOREIGN KEY (uid) REFERENCES "user"(uid) ON UPDATE RESTRICT ON DELETE CASCADE;
-
-
---
--- Name: playoff_prediction_cid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
---
-
-ALTER TABLE ONLY playoff_prediction
-    ADD CONSTRAINT playoff_prediction_cid_fkey FOREIGN KEY (cid, team1) REFERENCES team_in_competition(cid, tid) ON UPDATE RESTRICT ON DELETE CASCADE;
-
-
---
--- Name: playoff_prediction_cid_fkey1; Type: FK CONSTRAINT; Schema: public; Owner: alan
---
-
-ALTER TABLE ONLY playoff_prediction
-    ADD CONSTRAINT playoff_prediction_cid_fkey1 FOREIGN KEY (cid, team2) REFERENCES team_in_competition(cid, tid) ON UPDATE RESTRICT ON DELETE CASCADE;
-
-
---
--- Name: playoff_prediction_cid_fkey2; Type: FK CONSTRAINT; Schema: public; Owner: alan
---
-
-ALTER TABLE ONLY playoff_prediction
-    ADD CONSTRAINT playoff_prediction_cid_fkey2 FOREIGN KEY (cid, team3) REFERENCES team_in_competition(cid, tid) ON UPDATE RESTRICT ON DELETE CASCADE;
-
-
---
--- Name: playoff_prediction_cid_fkey3; Type: FK CONSTRAINT; Schema: public; Owner: alan
---
-
-ALTER TABLE ONLY playoff_prediction
-    ADD CONSTRAINT playoff_prediction_cid_fkey3 FOREIGN KEY (cid, team4) REFERENCES team_in_competition(cid, tid) ON UPDATE RESTRICT ON DELETE CASCADE;
-
-
---
--- Name: playoff_prediction_cid_fkey4; Type: FK CONSTRAINT; Schema: public; Owner: alan
---
-
-ALTER TABLE ONLY playoff_prediction
-    ADD CONSTRAINT playoff_prediction_cid_fkey4 FOREIGN KEY (cid, team5) REFERENCES team_in_competition(cid, tid) ON UPDATE RESTRICT ON DELETE CASCADE;
-
-
---
--- Name: playoff_prediction_cid_fkey5; Type: FK CONSTRAINT; Schema: public; Owner: alan
---
-
-ALTER TABLE ONLY playoff_prediction
-    ADD CONSTRAINT playoff_prediction_cid_fkey5 FOREIGN KEY (cid, team6) REFERENCES team_in_competition(cid, tid) ON UPDATE RESTRICT ON DELETE CASCADE;
-
-
---
--- Name: playoff_prediction_uid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
---
-
-ALTER TABLE ONLY playoff_prediction
-    ADD CONSTRAINT playoff_prediction_uid_fkey FOREIGN KEY (uid) REFERENCES "user"(uid) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -1130,6 +1431,38 @@ ALTER TABLE ONLY team_in_competition
 
 ALTER TABLE ONLY team_in_competition
     ADD CONSTRAINT team_in_competition_tid_fkey FOREIGN KEY (tid) REFERENCES team(tid) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: wildcard pick_cid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
+--
+
+ALTER TABLE ONLY "wildcard pick"
+    ADD CONSTRAINT "wildcard pick_cid_fkey" FOREIGN KEY (cid, wild1) REFERENCES team_in_competition(cid, tid) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: wildcard pick_cid_fkey1; Type: FK CONSTRAINT; Schema: public; Owner: alan
+--
+
+ALTER TABLE ONLY "wildcard pick"
+    ADD CONSTRAINT "wildcard pick_cid_fkey1" FOREIGN KEY (cid, wild2) REFERENCES team_in_competition(cid, tid) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: wildcard pick_confid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
+--
+
+ALTER TABLE ONLY "wildcard pick"
+    ADD CONSTRAINT "wildcard pick_confid_fkey" FOREIGN KEY (confid) REFERENCES conference(confid) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: wildcard pick_uid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
+--
+
+ALTER TABLE ONLY "wildcard pick"
+    ADD CONSTRAINT "wildcard pick_uid_fkey" FOREIGN KEY (uid) REFERENCES "user"(uid) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
