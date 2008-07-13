@@ -955,11 +955,6 @@ COPY answer (uid, comment, submit_date, cid, rid, oid) FROM stdin;
 --
 
 COPY competition (description, condition, administrator, open, cid, pp_deadline, gap) FROM stdin;
-		\N	f	1	\N	08:00:00
-		\N	t	2	\N	08:00:00
-		\N	f	3	\N	08:00:00
-		\N	t	4	\N	08:00:00
-		\N	f	5	\N	08:00:00
 \.
 
 
