@@ -61,7 +61,8 @@ CREATE TABLE competition (
     administrator integer,
     open boolean DEFAULT false NOT NULL,
     cid integer NOT NULL,
-    pp_deadline timestamp with time zone
+    pp_deadline timestamp with time zone,
+    gap interval DEFAULT '01:00:00'::interval NOT NULL
 );
 
 
@@ -107,6 +108,13 @@ COMMENT ON COLUMN competition.cid IS 'Competition ID';
 --
 
 COMMENT ON COLUMN competition.pp_deadline IS 'Playoff Prediction Deadline';
+
+
+--
+-- Name: COLUMN competition.gap; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN competition.gap IS 'Gap of how long before match time picks have to be in';
 
 
 --
@@ -330,12 +338,12 @@ CREATE TABLE match (
     aid character(3) NOT NULL,
     match_time timestamp with time zone,
     comment text,
-    status smallint DEFAULT 0 NOT NULL,
     ascore integer,
     hscore integer,
     cid integer NOT NULL,
     combined_score integer,
-    value smallint DEFAULT 1 NOT NULL
+    value smallint DEFAULT 1 NOT NULL,
+    open boolean DEFAULT false NOT NULL
 );
 
 
@@ -377,13 +385,6 @@ COMMENT ON COLUMN match.comment IS 'Administrator Comment for this Match';
 
 
 --
--- Name: COLUMN match.status; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN match.status IS '0=inprep,1=picks,2=awaitingresult,3=results available';
-
-
---
 -- Name: COLUMN match.ascore; Type: COMMENT; Schema: public; Owner: alan
 --
 
@@ -416,6 +417,13 @@ COMMENT ON COLUMN match.combined_score IS 'Value of Combined Score for an over/u
 --
 
 COMMENT ON COLUMN match.value IS 'Points awarded for a correct pick';
+
+
+--
+-- Name: COLUMN match.open; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN match.open IS 'True if Match is set up and ready';
 
 
 --
@@ -676,7 +684,8 @@ COMMENT ON COLUMN team.div IS 'division team plays in';
 
 CREATE TABLE team_in_competition (
     tid character(3) NOT NULL,
-    cid integer NOT NULL
+    cid integer NOT NULL,
+    made_playoff boolean DEFAULT false NOT NULL
 );
 
 
@@ -694,6 +703,13 @@ COMMENT ON COLUMN team_in_competition.tid IS 'Team ID';
 --
 
 COMMENT ON COLUMN team_in_competition.cid IS 'Competition ID';
+
+
+--
+-- Name: COLUMN team_in_competition.made_playoff; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN team_in_competition.made_playoff IS 'True if team made playoffs';
 
 
 --
@@ -938,12 +954,12 @@ COPY answer (uid, comment, submit_date, cid, rid, oid) FROM stdin;
 -- Data for Name: competition; Type: TABLE DATA; Schema: public; Owner: alan
 --
 
-COPY competition (description, condition, administrator, open, cid, pp_deadline) FROM stdin;
-		\N	f	1	\N
-		\N	t	2	\N
-		\N	f	3	\N
-		\N	t	4	\N
-		\N	f	5	\N
+COPY competition (description, condition, administrator, open, cid, pp_deadline, gap) FROM stdin;
+		\N	f	1	\N	08:00:00
+		\N	t	2	\N	08:00:00
+		\N	f	3	\N	08:00:00
+		\N	t	4	\N	08:00:00
+		\N	f	5	\N	08:00:00
 \.
 
 
@@ -1005,7 +1021,7 @@ W	West
 -- Data for Name: match; Type: TABLE DATA; Schema: public; Owner: alan
 --
 
-COPY match (rid, hid, aid, match_time, comment, status, ascore, hscore, cid, combined_score, value) FROM stdin;
+COPY match (rid, hid, aid, match_time, comment, ascore, hscore, cid, combined_score, value, open) FROM stdin;
 \.
 
 
@@ -1085,7 +1101,7 @@ KC 	Kansas City Chiefs			AFC	W
 -- Data for Name: team_in_competition; Type: TABLE DATA; Schema: public; Owner: alan
 --
 
-COPY team_in_competition (tid, cid) FROM stdin;
+COPY team_in_competition (tid, cid, made_playoff) FROM stdin;
 \.
 
 
