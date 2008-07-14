@@ -62,6 +62,8 @@ if ($uid == $row['administrator']) {
 	//User is administrator of this competition
 	$admin = true;
 }
+$gap = row['gap'];   //difference from match time that picks close
+$playoff_deadline=row['pp_deadline']; //is set will be the cutoff point for playoff predictions, if null there is no playoff quiz
 dbFree($result)
 
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -137,7 +139,7 @@ if(dbNumRows($result) == 0) {
 }
 dbFree($result);
 dbQuery('SELECT DISTINCT round.rid round.name FROM match JOIN round USING (cid,rid) WHERE cid = '
-		.dbMakeSafe($cid).' AND status > '.(($registered)? '1' : '2').'ORDER BY rid DESC ;');
+		.dbMakeSafe($cid).' AND open IS TRUE '.(($registered)? '' : ' AND match_date - '.dbMakeSafe($gap)).' ORDER BY rid DESC ;');
 if (dbNumRows($result) > 0) {
 	$row=dbFetchRow($result);
 
@@ -175,9 +177,10 @@ dbFreeResult($result);
 $sql = 'SELECT cid, name FROM competition WHERE cid <> '.dbMakeSafe($cid).' AND open IS TRUE AND cid NOT IN ';
 // checking not already registered for a cid where registration is only open
 $sql .= '(SELECT cid FROM registration WHERE uid = '.dbMakeSafe($uid).') UNION ';
-$sql .= 'SELECT DISTINCT cid, name FROM competition JOIN match USING (cid) LEFT JOIN registration USING (cid)';
+$sql .= 'SELECT DISTINCT c.cid, c.name FROM competition c JOIN match m USING (cid) LEFT JOIN registration  r ';
 // registered users can see a competition when picks are ready for picking, non registered when awaiting results
-$sql .= ' WHERE cid <> '.dbMakeSafe($cid).' AND match.status > CASE WHEN uid IS NULL THEN 2 ELSE 1 END CASE ;';
+$sql .= 'ON r.cid = m.cid AND r.uid = '.dbMakeSafe($uid).' WHERE c.cid <> '.dbMakeSafe($cid).' AND m.open IS TRUE ';
+$sqk .= 'AND CASE WHEN uid IS NULL THEN  (m.match_time - '.dbMakeSafe($gap)') > now ELSE true END CASE ;';
 $result = dbQuery($sql);
 
 if (dbNumRows($result) > 0) {
@@ -189,13 +192,14 @@ if (dbNumRows($result) > 0) {
 ?>	<li>Competitions
 		<ul>
 <?php 
-	while ($row = dnFetchRow($result)) {
+	while ($row = dbFetchRow($result)) {
 ?>			<li><a href="index.php?<?php echo 'cid='.$row['cid'] ; ?>"><?php echo $row['name'] ;?></a></li>
 <?php	}
 ?>		</ul>
 	</li>
 <?php
 }
+dbFreeResult($result);
 if(in_array(SMF_FOOTBALL,$groups)) {
 // Am Global Administrator - let me also do Admin thinks
 	if (!$menu) {
@@ -219,16 +223,177 @@ if($admin) {
 
 if ($menu) {
 ?></ul>
+<div id="content">
 <?php
 }
 if ($registered) {
 // If user is registered and we can do picks then we need to display the  Picks Section
 ?><div id="picks">
-</div>
-<div id="bonus">
+<?php
+$sql = 'SELECT m.hid AS hid, m.aid AS aid, p.pid AS pid, m.combined_score AS cs, p.over AS over p.comment AS comment FROM match m LEFT JOIN pick p ';
+$sql .= 'ON m.cid = p.cid AND m.rid = p.rid AND m.hid = p.hid AND p.uid = '.dbMakeSafe($uid);
+$sql .= ' WHERE m.cid = '.dbMakeSafe($cid).' AND m.rid = '.dbMakeSafe($rid).'WHERE m.open IS TRUE AND m.match_time - '.$gap.' > now() ;';
+$result = dbQuery($sql);
+
+?>	<table>
+		<caption>Match Picks</caption>
+		<thead>
+			<tr>
+				<th class="team">Team Pick</th>
+				<th class="score">Score</th><th class="ou_select">Over/Under</th>
+				<th class="comment">Comment</td>
+			</tr>
+		</thead>
+		<tbody>
+<?php
+if (dbNumRows($result) == 0) {
+?>			<tr><td colspan="2" class="nopick">No Matches to Pick</td></tr>
+<?php
+} else {
+	while ($row=dbFetchRow($result)) {
+?>			<tr><form id="<?php echo $row['hid'];?>">
+				<td>
+					<input class="pick" type="radio" 
+						name="<?php echo $row['hid'];?>"
+						value="<?php echo $row['hid'];?>"
+						 <?php if ($row['pid'] == $row['hid']) echo 'checked';?>/><?php echo $row['hid'];?><br/>
+					<input class="pick" type="radio" 
+						name="<?php echo $row['hid'];?>"
+						value="<?php echo $row['aid'];?>"
+						 <?php if ($row['pid'] == $row['aid']) echo 'checked';?>/><?php echo $row['aid'];?></td>
+				<td class="ou"><?php echo $row['cs'];?></td><td>
+					<input class="pick" type="radio"
+						name="<?php echo $row['aid'];?>" value="U" 
+						<?php if ($row['over'] == 'f') echo 'checked';?>/>Under<br/>
+					<input class="pick" type="radio"
+						name="<?php echo $row['aid'];?>" value="O" 
+						<?php if ($row['over'] == 't') echo 'checked';?>/>Over<br/></td>
+				<td><textarea class="pick" rows="2" cols="20"><?php echo $row['comment'];?></textarea></td>
+			    </form>
+			</tr>
+<?php
+	}
+}
+dbFreeResult($result);
+?>		</tbody>
+	</table>
 </div>
 <?php
-}
+	if(!is_null($playoff_deadline) and strtotime($play_off_deadline) > time()) {
+//Playoff selection is part of this competition
+?><div id="playoff">
+<?php
+$sql = 'SELECT t.confid AS confid, .divid AS divid, t.tid AS tid, u.team AS pid, w.wild1 AS w1, w.wild2 AS w2,d.name AS dn, c.name AS cn'; 
+$sql .= ' FROM team_in_competition t JOIN conference c USING (confid) JOIN division d USING (divid)';
+$sql .= ' LEFT JOIN div_winner_pick u ON t.cid = u.cid AND t.confid = u.confid AND t.divid = u.divid AND t.tid = u.team AND u.uid = '.dbMakeSafe($uid);
+$sql .= ' LEFT JOIN wildcard_pick w ON t.cid = w.cid AND t.confid = w.confid AND (t.tid = w.wild1 OR t.tid = w.wild2) AND u.uid = '.dbMakeSafe($uid);
+$sql .= ' WHERE t.cid = '.dbMakeSafe($cid).' ORDER BY confid,divid,tid;';
+		$result=dbQuery($sql);  //get all teams and whether this user as picked them
+		$playoffs = array();
+		$divs = array();
+		$confs = array();
+		$sizes = array();
+		while ($row=dbFetchRow($result)) {
+			$pick = array();
+			$pick['tid']=$row['tid'];
+			if(!isnull($row['pid'])) {
+				$pick['pid']=true;
+			} else {
+				$pick['pid']=false;
+			}
+			if(!isnull($row['w1'])) {
+				$pick['w1']=true;
+			} else {
+				$pick['w1']=false;
+			}
+			if(!isnull($row['w2'])) {
+				$pick['w2']=true;
+			} else {
+				$pick['w2']=false;
+			}
+			$playoffs[$row['confid'],$row['divid']][] = $pick;
+			if (isset($sizes[$row['confid'],$row['divid']])) {
+				$sizes[$row['confid'],$row['divid']]++;
+			} else {
+				$sizes[$row['confid'],$row['divid']] = 1;
+			}
+			$confs['confid'] = $row['cn'];
+			$divs['divid'] = $row['dn'];
+		}
+		dbFreeResult($result);
+?>	<table>
+		<caption>Pick divisional winner and wildcard picks for each conference</caption>
+		<thead>
+			<tr>
+				<th class="po_h1">\</th><th class="po_h2">Division</th>
+<?php
+		foreach($divs as $division) {
+			// for each division we are building a division name column, and three radio button colums to hold divisional winner
+			// and two wildcard pick columns
+?>				<th class="po_hd" rowspan="2"><?php echo $division;?></th>
+				<th class="po_dw">D</th><th class="po_w1">W</th><th class="po_w2">W</th>
+<?php
+		}
+?>			</tr>		
+			<tr>
+				<th class="po_h3">Conference</th><th class="po_h4">\</th>
+<?php
+		foreach($divs as $division) {
+?>				<th>W</th><th>1</th><th>2</th>
+<?php
+		}
+?>			</tr>	
+		</thead>
+		<tbody><form id="po_form">
+<?php
+		foreach($confs as $confid => $conference) {
+			$no_of_rows = max($sizes[$confid]);
+?>			<tr>
+				<td class="po_b1" colspan="2" rowspan="<?php echo $no_of_rows;?>"><?php echo $conference;?></td>
+<?php
+			for ($i = 0; $i < $no_of_rows-1;$i++) {
+				if( $i != 0) {
+?>			<tr>
+<?php
+				}
+				foreach($divs as $divid => $division) {
+					$tid=$playoffs[$config,$divid,$i,'tid'];
+?>				<td class="po_dn"><?php echo $tid;?></td>
+				<td class="po_pdw">
+					<input type="radio" 
+						name="<?php echo $confid.$divid;?>"
+						value="<?php echo $tid;?>"
+						<?php if ($playoffs[$confid,$divid,'pid']) echo 'checked';?> />
+				</td>
+				<td class="po_wild">
+					<input type="radio" 
+						name="<?php echo $confid.'w1';?>"
+						value="<?php echo $tid;?>"
+						<?php if ($playoffs[$confid,$divid,'w1']) echo 'checked';?> />
+				</td>
+				<td class="po_wild">
+					<input type="radio" 
+						name="<?php echo $confid.'w2';?>"
+						value="<?php echo $tid;?>"
+						<?php if ($playoffs[$confid,$divid,'w2']) echo 'checked';?> />
+				</td>
+<?php
+				}
+?>			</tr>
+<?php
+			}
+		}
+?>		</form></tbody>
+	</table>
+</div>
+<?php
+	}  //playoffs
+}//registered
+?>
+<div id="result_gen">
+	<table>
+	</table>
+</div>
 <div id="copyright">MBball <span id="version"></span> &copy; 2008 Alan Chandler.  Licenced under the GPL</div>
 </div>
 </body>
