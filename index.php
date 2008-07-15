@@ -230,9 +230,11 @@ if ($registered) {
 // If user is registered and we can do picks then we need to display the  Picks Section
 ?><div id="picks">
 <?php
-$sql = 'SELECT m.hid AS hid, m.aid AS aid, p.pid AS pid, m.combined_score AS cs, p.over AS over p.comment AS comment FROM match m LEFT JOIN pick p ';
+$sql = 'SELECT m.hid AS hid, m.aid AS aid, p.pid AS pid, m.combined_score AS cs, p.over AS over p.comment AS comment';
+$sql .= ' FROM match m JOIN team t LEFT JOIN pick p ';
 $sql .= 'ON m.cid = p.cid AND m.rid = p.rid AND m.hid = p.hid AND p.uid = '.dbMakeSafe($uid);
-$sql .= ' WHERE m.cid = '.dbMakeSafe($cid).' AND m.rid = '.dbMakeSafe($rid).'WHERE m.open IS TRUE AND m.match_time - '.$gap.' > now() ;';
+$sql .= ' WHERE m.cid = '.dbMakeSafe($cid).' AND m.rid = '.dbMakeSafe($rid).'WHERE m.open IS TRUE AND m.match_time - '.$gap.' > now()';
+$sql .= ' ORDER BY t.confid,t.divid ;';
 $result = dbQuery($sql);
 
 ?>	<table>
