@@ -138,11 +138,11 @@ if(dbNumRows($result) == 0) {
 	$registered = true;
 }
 dbFree($result);
-dbQuery('SELECT DISTINCT round.rid round.name FROM match JOIN round USING (cid,rid) WHERE cid = '
-		.dbMakeSafe($cid).' AND open IS TRUE '.(($registered)? '' : ' AND match_date - '.dbMakeSafe($gap)).' ORDER BY rid DESC ;');
+dbQuery('SELECT DISTINCT r.rid AS rid, r.name AS name FROM match m JOIN round r USING (cid,rid) LEFT JOIN pick p USING (cid,rid) WHERE r.cid = '
+		.dbMakeSafe($cid).' AND m.open IS TRUE'.(($registered)? '' : ' AND p.uid IS NOT NULL').' ORDER BY rid DESC ;');
 if (dbNumRows($result) > 0) {
 	$row=dbFetchRow($result);
-
+	$round_name = $row['name'];
 	if(isset($_GET['rid']))
 		$rid=$_GET['rid'];
 	} else {
@@ -164,6 +164,8 @@ if (dbNumRows($result) > 0) {
 			if ($row['rid'] != $rid) {
 ?>			<li><a href="index.php?<?php echo 'cid='.$cid.'&rid='.$row['rid']; ?>"><?php echo $row['name'] ;?></a></li>
 <?php
+			} else {
+				$round_name = $row['name'];
 			}
 		} while ($row = dbFetchRow($result));
 ?>		</ul>
@@ -174,13 +176,9 @@ if (dbNumRows($result) > 0) {
 dbFreeResult($result);
 
 // The following select should select the cid and name of all competitions that are in a state where 
-$sql = 'SELECT cid, name FROM competition WHERE cid <> '.dbMakeSafe($cid).' AND open IS TRUE AND cid NOT IN ';
-// checking not already registered for a cid where registration is only open
-$sql .= '(SELECT cid FROM registration WHERE uid = '.dbMakeSafe($uid).') UNION ';
-$sql .= 'SELECT DISTINCT c.cid, c.name FROM competition c JOIN match m USING (cid) LEFT JOIN registration  r ';
-// registered users can see a competition when picks are ready for picking, non registered when awaiting results
-$sql .= 'ON r.cid = m.cid AND r.uid = '.dbMakeSafe($uid).' WHERE c.cid <> '.dbMakeSafe($cid).' AND m.open IS TRUE ';
-$sqk .= 'AND CASE WHEN uid IS NULL THEN  (m.match_time - '.dbMakeSafe($gap)') > now ELSE true END CASE ;';
+$sql = 'SELECT DISTINCT c.cid AS cid, c.name AS name FROM competition c LEFT JOIN registration r ON c.cid = r.cid AND r.uid  = '.dbMakeSafe($uid);
+$sql .= ' LEFT JOIN match m USING (cid) LEFT JOIN pick p USING (cid) WHERE cid <> '.dbMakeSafe($cid);
+$sql .= ' AND ((r.uid IS NULL AND (c.open IS TRUE OR p.rid IS NOT NULL)) OR (r.uid IS NOT NULL AND m.open IS TRUE)) ; ';
 $result = dbQuery($sql);
 
 if (dbNumRows($result) > 0) {
@@ -230,30 +228,41 @@ if ($registered) {
 // If user is registered and we can do picks then we need to display the  Picks Section
 ?><div id="picks">
 <?php
-$sql = 'SELECT m.hid AS hid, m.aid AS aid, p.pid AS pid, m.combined_score AS cs, p.over AS over p.comment AS comment';
-$sql .= ' FROM match m JOIN team t LEFT JOIN pick p ';
+$sql = 'SELECT m.hid AS hid, m.aid AS aid, p.pid AS pid, m.combined_score AS cs, p.over AS over p.comment AS comment, r.ou_round AS our';
+$sql .= ' FROM round r JOIN match m ON (cid, rid) JOIN team t ON (cid,rid,hid) LEFT JOIN pick p ';
 $sql .= 'ON m.cid = p.cid AND m.rid = p.rid AND m.hid = p.hid AND p.uid = '.dbMakeSafe($uid);
 $sql .= ' WHERE m.cid = '.dbMakeSafe($cid).' AND m.rid = '.dbMakeSafe($rid).'WHERE m.open IS TRUE AND m.match_time - '.$gap.' > now()';
 $sql .= ' ORDER BY t.confid,t.divid ;';
 $result = dbQuery($sql);
-
+$norows = dbNumRows($result);
+if ($norows == 0) {
+?>	<form id="picks">
+<?php
+}
 ?>	<table>
-		<caption>Match Picks</caption>
+		<caption>Match Picks for <?php echo $round_name;?></caption>
 		<thead>
 			<tr>
 				<th class="team">Team Pick</th>
-				<th class="score">Score</th><th class="ou_select">Over/Under</th>
+<?php
+if ( $norows > 0) {
+	$row=dbFetchRow($result);  //get first row so we can check what we need in header
+	if ($row['our'] == 't') {
+?>				<th class="score">Score</th><th class="ou_select">Over/Under</th>
+<?php
+	}
+?>
 				<th class="comment">Comment</td>
 			</tr>
 		</thead>
 		<tbody>
 <?php
-if (dbNumRows($result) == 0) {
+if ($norows == 0) {
 ?>			<tr><td colspan="2" class="nopick">No Matches to Pick</td></tr>
 <?php
 } else {
-	while ($row=dbFetchRow($result)) {
-?>			<tr><form id="<?php echo $row['hid'];?>">
+	do {
+?>			<tr>
 				<td>
 					<input class="pick" type="radio" 
 						name="<?php echo $row['hid'];?>"
@@ -263,23 +272,34 @@ if (dbNumRows($result) == 0) {
 						name="<?php echo $row['hid'];?>"
 						value="<?php echo $row['aid'];?>"
 						 <?php if ($row['pid'] == $row['aid']) echo 'checked';?>/><?php echo $row['aid'];?></td>
-				<td class="ou"><?php echo $row['cs'];?></td><td>
+<?php
+	if ($row['our'] == 't') {
+?>				<td class="ou"><?php echo $row['cs'];?></td><td>
 					<input class="pick" type="radio"
 						name="<?php echo $row['aid'];?>" value="U" 
 						<?php if ($row['over'] == 'f') echo 'checked';?>/>Under<br/>
 					<input class="pick" type="radio"
 						name="<?php echo $row['aid'];?>" value="O" 
 						<?php if ($row['over'] == 't') echo 'checked';?>/>Over<br/></td>
-				<td><textarea class="pick" rows="2" cols="20"><?php echo $row['comment'];?></textarea></td>
+<?php
+	}
+?>				<td><textarea class="pick" rows="2" cols="20"><?php echo $row['comment'];?></textarea></td>
 			    </form>
 			</tr>
 <?php
-	}
+	} while ($row=dbFetchRow($result));
 }
 dbFreeResult($result);
 ?>		</tbody>
 	</table>
-</div>
+<?php
+if($norows > 0) {
+?>	<textarea id="round_comment"></textarea>
+	<input type="submit" name="pick_submit" value="Make Picks" />
+	</form>
+<?php
+}
+?></div>
 <?php
 	if(!is_null($playoff_deadline) and strtotime($play_off_deadline) > time()) {
 //Playoff selection is part of this competition
