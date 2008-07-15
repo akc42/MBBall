@@ -22,36 +22,6 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: answer; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
---
-
-CREATE TABLE answer (
-    uid integer NOT NULL,
-    comment text,
-    submit_date timestamp with time zone,
-    cid integer NOT NULL,
-    rid integer NOT NULL,
-    oid smallint NOT NULL
-);
-
-
-ALTER TABLE public.answer OWNER TO alan;
-
---
--- Name: COLUMN answer.submit_date; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN answer.submit_date IS 'Date Time Submitted answer';
-
-
---
--- Name: COLUMN answer.oid; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN answer.oid IS 'ID of Question Option Selected as Coorect';
-
-
---
 -- Name: competition; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
 --
 
@@ -135,7 +105,7 @@ ALTER TABLE public.competition_conference_wildcards OWNER TO alan;
 -- Name: TABLE competition_conference_wildcards; Type: COMMENT; Schema: public; Owner: alan
 --
 
-COMMENT ON TABLE competition_conference_wildcards IS 'Defines who where the playoff whildcards';
+COMMENT ON TABLE competition_conference_wildcards IS 'Defines who where the playoff wildcards for a conference in a competition';
 
 
 --
@@ -427,6 +397,121 @@ COMMENT ON COLUMN match.open IS 'True if Match is set up and ready';
 
 
 --
+-- Name: option; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
+--
+
+CREATE TABLE option (
+    cid integer NOT NULL,
+    rid integer NOT NULL,
+    oid smallint NOT NULL,
+    label character varying(14)
+);
+
+
+ALTER TABLE public.option OWNER TO alan;
+
+--
+-- Name: TABLE option; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON TABLE option IS 'Holds one possible answer to the round question';
+
+
+--
+-- Name: COLUMN option.cid; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN option.cid IS 'Competition ID';
+
+
+--
+-- Name: COLUMN option.rid; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN option.rid IS 'Round ID';
+
+
+--
+-- Name: COLUMN option.oid; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN option.oid IS 'Option ID';
+
+
+--
+-- Name: COLUMN option.label; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN option.label IS 'Simple Label for this option';
+
+
+--
+-- Name: option_pick; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
+--
+
+CREATE TABLE option_pick (
+    uid integer NOT NULL,
+    comment text,
+    submit_date timestamp with time zone,
+    cid integer NOT NULL,
+    rid integer NOT NULL,
+    oid smallint,
+    value integer
+);
+
+
+ALTER TABLE public.option_pick OWNER TO alan;
+
+--
+-- Name: COLUMN option_pick.uid; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN option_pick.uid IS 'User ID';
+
+
+--
+-- Name: COLUMN option_pick.comment; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN option_pick.comment IS 'General Comment from user about the round';
+
+
+--
+-- Name: COLUMN option_pick.submit_date; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN option_pick.submit_date IS 'Date Time Submitted answer';
+
+
+--
+-- Name: COLUMN option_pick.cid; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN option_pick.cid IS 'Competition ID';
+
+
+--
+-- Name: COLUMN option_pick.rid; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN option_pick.rid IS 'Round ID';
+
+
+--
+-- Name: COLUMN option_pick.oid; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN option_pick.oid IS 'ID of Question Option Selected as Correct (only if multichoice)';
+
+
+--
+-- Name: COLUMN option_pick.value; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN option_pick.value IS 'Value of answer if not multichoice';
+
+
+--
 -- Name: pick; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
 --
 
@@ -501,55 +586,6 @@ COMMENT ON COLUMN pick.over IS 'true if over score is selected';
 
 
 --
--- Name: question_option; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
---
-
-CREATE TABLE question_option (
-    cid integer NOT NULL,
-    rid integer NOT NULL,
-    oid smallint NOT NULL,
-    option integer NOT NULL
-);
-
-
-ALTER TABLE public.question_option OWNER TO alan;
-
---
--- Name: TABLE question_option; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON TABLE question_option IS 'Holds one possible answer to the bonus question';
-
-
---
--- Name: COLUMN question_option.cid; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN question_option.cid IS 'Competition ID';
-
-
---
--- Name: COLUMN question_option.rid; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN question_option.rid IS 'Round ID';
-
-
---
--- Name: COLUMN question_option.oid; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN question_option.oid IS 'Option ID';
-
-
---
--- Name: COLUMN question_option.option; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN question_option.option IS 'Text of potential Answer to Bonus Question';
-
-
---
 -- Name: registration; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
 --
 
@@ -596,11 +632,14 @@ COMMENT ON COLUMN registration.agree_date IS 'Date Time Agreed with Conditions o
 
 CREATE TABLE round (
     rid integer NOT NULL,
-    comment text,
     deadline timestamp with time zone,
     cid integer NOT NULL,
     question text,
-    valid_question boolean DEFAULT false
+    valid_question boolean DEFAULT false,
+    answer integer,
+    value smallint DEFAULT 1 NOT NULL,
+    name character varying(14),
+    ou_round boolean DEFAULT false NOT NULL
 );
 
 
@@ -646,6 +685,34 @@ COMMENT ON COLUMN round.question IS 'Bonus Question Text';
 --
 
 COMMENT ON COLUMN round.valid_question IS 'Set once a valid bonus question has been set up';
+
+
+--
+-- Name: COLUMN round.answer; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN round.answer IS 'If not null an answer to a numeric question is in this field (multichoice determined by existance of option entry';
+
+
+--
+-- Name: COLUMN round.value; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN round.value IS 'Value given for a correct pick or answer';
+
+
+--
+-- Name: COLUMN round.name; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN round.name IS 'Name of the Round';
+
+
+--
+-- Name: COLUMN round.ou_round; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN round.ou_round IS 'set if over underscores are requested for this round';
 
 
 --
@@ -726,10 +793,10 @@ CREATE TABLE "user" (
 ALTER TABLE public."user" OWNER TO alan;
 
 --
--- Name: wildcard pick; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
+-- Name: wildcard_pick; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
 --
 
-CREATE TABLE "wildcard pick" (
+CREATE TABLE wildcard_pick (
     cid integer NOT NULL,
     confid character(3) NOT NULL,
     uid integer NOT NULL,
@@ -738,48 +805,13 @@ CREATE TABLE "wildcard pick" (
 );
 
 
-ALTER TABLE public."wildcard pick" OWNER TO alan;
+ALTER TABLE public.wildcard_pick OWNER TO alan;
 
 --
--- Name: TABLE "wildcard pick"; Type: COMMENT; Schema: public; Owner: alan
+-- Name: TABLE wildcard_pick; Type: COMMENT; Schema: public; Owner: alan
 --
 
-COMMENT ON TABLE "wildcard pick" IS 'user pick of teams making playoffs from the wildcard';
-
-
---
--- Name: COLUMN "wildcard pick".cid; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN "wildcard pick".cid IS 'Competition ID';
-
-
---
--- Name: COLUMN "wildcard pick".confid; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN "wildcard pick".confid IS 'Conference ID';
-
-
---
--- Name: COLUMN "wildcard pick".uid; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN "wildcard pick".uid IS 'User ID';
-
-
---
--- Name: COLUMN "wildcard pick".wild1; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN "wildcard pick".wild1 IS 'First Wildcard Pick';
-
-
---
--- Name: COLUMN "wildcard pick".wild2; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN "wildcard pick".wild2 IS 'Second Wildcard Pick';
+COMMENT ON TABLE wildcard_pick IS 'Users Pick of WildCard Entries for each conference';
 
 
 --
@@ -838,116 +870,10 @@ SELECT pg_catalog.setval('div_winner_pick_cid_seq', 1, false);
 
 
 --
--- Name: question_option_option_seq; Type: SEQUENCE; Schema: public; Owner: alan
---
-
-CREATE SEQUENCE question_option_option_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.question_option_option_seq OWNER TO alan;
-
---
--- Name: question_option_option_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: alan
---
-
-ALTER SEQUENCE question_option_option_seq OWNED BY question_option.option;
-
-
---
--- Name: question_option_option_seq; Type: SEQUENCE SET; Schema: public; Owner: alan
---
-
-SELECT pg_catalog.setval('question_option_option_seq', 1, false);
-
-
---
--- Name: wildcard pick_wild1_seq; Type: SEQUENCE; Schema: public; Owner: alan
---
-
-CREATE SEQUENCE "wildcard pick_wild1_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
-ALTER TABLE public."wildcard pick_wild1_seq" OWNER TO alan;
-
---
--- Name: wildcard pick_wild1_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: alan
---
-
-ALTER SEQUENCE "wildcard pick_wild1_seq" OWNED BY "wildcard pick".wild1;
-
-
---
--- Name: wildcard pick_wild1_seq; Type: SEQUENCE SET; Schema: public; Owner: alan
---
-
-SELECT pg_catalog.setval('"wildcard pick_wild1_seq"', 1, false);
-
-
---
--- Name: wildcard pick_wild2_seq; Type: SEQUENCE; Schema: public; Owner: alan
---
-
-CREATE SEQUENCE "wildcard pick_wild2_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
-ALTER TABLE public."wildcard pick_wild2_seq" OWNER TO alan;
-
---
--- Name: wildcard pick_wild2_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: alan
---
-
-ALTER SEQUENCE "wildcard pick_wild2_seq" OWNED BY "wildcard pick".wild2;
-
-
---
--- Name: wildcard pick_wild2_seq; Type: SEQUENCE SET; Schema: public; Owner: alan
---
-
-SELECT pg_catalog.setval('"wildcard pick_wild2_seq"', 1, false);
-
-
---
 -- Name: cid; Type: DEFAULT; Schema: public; Owner: alan
 --
 
 ALTER TABLE competition ALTER COLUMN cid SET DEFAULT nextval('competition_cid_seq'::regclass);
-
-
---
--- Name: cid; Type: DEFAULT; Schema: public; Owner: alan
---
-
-ALTER TABLE div_winner_pick ALTER COLUMN cid SET DEFAULT nextval('div_winner_pick_cid_seq'::regclass);
-
-
---
--- Name: option; Type: DEFAULT; Schema: public; Owner: alan
---
-
-ALTER TABLE question_option ALTER COLUMN option SET DEFAULT nextval('question_option_option_seq'::regclass);
-
-
---
--- Data for Name: answer; Type: TABLE DATA; Schema: public; Owner: alan
---
-
-COPY answer (uid, comment, submit_date, cid, rid, oid) FROM stdin;
-\.
 
 
 --
@@ -1021,18 +947,26 @@ COPY match (rid, hid, aid, match_time, comment, ascore, hscore, cid, combined_sc
 
 
 --
--- Data for Name: pick; Type: TABLE DATA; Schema: public; Owner: alan
+-- Data for Name: option; Type: TABLE DATA; Schema: public; Owner: alan
 --
 
-COPY pick (uid, comment, submit_date, cid, rid, hid, pid, over) FROM stdin;
+COPY option (cid, rid, oid, label) FROM stdin;
 \.
 
 
 --
--- Data for Name: question_option; Type: TABLE DATA; Schema: public; Owner: alan
+-- Data for Name: option_pick; Type: TABLE DATA; Schema: public; Owner: alan
 --
 
-COPY question_option (cid, rid, oid, option) FROM stdin;
+COPY option_pick (uid, comment, submit_date, cid, rid, oid, value) FROM stdin;
+\.
+
+
+--
+-- Data for Name: pick; Type: TABLE DATA; Schema: public; Owner: alan
+--
+
+COPY pick (uid, comment, submit_date, cid, rid, hid, pid, over) FROM stdin;
 \.
 
 
@@ -1048,7 +982,7 @@ COPY registration (uid, cid, agree_date) FROM stdin;
 -- Data for Name: round; Type: TABLE DATA; Schema: public; Owner: alan
 --
 
-COPY round (rid, comment, deadline, cid, question, valid_question) FROM stdin;
+COPY round (rid, deadline, cid, question, valid_question, answer, value, name, ou_round) FROM stdin;
 \.
 
 
@@ -1109,10 +1043,10 @@ COPY "user" (uid, name, email) FROM stdin;
 
 
 --
--- Data for Name: wildcard pick; Type: TABLE DATA; Schema: public; Owner: alan
+-- Data for Name: wildcard_pick; Type: TABLE DATA; Schema: public; Owner: alan
 --
 
-COPY "wildcard pick" (cid, confid, uid, wild1, wild2) FROM stdin;
+COPY wildcard_pick (cid, confid, uid, wild1, wild2) FROM stdin;
 \.
 
 
@@ -1120,8 +1054,8 @@ COPY "wildcard pick" (cid, confid, uid, wild1, wild2) FROM stdin;
 -- Name: answer_pkey; Type: CONSTRAINT; Schema: public; Owner: alan; Tablespace: 
 --
 
-ALTER TABLE ONLY answer
-    ADD CONSTRAINT answer_pkey PRIMARY KEY (cid, rid, oid, uid);
+ALTER TABLE ONLY option_pick
+    ADD CONSTRAINT answer_pkey PRIMARY KEY (uid, cid, rid);
 
 
 --
@@ -1192,7 +1126,7 @@ ALTER TABLE ONLY pick
 -- Name: question_option_pkey; Type: CONSTRAINT; Schema: public; Owner: alan; Tablespace: 
 --
 
-ALTER TABLE ONLY question_option
+ALTER TABLE ONLY option
     ADD CONSTRAINT question_option_pkey PRIMARY KEY (cid, rid, oid);
 
 
@@ -1237,26 +1171,34 @@ ALTER TABLE ONLY "user"
 
 
 --
--- Name: wildcard pick_pkey; Type: CONSTRAINT; Schema: public; Owner: alan; Tablespace: 
+-- Name: wildcard_pick_pkey; Type: CONSTRAINT; Schema: public; Owner: alan; Tablespace: 
 --
 
-ALTER TABLE ONLY "wildcard pick"
-    ADD CONSTRAINT "wildcard pick_pkey" PRIMARY KEY (cid, confid, uid);
+ALTER TABLE ONLY wildcard_pick
+    ADD CONSTRAINT wildcard_pick_pkey PRIMARY KEY (cid, confid, uid);
 
 
 --
 -- Name: answer_cid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
 --
 
-ALTER TABLE ONLY answer
+ALTER TABLE ONLY option_pick
     ADD CONSTRAINT answer_cid_fkey FOREIGN KEY (cid, rid) REFERENCES round(cid, rid) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: answer_cid_fkey1; Type: FK CONSTRAINT; Schema: public; Owner: alan
+--
+
+ALTER TABLE ONLY option_pick
+    ADD CONSTRAINT answer_cid_fkey1 FOREIGN KEY (cid, rid, oid) REFERENCES option(cid, rid, oid) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
 -- Name: answer_uid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
 --
 
-ALTER TABLE ONLY answer
+ALTER TABLE ONLY option_pick
     ADD CONSTRAINT answer_uid_fkey FOREIGN KEY (uid) REFERENCES "user"(uid) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
@@ -1442,38 +1384,6 @@ ALTER TABLE ONLY team_in_competition
 
 ALTER TABLE ONLY team_in_competition
     ADD CONSTRAINT team_in_competition_tid_fkey FOREIGN KEY (tid) REFERENCES team(tid) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: wildcard pick_cid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
---
-
-ALTER TABLE ONLY "wildcard pick"
-    ADD CONSTRAINT "wildcard pick_cid_fkey" FOREIGN KEY (cid, wild1) REFERENCES team_in_competition(cid, tid) ON UPDATE RESTRICT ON DELETE CASCADE;
-
-
---
--- Name: wildcard pick_cid_fkey1; Type: FK CONSTRAINT; Schema: public; Owner: alan
---
-
-ALTER TABLE ONLY "wildcard pick"
-    ADD CONSTRAINT "wildcard pick_cid_fkey1" FOREIGN KEY (cid, wild2) REFERENCES team_in_competition(cid, tid) ON UPDATE RESTRICT ON DELETE CASCADE;
-
-
---
--- Name: wildcard pick_confid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
---
-
-ALTER TABLE ONLY "wildcard pick"
-    ADD CONSTRAINT "wildcard pick_confid_fkey" FOREIGN KEY (confid) REFERENCES conference(confid) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: wildcard pick_uid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
---
-
-ALTER TABLE ONLY "wildcard pick"
-    ADD CONSTRAINT "wildcard pick_uid_fkey" FOREIGN KEY (uid) REFERENCES "user"(uid) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
