@@ -1,0 +1,33 @@
+ This is just some random comments on the design and implementation as I come to them so that they are noted for the future.
+
+PAGE LAYOUT
+
+index.php
+
+Menu - enables other competitions and rounds to be viewed ($cid and $rid hold competition and round id)
+
+If user is registered then
+	Match pick Selection
+	if playoffs selection in play
+		Playoff selection (divisional winner and 2 wildcards for each conference)
+	
+
+Show all users picks for this round, together with comments and bonus question answers - plus total scores for round
+
+Show all users and then summary of points for each round so far, together with final total.
+
+register.php  - allows user to register himself for a competition
+
+admin.php - admin (to be expanded)
+
+
+
+DATES AND TIMES
+
+Dates and times (of matches mainly) need to be displayed in the local time of the user.  This is only known at the javascript level and not php.  In order to manage this - all times will be held in seconds since 1970 (unix time) and converted to local time via javaascript.  All time to be output as
+
+<span class="time">12345678</span>
+
+where 12345678 is the actual value of the date required in unix time.
+
+The init function of javascript will look for all span elements like this and convert to a local time display.
