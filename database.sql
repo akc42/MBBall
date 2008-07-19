@@ -31,8 +31,8 @@ CREATE TABLE competition (
     administrator integer,
     open boolean DEFAULT false NOT NULL,
     cid integer NOT NULL,
-    pp_deadline timestamp with time zone,
-    gap interval DEFAULT '01:00:00'::interval NOT NULL
+    pp_deadline bigint DEFAULT 0 NOT NULL,
+    gap bigint DEFAULT 3600 NOT NULL
 );
 
 
@@ -77,14 +77,14 @@ COMMENT ON COLUMN competition.cid IS 'Competition ID';
 -- Name: COLUMN competition.pp_deadline; Type: COMMENT; Schema: public; Owner: alan
 --
 
-COMMENT ON COLUMN competition.pp_deadline IS 'Playoff Prediction Deadline';
+COMMENT ON COLUMN competition.pp_deadline IS 'Playoff Selection Deadline 0 if no selection';
 
 
 --
 -- Name: COLUMN competition.gap; Type: COMMENT; Schema: public; Owner: alan
 --
 
-COMMENT ON COLUMN competition.gap IS 'Gap of how long before match time picks have to be in';
+COMMENT ON COLUMN competition.gap IS 'Seconds to go before match to make pick deadline';
 
 
 --
@@ -231,7 +231,8 @@ CREATE TABLE div_winner_pick (
     confid character(3) NOT NULL,
     divid character(1) NOT NULL,
     team character(3),
-    uid integer NOT NULL
+    uid integer NOT NULL,
+    submit_time integer NOT NULL
 );
 
 
@@ -280,6 +281,13 @@ COMMENT ON COLUMN div_winner_pick.uid IS 'User ID';
 
 
 --
+-- Name: COLUMN div_winner_pick.submit_time; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN div_winner_pick.submit_time IS 'Time of submission';
+
+
+--
 -- Name: division; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
 --
 
@@ -306,14 +314,13 @@ CREATE TABLE match (
     rid integer NOT NULL,
     hid character(3) NOT NULL,
     aid character(3) NOT NULL,
-    match_time timestamp with time zone,
     comment text,
     ascore integer,
     hscore integer,
     cid integer NOT NULL,
     combined_score integer,
-    value smallint DEFAULT 1 NOT NULL,
-    open boolean DEFAULT false NOT NULL
+    open boolean DEFAULT false NOT NULL,
+    match_time bigint
 );
 
 
@@ -338,13 +345,6 @@ COMMENT ON COLUMN match.hid IS 'home team id';
 --
 
 COMMENT ON COLUMN match.aid IS 'Away Team ID';
-
-
---
--- Name: COLUMN match.match_time; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN match.match_time IS 'Time when match will be played';
 
 
 --
@@ -379,14 +379,7 @@ COMMENT ON COLUMN match.cid IS 'Competition ID';
 -- Name: COLUMN match.combined_score; Type: COMMENT; Schema: public; Owner: alan
 --
 
-COMMENT ON COLUMN match.combined_score IS 'Value of Combined Score for an over/under question';
-
-
---
--- Name: COLUMN match.value; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN match.value IS 'Points awarded for a correct pick';
+COMMENT ON COLUMN match.combined_score IS 'Value of Combined Score for an over/under question (add 0.5 to this for the question)';
 
 
 --
@@ -394,6 +387,13 @@ COMMENT ON COLUMN match.value IS 'Points awarded for a correct pick';
 --
 
 COMMENT ON COLUMN match.open IS 'True if Match is set up and ready';
+
+
+--
+-- Name: COLUMN match.match_time; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN match.match_time IS 'Time match is due to be played';
 
 
 --
@@ -452,11 +452,11 @@ COMMENT ON COLUMN option.label IS 'Simple Label for this option';
 CREATE TABLE option_pick (
     uid integer NOT NULL,
     comment text,
-    submit_date timestamp with time zone,
     cid integer NOT NULL,
     rid integer NOT NULL,
     oid smallint,
-    value integer
+    value integer,
+    submit_time bigint
 );
 
 
@@ -474,13 +474,6 @@ COMMENT ON COLUMN option_pick.uid IS 'User ID';
 --
 
 COMMENT ON COLUMN option_pick.comment IS 'General Comment from user about the round';
-
-
---
--- Name: COLUMN option_pick.submit_date; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN option_pick.submit_date IS 'Date Time Submitted answer';
 
 
 --
@@ -512,18 +505,25 @@ COMMENT ON COLUMN option_pick.value IS 'Value of answer if not multichoice';
 
 
 --
+-- Name: COLUMN option_pick.submit_time; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN option_pick.submit_time IS 'Time of Submission';
+
+
+--
 -- Name: pick; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
 --
 
 CREATE TABLE pick (
     uid integer NOT NULL,
     comment text,
-    submit_date timestamp with time zone,
     cid integer NOT NULL,
     rid integer NOT NULL,
     hid character(3) NOT NULL,
     pid character(3),
-    over boolean
+    over boolean,
+    submit_time bigint
 );
 
 
@@ -541,13 +541,6 @@ COMMENT ON COLUMN pick.uid IS 'User ID';
 --
 
 COMMENT ON COLUMN pick.comment IS 'Comment on the pick and why it was chosen';
-
-
---
--- Name: COLUMN pick.submit_date; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN pick.submit_date IS 'Date Time Submitted Pick';
 
 
 --
@@ -586,13 +579,20 @@ COMMENT ON COLUMN pick.over IS 'true if over score is selected';
 
 
 --
+-- Name: COLUMN pick.submit_time; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN pick.submit_time IS 'Time of submission';
+
+
+--
 -- Name: registration; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
 --
 
 CREATE TABLE registration (
     uid integer NOT NULL,
     cid integer NOT NULL,
-    agree_date timestamp with time zone
+    agree_time bigint
 );
 
 
@@ -620,10 +620,10 @@ COMMENT ON COLUMN registration.cid IS 'Competition ID';
 
 
 --
--- Name: COLUMN registration.agree_date; Type: COMMENT; Schema: public; Owner: alan
+-- Name: COLUMN registration.agree_time; Type: COMMENT; Schema: public; Owner: alan
 --
 
-COMMENT ON COLUMN registration.agree_date IS 'Date Time Agreed with Conditions of Registration';
+COMMENT ON COLUMN registration.agree_time IS 'Time Agreed to Competition Conditions';
 
 
 --
@@ -632,14 +632,14 @@ COMMENT ON COLUMN registration.agree_date IS 'Date Time Agreed with Conditions o
 
 CREATE TABLE round (
     rid integer NOT NULL,
-    deadline timestamp with time zone,
     cid integer NOT NULL,
     question text,
     valid_question boolean DEFAULT false,
     answer integer,
     value smallint DEFAULT 1 NOT NULL,
     name character varying(14),
-    ou_round boolean DEFAULT false NOT NULL
+    ou_round boolean DEFAULT false NOT NULL,
+    deadline bigint
 );
 
 
@@ -657,13 +657,6 @@ COMMENT ON TABLE round IS 'Round in Competition';
 --
 
 COMMENT ON COLUMN round.rid IS 'Round Number';
-
-
---
--- Name: COLUMN round.deadline; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN round.deadline IS 'Deadline for answering Bonus Question';
 
 
 --
@@ -713,6 +706,13 @@ COMMENT ON COLUMN round.name IS 'Name of the Round';
 --
 
 COMMENT ON COLUMN round.ou_round IS 'set if over underscores are requested for this round';
+
+
+--
+-- Name: COLUMN round.deadline; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN round.deadline IS 'Deadline for submitting answers to bonus questions';
 
 
 --
@@ -801,7 +801,8 @@ CREATE TABLE wildcard_pick (
     confid character(3) NOT NULL,
     uid integer NOT NULL,
     wild1 character(3) NOT NULL,
-    wild2 character(3) NOT NULL
+    wild2 character(3) NOT NULL,
+    submit_time bigint
 );
 
 
@@ -812,6 +813,13 @@ ALTER TABLE public.wildcard_pick OWNER TO alan;
 --
 
 COMMENT ON TABLE wildcard_pick IS 'Users Pick of WildCard Entries for each conference';
+
+
+--
+-- Name: COLUMN wildcard_pick.submit_time; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN wildcard_pick.submit_time IS 'Time of Submission';
 
 
 --
@@ -870,10 +878,45 @@ SELECT pg_catalog.setval('div_winner_pick_cid_seq', 1, false);
 
 
 --
+-- Name: div_winner_pick_submit_time_seq; Type: SEQUENCE; Schema: public; Owner: alan
+--
+
+CREATE SEQUENCE div_winner_pick_submit_time_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.div_winner_pick_submit_time_seq OWNER TO alan;
+
+--
+-- Name: div_winner_pick_submit_time_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: alan
+--
+
+ALTER SEQUENCE div_winner_pick_submit_time_seq OWNED BY div_winner_pick.submit_time;
+
+
+--
+-- Name: div_winner_pick_submit_time_seq; Type: SEQUENCE SET; Schema: public; Owner: alan
+--
+
+SELECT pg_catalog.setval('div_winner_pick_submit_time_seq', 1, false);
+
+
+--
 -- Name: cid; Type: DEFAULT; Schema: public; Owner: alan
 --
 
 ALTER TABLE competition ALTER COLUMN cid SET DEFAULT nextval('competition_cid_seq'::regclass);
+
+
+--
+-- Name: submit_time; Type: DEFAULT; Schema: public; Owner: alan
+--
+
+ALTER TABLE div_winner_pick ALTER COLUMN submit_time SET DEFAULT nextval('div_winner_pick_submit_time_seq'::regclass);
 
 
 --
@@ -922,7 +965,7 @@ COPY div_winner (cid, confid, did, tid) FROM stdin;
 -- Data for Name: div_winner_pick; Type: TABLE DATA; Schema: public; Owner: alan
 --
 
-COPY div_winner_pick (cid, confid, divid, team, uid) FROM stdin;
+COPY div_winner_pick (cid, confid, divid, team, uid, submit_time) FROM stdin;
 \.
 
 
@@ -942,7 +985,7 @@ W	West
 -- Data for Name: match; Type: TABLE DATA; Schema: public; Owner: alan
 --
 
-COPY match (rid, hid, aid, match_time, comment, ascore, hscore, cid, combined_score, value, open) FROM stdin;
+COPY match (rid, hid, aid, comment, ascore, hscore, cid, combined_score, open, match_time) FROM stdin;
 \.
 
 
@@ -958,7 +1001,7 @@ COPY option (cid, rid, oid, label) FROM stdin;
 -- Data for Name: option_pick; Type: TABLE DATA; Schema: public; Owner: alan
 --
 
-COPY option_pick (uid, comment, submit_date, cid, rid, oid, value) FROM stdin;
+COPY option_pick (uid, comment, cid, rid, oid, value, submit_time) FROM stdin;
 \.
 
 
@@ -966,7 +1009,7 @@ COPY option_pick (uid, comment, submit_date, cid, rid, oid, value) FROM stdin;
 -- Data for Name: pick; Type: TABLE DATA; Schema: public; Owner: alan
 --
 
-COPY pick (uid, comment, submit_date, cid, rid, hid, pid, over) FROM stdin;
+COPY pick (uid, comment, cid, rid, hid, pid, over, submit_time) FROM stdin;
 \.
 
 
@@ -974,7 +1017,7 @@ COPY pick (uid, comment, submit_date, cid, rid, hid, pid, over) FROM stdin;
 -- Data for Name: registration; Type: TABLE DATA; Schema: public; Owner: alan
 --
 
-COPY registration (uid, cid, agree_date) FROM stdin;
+COPY registration (uid, cid, agree_time) FROM stdin;
 \.
 
 
@@ -982,7 +1025,7 @@ COPY registration (uid, cid, agree_date) FROM stdin;
 -- Data for Name: round; Type: TABLE DATA; Schema: public; Owner: alan
 --
 
-COPY round (rid, deadline, cid, question, valid_question, answer, value, name, ou_round) FROM stdin;
+COPY round (rid, cid, question, valid_question, answer, value, name, ou_round, deadline) FROM stdin;
 \.
 
 
@@ -1046,7 +1089,7 @@ COPY "user" (uid, name, email) FROM stdin;
 -- Data for Name: wildcard_pick; Type: TABLE DATA; Schema: public; Owner: alan
 --
 
-COPY wildcard_pick (cid, confid, uid, wild1, wild2) FROM stdin;
+COPY wildcard_pick (cid, confid, uid, wild1, wild2, submit_time) FROM stdin;
 \.
 
 

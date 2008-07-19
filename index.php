@@ -62,8 +62,8 @@ if ($uid == $row['administrator']) {
 	//User is administrator of this competition
 	$admin = true;
 }
-$gap = row['gap'];   //difference from match time that picks close
-$playoff_deadline=row['pp_deadline']; //is set will be the cutoff point for playoff predictions, if null there is no playoff quiz
+$gap = $row['gap'];   //difference from match time that picks close
+$playoff_deadline=$row['pp_deadline']; //is set will be the cutoff point for playoff predictions, if null there is no playoff quiz
 dbFree($result)
 
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -286,7 +286,7 @@ if((dbNumRows($result > 0 ) {
 ?>					<td>
 <?php 				if($row['madep'] == 't') {
 						//Bold id if made playoff
-						echo '<b>.$row['tid'].'</b>';
+						echo '<b>'.$row['tid'].'</b>';
 					} else {
 						echo $row['tid'];
 					}
@@ -326,7 +326,7 @@ We will need round data for both several things - so get it now
 $resultround = dbQuery('SELECT * FROM round WHERE rid = '.dbMakeSafe($rid).' ;');
 $haverounddata = false;
 if(dbNumRows($resultround !=0) {  //OK we have a round - so now we need
-	$rounddata = dbFetchRows($resultround);
+	$rounddata = dbFetchRow($resultround);
 	$haverounddata = true;
 }
 dbFreeResult($resultround);
@@ -383,7 +383,7 @@ $norows = dbNumRows($result);
 						 <?php if ($row['pid'] == $row['aid']) echo 'checked';?>/><?php echo $row['aid'];?></td>
 <?php
 				if ($rounddata['ou_round'] == 't') {
-?>				<td class="ou"><?php echo $row['cs'];?></td><td>
+?>				<td class="ou"><?php echo ($row['cs']+0.5);?></td><td>
 					<input class="pick" type="radio"
 						name="<?php echo $row['aid'];?>" value="U" 
 						<?php if ($row['over'] == 'f') echo 'checked';?>/>Under<br/>
@@ -412,7 +412,7 @@ $norows = dbNumRows($result);
 <?php
 $result=dbQuery('SELECT * FROM option WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).';');
 $noopts = dbNumRows($result);  //No of multichoice examples 0= numeric answer required
-$resultop = dbQuery('SELECT * FROM option_pick WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' AND uid = .dbMakeSafe($uid).';'
+$resultop = dbQuery('SELECT * FROM option_pick WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' AND uid = '.dbMakeSafe($uid).';');
 		if (dbNumRows($resultop) > 0 ) {
 			$opdata = dbFetchRow($resultop);
 		}
@@ -469,7 +469,7 @@ $resultop = dbQuery('SELECT * FROM option_pick WHERE cid = '.dbMakeSafe($cid).' 
 </div>
 <?php
 	} //end of check for rounddata
-	if(!is_null($playoff_deadline) and strtotime($play_off_deadline) > time()) {
+	if($playoff_deadline != 0 and $play_off_deadline > time()) {
 //Playoff selection is part of this competition
 ?><div id="playoff">
 <?php
@@ -586,6 +586,50 @@ if ($haverounddata) {
 	<table>
 		<caption>Details of this rounds pick</caption>
 		<thead>
+			<tr><th></th>
+<?php
+$result = dbQuery('SELECT * FROM match WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' AND  open IS TRUE;');
+	while($row = dbFetchRow($result)) {
+		if(!(isnull($row['hscore']) || isnull($row['ascore']) || $row['hscore'] < $row['ascore'])) {
+			//Home win
+			echo '<th><b>'.$row['hid'].'</b></th>';
+		} else {
+			echo '<th>'.$row['hid'].'</th>';
+		}
+		if(!(isnull($row['hscore']) || isnull($row['ascore']) || $row['hscore'] > $row['ascore'])) {
+			//Home win
+			echo '<th><b>'.$row['aid'].'</b></th>';
+		} else {
+			echo '<th>'.$row['aid'].'</th>';
+		}
+	}
+?>			</tr>
+<?php
+	if($rounddata['ou_round']) {
+		//This is an over or under guessing round, so we need to also show the over/under results
+?>			<tr><th></th>
+<?php
+		pg_result_seek($result,0);  //put the results back to the start so we can interate over them again
+		while($row = dbFetchRow($result)) {
+			$cs = $row['combined_score']+0.5;
+			if(!(isnull($row['hscore']) || isnull($row['ascore']))) {
+				$scores=$row['hscore']+$row['ascore'];
+?>				<th><?php echo $scores.'('.$cs.')';?></th>
+				<th><?php echo ($scores>$cs)?'Over':'Under';?></th>
+<?php
+			} else {
+?>				<th><?php echo '('.$cs.')';?></th><th></th>
+<?php
+			}
+		}
+?>			</tr>
+<?php
+	}		
+	
+
+
+
+
 ------------------------------->Need to list matches in one or two rows dependent whether ou_round, bonusq. round comment and overall score for the round.			
 	</table>
 </div>
