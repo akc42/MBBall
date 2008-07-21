@@ -403,7 +403,7 @@ COMMENT ON COLUMN match.match_time IS 'Time match is due to be played';
 CREATE TABLE option (
     cid integer NOT NULL,
     rid integer NOT NULL,
-    oid smallint NOT NULL,
+    oid integer NOT NULL,
     label character varying(14)
 );
 
@@ -454,8 +454,7 @@ CREATE TABLE option_pick (
     comment text,
     cid integer NOT NULL,
     rid integer NOT NULL,
-    oid smallint,
-    value integer,
+    oid integer,
     submit_time bigint
 );
 
@@ -494,14 +493,7 @@ COMMENT ON COLUMN option_pick.rid IS 'Round ID';
 -- Name: COLUMN option_pick.oid; Type: COMMENT; Schema: public; Owner: alan
 --
 
-COMMENT ON COLUMN option_pick.oid IS 'ID of Question Option Selected as Correct (only if multichoice)';
-
-
---
--- Name: COLUMN option_pick.value; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN option_pick.value IS 'Value of answer if not multichoice';
+COMMENT ON COLUMN option_pick.oid IS 'ID of Question Option Selected as Correct if multichoice, else value of answer (only if multichoice)';
 
 
 --
@@ -684,7 +676,7 @@ COMMENT ON COLUMN round.valid_question IS 'Set once a valid bonus question has b
 -- Name: COLUMN round.answer; Type: COMMENT; Schema: public; Owner: alan
 --
 
-COMMENT ON COLUMN round.answer IS 'If not null an answer to a numeric question is in this field (multichoice determined by existance of option entry';
+COMMENT ON COLUMN round.answer IS 'If not null an answer to a numeric question or oid of mutichoice question';
 
 
 --
@@ -778,6 +770,18 @@ COMMENT ON COLUMN team_in_competition.cid IS 'Competition ID';
 
 COMMENT ON COLUMN team_in_competition.made_playoff IS 'True if team made playoffs';
 
+
+--
+-- Name: test; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
+--
+
+CREATE TABLE test (
+    a boolean,
+    b boolean
+);
+
+
+ALTER TABLE public.test OWNER TO alan;
 
 --
 -- Name: user; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
@@ -1001,7 +1005,7 @@ COPY option (cid, rid, oid, label) FROM stdin;
 -- Data for Name: option_pick; Type: TABLE DATA; Schema: public; Owner: alan
 --
 
-COPY option_pick (uid, comment, cid, rid, oid, value, submit_time) FROM stdin;
+COPY option_pick (uid, comment, cid, rid, oid, submit_time) FROM stdin;
 \.
 
 
@@ -1074,6 +1078,16 @@ KC 	Kansas City Chiefs			AFC	W
 --
 
 COPY team_in_competition (tid, cid, made_playoff) FROM stdin;
+\.
+
+
+--
+-- Data for Name: test; Type: TABLE DATA; Schema: public; Owner: alan
+--
+
+COPY test (a, b) FROM stdin;
+t	t
+f	t
 \.
 
 
@@ -1227,14 +1241,6 @@ ALTER TABLE ONLY wildcard_pick
 
 ALTER TABLE ONLY option_pick
     ADD CONSTRAINT answer_cid_fkey FOREIGN KEY (cid, rid) REFERENCES round(cid, rid) ON UPDATE RESTRICT ON DELETE CASCADE;
-
-
---
--- Name: answer_cid_fkey1; Type: FK CONSTRAINT; Schema: public; Owner: alan
---
-
-ALTER TABLE ONLY option_pick
-    ADD CONSTRAINT answer_cid_fkey1 FOREIGN KEY (cid, rid, oid) REFERENCES option(cid, rid, oid) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
