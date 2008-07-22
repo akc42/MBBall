@@ -772,18 +772,6 @@ COMMENT ON COLUMN team_in_competition.made_playoff IS 'True if team made playoff
 
 
 --
--- Name: test; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
---
-
-CREATE TABLE test (
-    a boolean,
-    b boolean
-);
-
-
-ALTER TABLE public.test OWNER TO alan;
-
---
 -- Name: user; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
 --
 
@@ -1078,16 +1066,6 @@ KC 	Kansas City Chiefs			AFC	W
 --
 
 COPY team_in_competition (tid, cid, made_playoff) FROM stdin;
-\.
-
-
---
--- Data for Name: test; Type: TABLE DATA; Schema: public; Owner: alan
---
-
-COPY test (a, b) FROM stdin;
-t	t
-f	t
 \.
 
 
