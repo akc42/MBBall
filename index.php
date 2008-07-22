@@ -225,8 +225,8 @@ if ($menu) {
 <?php
 }
 // It would be good to have a set of team names. 
-$sql = 'SELECT t.confid AS confid, t.divid AS divid, t.tid AS tid, d.name AS dn, c.name AS cn,';
-$sql .= team.name AS name, team.logo AS logo, team.url AS url 
+$sql = 'SELECT t.confid AS confid, t.divid AS divid, t.tid AS tid, t.made_playoff AS mp, d.name AS dn, c.name AS cn,';
+$sql .= 'team.name AS name, team.logo AS logo, team.url AS url'; 
 $sql .= ' FROM team_in_competition t JOIN conference c USING (confid) JOIN division d USING (divid) JOIN team USING (tid)';
 $sql .= ' WHERE t.cid = '.dbMakeSafe($cid).' ORDER BY confid,divid,tid;';
 $result = dbQuery($sql);
@@ -244,6 +244,7 @@ if((dbNumRows($result > 0 ) {
 			$pick['name']=$row['name'];
 			$pick['logo']=$row['logo'];
 			$pick['url']=$row['url'];
+			$pick['mp'] = $row['mp'];
 			$teams[$row['confid'],$row['divid']][] = $pick;
 			if (isset($sizes[$row['confid'],$row['divid']])) {
 				$sizes[$row['confid'],$row['divid']]++;
@@ -736,6 +737,7 @@ $resultmatch = dbQuery($sql);
 			</tr>
 <?php
 	}
+	dbFreeResult($result);
 ?>		</tbody>	
 	</table>
 </div>
@@ -771,11 +773,27 @@ if ($playoff_deadline != 0) {
 			}
 		}
 	}
-$sql = 'SELECT u.name AS name, r.uid AS uid, w.wild1 AS w1 w.wild2 AS w2, sum(?) +  AS score FROM registration r JOIN user USING (uid) LEFT JOIN wildcard_pick w USING (uid)';
-$sql .= ' LEFT JOIN div_winner_pick AS dw USING (uid) JOIN team_in_competition t USING (cid)';
-$sql .= ' GROUP BY u.name, r.uid, w.wild1, w.wild2'; 
+$sql = 'SELECT u.name AS name, r.uid AS uid, w.wild1 AS w1 w.wild2 AS w2,'
+$sql .= ' sum(CAST(t.made_playoff AS integer)) + CAST(tw1.made_playoff AS integer) + CAST(tw2.made_playoff AS integer)  AS score';
+$sql .= ' FROM registration r JOIN user USING (uid)'
+$sql .= ' LEFT JOIN (wildcard_pick w JOIN team_in_competition tw1 ON w.cid = tw1.cid AND w.wild1 = tw1.tid';
+$sql .= ' JOIN team_in_competition tw2 ON w.cid = tw2.cid AND w.wild2 = tw2.tid) USING (uid)';
+$sql .= ' LEFT JOIN (div_winner_pick AS dw JOIN team_in_competition t ON dw.cid = t.cid AND dw.team = t.tid) USING (uid)';
+$sql .= ' GROUP BY u.name, r.uid'; 
 $sql .= ' WHERE cid = '.dbMakeSafe($cid).' ORDER BY score DESC;'
-
+$result = dbQuery($sql);
+	while($row = dbFetchRow($result)) {
+		$playoff_selections = array();
+		$playoff_selections[] = $row['w1'];
+		$playoff_selections[] = $row['w2'];
+		$resultplay = dbQuery('SELECT team FROM div_winner_pick WHERE cid = '.dbMakeSafe($cid).' AND uid = '.dbMakeSafe($row['uid']).';');
+		while($playdata = dbFetchRow($resultplay)) {
+			$playoff_selections[] = $playdata['team'];
+		}
+?>			<tr>
+				<td><?php echo $row['name']; ?></td>
+<?php
+	}
 }
 ?><div id="copyright">MBball <span id="version"></span> &copy; 2008 Alan Chandler.  Licenced under the GPL</div>
 </div>
