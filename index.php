@@ -254,7 +254,7 @@ if((dbNumRows($result > 0 ) {
 			$divs['divid'] = $row['dn'];
 		}
 ?>		<table>
-			<caption>List of teams in competition<br>(if made playoff team id is in bold)</caption>
+			<caption>List of teams in competition</caption>
 			<thead>
 				<tr>
 					<th class="po_h1">\</th><th class="po_h2">Division</th>
@@ -283,13 +283,14 @@ if((dbNumRows($result > 0 ) {
 				}
 				foreach($divs as $divid => $division) {
 					$row=$teams[$config,$divid,$i];
-?>					<td>
-<?php 				if($row['madep'] == 't') {
-						//Bold id if made playoff
-						echo '<b>'.$row['tid'].'</b>';
+					if($row['madep'] == 't') {
+?>					<td class="in_po">
+<?php
 					} else {
-						echo $row['tid'];
+?>					<td>
+<?php						
 					}
+					echo $row['tid'];
 ?>					</td>
 					<td>
 					if (!isnull($row['url']) {
@@ -712,21 +713,71 @@ $resultmatch = dbQuery($sql);
 ?>				<td colspan="2" <?php if(!isnull($matchdata['pid']) && !isnull($matchdata['hscore']) && !isnull($matchdata['ascore']) && 
 						($matchdata['pid'] == $matchdata['hid'] && $matchdata['hscore']>$matchdata['ascore']) ||
 						($matchdata['pid'] == $matchdata['aid'] && $matchdata['hscore']<$matchdata['ascore']))
-							echo 'class="win"' ;?>><?php if(!isnull($resultmatch['pid'])) echo $resultmatch['pid'];?></td>
+							echo 'class="win"' ;?>><?php if(!isnull($matchdata['pid'])) echo $matchdata['pid'];?></td>
 <?php
 			}
 		}
 		if($rounddata['valid_question'] == 't') {
-			if(
-/////////////////////////////////////////////////////////
-		
-?>			</tr>
+			if($bqopts > 0) {
+				// this is a multichoice question, so get results and output them
+				pg_result_seek($resultbq,0);  //reset lost of options to start
+				while ($optdata = dbFetchRow($resultbq)) {
+?>				<td <?php if($optdata['oid'] == $matchdata['oid'] && $row['oid'] == $rounddata['answer']) 
+					echo 'class="win"';?>><?php if($optdata['oid'] == $row['oid']) echo 'X';?></td>
+<?php
+				}
+			} else {
+?>				<td <?php if($row['oid'] == $rounddata['answer']) echo 'class="win"';?>>
+					<?php if(!isnull($row['oid'])) echo $row['oid'];?></td>
+<?php
+			}
+		}
+?>				<td><?php echo $row['score']; ?></td>	
+			</tr>
 <?php
 	}
 ?>		</tbody>	
 	</table>
 </div>
-<div id="copyright">MBball <span id="version"></span> &copy; 2008 Alan Chandler.  Licenced under the GPL</div>
+<?php
+}
+if ($playoff_deadline != 0) {
+?>	<table>
+		<caption>Players Playoff Picks</caption>
+		<thead>
+			<tr><th rowspan="3"></th>
+<?php
+	foreach($confs as $confid => $conference) {
+?>				<th colspan="<?php echo array_sum($sizes[$confid]);?>"><?php echo $confid; ?></td>
+<?php
+	}
+?>			</tr>
+			<tr>
+<?php
+	foreach($confs as $confid => $conference) {
+		foreach($divs as $divid => $division{
+?>				<th colsspan="<?php echo $sizes[$confid,$divid];?>"><?php echo $divid; ?></td>
+<?php
+		}
+	}
+?>			</tr>
+			<tr>
+<?php
+	foreach($confs as $confid => $conference) {
+		foreach($divs as $divid => $division{
+			foreach($teams[$confid,$divid] as $team) {
+?>				<th><?php echo $team['tid'];?></th>
+<?php
+			}
+		}
+	}
+$sql = 'SELECT u.name AS name, r.uid AS uid, w.wild1 AS w1 w.wild2 AS w2, sum(?) +  AS score FROM registration r JOIN user USING (uid) LEFT JOIN wildcard_pick w USING (uid)';
+$sql .= ' LEFT JOIN div_winner_pick AS dw USING (uid) JOIN team_in_competition t USING (cid)';
+$sql .= ' GROUP BY u.name, r.uid, w.wild1, w.wild2'; 
+$sql .= ' WHERE cid = '.dbMakeSafe($cid).' ORDER BY score DESC;'
+
+}
+?><div id="copyright">MBball <span id="version"></span> &copy; 2008 Alan Chandler.  Licenced under the GPL</div>
 </div>
 </body>
 

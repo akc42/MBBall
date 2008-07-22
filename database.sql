@@ -804,8 +804,8 @@ CREATE TABLE wildcard_pick (
     cid integer NOT NULL,
     confid character(3) NOT NULL,
     uid integer NOT NULL,
-    wild1 character(3) NOT NULL,
-    wild2 character(3) NOT NULL,
+    wild1 character(3),
+    wild2 character(3),
     submit_time bigint
 );
 
@@ -1433,6 +1433,22 @@ ALTER TABLE ONLY team_in_competition
 
 ALTER TABLE ONLY team_in_competition
     ADD CONSTRAINT team_in_competition_tid_fkey FOREIGN KEY (tid) REFERENCES team(tid) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: wildcard_pick_cid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
+--
+
+ALTER TABLE ONLY wildcard_pick
+    ADD CONSTRAINT wildcard_pick_cid_fkey FOREIGN KEY (cid, wild2) REFERENCES team_in_competition(cid, tid) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+--
+-- Name: wildcard_pick_cid_fkey2; Type: FK CONSTRAINT; Schema: public; Owner: alan
+--
+
+ALTER TABLE ONLY wildcard_pick
+    ADD CONSTRAINT wildcard_pick_cid_fkey2 FOREIGN KEY (cid, wild1) REFERENCES team_in_competition(cid, tid) ON UPDATE CASCADE ON DELETE SET NULL;
 
 
 --
