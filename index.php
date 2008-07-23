@@ -773,14 +773,13 @@ if ($playoff_deadline != 0) {
 			}
 		}
 	}
-$sql = 'SELECT u.name AS name, r.uid AS uid, w.wild1 AS w1 w.wild2 AS w2,'
-$sql .= ' sum(CAST(t.made_playoff AS integer)) + CAST(tw1.made_playoff AS integer) + CAST(tw2.made_playoff AS integer)  AS score';
+$sql = 'SELECT u.name AS name, r.uid AS uid, sum(CAST(t.made_playoff AS integer)) AS score'
 $sql .= ' FROM registration r JOIN user USING (uid)'
-$sql .= ' LEFT JOIN (wildcard_pick w JOIN team_in_competition tw1 ON w.cid = tw1.cid AND w.wild1 = tw1.tid';
-$sql .= ' JOIN team_in_competition tw2 ON w.cid = tw2.cid AND w.wild2 = tw2.tid) USING (uid)';
-$sql .= ' LEFT JOIN (div_winner_pick AS dw JOIN team_in_competition t ON dw.cid = t.cid AND dw.team = t.tid) USING (uid)';
+$sql .= ' JOIN (( SELECT cid, tid, uid  FROM wildcard_pick UNION SELECT cid,tid,uid FROM div_winner_pick) AS pick';
+$sql .= ' JOIN team_in_competition t USING (cid,tid)) USING (cid,uid)';
+$sql .= ' WHERE cid = '.dbMakeSafe($cid);
 $sql .= ' GROUP BY u.name, r.uid'; 
-$sql .= ' WHERE cid = '.dbMakeSafe($cid).' ORDER BY score DESC;'
+$sql .= ' ORDER BY score DESC;'
 $result = dbQuery($sql);
 	while($row = dbFetchRow($result)) {
 		$playoff_selections = array();
