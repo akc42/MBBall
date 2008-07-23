@@ -63,7 +63,8 @@ if ($uid == $row['administrator']) {
 	$admin = true;
 }
 $gap = $row['gap'];   //difference from match time that picks close
-$playoff_deadline=$row['pp_deadline']; //is set will be the cutoff point for playoff predictions, if null there is no playoff quiz
+$playoff_deadline=$row['pp_deadline']; //is set will be the cutoff point for playoff predictions, if 0 there is no playoff quiz
+$registration_open = ($row['open'] == 't'); //is the competition open for registration
 dbFree($result)
 
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -127,7 +128,7 @@ if(dbNumRows($result) == 0) {
 	$registered = false;
 
 	// Does competition allow registration at this time
-	if($row['open'] == 't') {
+	if($registration_open) {
 		//yes so provide a link to register this user
 ?><ul id="menu">
 	<li><a id="register" href="register.php?<?php echo 'uid='.$uid.'&pass='.$password.'&cid='.$cid; ?>">Register	</a></li>
@@ -138,8 +139,8 @@ if(dbNumRows($result) == 0) {
 	$registered = true;
 }
 dbFree($result);
-dbQuery('SELECT DISTINCT r.rid AS rid, r.name AS name FROM match m JOIN round r USING (cid,rid) LEFT JOIN pick p USING (cid,rid) WHERE r.cid = '
-		.dbMakeSafe($cid).' AND m.open IS TRUE'.(($registered)? '' : ' AND p.uid IS NOT NULL').' ORDER BY rid DESC ;');
+dbQuery('SELECT r.rid AS rid, r.name AS name FROM round r JOIN match m USING (cid,rid) WHERE r.cid = '.dbMakeSafe($cid)
+	.' AND m.open IS TRUE GROUP BY r.rid, r.name ORDER BY rid DESC ;');  //find rounds where at least one match is open
 if (dbNumRows($result) > 0) {
 	$row=dbFetchRow($result);
 	$round_name = $row['name'];
@@ -175,10 +176,11 @@ if (dbNumRows($result) > 0) {
 }
 dbFreeResult($result);
 
-// The following select should select the cid and name of all competitions that are in a state where 
-$sql = 'SELECT DISTINCT c.cid AS cid, c.name AS name FROM competition c LEFT JOIN registration r ON c.cid = r.cid AND r.uid  = '.dbMakeSafe($uid);
-$sql .= ' LEFT JOIN match m USING (cid) LEFT JOIN pick p USING (cid) WHERE cid <> '.dbMakeSafe($cid);
-$sql .= ' AND ((r.uid IS NULL AND (c.open IS TRUE OR p.rid IS NOT NULL)) OR (r.uid IS NOT NULL AND m.open IS TRUE)) ; ';
+// The following select should select the cid and name of all competitions that are in a state
+// where there is at least one open match or it is taking registrations and we are not yet registered
+$sql = 'SELECT c.cid AS cid, c.name AS name FROM competition c LEFT JOIN registration r ON c.cid = r.cid AND r.uid  = '.dbMakeSafe($uid);
+$sql .= ' LEFT JOIN match m USING (cid) WHERE cid <> '.dbMakeSafe($cid);
+$sql .= ' AND ((r.uid IS NULL AND c.open IS TRUE ) OR m.open IS TRUE) GROUP BY c.cid, c.name ORDER BY c.cid DESC ; ';
 $result = dbQuery($sql);
 
 if (dbNumRows($result) > 0) {
