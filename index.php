@@ -207,7 +207,8 @@ if(in_array(SMF_FOOTBALL,$groups)) {
 <?php
 		$menu=true;
 	}
-?>	<li><a href="admin.php?<?php echo 'uid='.$uid.'&pass='.$password.'&cid='.dbMakeSafe($cid).;?>">Administration</a></li>
+?>	<li><a href="admin.php?<?php echo 'uid='.$uid.'&pass='.$password.'&global=true';?>">Global Admin</a></li>
+</li>
 <?php
 }
 if($admin) {
@@ -217,7 +218,7 @@ if($admin) {
 <?php
 		$menu=true;
 	}
-?>	<li><a href="admin.php?<?php echo 'uid='.$uid.'&pass='.$password.'&global=true';?>">Global Admin</a></li>
+?>	<li><a href="admin.php?<?php echo 'uid='.$uid.'&pass='.$password.'&cid='.dbMakeSafe($cid).;?>">Administration</a>?>
 <?php 
 }
 
@@ -226,19 +227,28 @@ if ($menu) {
 <div id="content">
 <?php
 }
+//Lets get the conference and div lists as this is data useful throughout this page
+$confs = array();
+$divs = array(); 
+$result = dbQuery('SELECT * FROM conference ORDER BY confid;');
+while($row = dbFetchRow($result)) {
+	$confs[$row['confid']] = $row['name'];
+}
+dbFreeResult($result);
+$result = dbQuery('SELECT * FROM division ORDER BY divid;');
+while($row = dbFetchRow($result)) {
+	$divs[$row['divid']] = $row['name'];
+}
+dbFreeResult($result)
+
 // It would be good to have a set of team names. 
-$sql = 'SELECT t.confid AS confid, t.divid AS divid, t.tid AS tid, t.made_playoff AS mp, d.name AS dn, c.name AS cn,';
-$sql .= 'team.name AS name, team.logo AS logo, team.url AS url'; 
-$sql .= ' FROM team_in_competition t JOIN conference c USING (confid) JOIN division d USING (divid) JOIN team USING (tid)';
+$sql = 'SELECT *  FROM team_in_competition t JOIN JOIN team USING (tid)'; 
 $sql .= ' WHERE t.cid = '.dbMakeSafe($cid).' ORDER BY confid,divid,tid;';
 $result = dbQuery($sql);
 if((dbNumRows($result > 0 ) {
 ?>	<div id="team_list">
 <?php
-		$result=dbQuery($sql);  //get all teams and whether this user as picked them
 		$teams = array();
-		$divs = array();
-		$confs = array();
 		$sizes = array();
 		while ($row=dbFetchRow($result)) {
 			$pick = array();
@@ -246,15 +256,13 @@ if((dbNumRows($result > 0 ) {
 			$pick['name']=$row['name'];
 			$pick['logo']=$row['logo'];
 			$pick['url']=$row['url'];
-			$pick['mp'] = $row['mp'];
+			$pick['mp'] = ($row['made_playoff'] == 't');
 			$teams[$row['confid'],$row['divid']][] = $pick;
 			if (isset($sizes[$row['confid'],$row['divid']])) {
 				$sizes[$row['confid'],$row['divid']]++;
 			} else {
 				$sizes[$row['confid'],$row['divid']] = 1;
 			}
-			$confs['confid'] = $row['cn'];
-			$divs['divid'] = $row['dn'];
 		}
 ?>		<table>
 			<caption>List of teams in competition</caption>
@@ -285,36 +293,38 @@ if((dbNumRows($result > 0 ) {
 <?php
 				}
 				foreach($divs as $divid => $division) {
-					$row=$teams[$config,$divid,$i];
-					if($row['madep'] == 't') {
+					if(isset($teams[$config,$divid,$i]) { //only if this entry is set
+						$row=$teams[$config,$divid,$i];
+						if($row['mp']) {
 ?>					<td class="in_po">
 <?php
-					} else {
+						} else {
 ?>					<td>
 <?php						
-					}
-					echo $row['tid'];
+						}
+						echo $row['tid'];
 ?>					</td>
 					<td>
-					if (!isnull($row['url']) {
+<?php
+						if (!isnull($row['url']) {
 						// if we have a url for team provide a link for it
-						echo '<a href="'.$row['url'].'">'.$row['name'].'</a>';
-					} else {
-						echo $row['name'];
-					}
+							echo '<a href="'.$row['url'].'">'.$row['name'].'</a>';
+						} else {
+							echo $row['name'];
+						}
 ?>					</td>
 					<td>
 <?php 
-					if(!isnull($row['logo'])) {
-						if (!isnull($row['url']) {			
-							echo '<a href="'.$row['url'].'"><img src="'.$row['logo'].' alt="team logo" /></a>';
-						} else {
-							echo '<img src="'.$row['logo'].' alt="team logo" />';
+						if(!isnull($row['logo'])) {
+							if (!isnull($row['url']) {			
+								echo '<a href="'.$row['url'].'"><img src="'.$row['logo'].' alt="team logo" /></a>';
+							} else {
+								echo '<img src="'.$row['logo'].' alt="team logo" />';
+							}
 						}
-					}
 ?>					</td>
-
 <?php
+					}
 				}
 ?>				</tr>
 <?php
@@ -327,9 +337,9 @@ if((dbNumRows($result > 0 ) {
 }
 dbFreeResult($result);
 We will need round data for both several things - so get it now
-$resultround = dbQuery('SELECT * FROM round WHERE rid = '.dbMakeSafe($rid).' ;');
+$resultround = dbQuery('SELECT * FROM round WHERE cid = .'dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' ;');
 $haverounddata = false;
-if(dbNumRows($resultround !=0) {  //OK we have a round - so now we need
+if(dbNumRows($resultround !=0) {  //OK we have a round - so now we need to get it
 	$rounddata = dbFetchRow($resultround);
 	$haverounddata = true;
 }
@@ -337,29 +347,29 @@ dbFreeResult($resultround);
 		
 
 if ($registered) {
-	$resultround = dbQuery('SELECT * FROM round WHERE rid = '.dbMakeSafe($rid).' ;');
 	if($haverounddata) {  //OK we have a round - so now we need to do the picks for this round
 // If user is registered and we can do picks then we need to display the  Picks Section
-?><div id="picks">
-<?php
 $sql = 'SELECT m.hid AS hid, m.aid AS aid, p.pid AS pid, m.combined_score AS cs, p.over AS over p.comment AS comment';
-$sql .= ' FROM match m ON (cid, rid) JOIN team t USING (cid,rid,hid) LEFT JOIN pick p ';
+$sql .= ' FROM match m JOIN team t ON m.hid = t.tid LEFT JOIN pick p ';
 $sql .= 'ON m.cid = p.cid AND m.rid = p.rid AND m.hid = p.hid AND p.uid = '.dbMakeSafe($uid);
 $sql .= ' WHERE m.cid = '.dbMakeSafe($cid).' AND m.rid = '.dbMakeSafe($rid).'WHERE m.open IS TRUE AND m.match_time > '.dbMakeSafe(time()+$gap);
-$sql .= ' ORDER BY t.confid,t.divid ;';
+$sql .= ' ORDER BY t.confid,t.divid, m.hid;';
 $result = dbQuery($sql);
-$norows = dbNumRows($result);
-		if ($norows == 0) {
-?>	<form id="picks">
+$nomatches = dbNumRows($result);
+$time_at_top = time();
+		if ($nomatches > 0 || $rounddata['valid_question']||
+			($playoff_deadline != 0 and $play_off_deadline > $time_at_top)) {
+?><form id="pick">
 <?php
 		}
-?>	<table>
-		<caption>Match Picks for <?php echo $round_name;?></caption>
+		if($nomatches >0) {
+?>	<div id="picks">
+		<table>
+		<caption>Match Picks for <?php echo $rounddata['name'];?></caption>
 		<thead>
 			<tr>
 				<th class="team">Team Pick</th>
 <?php
-		if ( $norows > 0) {
 			if ($rounddata['ou_round'] == 't') {
 ?>				<th class="score">Score</th><th class="ou_select">Over/Under</th>
 <?php
@@ -370,10 +380,6 @@ $norows = dbNumRows($result);
 		</thead>
 		<tbody>
 <?php
-		if ($norows == 0) {
-?>			<tr><td colspan="2" class="nopick">No Matches to Pick</td></tr>
-<?php
-		} else {
 			while($row=dbFetchRow($result) {
 ?>			<tr>
 				<td>
@@ -401,13 +407,14 @@ $norows = dbNumRows($result);
 <?php
 				}
 			}
-		}
-	dbFreeResult($result);
+		
 ?>		</tbody>
-	</table>
+		</table>
 <?php
-	if ($rounddata['valid_question']) {
-?>	<table>
+		}
+		dbFreeResult($result);
+		if ($rounddata['valid_question']) {
+?>		<table>
 		<caption>Bonus Question</caption>
 		<thead>
 			<tr><th class="bq">Question</th><th class="ba">Answer</th><th class="comment">Comment</th></tr>
@@ -417,115 +424,83 @@ $norows = dbNumRows($result);
 $result=dbQuery('SELECT * FROM option WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).';');
 $noopts = dbNumRows($result);  //No of multichoice examples 0= numeric answer required
 $resultop = dbQuery('SELECT * FROM option_pick WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' AND uid = '.dbMakeSafe($uid).';');
-		if (dbNumRows($resultop) > 0 ) {
-			$opdata = dbFetchRow($resultop);
+			if (dbNumRows($resultop) > 0 ) {
+				$opdata = dbFetchRow($resultop);
 		}
-		if ($noopts ==0 ) {
-			$row = dbFetchRow($result);
+			if ($noopts ==0 ) {
+				$row = dbFetchRow($result);
 //Question is a numeric type
 ?>			<tr><td><?php echo rounddata['question'];?></td><td><input type="text" name="answer"
 <?php
-			if(!isnull($row['value']) {
-				echo 'value="'.$row['value'].'"';
-			}
+				if(!isnull($row['value']) {
+					echo 'value="'.$row['value'].'"';
+				}
 ?>													/></td>
 			<td><textarea id=bonus_comment">
 <?php
-			if (isset($optdata) && !isnull($opdata['comment']) echo $opdata['comment'];
+				if (isset($optdata) && !isnull($opdata['comment']) echo $opdata['comment'];
 ?>			</textarea></td></tr>
 <?php 
-		} else {
+			} else {
 //Question is multichoice
-			for($i=1; $i<$noopts;$i++) {
-				$row = dbFetchRow($result);
+				for($i=1; $i<$noopts;$i++) {
+					$row = dbFetchRow($result);
 ?>			<tr>
 <?php
-				if($i == 1) {
+					if($i == 1) {
 ?>				<td rowspan ="<?php echo $noopts ;?>"><?php echo rounddata['question'];?></td>
 <?php
-				}
+					}
 ?>				<td><input type="radio" name="answer" value="<?php echo $row['oid'];?>"
 <?php
-				if(isset($opdata) && $optdata['oid'] == $row['oid']) echo 'checked';
+					if(isset($opdata) && $optdata['oid'] == $row['oid']) echo 'checked';
 ?>					/> <?php echo $row['label']; ?></td>
 <?php
-				if($i == 1) {
+					if($i == 1) {
 ?>				<tdrowspan ="<?php echo $noopts ;?>"><textarea id=bonus_comment">
 <?php
-					if (isset($optdata) && !isnull($opdata['comment']) echo $opdata['comment'];
+						if (isset($optdata) && !isnull($opdata['comment']) echo $opdata['comment'];
 ?>					</textarea></td>
 <>php
-				}
+					}
 ?>			</tr>
 <?php
+				}
 			}
-		}
 ?>		</tbody>
-	</table>
+		</table>
 <?php
-	dbFree($result);
-	dbFree($resultop);
-	}
-?>
-	<textarea id="round_comment"></textarea>
-	<input type="submit" name="pick_submit" value="Make Picks" />
-	</form>
-</div>
+		dbFree($result);
+		dbFree($resultop);
+?>	</div>
 <?php
-	} //end of check for rounddata
-	if($playoff_deadline != 0 and $play_off_deadline > time()) {
-//Playoff selection is part of this competition
-?><div id="playoff">
-<?php
-$sql = 'SELECT t.confid AS confid, t.divid AS divid, t.tid AS tid, u.team AS pid, w.wild1 AS w1, w.wild2 AS w2,d.name AS dn, c.name AS cn'; 
-$sql .= ' FROM team_in_competition t JOIN conference c USING (confid) JOIN division d USING (divid)';
-$sql .= ' LEFT JOIN div_winner_pick u ON t.cid = u.cid AND t.confid = u.confid AND t.divid = u.divid AND t.tid = u.team AND u.uid = '.dbMakeSafe($uid);
-$sql .= ' LEFT JOIN wildcard_pick w ON t.cid = w.cid AND t.confid = w.confid AND (t.tid = w.wild1 OR t.tid = w.wild2) AND u.uid = '.dbMakeSafe($uid);
-$sql .= ' WHERE t.cid = '.dbMakeSafe($cid).' ORDER BY confid,divid,tid;';
-		$result=dbQuery($sql);  //get all teams and whether this user as picked them
-		$playoffs = array();
-		$divs = array();
-		$confs = array();
-		$sizes = array();
-		while ($row=dbFetchRow($result)) {
-			$pick = array();
-			$pick['tid']=$row['tid'];
-			if(!isnull($row['pid'])) {
-				$pick['pid']=true;
-			} else {
-				$pick['pid']=false;
-			}
-			if(!isnull($row['w1'])) {
-				$pick['w1']=true;
-			} else {
-				$pick['w1']=false;
-			}
-			if(!isnull($row['w2'])) {
-				$pick['w2']=true;
-			} else {
-				$pick['w2']=false;
-			}
-			$playoffs[$row['confid'],$row['divid']][] = $pick;
-			if (isset($sizes[$row['confid'],$row['divid']])) {
-				$sizes[$row['confid'],$row['divid']]++;
-			} else {
-				$sizes[$row['confid'],$row['divid']] = 1;
-			}
-			$confs['confid'] = $row['cn'];
-			$divs['divid'] = $row['dn'];
 		}
-		dbFreeResult($result);
-?>	<table>
+	} //end of check for rounddata
+	if($playoff_deadline != 0 and $play_off_deadline > $time_at_top) {
+//Playoff selection is part of this competition
+?>	<div id="playoff">
+<?php
+$result=dbQuery('SELECT tid FROM div_winner_pick WHERE cid = '.dbMakeSafe($cid).' AND uid = '.dbMakeSafe($uid).';');
+		$dw = array();
+		while($row = dbFetchRow($result)) {
+			$dw[$row['tid']] = 1;
+		}
+dbFreeResult($result);
+result=dbQuery('SELECT tid FROM wildcard_pick WHERE cid = '.dbMakeSafe($cid).' AND uid = '.dbMakeSafe($uid).';');
+		$wild = array();
+		while($row = dbFetchRow($result)) {
+			$wild[$row['tid']] = 1;
+		}
+		$wild1_shown = false;
+?>		<table>
 		<caption>Pick divisional winner and wildcard picks for each conference</caption>
 		<thead>
 			<tr>
 				<th class="po_h1">\</th><th class="po_h2">Division</th>
 <?php
 		foreach($divs as $division) {
-			// for each division we are building a division name column, and three radio button colums to hold divisional winner
-			// and two wildcard pick columns
-?>				<th class="po_hd" rowspan="2"><?php echo $division;?></th>
-				<th class="po_dw">D</th><th class="po_w1">W</th><th class="po_w2">W</th>
+			// for each division we are building a team id, name and logo columns
+?>				<th class="t_dn" colspan="4"><?php echo $division;?></th>
 <?php
 		}
 ?>			</tr>		
@@ -533,12 +508,15 @@ $sql .= ' WHERE t.cid = '.dbMakeSafe($cid).' ORDER BY confid,divid,tid;';
 				<th class="po_h3">Conference</th><th class="po_h4">\</th>
 <?php
 		foreach($divs as $division) {
-?>				<th>W</th><th>1</th><th>2</th>
+				<th class="po_h5">Team</th>
+				<th class="po_h6>D Win</th>
+				<th class="po_h6">Wild1</th>
+				<th class="po_h6">Wild2</th>
 <?php
 		}
 ?>			</tr>	
 		</thead>
-		<tbody><form id="po_form">
+		<tbody>
 <?php
 		foreach($confs as $confid => $conference) {
 			$no_of_rows = max($sizes[$confid]);
@@ -551,37 +529,45 @@ $sql .= ' WHERE t.cid = '.dbMakeSafe($cid).' ORDER BY confid,divid,tid;';
 <?php
 				}
 				foreach($divs as $divid => $division) {
-					$tid=$playoffs[$config,$divid,$i,'tid'];
-?>				<td class="po_dn"><?php echo $tid;?></td>
+					if(isset($teams[$config,$divid,$i]) { //only if this entry is set
+						$tid=$teams[$config,$divid,$i,'tid'];
+?>				<td><?php echo $tid; ?></td>
 				<td class="po_pdw">
 					<input type="radio" 
 						name="<?php echo $confid.$divid;?>"
 						value="<?php echo $tid;?>"
-						<?php if ($playoffs[$confid,$divid,'pid']) echo 'checked';?> />
+						<?php if (isset($dw[$tid])) echo 'checked';?> />
 				</td>
 				<td class="po_wild">
 					<input type="radio" 
 						name="<?php echo $confid.'w1';?>"
 						value="<?php echo $tid;?>"
-						<?php if ($playoffs[$confid,$divid,'w1']) echo 'checked';?> />
+						<?php if (isset($wild($tid)) {echo 'checked'; $wild1_shown=true} ?> />
 				</td>
 				<td class="po_wild">
 					<input type="radio" 
 						name="<?php echo $confid.'w2';?>"
 						value="<?php echo $tid;?>"
-						<?php if ($playoffs[$confid,$divid,'w2']) echo 'checked';?> />
-				</td>
+						<?php if ($wild1_shown && isset($wild[$tid])) echo 'checked';?> />
+			</td>
 <?php
+					}
 				}
 ?>			</tr>
 <?php
 			}
 		}
-?>		</form></tbody>
-	</table>
-</div>
+?>		</tbody>
+		</table>
+	</div>
 <?php
 	}  //playoffs
+	if ($nomatches > 0 || $rounddata['valid_question']||
+		($playoff_deadline != 0 and $play_off_deadline > $time_at_top)) {
+?>	<input type="submit" name="pick_submit" value="Make Picks" />
+</form>
+<?php
+	}
 }//registered
 if ($haverounddata) {
 //we have a round specified, so we are definitely going to specifiy a table of everyones picks (it maybe no matches
@@ -601,7 +587,7 @@ $result = dbQuery('SELECT * FROM match m JOIN team t ON m.hid = t.tid WHERE m.ci
 			echo '<th>'.$row['hid'].'</th>';
 		}
 		if(!(isnull($row['hscore']) || isnull($row['ascore']) || $row['hscore'] > $row['ascore'])) {
-			//Home win
+			//Away win
 			echo '<th class="win">'.$row['aid'].'</th>';
 		} else {
 			echo '<th>'.$row['aid'].'</th>';
@@ -691,6 +677,7 @@ $sql .= ' JOIN option o USING (cid,rid,oid)';
 $sql .= ' JOIN match m USING (cid,rid) LEFT JOIN pick p USING (cid,rid,hid,uid)';
 $sql .= ' GROUP BY u.uid, u.name, op.oid, o.label, r.answer,r.value, r.ou_round, r.valid_question';
 $sql .= ' WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' AND m.open IS TRUE ORDER BY score DESC;';
+
 $result = dbQuery($sql);
 	while ($row = dbFetchRow($result)) {
 $sql = 'SELECT * FROM match m JOIN team t ON m.hid = t.tid';
@@ -746,7 +733,9 @@ $resultmatch = dbQuery($sql);
 <?php
 }
 if ($playoff_deadline != 0) {
-?>	<table>
+?>
+<div id="playoff_results">	
+	<table>
 		<caption>Players Playoff Picks</caption>
 		<thead>
 			<tr><th rowspan="3"></th>
@@ -755,7 +744,8 @@ if ($playoff_deadline != 0) {
 ?>				<th colspan="<?php echo array_sum($sizes[$confid]);?>"><?php echo $confid; ?></td>
 <?php
 	}
-?>			</tr>
+?>				<th rowspan="3">Score</th>
+			</tr>
 			<tr>
 <?php
 	foreach($confs as $confid => $conference) {
@@ -775,6 +765,10 @@ if ($playoff_deadline != 0) {
 			}
 		}
 	}
+?>			</tr>
+		</thead>
+		<tbody>
+<?php
 $sql = 'SELECT u.name AS name, r.uid AS uid, sum(CAST(t.made_playoff AS integer)) AS score'
 $sql .= ' FROM registration r JOIN user USING (uid)'
 $sql .= ' JOIN (( SELECT cid, tid, uid  FROM wildcard_pick UNION SELECT cid,tid,uid FROM div_winner_pick) AS pick';
@@ -785,18 +779,47 @@ $sql .= ' ORDER BY score DESC;'
 $result = dbQuery($sql);
 	while($row = dbFetchRow($result)) {
 		$playoff_selections = array();
-		$playoff_selections[] = $row['w1'];
-		$playoff_selections[] = $row['w2'];
-		$resultplay = dbQuery('SELECT team FROM div_winner_pick WHERE cid = '.dbMakeSafe($cid).' AND uid = '.dbMakeSafe($row['uid']).';');
+		$resultplay = dbQuery('SELECT cid, tid, uid  FROM wildcard_pick UNION SELECT cid,tid,uid FROM div_winner_pick WHERE cid = '.dbMakeSafe($cid).' AND uid = '.dbMakeSafe($row['uid']).';');
 		while($playdata = dbFetchRow($resultplay)) {
-			$playoff_selections[] = $playdata['team'];
+			$playoff_selections[$playdata['tid']] = 1;
 		}
 ?>			<tr>
 				<td><?php echo $row['name']; ?></td>
 <?php
+		foreach($confs as $confid => $conference) {
+			foreach($divs as $divid => $division{
+				foreach($teams[$confid,$divid] as $team) {
+?>					<td <?php if($team['mp'] && isset($playoff_selections[$team['tid']])) echo 'class="win"';?>>
+						<?php if(isset($playoff_selections[$team['tid']])) echo $team['tid'];?></td>
+<?php
+				}
+			}
+		}
+		dbFreeResult($resultplay);
+		unset($playoff_selections);
+?>				<td><?php echo $row['score'];?></td>
+			</tr>
+<?php
 	}
+	dbFreeResult($result);
+?>		</tbody>
+	</table>
+</div>
+<?php
 }
-?><div id="copyright">MBball <span id="version"></span> &copy; 2008 Alan Chandler.  Licenced under the GPL</div>
+
+
+?><div id="overall_results">
+	<table>
+		<caption>Overall Results</caption>
+		<thead>
+			<tr>
+<?php
+
+?>		</tbody>
+	</table>
+</div>
+<div id="copyright">MBball <span id="version"></span> &copy; 2008 Alan Chandler.  Licenced under the GPL</div>
 </div>
 </body>
 
