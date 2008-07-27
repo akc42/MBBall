@@ -509,7 +509,7 @@ result=dbQuery('SELECT tid FROM wildcard_pick WHERE cid = '.dbMakeSafe($cid).' A
 <?php
 		foreach($divs as $division) {
 				<th class="po_h5">Team</th>
-				<th class="po_h6>D Win</th>
+				<th class="po_h6">D Win</th>
 				<th class="po_h6">Wild1</th>
 				<th class="po_h6">Wild2</th>
 <?php
@@ -579,7 +579,9 @@ if ($haverounddata) {
 			<tr><th rowspan="4" class="match_data">Match Data</th>
 <?php
 $result = dbQuery('SELECT * FROM match m JOIN team t ON m.hid = t.tid WHERE m.cid = '.dbMakeSafe($cid).' AND m.rid = '.dbMakeSafe($rid).' AND  m.open IS TRUE ORDER BY t.confid, t.divid, hid;');
+$nomatches = 0;
 	while($row = dbFetchRow($result)) {
+		$nomatches++;
 		if(!(isnull($row['hscore']) || isnull($row['ascore']) || $row['hscore'] < $row['ascore'])) {
 			//Home win
 			echo '<th class="win">'.$row['hid'].'</th>';
@@ -605,7 +607,7 @@ $bqops = dbNumRows($resultbq);
 			<tr>
 <?php
 				//first three rows first column covered by rowspan
-	pg_result_seek($result,0);  //put the results back to the start so we can interate over them again
+	dbRestartQuery($result);  //put the results back to the start so we can interate over them again
 	while($row = dbFetchRow($result)) {
 ?>				<th colspan="2"><span class="time"><?php echo $row['match_date'];?></span></th>
 <?php
@@ -617,7 +619,7 @@ $bqops = dbNumRows($resultbq);
 ?>			<th>Correct Answer</th></tr>
 			<tr>
 <?php
-	pg_result_Seeq($result,0);  //put the results back to the start so we can interate over them again
+	dbRestartQuery($result);  //put the results back to the start so we can interate over them again
 	while($row = dbFetchRow($result)) {
 ?>				<th><?php if(!isnull($row['hscore']) echo $row['hscore'];?></th>
 				<th><?php if(!isnull($row['ascore']) echo $row['ascore'];?></th>
@@ -628,7 +630,7 @@ $bqops = dbNumRows($resultbq);
 			</tr>
 			<tr>
 <?php
-	pg_result_seek($result,0);  //put the results back to the start so we can interate over them again
+	dbRestartQuery($result);  //put the results back to the start so we can interate over them again
 	while($row = dbFetchRow($result)) {
 		if($rounddata['ou_round']) {
 		//This is an over or under guessing round, so we need to also show the over/under results
@@ -666,65 +668,76 @@ $bqops = dbNumRows($resultbq);
 		<tbody>
 <?php
 dbFreeResult($result);
-	// now we have completed the body we need to get the users picks and resultant score
-$sql = 'SELECT u.name AS name, u.uid AS uid, op.oid AS oid,';
-$sql .= ' (sum(COALESCE(CAST((pid = hid AND hscore > ascore) OR (pid = aid AND ascore > hscore) AS integer),0) + ';
-$sql .= 'COALESCE(CAST(r.ou_round AND ((((combined_score +0.5) < (hscore +ascore)) AND over)';
-$sql .= ' OR (((combined_score +0.5) < (hscore +ascore)) AND NOT over)) AS integer),0) +';
-$sql .= ' COALESCE(CAST((r.valid_question AND op.oid = r.answer) AS integer),0)) * r.value AS score';
-$sql .= ' FROM registered r JOIN users u USING (uid) JOIN round r USING (cid) LEFT JOIN option_pick op USING (cid,rid,uid)';
-$sql .= ' JOIN option o USING (cid,rid,oid)';
-$sql .= ' JOIN match m USING (cid,rid) LEFT JOIN pick p USING (cid,rid,hid,uid)';
-$sql .= ' GROUP BY u.uid, u.name, op.oid, o.label, r.answer,r.value, r.ou_round, r.valid_question';
-$sql .= ' WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' AND m.open IS TRUE ORDER BY score DESC;';
-
+	// now we have completed the body we need to get the users resultant score
+$sql = 'SELECT u.name AS name, u.uid AS uid,b.score AS rscore, r.score AS score';
+$sql .= ' FROM round_score r JOIN participant u USING (uid)';
+$sql .= ' WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid);
+$sql .= ' ORDER BY score DESC;';
 $result = dbQuery($sql);
-	while ($row = dbFetchRow($result)) {
-$sql = 'SELECT * FROM match m JOIN team t ON m.hid = t.tid';
-$sql .= ' LEFT JOIN pick p ON m.cid = p.cid AND m.rid = p.rid AND m.hid = p.hid AND p.uid = '.dbMakeSafe($row['uid']); 
-$sql .= ' WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' AND m.open IS TRUE ORDER BY t.confid, t.divid, m.hid;'; 
+$sql = 'SELECT round_score r JOIN match m USING (cid,rid) JOIN team USING (hid)';
+$sql .= ' LEFT JOIN pick p USING (cid,rid,hid,uid)'; 
+$sql .= ' WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' AND m.open IS TRUE ORDER BY r.score DESC, t.confid, t.divid, m.hid;'; 
 $resultmatch = dbQuery($sql);
+	if ($matchdata = dbFetch($resultmatch);
+		$i = 0;
+		while ($row = dbFetchRow($result)) {
+			for($match = $i*$nomatches;$match++;$match < ($i+1)*$nomatches) {
 ?>			<tr>
 				<td><?php echo $row['name'];?></td>
 <?php
-		while($matchdata = dbFetchRow($resultmatch)) {
-			if($rounddata['ou_round']) {
-?>				<td <?php if(!isnull($matchdata['pid']) && !isnull($matchdata['hscore']) && !isnull($matchdata['ascore']) && 
-						($matchdata['pid'] == $matchdata['hid'] && $matchdata['hscore']>$matchdata['ascore']) ||
-						($matchdata['pid'] == $matchdata['aid'] && $matchdata['hscore']<$matchdata['ascore']))
-							echo 'class="win"' ;?>><?php if(!isnull($resultmatch['pid'])) echo $resultmatch['pid'];?></td>
-				<td <?php if(!isnull($matchdata['over']) !isnull($matchdata['hscore']) && !isnull($matchdata['ascore']) &&
-					($matchdata['over'] == 't' && ($matchdata['combined_score']+0.5 < $matchdata['hscore']+$matchdata['ascore'])) || 
-					(!$matchdata['over'] == 't' && ($matchdata['combined_score']+0.5 > $matchdata['hscore']+$matchdata['ascore'])))
+				if($rounddata['ou_round']) {
+?>				<td <?php if(!isnull($matchdata[$match,'pid']) && !isnull($matchdata[$match,'hscore']) &&
+						 !isnull($matchdata[$match,'ascore']) && 
+						($matchdata[$match,'pid'] == $matchdata[$match,'hid'] &&
+						$matchdata[$match,'hscore']>$matchdata[$match,'ascore']) ||
+						($matchdata[$match,'pid'] == $matchdata[$match,'aid'] && 
+						$matchdata[$match,'hscore']<$matchdata[$match,'ascore']))
+							echo 'class="win"' ;?>>
+					<?php if(!isnull($matchdata[$match,'pid'])) echo $matchdata[$match,'pid'];?>
+				</td>
+				<td <?php if(!isnull($matchdata[$match,'over']) !isnull($matchdata[$match,'hscore']) &&
+						 !isnull($matchdata[$match,'ascore']) &&
+						($matchdata[$match,'over'] == 't' && 
+						($matchdata[$match,'combined_score']+0.5 < $matchdata[$match,'hscore']+$matchdata[$match,'ascore'])) || 
+						(!$matchdata[$match,'over'] == 't' && 
+						($matchdata[$match,'combined_score']+0.5 > $matchdata[$match,'hscore']+$matchdata[$match,'ascore'])))
 							echo 'class="win"';?>>
-					<?php if(!isnull($matchdata['over']) echo ($matchdata['over'] == 't')?'Over':'Under';?></td>
+					<?php if(!isnull($matchdata[$match,'over']) echo ($matchdata[$match,'over'] == 't')?'Over':'Under';?>
+				</td>
 <?php
-			} else {
-?>				<td colspan="2" <?php if(!isnull($matchdata['pid']) && !isnull($matchdata['hscore']) && !isnull($matchdata['ascore']) && 
-						($matchdata['pid'] == $matchdata['hid'] && $matchdata['hscore']>$matchdata['ascore']) ||
-						($matchdata['pid'] == $matchdata['aid'] && $matchdata['hscore']<$matchdata['ascore']))
-							echo 'class="win"' ;?>><?php if(!isnull($matchdata['pid'])) echo $matchdata['pid'];?></td>
-<?php
-			}
-		}
-		if($rounddata['valid_question'] == 't') {
-			if($bqopts > 0) {
-				// this is a multichoice question, so get results and output them
-				pg_result_seek($resultbq,0);  //reset lost of options to start
-				while ($optdata = dbFetchRow($resultbq)) {
-?>				<td <?php if($optdata['oid'] == $matchdata['oid'] && $row['oid'] == $rounddata['answer']) 
-					echo 'class="win"';?>><?php if($optdata['oid'] == $row['oid']) echo 'X';?></td>
+				} else {
+?>				<td colspan="2" <?php if(!isnull($matchdata[$match,'pid']) && !isnull($matchdata[$match,'hscore']) &&
+						!isnull($matchdata[$match,'ascore']) && 
+						($matchdata[$match,'pid'] == $matchdata[$match,'hid'] &&
+						 $matchdata[$match,'hscore']>$matchdata[$match,'ascore']) ||
+						($matchdata[$match,'pid'] == $matchdata[$match,'aid'] && 
+						$matchdata[$match,'hscore']<$matchdata[$match,'ascore']))
+							echo 'class="win"' ;?>>
+					<?php if(!isnull($matchdata[$match,'pid'])) echo $matchdata[$match,'pid'];?>
+				</td>
 <?php
 				}
-			} else {
-?>				<td <?php if($row['oid'] == $rounddata['answer']) echo 'class="win"';?>>
-					<?php if(!isnull($row['oid'])) echo $row['oid'];?></td>
+				if($rounddata['valid_question'] == 't') {
+					if($bqopts > 0) {
+				// this is a multichoice question, so get results and output them
+					dbRestartQuery($resultbq);  //reset lost of options to start
+						while ($optdata = dbFetchRow($resultbq)) {
+?>				<td <?php if($optdata['oid'] == $rounddata['answer']] && $row['rscore'] > 0) 
+					echo 'class="win"';?>><?php if($row['rscore'] > 0) echo 'X';?></td>
 <?php
-			}
-		}
+						}
+					} else {
+?>				<td <?php if($row['rscore'] > 0) echo 'class="win"';?>>
+					<?php if($row['rscore'] > 0) echo $rounddata['answer'];?></td>
+<?php
+					}
+				}
 ?>				<td><?php echo $row['score']; ?></td>	
 			</tr>
 <?php
+			}
+			$i++;
+		}
 	}
 	dbFreeResult($result);
 ?>		</tbody>	
@@ -769,17 +782,14 @@ if ($playoff_deadline != 0) {
 		</thead>
 		<tbody>
 <?php
-$sql = 'SELECT u.name AS name, r.uid AS uid, sum(CAST(t.made_playoff AS integer)) AS score'
-$sql .= ' FROM registration r JOIN user USING (uid)'
-$sql .= ' JOIN (( SELECT cid, tid, uid  FROM wildcard_pick UNION SELECT cid,tid,uid FROM div_winner_pick) AS pick';
-$sql .= ' JOIN team_in_competition t USING (cid,tid)) USING (cid,uid)';
+$sql = 'SELECT u.name AS name, u.uid AS uid, p.score AS score'
+$sql .= ' FROM playoff_score p JOIN user USING (uid)'
 $sql .= ' WHERE cid = '.dbMakeSafe($cid);
-$sql .= ' GROUP BY u.name, r.uid'; 
-$sql .= ' ORDER BY score DESC;'
+$$sql .= ' ORDER BY score DESC;'
 $result = dbQuery($sql);
 	while($row = dbFetchRow($result)) {
 		$playoff_selections = array();
-		$resultplay = dbQuery('SELECT cid, tid, uid  FROM wildcard_pick UNION SELECT cid,tid,uid FROM div_winner_pick WHERE cid = '.dbMakeSafe($cid).' AND uid = '.dbMakeSafe($row['uid']).';');
+		$resultplay = dbQuery('SELECT tid  FROM playoff_picks WHERE cid = '.dbMakeSafe($cid).' AND uid = '.dbMakeSafe($row['uid']).';');
 		while($playdata = dbFetchRow($resultplay)) {
 			$playoff_selections[$playdata['tid']] = 1;
 		}
@@ -813,9 +823,41 @@ $result = dbQuery($sql);
 	<table>
 		<caption>Overall Results</caption>
 		<thead>
-			<tr>
+			<tr><th>Name</th>
 <?php
-
+	$result = dbQuery('SELECT name FROM round WHERE cid = '.dbMakeSafe($cid).' AND rid <= '.dbMakeSafe($rid)' ORDER BY rid DESC;');
+	while($row = dbFetchRow($result)) {
+?>				<th><?php echo $row['name']; ?></th>
+<?php
+	}
+	dbFreeResult($result);
+	if($playoff_deadline != 0) {
+?>				<th>PlayOffs</th>
+<?php
+	}
+?>				<th>Total</th>
+			</tr>
+		</thead>
+		<tbody>
+<?php
+$sql = 'SELECT u.name AS name, p.score AS pscore sum(r.score) AS rscores, p.score+rscores AS total';
+$sql .= ' FROM participant u JOIN registration reg USING (uid) JOIN playoff_score p USING (cid,uid) JOIN round_score USING (cid,uid)';
+$sql .= ' WHERE cid = '.dbMakeSafe($cid).' AND rid <= '.dbMakeSafe($rid);
+$sql .= ' GROUP BY u.name, p.score ORDER BY total DESC;';
+	$result = dbQuery($sql);
+	while($row = dbFetchRow($result)) {
+?>			<tr>
+				<td><?php echo $row['name'];?></td>
+<?php
+		$resultround = dbQuery('SELECT score FROM round_score WHERE cid = '.dbMakeSafe($cid).' AND
+					 rid <= '.dbMakeSafe($rid).' AND uid = '.dbMakeSafe($uid).' ORDER BY rid DESC;');
+		while ($rscore = dbFetchRow($resultround)) {
+?>				<td><?php echo $row['score'];?></td>				
+<?php
+		}
+?>			</tr>
+<?php
+	}
 ?>		</tbody>
 	</table>
 </div>
