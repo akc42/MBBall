@@ -22,6 +22,211 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
+-- Name: option_pick; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
+--
+
+CREATE TABLE option_pick (
+    uid integer NOT NULL,
+    comment text,
+    cid integer NOT NULL,
+    rid integer NOT NULL,
+    oid integer,
+    submit_time bigint
+);
+
+
+ALTER TABLE public.option_pick OWNER TO alan;
+
+--
+-- Name: COLUMN option_pick.uid; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN option_pick.uid IS 'User ID';
+
+
+--
+-- Name: COLUMN option_pick.comment; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN option_pick.comment IS 'General Comment from user about the round';
+
+
+--
+-- Name: COLUMN option_pick.cid; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN option_pick.cid IS 'Competition ID';
+
+
+--
+-- Name: COLUMN option_pick.rid; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN option_pick.rid IS 'Round ID';
+
+
+--
+-- Name: COLUMN option_pick.oid; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN option_pick.oid IS 'ID of Question Option Selected as Correct if multichoice, else value of answer (only if multichoice)';
+
+
+--
+-- Name: COLUMN option_pick.submit_time; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN option_pick.submit_time IS 'Time of Submission';
+
+
+--
+-- Name: registration; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
+--
+
+CREATE TABLE registration (
+    uid integer NOT NULL,
+    cid integer NOT NULL,
+    agree_time bigint
+);
+
+
+ALTER TABLE public.registration OWNER TO alan;
+
+--
+-- Name: TABLE registration; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON TABLE registration IS 'Record of users registerd with a competition';
+
+
+--
+-- Name: COLUMN registration.uid; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN registration.uid IS 'User ID';
+
+
+--
+-- Name: COLUMN registration.cid; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN registration.cid IS 'Competition ID';
+
+
+--
+-- Name: COLUMN registration.agree_time; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN registration.agree_time IS 'Time Agreed to Competition Conditions';
+
+
+--
+-- Name: round; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
+--
+
+CREATE TABLE round (
+    rid integer NOT NULL,
+    cid integer NOT NULL,
+    question text,
+    valid_question boolean DEFAULT false,
+    answer integer,
+    value smallint DEFAULT 1 NOT NULL,
+    name character varying(14),
+    ou_round boolean DEFAULT false NOT NULL,
+    deadline bigint
+);
+
+
+ALTER TABLE public.round OWNER TO alan;
+
+--
+-- Name: TABLE round; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON TABLE round IS 'Round in Competition';
+
+
+--
+-- Name: COLUMN round.rid; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN round.rid IS 'Round Number';
+
+
+--
+-- Name: COLUMN round.cid; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN round.cid IS 'Competition ID';
+
+
+--
+-- Name: COLUMN round.question; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN round.question IS 'Bonus Question Text';
+
+
+--
+-- Name: COLUMN round.valid_question; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN round.valid_question IS 'Set once a valid bonus question has been set up';
+
+
+--
+-- Name: COLUMN round.answer; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN round.answer IS 'If not null an answer to a numeric question or oid of mutichoice question';
+
+
+--
+-- Name: COLUMN round.value; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN round.value IS 'Value given for a correct pick or answer';
+
+
+--
+-- Name: COLUMN round.name; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN round.name IS 'Name of the Round';
+
+
+--
+-- Name: COLUMN round.ou_round; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN round.ou_round IS 'set if over underscores are requested for this round';
+
+
+--
+-- Name: COLUMN round.deadline; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN round.deadline IS 'Deadline for submitting answers to bonus questions';
+
+
+--
+-- Name: bonus_score; Type: VIEW; Schema: public; Owner: alan
+--
+
+CREATE VIEW bonus_score AS
+    SELECT r.cid, r.rid, u.uid, (((p.uid IS NOT NULL))::integer * r.value) AS score FROM ((registration u JOIN round r USING (cid)) LEFT JOIN option_pick p ON (((((p.cid = r.cid) AND (p.rid = r.rid)) AND (p.oid = r.answer)) AND (r.valid_question IS TRUE))));
+
+
+ALTER TABLE public.bonus_score OWNER TO alan;
+
+--
+-- Name: VIEW bonus_score; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON VIEW bonus_score IS 'Points scored in round by user answering the bonus question';
+
+
+--
 -- Name: competition; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
 --
 
@@ -299,133 +504,6 @@ COMMENT ON COLUMN match.match_time IS 'Time match is due to be played';
 
 
 --
--- Name: option; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
---
-
-CREATE TABLE option (
-    cid integer NOT NULL,
-    rid integer NOT NULL,
-    oid integer NOT NULL,
-    label character varying(14)
-);
-
-
-ALTER TABLE public.option OWNER TO alan;
-
---
--- Name: TABLE option; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON TABLE option IS 'Holds one possible answer to the round question';
-
-
---
--- Name: COLUMN option.cid; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN option.cid IS 'Competition ID';
-
-
---
--- Name: COLUMN option.rid; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN option.rid IS 'Round ID';
-
-
---
--- Name: COLUMN option.oid; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN option.oid IS 'Option ID';
-
-
---
--- Name: COLUMN option.label; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN option.label IS 'Simple Label for this option';
-
-
---
--- Name: option_pick; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
---
-
-CREATE TABLE option_pick (
-    uid integer NOT NULL,
-    comment text,
-    cid integer NOT NULL,
-    rid integer NOT NULL,
-    oid integer,
-    submit_time bigint
-);
-
-
-ALTER TABLE public.option_pick OWNER TO alan;
-
---
--- Name: COLUMN option_pick.uid; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN option_pick.uid IS 'User ID';
-
-
---
--- Name: COLUMN option_pick.comment; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN option_pick.comment IS 'General Comment from user about the round';
-
-
---
--- Name: COLUMN option_pick.cid; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN option_pick.cid IS 'Competition ID';
-
-
---
--- Name: COLUMN option_pick.rid; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN option_pick.rid IS 'Round ID';
-
-
---
--- Name: COLUMN option_pick.oid; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN option_pick.oid IS 'ID of Question Option Selected as Correct if multichoice, else value of answer (only if multichoice)';
-
-
---
--- Name: COLUMN option_pick.submit_time; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN option_pick.submit_time IS 'Time of Submission';
-
-
---
--- Name: participant; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
---
-
-CREATE TABLE participant (
-    uid integer NOT NULL,
-    name character varying,
-    email character varying
-);
-
-
-ALTER TABLE public.participant OWNER TO alan;
-
---
--- Name: TABLE participant; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON TABLE participant IS 'forum user who will participate in one or more competitions';
-
-
---
 -- Name: pick; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
 --
 
@@ -500,197 +578,89 @@ COMMENT ON COLUMN pick.submit_time IS 'Time of submission';
 
 
 --
--- Name: registration; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
+-- Name: match_score; Type: VIEW; Schema: public; Owner: alan
 --
 
-CREATE TABLE registration (
-    uid integer NOT NULL,
+CREATE VIEW match_score AS
+    SELECT m.cid, m.rid, m.hid, u.uid, ((((p.uid IS NOT NULL))::integer + ((o.uid IS NOT NULL))::integer) * r.value) AS score FROM ((((registration u JOIN match m USING (cid)) JOIN round r USING (cid, rid)) LEFT JOIN pick p ON ((((((p.cid = m.cid) AND (p.rid = m.rid)) AND (p.hid = m.hid)) AND (p.uid = u.uid)) AND (((m.hscore >= m.ascore) AND (p.pid = m.hid)) OR ((m.hscore <= m.ascore) AND (p.pid = m.aid)))))) LEFT JOIN pick o ON (((((((o.cid = m.cid) AND (o.rid = m.rid)) AND (o.hid = m.hid)) AND (o.uid = u.uid)) AND (r.ou_round IS TRUE)) AND (((((m.hscore + m.ascore))::numeric > ((m.combined_score)::numeric + 0.5)) AND (o.over IS TRUE)) OR ((((m.hscore + m.ascore))::numeric < ((m.combined_score)::numeric + 0.5)) AND (o.over IS NOT TRUE)))))) WHERE (m.open IS TRUE);
+
+
+ALTER TABLE public.match_score OWNER TO alan;
+
+--
+-- Name: VIEW match_score; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON VIEW match_score IS 'points user scored in a match from the pick and over/under question (if present)';
+
+
+--
+-- Name: option; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
+--
+
+CREATE TABLE option (
     cid integer NOT NULL,
-    agree_time bigint
-);
-
-
-ALTER TABLE public.registration OWNER TO alan;
-
---
--- Name: TABLE registration; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON TABLE registration IS 'Record of users registerd with a competition';
-
-
---
--- Name: COLUMN registration.uid; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN registration.uid IS 'User ID';
-
-
---
--- Name: COLUMN registration.cid; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN registration.cid IS 'Competition ID';
-
-
---
--- Name: COLUMN registration.agree_time; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN registration.agree_time IS 'Time Agreed to Competition Conditions';
-
-
---
--- Name: round; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
---
-
-CREATE TABLE round (
     rid integer NOT NULL,
-    cid integer NOT NULL,
-    question text,
-    valid_question boolean DEFAULT false,
-    answer integer,
-    value smallint DEFAULT 1 NOT NULL,
-    name character varying(14),
-    ou_round boolean DEFAULT false NOT NULL,
-    deadline bigint
+    oid integer NOT NULL,
+    label character varying(14)
 );
 
 
-ALTER TABLE public.round OWNER TO alan;
+ALTER TABLE public.option OWNER TO alan;
 
 --
--- Name: TABLE round; Type: COMMENT; Schema: public; Owner: alan
+-- Name: TABLE option; Type: COMMENT; Schema: public; Owner: alan
 --
 
-COMMENT ON TABLE round IS 'Round in Competition';
-
-
---
--- Name: COLUMN round.rid; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN round.rid IS 'Round Number';
+COMMENT ON TABLE option IS 'Holds one possible answer to the round question';
 
 
 --
--- Name: COLUMN round.cid; Type: COMMENT; Schema: public; Owner: alan
+-- Name: COLUMN option.cid; Type: COMMENT; Schema: public; Owner: alan
 --
 
-COMMENT ON COLUMN round.cid IS 'Competition ID';
-
-
---
--- Name: COLUMN round.question; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN round.question IS 'Bonus Question Text';
+COMMENT ON COLUMN option.cid IS 'Competition ID';
 
 
 --
--- Name: COLUMN round.valid_question; Type: COMMENT; Schema: public; Owner: alan
+-- Name: COLUMN option.rid; Type: COMMENT; Schema: public; Owner: alan
 --
 
-COMMENT ON COLUMN round.valid_question IS 'Set once a valid bonus question has been set up';
-
-
---
--- Name: COLUMN round.answer; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN round.answer IS 'If not null an answer to a numeric question or oid of mutichoice question';
+COMMENT ON COLUMN option.rid IS 'Round ID';
 
 
 --
--- Name: COLUMN round.value; Type: COMMENT; Schema: public; Owner: alan
+-- Name: COLUMN option.oid; Type: COMMENT; Schema: public; Owner: alan
 --
 
-COMMENT ON COLUMN round.value IS 'Value given for a correct pick or answer';
-
-
---
--- Name: COLUMN round.name; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN round.name IS 'Name of the Round';
+COMMENT ON COLUMN option.oid IS 'Option ID';
 
 
 --
--- Name: COLUMN round.ou_round; Type: COMMENT; Schema: public; Owner: alan
+-- Name: COLUMN option.label; Type: COMMENT; Schema: public; Owner: alan
 --
 
-COMMENT ON COLUMN round.ou_round IS 'set if over underscores are requested for this round';
-
-
---
--- Name: COLUMN round.deadline; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN round.deadline IS 'Deadline for submitting answers to bonus questions';
+COMMENT ON COLUMN option.label IS 'Simple Label for this option';
 
 
 --
--- Name: team; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
+-- Name: participant; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
 --
 
-CREATE TABLE team (
-    tid character(3) NOT NULL,
-    name character varying(50) NOT NULL,
-    logo character varying(80),
-    url character varying(100),
-    confid character(3),
-    divid character(1)
+CREATE TABLE participant (
+    uid integer NOT NULL,
+    name character varying,
+    email character varying
 );
 
 
-ALTER TABLE public.team OWNER TO alan;
+ALTER TABLE public.participant OWNER TO alan;
 
 --
--- Name: COLUMN team.confid; Type: COMMENT; Schema: public; Owner: alan
+-- Name: TABLE participant; Type: COMMENT; Schema: public; Owner: alan
 --
 
-COMMENT ON COLUMN team.confid IS 'Conference Team Plays in ';
-
-
---
--- Name: COLUMN team.divid; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN team.divid IS 'division team plays in';
-
-
---
--- Name: team_in_competition; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
---
-
-CREATE TABLE team_in_competition (
-    tid character(3) NOT NULL,
-    cid integer NOT NULL,
-    made_playoff boolean DEFAULT false NOT NULL
-);
-
-
-ALTER TABLE public.team_in_competition OWNER TO alan;
-
---
--- Name: COLUMN team_in_competition.tid; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN team_in_competition.tid IS 'Team ID';
-
-
---
--- Name: COLUMN team_in_competition.cid; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN team_in_competition.cid IS 'Competition ID';
-
-
---
--- Name: COLUMN team_in_competition.made_playoff; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON COLUMN team_in_competition.made_playoff IS 'True if team made playoffs';
+COMMENT ON TABLE participant IS 'forum user who will participate in one or more competitions';
 
 
 --
@@ -759,6 +729,121 @@ COMMENT ON COLUMN wildcard_pick.oid IS 'Either 1 or 2 depending on which wildcar
 
 
 --
+-- Name: playoff_picks; Type: VIEW; Schema: public; Owner: alan
+--
+
+CREATE VIEW playoff_picks AS
+    SELECT wildcard_pick.cid, wildcard_pick.tid, wildcard_pick.uid FROM wildcard_pick UNION SELECT div_winner_pick.cid, div_winner_pick.tid, div_winner_pick.uid FROM div_winner_pick;
+
+
+ALTER TABLE public.playoff_picks OWNER TO alan;
+
+--
+-- Name: VIEW playoff_picks; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON VIEW playoff_picks IS 'used to identify teams a user has picked correctly';
+
+
+--
+-- Name: team_in_competition; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
+--
+
+CREATE TABLE team_in_competition (
+    tid character(3) NOT NULL,
+    cid integer NOT NULL,
+    made_playoff boolean DEFAULT false NOT NULL
+);
+
+
+ALTER TABLE public.team_in_competition OWNER TO alan;
+
+--
+-- Name: COLUMN team_in_competition.tid; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN team_in_competition.tid IS 'Team ID';
+
+
+--
+-- Name: COLUMN team_in_competition.cid; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN team_in_competition.cid IS 'Competition ID';
+
+
+--
+-- Name: COLUMN team_in_competition.made_playoff; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN team_in_competition.made_playoff IS 'True if team made playoffs';
+
+
+--
+-- Name: playoff_score; Type: VIEW; Schema: public; Owner: alan
+--
+
+CREATE VIEW playoff_score AS
+    SELECT u.cid, u.uid, count(p.uid) AS score FROM (registration u LEFT JOIN (playoff_picks p JOIN team_in_competition t ON ((((p.cid = t.cid) AND (p.tid = t.tid)) AND (t.made_playoff IS TRUE)))) ON (((p.cid = u.cid) AND (p.uid = u.uid)))) GROUP BY u.cid, u.uid;
+
+
+ALTER TABLE public.playoff_score OWNER TO alan;
+
+--
+-- Name: VIEW playoff_score; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON VIEW playoff_score IS 'Score user makes in correctly guessing the playoffs';
+
+
+--
+-- Name: round_score; Type: VIEW; Schema: public; Owner: alan
+--
+
+CREATE VIEW round_score AS
+    SELECT r.cid, r.rid, r.uid, sum(m.score) AS mscore, r.score AS bscore, (sum(m.score) + r.score) AS score FROM (match_score m RIGHT JOIN bonus_score r USING (cid, rid, uid)) GROUP BY r.cid, r.rid, r.uid, r.score;
+
+
+ALTER TABLE public.round_score OWNER TO alan;
+
+--
+-- Name: VIEW round_score; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON VIEW round_score IS 'Get total score for the round by user';
+
+
+--
+-- Name: team; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
+--
+
+CREATE TABLE team (
+    tid character(3) NOT NULL,
+    name character varying(50) NOT NULL,
+    logo character varying(80),
+    url character varying(100),
+    confid character(3),
+    divid character(1)
+);
+
+
+ALTER TABLE public.team OWNER TO alan;
+
+--
+-- Name: COLUMN team.confid; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN team.confid IS 'Conference Team Plays in ';
+
+
+--
+-- Name: COLUMN team.divid; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN team.divid IS 'division team plays in';
+
+
+--
 -- Name: competition_cid_seq; Type: SEQUENCE; Schema: public; Owner: alan
 --
 
@@ -797,7 +882,6 @@ ALTER TABLE competition ALTER COLUMN cid SET DEFAULT nextval('competition_cid_se
 --
 
 COPY competition (description, condition, administrator, open, cid, pp_deadline, gap) FROM stdin;
-Test Competition	There is no conditions attached to this competition as it is a dummy one for testing the whole area.  This text has just been added so that one can see a reasonable version during testing	55	f	6	1217581200	3600
 \.
 
 
@@ -1216,11 +1300,27 @@ ALTER TABLE ONLY team_in_competition
 
 
 --
--- Name: wildcard_pick_cid_fkey2; Type: FK CONSTRAINT; Schema: public; Owner: alan
+-- Name: wildcard_pick_cid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
 --
 
 ALTER TABLE ONLY wildcard_pick
-    ADD CONSTRAINT wildcard_pick_cid_fkey2 FOREIGN KEY (cid, tid) REFERENCES team_in_competition(cid, tid) ON UPDATE CASCADE ON DELETE SET NULL;
+    ADD CONSTRAINT wildcard_pick_cid_fkey FOREIGN KEY (cid, uid) REFERENCES registration(cid, uid) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: wildcard_pick_cid_fkey1; Type: FK CONSTRAINT; Schema: public; Owner: alan
+--
+
+ALTER TABLE ONLY wildcard_pick
+    ADD CONSTRAINT wildcard_pick_cid_fkey1 FOREIGN KEY (cid, tid) REFERENCES team_in_competition(cid, tid) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: wildcard_pick_confid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
+--
+
+ALTER TABLE ONLY wildcard_pick
+    ADD CONSTRAINT wildcard_pick_confid_fkey FOREIGN KEY (confid) REFERENCES conference(confid) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
