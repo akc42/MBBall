@@ -246,7 +246,8 @@ CREATE TABLE competition (
     cid integer NOT NULL,
     pp_deadline bigint DEFAULT 0 NOT NULL,
     gap bigint DEFAULT 3600 NOT NULL,
-    bb_approval boolean DEFAULT false NOT NULL
+    bb_approval boolean DEFAULT false NOT NULL,
+    creation_date date DEFAULT now() NOT NULL
 );
 
 
@@ -306,6 +307,13 @@ COMMENT ON COLUMN competition.gap IS 'Seconds to go before match to make pick de
 --
 
 COMMENT ON COLUMN competition.bb_approval IS 'Set if BB''s Need Approval after registering to play';
+
+
+--
+-- Name: COLUMN competition.creation_date; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN competition.creation_date IS 'Date Competition Created';
 
 
 --
@@ -921,7 +929,7 @@ ALTER TABLE competition ALTER COLUMN cid SET DEFAULT nextval('competition_cid_se
 -- Data for Name: competition; Type: TABLE DATA; Schema: public; Owner: alan
 --
 
-COPY competition (description, condition, administrator, open, cid, pp_deadline, gap, bb_approval) FROM stdin;
+COPY competition (description, condition, administrator, open, cid, pp_deadline, gap, bb_approval, creation_date) FROM stdin;
 \.
 
 
