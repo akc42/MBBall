@@ -28,6 +28,17 @@ $password = sha1("Football".$uid);
 
 define ('BALL',1);   //defined so we can control access to some of the files.
 require_once('db.php');
+if(in_array(SMF_FOOTBALL,$groups)) {
+	//Global administrator - so check that participant record is up to date
+	dbQuery('BEGIN;');
+	$result=dbQuery('SELECT * FROM participant WHERE uid = '.dbMakeSafe($uid).';');
+	if(dbNumRows($result) > 0) {
+		dbQuery('UPDATE participant SET name = '.dbMakeSafe($name).', email = '.dbMakeSafe($email).' WHERE uid = '.dbMakeSafe($uid).';');
+	} else {
+		dbQuery('INSERT INTO participant (uid,name,email) VALUES ('.dbMakeSafe($uid).','.dbMakeSafe($name).','.dbMakeSafe($email).');');
+	}
+	dbQuery('COMMIT;');
+}
 
 if(isset($_GET['cid'])) {
 	$cid = $_GET['cid'];
@@ -141,7 +152,9 @@ if(dbNumRows($result) == 0) {
 	}
 } else {
 	$registered = true;
-	dbQuery('UPDATE participant SET name = '.dbMakeSafe($name).', email = '.dbMakeSafe($email).' WHERE uid = '.dbMakeSafe($uid).';');
+	if(!in_array(SMF_FOOTBALL,$groups)) { //update already done if global administrator
+		dbQuery('UPDATE participant SET name = '.dbMakeSafe($name).', email = '.dbMakeSafe($email).' WHERE uid = '.dbMakeSafe($uid).';');
+	}
 }
 dbFree($result);
 dbQuery('SELECT r.rid AS rid, r.name AS name FROM round r JOIN match m USING (cid,rid) WHERE r.cid = '.dbMakeSafe($cid)
