@@ -23,7 +23,7 @@ define('MBBALL_ICON_PATH', '/football/images/');
 $groups =& $user_info['groups'];
 $uid = $ID_MEMBER;
 $name =& $user_info['name'];
-$password = sha1("Key".$uid);
+$password = sha1("Football".$uid);
 
 define ('BALL',1);   //defined so we can control access to some of the files.
 require_once('db.php');
@@ -86,7 +86,7 @@ dbFree($result)
 window.addEvent('domready', function() {
 	MBball.init({uid: <?php echo $uid;?>, 
 				name: '<?php echo $name ; ?>',
-				password : '<?php echo sha1("Key".$uid); ?>'});
+				password : '<?php echo sha1("Football".$uid); ?>'});
 });	
 window.addEvent('unload', function() {
 	MBball.logout();
