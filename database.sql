@@ -1331,7 +1331,207 @@ REVOKE ALL ON SCHEMA public FROM PUBLIC;
 REVOKE ALL ON SCHEMA public FROM postgres;
 GRANT ALL ON SCHEMA public TO postgres;
 GRANT ALL ON SCHEMA public TO PUBLIC;
-GRANT ALL ON SCHEMA public TO melindas_ball;
+GRANT USAGE ON SCHEMA public TO melindas_ball;
+
+
+--
+-- Name: option_pick; Type: ACL; Schema: public; Owner: alan
+--
+
+REVOKE ALL ON TABLE option_pick FROM PUBLIC;
+REVOKE ALL ON TABLE option_pick FROM alan;
+GRANT ALL ON TABLE option_pick TO alan;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE option_pick TO melindas_ball;
+
+
+--
+-- Name: registration; Type: ACL; Schema: public; Owner: alan
+--
+
+REVOKE ALL ON TABLE registration FROM PUBLIC;
+REVOKE ALL ON TABLE registration FROM alan;
+GRANT ALL ON TABLE registration TO alan;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE registration TO melindas_ball;
+
+
+--
+-- Name: round; Type: ACL; Schema: public; Owner: alan
+--
+
+REVOKE ALL ON TABLE round FROM PUBLIC;
+REVOKE ALL ON TABLE round FROM alan;
+GRANT ALL ON TABLE round TO alan;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE round TO melindas_ball;
+
+
+--
+-- Name: bonus_score; Type: ACL; Schema: public; Owner: alan
+--
+
+REVOKE ALL ON TABLE bonus_score FROM PUBLIC;
+REVOKE ALL ON TABLE bonus_score FROM alan;
+GRANT ALL ON TABLE bonus_score TO alan;
+GRANT SELECT ON TABLE bonus_score TO melindas_ball;
+
+
+--
+-- Name: competition; Type: ACL; Schema: public; Owner: alan
+--
+
+REVOKE ALL ON TABLE competition FROM PUBLIC;
+REVOKE ALL ON TABLE competition FROM alan;
+GRANT ALL ON TABLE competition TO alan;
+GRANT SELECT,INSERT,REFERENCES,UPDATE ON TABLE competition TO melindas_ball;
+
+
+--
+-- Name: conference; Type: ACL; Schema: public; Owner: alan
+--
+
+REVOKE ALL ON TABLE conference FROM PUBLIC;
+REVOKE ALL ON TABLE conference FROM alan;
+GRANT ALL ON TABLE conference TO alan;
+GRANT SELECT ON TABLE conference TO melindas_ball;
+
+
+--
+-- Name: default_competition; Type: ACL; Schema: public; Owner: alan
+--
+
+REVOKE ALL ON TABLE default_competition FROM PUBLIC;
+REVOKE ALL ON TABLE default_competition FROM alan;
+GRANT ALL ON TABLE default_competition TO alan;
+GRANT SELECT,UPDATE ON TABLE default_competition TO melindas_ball;
+
+
+--
+-- Name: div_winner_pick; Type: ACL; Schema: public; Owner: alan
+--
+
+REVOKE ALL ON TABLE div_winner_pick FROM PUBLIC;
+REVOKE ALL ON TABLE div_winner_pick FROM alan;
+GRANT ALL ON TABLE div_winner_pick TO alan;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE div_winner_pick TO melindas_ball;
+
+
+--
+-- Name: division; Type: ACL; Schema: public; Owner: alan
+--
+
+REVOKE ALL ON TABLE division FROM PUBLIC;
+REVOKE ALL ON TABLE division FROM alan;
+GRANT ALL ON TABLE division TO alan;
+GRANT SELECT ON TABLE division TO melindas_ball;
+
+
+--
+-- Name: match; Type: ACL; Schema: public; Owner: alan
+--
+
+REVOKE ALL ON TABLE match FROM PUBLIC;
+REVOKE ALL ON TABLE match FROM alan;
+GRANT ALL ON TABLE match TO alan;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE match TO melindas_ball;
+
+
+--
+-- Name: pick; Type: ACL; Schema: public; Owner: alan
+--
+
+REVOKE ALL ON TABLE pick FROM PUBLIC;
+REVOKE ALL ON TABLE pick FROM alan;
+GRANT ALL ON TABLE pick TO alan;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE pick TO melindas_ball;
+
+
+--
+-- Name: match_score; Type: ACL; Schema: public; Owner: alan
+--
+
+REVOKE ALL ON TABLE match_score FROM PUBLIC;
+REVOKE ALL ON TABLE match_score FROM alan;
+GRANT ALL ON TABLE match_score TO alan;
+GRANT SELECT ON TABLE match_score TO melindas_ball;
+
+
+--
+-- Name: option; Type: ACL; Schema: public; Owner: alan
+--
+
+REVOKE ALL ON TABLE option FROM PUBLIC;
+REVOKE ALL ON TABLE option FROM alan;
+GRANT ALL ON TABLE option TO alan;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE option TO melindas_ball;
+
+
+--
+-- Name: participant; Type: ACL; Schema: public; Owner: alan
+--
+
+REVOKE ALL ON TABLE participant FROM PUBLIC;
+REVOKE ALL ON TABLE participant FROM alan;
+GRANT ALL ON TABLE participant TO alan;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE participant TO melindas_ball;
+
+
+--
+-- Name: wildcard_pick; Type: ACL; Schema: public; Owner: alan
+--
+
+REVOKE ALL ON TABLE wildcard_pick FROM PUBLIC;
+REVOKE ALL ON TABLE wildcard_pick FROM alan;
+GRANT ALL ON TABLE wildcard_pick TO alan;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE wildcard_pick TO melindas_ball;
+
+
+--
+-- Name: playoff_picks; Type: ACL; Schema: public; Owner: alan
+--
+
+REVOKE ALL ON TABLE playoff_picks FROM PUBLIC;
+REVOKE ALL ON TABLE playoff_picks FROM alan;
+GRANT ALL ON TABLE playoff_picks TO alan;
+GRANT SELECT ON TABLE playoff_picks TO melindas_ball;
+
+
+--
+-- Name: team_in_competition; Type: ACL; Schema: public; Owner: alan
+--
+
+REVOKE ALL ON TABLE team_in_competition FROM PUBLIC;
+REVOKE ALL ON TABLE team_in_competition FROM alan;
+GRANT ALL ON TABLE team_in_competition TO alan;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE team_in_competition TO melindas_ball;
+
+
+--
+-- Name: playoff_score; Type: ACL; Schema: public; Owner: alan
+--
+
+REVOKE ALL ON TABLE playoff_score FROM PUBLIC;
+REVOKE ALL ON TABLE playoff_score FROM alan;
+GRANT ALL ON TABLE playoff_score TO alan;
+GRANT SELECT ON TABLE playoff_score TO melindas_ball;
+
+
+--
+-- Name: round_score; Type: ACL; Schema: public; Owner: alan
+--
+
+REVOKE ALL ON TABLE round_score FROM PUBLIC;
+REVOKE ALL ON TABLE round_score FROM alan;
+GRANT ALL ON TABLE round_score TO alan;
+GRANT SELECT ON TABLE round_score TO melindas_ball;
+
+
+--
+-- Name: team; Type: ACL; Schema: public; Owner: alan
+--
+
+REVOKE ALL ON TABLE team FROM PUBLIC;
+REVOKE ALL ON TABLE team FROM alan;
+GRANT ALL ON TABLE team TO alan;
+GRANT SELECT ON TABLE team TO melindas_ball;
 
 
 --
