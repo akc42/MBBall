@@ -23,6 +23,7 @@ define('MBBALL_ICON_PATH', '/football/images/');
 $groups =& $user_info['groups'];
 $uid = $ID_MEMBER;
 $name =& $user_info['name'];
+$email =& $user_infor['email'];
 $password = sha1("Football".$uid);
 
 define ('BALL',1);   //defined so we can control access to some of the files.
@@ -140,6 +141,7 @@ if(dbNumRows($result) == 0) {
 	}
 } else {
 	$registered = true;
+	dbQuery('UPDATE participant SET name = '.dbMakeSafe($name).', email = '.dbMakeSafe($email).' WHERE uid = '.dbMakeSafe($uid).';');
 }
 dbFree($result);
 dbQuery('SELECT r.rid AS rid, r.name AS name FROM round r JOIN match m USING (cid,rid) WHERE r.cid = '.dbMakeSafe($cid)
