@@ -68,7 +68,12 @@ window.addEvent('unload', function() {
 	comeptition.  In this case the functions are to edit the basic data for
 	a competition and to add rounds, with optional bonus questions and matches */
 
-if(isset($_GET['global')) {
+//we need this in both parts
+$resultusers = dbQuery('SELECT uid,name FROM participant WHERE last_logon > now() - interval \'1 year 1 month\' AND is_bb IS NOT TRUE
+				ORDER BY admin_experience DESC, name;');
+$userdata = dbFetch($resultusers);
+
+if(isset($_GET['global'])) {
 //Global administration
 ?><div id="competitions">
 	<table>
@@ -148,6 +153,9 @@ $result = dbQuery('SELECT description,uid,name FROM competition c LEFT JOIN part
 <?php
 } else {
 //Competition administration
+?><div id="competition">
+
+<?php
 }
 ?><div id="copyright">MBball <span id="version"></span> &copy; 2008 Alan Chandler.  Licenced under the GPL</div>
 </div>
