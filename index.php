@@ -37,9 +37,9 @@ if(isset($_GET['cid'])) {
 		$cid = $row['cid'];
 	} else {
 		if(in_array(SMF_FOOTBALL,$groups)) {
-			header( 'Location: http://www.melindasbackups.com/football/admin.php?uid='.$uid.'&pass='.$password.'&global=true' ) ; 
+			header( 'Location: admin.php?uid='.$uid.'&pass='.$password.'&global=true' ) ; 
 		} else {
-			header( 'Location: http://www.melindasbackups.com/football/nostart.html' ) ;
+			header( 'Location: nostart.html' ) ;
 		};
 		exit;
 	}
@@ -50,9 +50,9 @@ $result = dbQuery('SELECT * FROM Competition WHERE cid = '.dbMakeSafe($cid).';')
 if (dbNumRows($result) == 0) {
 	//This competition doesn't exist yet
 	if(in_array(SMF_FOOTBALL,$groups)) {
-		header( 'Location: http://www.melindasbackups.com/football/admin.php?uid='.$uid.'&pass='.$password.'&global=true&cid='.$cid ) ;
+		header( 'Location: admin.php?uid='.$uid.'&pass='.$password.'&global=true&cid='.$cid ) ;
 	} else {
-		header( 'Location: http://www.melindasbackups.com/football/nostart.html' ) ;
+		header( 'Location: nostart.html' ) ;
 	};
 	exit;
 }	
