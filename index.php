@@ -93,6 +93,7 @@ if ($uid == $row['administrator']) {
 $gap = $row['gap'];   //difference from match time that picks close
 $playoff_deadline=$row['pp_deadline']; //is set will be the cutoff point for playoff predictions, if 0 there is no playoff quiz
 $registration_open = ($row['open'] == 't'); //is the competition open for registration
+$approval_required = ($row['bb_approval'] == 't'); //BB approval is required
 dbFree($result)
 
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -164,15 +165,26 @@ if(dbNumRows($result) == 0) {
 		$menu=true;
 	}
 } else {
-	$registered = true;
+	$row = dbFetchRow($result);
+	if ($approval_required && $row['bb_approved'] != 't' && in_array(BABY_BACKUP,$groups)) {
+		$registered = false;
+	} else {
+		$registered = true;
+	}
 	if(!(in_array(SMF_FOOTBALL,$groups)  || $admin)) { //update already done if global or ordinary administrator
 			//Don't touch admin experience - might not be admin now, but could have been in past
-		dbQuery('UPDATE participant SET last_logon = now(), name = '
-			.dbMakeSafe($name).', email = '.dbMakeSafe($email).' WHERE uid = '.dbMakeSafe($uid).';');
+		if(in_array(BABY_BACKUP,$groups)) {
+			dbQuery('UPDATE participant SET last_logon = now(), is_bb = TRUE, name = '
+				.dbMakeSafe($name).', email = '.dbMakeSafe($email).' WHERE uid = '.dbMakeSafe($uid).';');
+		} else {
+		
+			dbQuery('UPDATE participant SET last_logon = now(), is_bb = FALSE, name = '
+				.dbMakeSafe($name).', email = '.dbMakeSafe($email).' WHERE uid = '.dbMakeSafe($uid).';');
+		}
 	}
 }
 dbFree($result);
-dbQuery('SELECT r.rid AS rid, r.name AS name FROM round r JOIN match m USING (cid,rid) WHERE r.cid = '.dbMakeSafe($cid)
+$result = dbQuery('SELECT r.rid AS rid, r.name AS name FROM round r JOIN match m USING (cid,rid) WHERE r.cid = '.dbMakeSafe($cid)
 	.' AND m.open IS TRUE GROUP BY r.rid, r.name ORDER BY rid DESC ;');  //find rounds where at least one match is open
 if (dbNumRows($result) > 0) {
 	$row=dbFetchRow($result);

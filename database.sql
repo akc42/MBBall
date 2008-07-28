@@ -86,7 +86,8 @@ COMMENT ON COLUMN option_pick.submit_time IS 'Time of Submission';
 CREATE TABLE registration (
     uid integer NOT NULL,
     cid integer NOT NULL,
-    agree_time bigint
+    agree_time bigint,
+    bb_approved boolean DEFAULT false NOT NULL
 );
 
 
@@ -118,6 +119,13 @@ COMMENT ON COLUMN registration.cid IS 'Competition ID';
 --
 
 COMMENT ON COLUMN registration.agree_time IS 'Time Agreed to Competition Conditions';
+
+
+--
+-- Name: COLUMN registration.bb_approved; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN registration.bb_approved IS 'Set if BB has been approved to play';
 
 
 --
@@ -237,7 +245,8 @@ CREATE TABLE competition (
     open boolean DEFAULT false NOT NULL,
     cid integer NOT NULL,
     pp_deadline bigint DEFAULT 0 NOT NULL,
-    gap bigint DEFAULT 3600 NOT NULL
+    gap bigint DEFAULT 3600 NOT NULL,
+    bb_approval boolean DEFAULT false NOT NULL
 );
 
 
@@ -290,6 +299,13 @@ COMMENT ON COLUMN competition.pp_deadline IS 'Playoff Selection Deadline 0 if no
 --
 
 COMMENT ON COLUMN competition.gap IS 'Seconds to go before match to make pick deadline';
+
+
+--
+-- Name: COLUMN competition.bb_approval; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN competition.bb_approval IS 'Set if BB''s Need Approval after registering to play';
 
 
 --
@@ -652,7 +668,8 @@ CREATE TABLE participant (
     name character varying,
     email character varying,
     last_logon date DEFAULT now() NOT NULL,
-    admin_experience boolean DEFAULT false NOT NULL
+    admin_experience boolean DEFAULT false NOT NULL,
+    is_bb boolean DEFAULT false NOT NULL
 );
 
 
@@ -677,6 +694,13 @@ COMMENT ON COLUMN participant.last_logon IS 'last time user connected';
 --
 
 COMMENT ON COLUMN participant.admin_experience IS 'Set true if user has ever been administrator';
+
+
+--
+-- Name: COLUMN participant.is_bb; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN participant.is_bb IS 'user is a baby backup';
 
 
 --
@@ -897,7 +921,7 @@ ALTER TABLE competition ALTER COLUMN cid SET DEFAULT nextval('competition_cid_se
 -- Data for Name: competition; Type: TABLE DATA; Schema: public; Owner: alan
 --
 
-COPY competition (description, condition, administrator, open, cid, pp_deadline, gap) FROM stdin;
+COPY competition (description, condition, administrator, open, cid, pp_deadline, gap, bb_approval) FROM stdin;
 \.
 
 
@@ -968,7 +992,7 @@ COPY option_pick (uid, comment, cid, rid, oid, submit_time) FROM stdin;
 -- Data for Name: participant; Type: TABLE DATA; Schema: public; Owner: alan
 --
 
-COPY participant (uid, name, email, last_logon, admin_experience) FROM stdin;
+COPY participant (uid, name, email, last_logon, admin_experience, is_bb) FROM stdin;
 \.
 
 
@@ -984,7 +1008,7 @@ COPY pick (uid, comment, cid, rid, hid, pid, over, submit_time) FROM stdin;
 -- Data for Name: registration; Type: TABLE DATA; Schema: public; Owner: alan
 --
 
-COPY registration (uid, cid, agree_time) FROM stdin;
+COPY registration (uid, cid, agree_time, bb_approved) FROM stdin;
 \.
 
 
@@ -1001,38 +1025,38 @@ COPY round (rid, cid, question, valid_question, answer, value, name, ou_round, d
 --
 
 COPY team (tid, name, logo, url, confid, divid) FROM stdin;
-NE 	New England Patriots			AFC	E
-NYG	New York Giants			NFC	E
-TEN	Tennessee Titans			AFC	S
-IND	Indianapolis Colts			AFC	S
-DAL	Dallas Cowboys			NFC	E
-WAS	Washington Redskins			NFC	E
-SEA	Seattle Seahawks			NFC	W
-ATL	Atlanta Falcons			NFC	S
-CIN	Cincinnati Bengals			AFC	N
-MIA	Miami Dolphins			AFC	E
-CAR	Carolina Panthers			NFC	S
-TB 	Tampa Bay Buccaneers			NFC	S
-BUF	Buffalo Bills			AFC	E
-PHI	Philadelphia Eagles			NFC	E
-NO 	New Orleans Saints			NFC	S
-CHI	Chicago			NFC	N
-JAC	Jacksonville Jaguars			AFC	S
-HOU	Houston Texans			AFC	S
-SF 	San Francisco 49ers			NFC	W
-CLE	Cleveland Browns			AFC	N
-PIT	Pittsburgh Steelers			AFC	N
-BAL	Baltimore Ravens			AFC	N
-DET	Detroit Lions			NFC	N
-GB 	Green Bay Packers			NFC	N
-SD 	San Diego Chargers			AFC	W
-OAK	Oakland Raiders			AFC	W
-MIN	Minnesota Vikings			NFC	N
-DEN	Denver Broncos			AFC	W
-STL	St. Louis Rams			NFC	W
-NYJ	New York Jets			AFC	E
-ARI	Arizona Cardinals			NFC	W
-KC 	Kansas City Chiefs			AFC	W
+NE 	New England Patriots	NE_logo-50x50.gif		AFC	E
+NYG	New York Giants	NYG_logo-50x50.gif		NFC	E
+TEN	Tennessee Titans	TEN_logo-50x50.gif		AFC	S
+IND	Indianapolis Colts	IND_logo-50x50.gif		AFC	S
+DAL	Dallas Cowboys	DAL_logo-50x50.gif		NFC	E
+WAS	Washington Redskins	WAS_logo-50x50.gif		NFC	E
+SEA	Seattle Seahawks	SEA_logo-50x50.gif		NFC	W
+ATL	Atlanta Falcons	ATL_logo-50x50.gif		NFC	S
+CIN	Cincinnati Bengals	CIN_logo-50x50.gif		AFC	N
+MIA	Miami Dolphins	MIA_logo-50x50.gif		AFC	E
+CAR	Carolina Panthers	CAR_logo-50x50.gif		NFC	S
+TB 	Tampa Bay Buccaneers	TB_logo-50x50.gif		NFC	S
+BUF	Buffalo Bills	BUF_logo-50x50.gif		AFC	E
+PHI	Philadelphia Eagles	PHI_logo-50x50.gif		NFC	E
+NO 	New Orleans Saints	NO_logo-50x50.gif		NFC	S
+CHI	Chicago	CHI_logo-50x50.gif		NFC	N
+JAC	Jacksonville Jaguars	JAC_logo-50x50.gif		AFC	S
+HOU	Houston Texans	HOU_logo-50x50.gif		AFC	S
+SF 	San Francisco 49ers	SF_logo-50x50.gif		NFC	W
+CLE	Cleveland Browns	CLE_logo-50x50.gif		AFC	N
+PIT	Pittsburgh Steelers	PIT_logo-50x50.gif		AFC	N
+BAL	Baltimore Ravens	BAL_logo-50x50.gif		AFC	N
+DET	Detroit Lions	DET_logo-50x50.gif		NFC	N
+GB 	Green Bay Packers	GB_logo-50x50.gif		NFC	N
+SD 	San Diego Chargers	SD_logo-50x50.gif		AFC	W
+OAK	Oakland Raiders	OAK_logo-50x50.gif		AFC	W
+MIN	Minnesota Vikings	MIN_logo-50x50.gif		NFC	N
+DEN	Denver Broncos	DEN_logo-50x50.gif		AFC	W
+STL	St. Louis Rams	STL_logo-50x50.gif		NFC	W
+NYJ	New York Jets	NYJ_logo-50x50.gif		AFC	E
+ARI	Arizona Cardinals	ARI_logo-50x50.gif		NFC	W
+KC 	Kansas City Chiefs	KC_logo-50x50.gif		AFC	W
 \.
 
 
