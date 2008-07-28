@@ -28,7 +28,7 @@ $password = sha1("Key".$uid);
 define ('BALL',1);   //defined so we can control access to some of the files.
 require_once('db.php');
 
-if(isset($_GET['cid']) {
+if(isset($_GET['cid'])) {
 	$cid = $_GET['cid'];
 } else {
 	$result = dbQuery('SELECT cid FROM default_competition;');
@@ -50,7 +50,7 @@ $result = dbQuery('SELECT * FROM Competition WHERE cid = '.dbMakeSafe($cid).';')
 if (dbNumRows($result) == 0) {
 	//This competition doesn't exist yet
 	if(in_array(SMF_FOOTBALL,$groups)) {
-		header( 'Location: http://www.melindasbackups.com/football/admin.php?uid='.$uid.'&pass='.$password.'&global=true.'&cid='.$cid' ) ;
+		header( 'Location: http://www.melindasbackups.com/football/admin.php?uid='.$uid.'&pass='.$password.'&global=true&cid='.$cid ) ;
 	} else {
 		header( 'Location: http://www.melindasbackups.com/football/nostart.html' ) ;
 	};
@@ -144,7 +144,7 @@ dbQuery('SELECT r.rid AS rid, r.name AS name FROM round r JOIN match m USING (ci
 if (dbNumRows($result) > 0) {
 	$row=dbFetchRow($result);
 	$round_name = $row['name'];
-	if(isset($_GET['rid']))
+	if(isset($_GET['rid'])) {
 		$rid=$_GET['rid'];
 	} else {
 		$rid=$row['rid'];  //if not set use the first row (ie highest round)
@@ -218,7 +218,7 @@ if($admin) {
 <?php
 		$menu=true;
 	}
-?>	<li><a href="admin.php?<?php echo 'uid='.$uid.'&pass='.$password.'&cid='.dbMakeSafe($cid).;?>">Administration</a>?>
+?>	<li><a href="admin.php?<?php echo 'uid='.$uid.'&pass='.$password.'&cid='.dbMakeSafe($cid);?>">Administration</a>?>
 <?php 
 }
 
@@ -239,17 +239,17 @@ $result = dbQuery('SELECT * FROM division ORDER BY divid;');
 while($row = dbFetchRow($result)) {
 	$divs[$row['divid']] = $row['name'];
 }
-dbFreeResult($result)
+dbFreeResult($result);
 
 // It would be good to have a set of team names. 
 $sql = 'SELECT *  FROM team_in_competition t JOIN JOIN team USING (tid)'; 
 $sql .= ' WHERE t.cid = '.dbMakeSafe($cid).' ORDER BY confid,divid,tid;';
 $result = dbQuery($sql);
-if((dbNumRows($result > 0 ) {
+if(dbNumRows($result) > 0 ) {
 ?>	<div id="team_list">
 <?php
-		$teams = array();
-		$sizes = array();
+		$teams = array(array());
+		$sizes = array(array());
 		while ($row=dbFetchRow($result)) {
 			$pick = array();
 			$pick['tid']=$row['tid'];
@@ -257,11 +257,11 @@ if((dbNumRows($result > 0 ) {
 			$pick['logo']=$row['logo'];
 			$pick['url']=$row['url'];
 			$pick['mp'] = ($row['made_playoff'] == 't');
-			$teams[$row['confid'],$row['divid']][] = $pick;
-			if (isset($sizes[$row['confid'],$row['divid']])) {
-				$sizes[$row['confid'],$row['divid']]++;
+			$teams[$row['confid']][$row['divid']][] = $pick;
+			if (isset($sizes[$row['confid']][$row['divid']])) {
+				$sizes[$row['confid']][$row['divid']]++;
 			} else {
-				$sizes[$row['confid'],$row['divid']] = 1;
+				$sizes[$row['confid']][$row['divid']] = 1;
 			}
 		}
 ?>		<table>
@@ -293,8 +293,8 @@ if((dbNumRows($result > 0 ) {
 <?php
 				}
 				foreach($divs as $divid => $division) {
-					if(isset($teams[$config,$divid,$i]) { //only if this entry is set
-						$row=$teams[$config,$divid,$i];
+					if(isset($teams[$config][$divid][$i])) { //only if this entry is set
+						$row=$teams[$config][$divid][$i];
 						if($row['mp']) {
 ?>					<td class="in_po">
 <?php
@@ -306,7 +306,7 @@ if((dbNumRows($result > 0 ) {
 ?>					</td>
 					<td>
 <?php
-						if (!isnull($row['url']) {
+						if (!isnull($row['url'])) {
 						// if we have a url for team provide a link for it
 							echo '<a href="'.$row['url'].'">'.$row['name'].'</a>';
 						} else {
@@ -316,7 +316,7 @@ if((dbNumRows($result > 0 ) {
 					<td>
 <?php 
 						if(!isnull($row['logo'])) {
-							if (!isnull($row['url']) {			
+							if (!isnull($row['url'])) {			
 								echo '<a href="'.$row['url'].'"><img src="'.$row['logo'].' alt="team logo" /></a>';
 							} else {
 								echo '<img src="'.$row['logo'].' alt="team logo" />';
@@ -336,10 +336,10 @@ if((dbNumRows($result > 0 ) {
 <?php
 }
 dbFreeResult($result);
-We will need round data for both several things - so get it now
-$resultround = dbQuery('SELECT * FROM round WHERE cid = .'dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' ;');
+//We will need round data for both several things - so get it now
+$resultround = dbQuery('SELECT * FROM round WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' ;');
 $haverounddata = false;
-if(dbNumRows($resultround !=0) {  //OK we have a round - so now we need to get it
+if(dbNumRows($resultround) !=0) {  //OK we have a round - so now we need to get it
 	$rounddata = dbFetchRow($resultround);
 	$haverounddata = true;
 }
@@ -380,7 +380,7 @@ $time_at_top = time();
 		</thead>
 		<tbody>
 <?php
-			while($row=dbFetchRow($result) {
+			while($row=dbFetchRow($result)) {
 ?>			<tr>
 				<td>
 					<input class="pick" type="radio" 
@@ -430,15 +430,15 @@ $resultop = dbQuery('SELECT * FROM option_pick WHERE cid = '.dbMakeSafe($cid).' 
 			if ($noopts ==0 ) {
 				$row = dbFetchRow($result);
 //Question is a numeric type
-?>			<tr><td><?php echo rounddata['question'];?></td><td><input type="text" name="answer"
+?>			<tr><td><?php echo $rounddata['question'];?></td><td><input type="text" name="answer"
 <?php
-				if(!isnull($row['value']) {
+				if(!isnull($row['value'])) {
 					echo 'value="'.$row['value'].'"';
 				}
 ?>													/></td>
 			<td><textarea id=bonus_comment">
 <?php
-				if (isset($optdata) && !isnull($opdata['comment']) echo $opdata['comment'];
+				if (isset($optdata) && !isnull($opdata['comment'])) echo $opdata['comment'];
 ?>			</textarea></td></tr>
 <?php 
 			} else {
@@ -448,7 +448,7 @@ $resultop = dbQuery('SELECT * FROM option_pick WHERE cid = '.dbMakeSafe($cid).' 
 ?>			<tr>
 <?php
 					if($i == 1) {
-?>				<td rowspan ="<?php echo $noopts ;?>"><?php echo rounddata['question'];?></td>
+?>				<td rowspan ="<?php echo $noopts ;?>"><?php echo $rounddata['question'];?></td>
 <?php
 					}
 ?>				<td><input type="radio" name="answer" value="<?php echo $row['oid'];?>"
@@ -459,7 +459,7 @@ $resultop = dbQuery('SELECT * FROM option_pick WHERE cid = '.dbMakeSafe($cid).' 
 					if($i == 1) {
 ?>				<tdrowspan ="<?php echo $noopts ;?>"><textarea id=bonus_comment">
 <?php
-						if (isset($optdata) && !isnull($opdata['comment']) echo $opdata['comment'];
+						if (isset($optdata) && !isnull($opdata['comment'])) echo $opdata['comment'];
 ?>					</textarea></td>
 <>php
 					}
@@ -486,7 +486,7 @@ $result=dbQuery('SELECT tid FROM div_winner_pick WHERE cid = '.dbMakeSafe($cid).
 			$dw[$row['tid']] = 1;
 		}
 dbFreeResult($result);
-result=dbQuery('SELECT tid FROM wildcard_pick WHERE cid = '.dbMakeSafe($cid).' AND uid = '.dbMakeSafe($uid).';');
+$result=dbQuery('SELECT tid FROM wildcard_pick WHERE cid = '.dbMakeSafe($cid).' AND uid = '.dbMakeSafe($uid).';');
 		$wild = array();
 		while($row = dbFetchRow($result)) {
 			$wild[$row['tid']] = 1;
@@ -508,7 +508,7 @@ result=dbQuery('SELECT tid FROM wildcard_pick WHERE cid = '.dbMakeSafe($cid).' A
 				<th class="po_h3">Conference</th><th class="po_h4">\</th>
 <?php
 		foreach($divs as $division) {
-				<th class="po_h5">Team</th>
+?>				<th class="po_h5">Team</th>
 				<th class="po_h6">D Win</th>
 				<th class="po_h6">Wild1</th>
 				<th class="po_h6">Wild2</th>
@@ -529,8 +529,8 @@ result=dbQuery('SELECT tid FROM wildcard_pick WHERE cid = '.dbMakeSafe($cid).' A
 <?php
 				}
 				foreach($divs as $divid => $division) {
-					if(isset($teams[$config,$divid,$i]) { //only if this entry is set
-						$tid=$teams[$config,$divid,$i,'tid'];
+					if(isset($teams[$config][$divid][$i])) { //only if this entry is set
+						$tid=$teams[$config][$divid][$i]['tid'];
 ?>				<td><?php echo $tid; ?></td>
 				<td class="po_pdw">
 					<input type="radio" 
@@ -542,7 +542,7 @@ result=dbQuery('SELECT tid FROM wildcard_pick WHERE cid = '.dbMakeSafe($cid).' A
 					<input type="radio" 
 						name="<?php echo $confid.'w1';?>"
 						value="<?php echo $tid;?>"
-						<?php if (isset($wild($tid)) {echo 'checked'; $wild1_shown=true} ?> />
+						<?php if (isset($wild[$tid])) {echo 'checked'; $wild1_shown=true;} ?> />
 				</td>
 				<td class="po_wild">
 					<input type="radio" 
@@ -621,8 +621,8 @@ $bqops = dbNumRows($resultbq);
 <?php
 	dbRestartQuery($result);  //put the results back to the start so we can interate over them again
 	while($row = dbFetchRow($result)) {
-?>				<th><?php if(!isnull($row['hscore']) echo $row['hscore'];?></th>
-				<th><?php if(!isnull($row['ascore']) echo $row['ascore'];?></th>
+?>				<th><?php if(!isnull($row['hscore'])) echo $row['hscore'];?></th>
+				<th><?php if(!isnull($row['ascore'])) echo $row['ascore'];?></th>
 <?php
 	}
 				//column part of rowspan from previous bonus question fit in here
@@ -678,7 +678,7 @@ $sql = 'SELECT round_score r JOIN match m USING (cid,rid) JOIN team USING (hid)'
 $sql .= ' LEFT JOIN pick p USING (cid,rid,hid,uid)'; 
 $sql .= ' WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' AND m.open IS TRUE ORDER BY r.score DESC, t.confid, t.divid, m.hid;'; 
 $resultmatch = dbQuery($sql);
-	if ($matchdata = dbFetch($resultmatch);
+	if ($matchdata = dbFetch($resultmatch)) {
 		$i = 0;
 		while ($row = dbFetchRow($result)) {
 			for($match = $i*$nomatches;$match++;$match < ($i+1)*$nomatches) {
@@ -686,34 +686,34 @@ $resultmatch = dbQuery($sql);
 				<td><?php echo $row['name'];?></td>
 <?php
 				if($rounddata['ou_round']) {
-?>				<td <?php if(!isnull($matchdata[$match,'pid']) && !isnull($matchdata[$match,'hscore']) &&
-						 !isnull($matchdata[$match,'ascore']) && 
-						($matchdata[$match,'pid'] == $matchdata[$match,'hid'] &&
-						$matchdata[$match,'hscore']>$matchdata[$match,'ascore']) ||
-						($matchdata[$match,'pid'] == $matchdata[$match,'aid'] && 
-						$matchdata[$match,'hscore']<$matchdata[$match,'ascore']))
+?>				<td <?php if(!isnull($matchdata[$match]['pid']) && !isnull($matchdata[$match]['hscore']) &&
+						 !isnull($matchdata[$match]['ascore']) && 
+						($matchdata[$match]['pid'] == $matchdata[$match]['hid'] &&
+						$matchdata[$match]['hscore']>$matchdata[$match]['ascore']) ||
+						($matchdata[$match]['pid'] == $matchdata[$match]['aid'] && 
+						$matchdata[$match]['hscore']<$matchdata[$match]['ascore']))
 							echo 'class="win"' ;?>>
-					<?php if(!isnull($matchdata[$match,'pid'])) echo $matchdata[$match,'pid'];?>
+					<?php if(!isnull($matchdata[$match]['pid'])) echo $matchdata[$match]['pid'];?>
 				</td>
-				<td <?php if(!isnull($matchdata[$match,'over']) !isnull($matchdata[$match,'hscore']) &&
-						 !isnull($matchdata[$match,'ascore']) &&
-						($matchdata[$match,'over'] == 't' && 
-						($matchdata[$match,'combined_score']+0.5 < $matchdata[$match,'hscore']+$matchdata[$match,'ascore'])) || 
-						(!$matchdata[$match,'over'] == 't' && 
-						($matchdata[$match,'combined_score']+0.5 > $matchdata[$match,'hscore']+$matchdata[$match,'ascore'])))
+				<td <?php if(!isnull($matchdata[$match]['over']) && !isnull($matchdata[$match]['hscore']) &&
+						 !isnull($matchdata[$match]['ascore']) &&
+						($matchdata[$match]['over'] == 't' && 
+						($matchdata[$match]['combined_score']+0.5 < $matchdata[$match]['hscore']+$matchdata[$match]['ascore'])) || 
+						(!$matchdata[$match]['over'] == 't' && 
+						($matchdata[$match]['combined_score']+0.5 > $matchdata[$match]['hscore']+$matchdata[$match]['ascore'])))
 							echo 'class="win"';?>>
-					<?php if(!isnull($matchdata[$match,'over']) echo ($matchdata[$match,'over'] == 't')?'Over':'Under';?>
+					<?php if(!isnull($matchdata[$match]['over'])) echo ($matchdata[$match]['over'] == 't')?'Over':'Under';?>
 				</td>
 <?php
 				} else {
-?>				<td colspan="2" <?php if(!isnull($matchdata[$match,'pid']) && !isnull($matchdata[$match,'hscore']) &&
-						!isnull($matchdata[$match,'ascore']) && 
-						($matchdata[$match,'pid'] == $matchdata[$match,'hid'] &&
-						 $matchdata[$match,'hscore']>$matchdata[$match,'ascore']) ||
-						($matchdata[$match,'pid'] == $matchdata[$match,'aid'] && 
-						$matchdata[$match,'hscore']<$matchdata[$match,'ascore']))
+?>				<td colspan="2" <?php if(!isnull($matchdata[$match]['pid']) && !isnull($matchdata[$match]['hscore']) &&
+						!isnull($matchdata[$match]['ascore']) && 
+						($matchdata[$match]['pid'] == $matchdata[$match]['hid'] &&
+						 $matchdata[$match]['hscore']>$matchdata[$match]['ascore']) ||
+						($matchdata[$match]['pid'] == $matchdata[$match]['aid'] && 
+						$matchdata[$match]['hscore']<$matchdata[$match]['ascore']))
 							echo 'class="win"' ;?>>
-					<?php if(!isnull($matchdata[$match,'pid'])) echo $matchdata[$match,'pid'];?>
+					<?php if(!isnull($matchdata[$match]['pid'])) echo $matchdata[$match]['pid'];?>
 				</td>
 <?php
 				}
@@ -722,7 +722,7 @@ $resultmatch = dbQuery($sql);
 				// this is a multichoice question, so get results and output them
 					dbRestartQuery($resultbq);  //reset lost of options to start
 						while ($optdata = dbFetchRow($resultbq)) {
-?>				<td <?php if($optdata['oid'] == $rounddata['answer']] && $row['rscore'] > 0) 
+?>				<td <?php if($optdata['oid'] == $rounddata['answer'] && $row['rscore'] > 0) 
 					echo 'class="win"';?>><?php if($row['rscore'] > 0) echo 'X';?></td>
 <?php
 						}
@@ -762,8 +762,9 @@ if ($playoff_deadline != 0) {
 			<tr>
 <?php
 	foreach($confs as $confid => $conference) {
-		foreach($divs as $divid => $division{
-?>				<th colsspan="<?php echo $sizes[$confid,$divid];?>"><?php echo $divid; ?></td>
+		foreach($divs as $divid => $division){
+?>				<th colsspan="<?php echo $sizes[$confid][$divid];?>">
+					<?php echo $divid; ?></th>
 <?php
 		}
 	}
@@ -771,8 +772,8 @@ if ($playoff_deadline != 0) {
 			<tr>
 <?php
 	foreach($confs as $confid => $conference) {
-		foreach($divs as $divid => $division{
-			foreach($teams[$confid,$divid] as $team) {
+		foreach($divs as $divid => $division) {
+			foreach($teams[$confid][$divid] as $team) {
 ?>				<th><?php echo $team['tid'];?></th>
 <?php
 			}
@@ -782,10 +783,10 @@ if ($playoff_deadline != 0) {
 		</thead>
 		<tbody>
 <?php
-$sql = 'SELECT u.name AS name, u.uid AS uid, p.score AS score'
-$sql .= ' FROM playoff_score p JOIN user USING (uid)'
+$sql = 'SELECT u.name AS name, u.uid AS uid, p.score AS score';
+$sql .= ' FROM playoff_score p JOIN user USING (uid)';
 $sql .= ' WHERE cid = '.dbMakeSafe($cid);
-$$sql .= ' ORDER BY score DESC;'
+$$sql .= ' ORDER BY score DESC;';
 $result = dbQuery($sql);
 	while($row = dbFetchRow($result)) {
 		$playoff_selections = array();
@@ -797,8 +798,8 @@ $result = dbQuery($sql);
 				<td><?php echo $row['name']; ?></td>
 <?php
 		foreach($confs as $confid => $conference) {
-			foreach($divs as $divid => $division{
-				foreach($teams[$confid,$divid] as $team) {
+			foreach($divs as $divid => $division){
+				foreach($teams[$confid][$divid] as $team) {
 ?>					<td <?php if($team['mp'] && isset($playoff_selections[$team['tid']])) echo 'class="win"';?>>
 						<?php if(isset($playoff_selections[$team['tid']])) echo $team['tid'];?></td>
 <?php
@@ -825,7 +826,7 @@ $result = dbQuery($sql);
 		<thead>
 			<tr><th>Name</th>
 <?php
-	$result = dbQuery('SELECT name FROM round WHERE cid = '.dbMakeSafe($cid).' AND rid <= '.dbMakeSafe($rid)' ORDER BY rid DESC;');
+	$result = dbQuery('SELECT name FROM round WHERE cid = '.dbMakeSafe($cid).' AND rid <= '.dbMakeSafe($rid).' ORDER BY rid DESC;');
 	while($row = dbFetchRow($result)) {
 ?>				<th><?php echo $row['name']; ?></th>
 <?php

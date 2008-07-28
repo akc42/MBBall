@@ -20,7 +20,7 @@ header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); // Date in the past
 		return $result;
 	}
 	function dbMakeSafe($value) {
-		return "'".pg_escape_string($value)."'" ;x
+		return "'".pg_escape_string($value)."'" ;
 	}
 	function dbNumRows($result) {
 		return pg_num_rows($result);
