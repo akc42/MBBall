@@ -33,9 +33,11 @@ if(in_array(SMF_FOOTBALL,$groups)) {
 	dbQuery('BEGIN;');
 	$result=dbQuery('SELECT * FROM participant WHERE uid = '.dbMakeSafe($uid).';');
 	if(dbNumRows($result) > 0) {
-		dbQuery('UPDATE participant SET name = '.dbMakeSafe($name).', email = '.dbMakeSafe($email).' WHERE uid = '.dbMakeSafe($uid).';');
+		dbQuery('UPDATE participant SET last_logon = now(), admin_experience = TRUE, name = '
+				.dbMakeSafe($name).', email = '.dbMakeSafe($email).' WHERE uid = '.dbMakeSafe($uid).';');
 	} else {
-		dbQuery('INSERT INTO participant (uid,name,email) VALUES ('.dbMakeSafe($uid).','.dbMakeSafe($name).','.dbMakeSafe($email).');');
+		dbQuery('INSERT INTO participant (uid,name,email,last_logon, admin_experience) VALUES ('
+				.dbMakeSafe($uid).','.dbMakeSafe($name).','.dbMakeSafe($email).', DEFAULT,TRUE);');
 	}
 	dbQuery('COMMIT;');
 }
@@ -76,6 +78,17 @@ $row = dbFetchRow($result);
 if ($uid == $row['administrator']) {
 	//User is administrator of this competition
 	$admin = true;
+	// check that participant record is up to date, as we are not going to be registered for the competition (maybe)
+	dbQuery('BEGIN;');
+	$result=dbQuery('SELECT * FROM participant WHERE uid = '.dbMakeSafe($uid).';');
+	if(dbNumRows($result) > 0) {
+		dbQuery('UPDATE participant SET last_logon = now(), admin_experience = TRUE, name = '
+				.dbMakeSafe($name).', email = '.dbMakeSafe($email).' WHERE uid = '.dbMakeSafe($uid).';');
+	} else {
+		dbQuery('INSERT INTO participant (uid,name,email,last_logon, admin_experience) VALUES ('
+				.dbMakeSafe($uid).','.dbMakeSafe($name).','.dbMakeSafe($email).', DEFAULT,TRUE);');
+	}
+	dbQuery('COMMIT;');
 }
 $gap = $row['gap'];   //difference from match time that picks close
 $playoff_deadline=$row['pp_deadline']; //is set will be the cutoff point for playoff predictions, if 0 there is no playoff quiz
@@ -152,8 +165,10 @@ if(dbNumRows($result) == 0) {
 	}
 } else {
 	$registered = true;
-	if(!in_array(SMF_FOOTBALL,$groups)) { //update already done if global administrator
-		dbQuery('UPDATE participant SET name = '.dbMakeSafe($name).', email = '.dbMakeSafe($email).' WHERE uid = '.dbMakeSafe($uid).';');
+	if(!(in_array(SMF_FOOTBALL,$groups)  || $admin)) { //update already done if global or ordinary administrator
+			//Don't touch admin experience - might not be admin now, but could have been in past
+		dbQuery('UPDATE participant SET last_logon = now(), name = '
+			.dbMakeSafe($name).', email = '.dbMakeSafe($email).' WHERE uid = '.dbMakeSafe($uid).';');
 	}
 }
 dbFree($result);

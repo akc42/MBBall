@@ -650,7 +650,9 @@ COMMENT ON COLUMN option.label IS 'Simple Label for this option';
 CREATE TABLE participant (
     uid integer NOT NULL,
     name character varying,
-    email character varying
+    email character varying,
+    last_logon date DEFAULT now() NOT NULL,
+    admin_experience boolean DEFAULT false NOT NULL
 );
 
 
@@ -661,6 +663,20 @@ ALTER TABLE public.participant OWNER TO alan;
 --
 
 COMMENT ON TABLE participant IS 'forum user who will participate in one or more competitions';
+
+
+--
+-- Name: COLUMN participant.last_logon; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN participant.last_logon IS 'last time user connected';
+
+
+--
+-- Name: COLUMN participant.admin_experience; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN participant.admin_experience IS 'Set true if user has ever been administrator';
 
 
 --
@@ -952,7 +968,7 @@ COPY option_pick (uid, comment, cid, rid, oid, submit_time) FROM stdin;
 -- Data for Name: participant; Type: TABLE DATA; Schema: public; Owner: alan
 --
 
-COPY participant (uid, name, email) FROM stdin;
+COPY participant (uid, name, email, last_logon, admin_experience) FROM stdin;
 \.
 
 
