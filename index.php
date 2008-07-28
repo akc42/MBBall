@@ -32,8 +32,11 @@ if(isset($_GET['cid'])) {
 	$cid = $_GET['cid'];
 } else {
 	$result = dbQuery('SELECT cid FROM default_competition;');
-	if(dbNumRows($result) != 0 ) {
-		$row=dbFetchRow($result);
+	if(dbNumRows($result) != 1 ) {
+		die("Database is corrupt - default_competition should have a single row");
+	}
+	$row=dbFetchRow($result);
+	if (!is_null($row['cid'])) {
 		$cid = $row['cid'];
 	} else {
 		if(in_array(SMF_FOOTBALL,$groups)) {
@@ -306,7 +309,7 @@ if(dbNumRows($result) > 0 ) {
 ?>					</td>
 					<td>
 <?php
-						if (!isnull($row['url'])) {
+						if (!is_null($row['url'])) {
 						// if we have a url for team provide a link for it
 							echo '<a href="'.$row['url'].'">'.$row['name'].'</a>';
 						} else {
@@ -315,11 +318,12 @@ if(dbNumRows($result) > 0 ) {
 ?>					</td>
 					<td>
 <?php 
-						if(!isnull($row['logo'])) {
-							if (!isnull($row['url'])) {			
-								echo '<a href="'.$row['url'].'"><img src="'.$row['logo'].' alt="team logo" /></a>';
+						if(!is_null($row['logo'])) {
+							$logopath = MBBALL_ICON_PATH.$row['logo'];
+							if (!is_null($row['url'])) {			
+								echo '<a href="'.$row['url'].'"><img src="'.$logopath.' alt="team logo" /></a>';
 							} else {
-								echo '<img src="'.$row['logo'].' alt="team logo" />';
+								echo '<img src="'.$logopath.' alt="team logo" />';
 							}
 						}
 ?>					</td>
@@ -432,13 +436,13 @@ $resultop = dbQuery('SELECT * FROM option_pick WHERE cid = '.dbMakeSafe($cid).' 
 //Question is a numeric type
 ?>			<tr><td><?php echo $rounddata['question'];?></td><td><input type="text" name="answer"
 <?php
-				if(!isnull($row['value'])) {
+				if(!is_null($row['value'])) {
 					echo 'value="'.$row['value'].'"';
 				}
 ?>													/></td>
 			<td><textarea id=bonus_comment">
 <?php
-				if (isset($optdata) && !isnull($opdata['comment'])) echo $opdata['comment'];
+				if (isset($optdata) && !is_null($opdata['comment'])) echo $opdata['comment'];
 ?>			</textarea></td></tr>
 <?php 
 			} else {
@@ -459,7 +463,7 @@ $resultop = dbQuery('SELECT * FROM option_pick WHERE cid = '.dbMakeSafe($cid).' 
 					if($i == 1) {
 ?>				<tdrowspan ="<?php echo $noopts ;?>"><textarea id=bonus_comment">
 <?php
-						if (isset($optdata) && !isnull($opdata['comment'])) echo $opdata['comment'];
+						if (isset($optdata) && !is_null($opdata['comment'])) echo $opdata['comment'];
 ?>					</textarea></td>
 <>php
 					}
@@ -582,13 +586,13 @@ $result = dbQuery('SELECT * FROM match m JOIN team t ON m.hid = t.tid WHERE m.ci
 $nomatches = 0;
 	while($row = dbFetchRow($result)) {
 		$nomatches++;
-		if(!(isnull($row['hscore']) || isnull($row['ascore']) || $row['hscore'] < $row['ascore'])) {
+		if(!(is_null($row['hscore']) || is_null($row['ascore']) || $row['hscore'] < $row['ascore'])) {
 			//Home win
 			echo '<th class="win">'.$row['hid'].'</th>';
 		} else {
 			echo '<th>'.$row['hid'].'</th>';
 		}
-		if(!(isnull($row['hscore']) || isnull($row['ascore']) || $row['hscore'] > $row['ascore'])) {
+		if(!(is_null($row['hscore']) || is_null($row['ascore']) || $row['hscore'] > $row['ascore'])) {
 			//Away win
 			echo '<th class="win">'.$row['aid'].'</th>';
 		} else {
@@ -621,8 +625,8 @@ $bqops = dbNumRows($resultbq);
 <?php
 	dbRestartQuery($result);  //put the results back to the start so we can interate over them again
 	while($row = dbFetchRow($result)) {
-?>				<th><?php if(!isnull($row['hscore'])) echo $row['hscore'];?></th>
-				<th><?php if(!isnull($row['ascore'])) echo $row['ascore'];?></th>
+?>				<th><?php if(!is_null($row['hscore'])) echo $row['hscore'];?></th>
+				<th><?php if(!is_null($row['ascore'])) echo $row['ascore'];?></th>
 <?php
 	}
 				//column part of rowspan from previous bonus question fit in here
@@ -635,7 +639,7 @@ $bqops = dbNumRows($resultbq);
 		if($rounddata['ou_round']) {
 		//This is an over or under guessing round, so we need to also show the over/under results
 			$cs = $row['combined_score']+0.5;
-			if(!(isnull($row['hscore']) || isnull($row['ascore']))) {
+			if(!(is_null($row['hscore']) || is_null($row['ascore']))) {
 				$scores=$row['hscore']+$row['ascore'];
 ?>				<th><?php echo $cs;?></th>
 				<th><?php echo ($scores>$cs)?'Over':'Under';?></th>
@@ -653,12 +657,12 @@ $bqops = dbNumRows($resultbq);
 		if($bqopts > 0) {
 			// this is a multichoice question, so get results and output them
 			while ($optdata = dbFetchRow($resultbq)) {
-?>				<th <?php if(!isnull($rounddata['answer']) && $rounddata['answer'] == $optdata['oid']) echo 'class="win"';?>>
+?>				<th <?php if(!is_null($rounddata['answer']) && $rounddata['answer'] == $optdata['oid']) echo 'class="win"';?>>
 					<?php echo $optdata['label'];?></th>
 <?php
 			}
 		} else {
-?>				<th><?php if(!isnull($rounddata['answer'])) echo $rounddata['answer'];?></th>
+?>				<th><?php if(!is_null($rounddata['answer'])) echo $rounddata['answer'];?></th>
 <?php
 		}
 	}
@@ -686,34 +690,34 @@ $resultmatch = dbQuery($sql);
 				<td><?php echo $row['name'];?></td>
 <?php
 				if($rounddata['ou_round']) {
-?>				<td <?php if(!isnull($matchdata[$match]['pid']) && !isnull($matchdata[$match]['hscore']) &&
-						 !isnull($matchdata[$match]['ascore']) && 
+?>				<td <?php if(!is_null($matchdata[$match]['pid']) && !is_null($matchdata[$match]['hscore']) &&
+						 !is_null($matchdata[$match]['ascore']) && 
 						($matchdata[$match]['pid'] == $matchdata[$match]['hid'] &&
 						$matchdata[$match]['hscore']>$matchdata[$match]['ascore']) ||
 						($matchdata[$match]['pid'] == $matchdata[$match]['aid'] && 
 						$matchdata[$match]['hscore']<$matchdata[$match]['ascore']))
 							echo 'class="win"' ;?>>
-					<?php if(!isnull($matchdata[$match]['pid'])) echo $matchdata[$match]['pid'];?>
+					<?php if(!is_null($matchdata[$match]['pid'])) echo $matchdata[$match]['pid'];?>
 				</td>
-				<td <?php if(!isnull($matchdata[$match]['over']) && !isnull($matchdata[$match]['hscore']) &&
-						 !isnull($matchdata[$match]['ascore']) &&
+				<td <?php if(!is_null($matchdata[$match]['over']) && !is_null($matchdata[$match]['hscore']) &&
+						 !is_null($matchdata[$match]['ascore']) &&
 						($matchdata[$match]['over'] == 't' && 
 						($matchdata[$match]['combined_score']+0.5 < $matchdata[$match]['hscore']+$matchdata[$match]['ascore'])) || 
 						(!$matchdata[$match]['over'] == 't' && 
 						($matchdata[$match]['combined_score']+0.5 > $matchdata[$match]['hscore']+$matchdata[$match]['ascore'])))
 							echo 'class="win"';?>>
-					<?php if(!isnull($matchdata[$match]['over'])) echo ($matchdata[$match]['over'] == 't')?'Over':'Under';?>
+					<?php if(!is_null($matchdata[$match]['over'])) echo ($matchdata[$match]['over'] == 't')?'Over':'Under';?>
 				</td>
 <?php
 				} else {
-?>				<td colspan="2" <?php if(!isnull($matchdata[$match]['pid']) && !isnull($matchdata[$match]['hscore']) &&
-						!isnull($matchdata[$match]['ascore']) && 
+?>				<td colspan="2" <?php if(!is_null($matchdata[$match]['pid']) && !is_null($matchdata[$match]['hscore']) &&
+						!is_null($matchdata[$match]['ascore']) && 
 						($matchdata[$match]['pid'] == $matchdata[$match]['hid'] &&
 						 $matchdata[$match]['hscore']>$matchdata[$match]['ascore']) ||
 						($matchdata[$match]['pid'] == $matchdata[$match]['aid'] && 
 						$matchdata[$match]['hscore']<$matchdata[$match]['ascore']))
 							echo 'class="win"' ;?>>
-					<?php if(!isnull($matchdata[$match]['pid'])) echo $matchdata[$match]['pid'];?>
+					<?php if(!is_null($matchdata[$match]['pid'])) echo $matchdata[$match]['pid'];?>
 				</td>
 <?php
 				}

@@ -900,6 +900,7 @@ NFC	National Football Conference
 --
 
 COPY default_competition (cid) FROM stdin;
+\N
 \.
 
 
@@ -1168,7 +1169,7 @@ ALTER TABLE ONLY option_pick
 --
 
 ALTER TABLE ONLY default_competition
-    ADD CONSTRAINT default_competition_cid_fkey FOREIGN KEY (cid) REFERENCES competition(cid) ON UPDATE RESTRICT ON DELETE CASCADE;
+    ADD CONSTRAINT default_competition_cid_fkey FOREIGN KEY (cid) REFERENCES competition(cid) ON UPDATE CASCADE ON DELETE SET NULL;
 
 
 --
