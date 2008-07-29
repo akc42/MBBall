@@ -18,18 +18,38 @@ var MBBall = new Class({
 	}
 });
 
-MBBUser = new Class({
-	extends: MBBall,
+var MBBUser = new Class({
+	Extends: MBBall,
 	initialize: function(version,me) {
 		this.parent(version,me);
 // other stuff
 	}
-}
+});
 
-MBBAdmin = new Class({
-	extends: MBBall,
+var MBBAdmin = new Class({
+	Extends: MBBall,
 	initialize: function(version,me) {
 		this.parent(version,me);
+		var cc = $('competitions');
+		if(cc) {
+			var req = new Request.HTML({
+				url:'competitions.php', 
+				onSuccess: function(html) {
+					cc.set('text', '');
+			//Inject the new DOM elements into the results div.
+					cc.adopt(html);
+				},
+		//Our request will most likely succeed, but just in case, we'll add an
+		//onFailure method which will let the user know what happened.
+				onFailure: function() {
+					cc.set('text', 'Failed to read competition data');
+				}
+			});
+			req.get(this.requestOptions);
+		}
+		var c = $('competition');
+		if(c) {
+		}
 // other stuff
 	}
-}
+});

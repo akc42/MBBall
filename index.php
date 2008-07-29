@@ -114,8 +114,7 @@ dbFree($result)
 	<!--
 var manager;
 window.addEvent('domready', function() {
-	manager = new MBBUser(<?php echo $version;?>,{uid: <?php echo $uid;?>, 
-				name: '<?php echo $name ; ?>',
+	manager = new MBBUser('<?php echo $version;?>',{uid: '<?php echo $uid;?>', 
 				password : '<?php echo sha1("Football".$uid); ?>'});
 });	
 window.addEvent('unload', function() {
@@ -791,7 +790,7 @@ $resultmatch = dbQuery($sql);
 	</table>
 </div>
 <?php
-}
+}//have round data
 if ($playoff_deadline != 0) {
 ?>
 <div id="playoff_results">	

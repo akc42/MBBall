@@ -26,8 +26,7 @@ require_once('db.php');
 
 var manager;
 window.addEvent('domready', function() {
-	manager = new MBBAdmin(<?php echo $version;?>,{uid: <?php echo $uid;?>, 
-				name: '<?php echo $name ; ?>',
+	manager = new MBBAdmin('<?php echo $_GET['v'];?>',{uid: '<?php echo $uid;?>', 
 				password : '<?php echo sha1("Football".$uid); ?>'});
 });	
 window.addEvent('unload', function() {
@@ -70,93 +69,15 @@ window.addEvent('unload', function() {
 	comeptition.  In this case the functions are to edit the basic data for
 	a competition and to add rounds, with optional bonus questions and matches */
 
-//we need this in both parts
-$resultusers = dbQuery('SELECT uid,name FROM participant WHERE last_logon > now() - interval \'1 year 1 month\' AND is_bb IS NOT TRUE
-				ORDER BY admin_experience DESC, name;');
-$userdata = dbFetch($resultusers);
-
 if(isset($_GET['global'])) {
 //Global administration
 ?><div id="competitions">
-	<table>
-		<caption>Football Competitions</caption>
-		<thead>
-			<tr>
-				<th>Title</th>
-				<th>Competition Administrator</th>
-				<th>Default</th>
-				<th></th>
-			</tr>
-		</thead>
-		<tbody>
-<?php
-$resultusers = dbQuery('SELECT uid,name FROM participant WHERE last_logon > now() - interval \'1 year 1 month\' AND is_bb IS NOT TRUE
-				ORDER BY admin_experience DESC, name;');
-$userdata = dbFetch($resultusers);
-$result = dbQuery('SELECT description,uid,name FROM competition c LEFT JOIN participant p ON c.administrator = p.uid ORDER BY cid DESC  ;');
-	if(dbNumRows($result) > 0) {
-		$resultdefault = dbQuery('SELECT cid FROM default_competition;');
-		if(dbNumRows($resultdefault) != 1 ) {
-			die("Database is corrupt - default_competition should have a single row");
-		}
-		$row=dbFetchRow($resultdefault);
-		if (!is_null($row['cid'])) {
-			$cid = $row['cid'];
-		} else {
-			$cid = 0;
-		}
-	}
-	while($row = dbFetchRow($result)) {
-?>		<form id="<?php echo 'F'.$row['cid'];?>">	
-			<tr>
-				<td class="change">
-					<input type="text" name="<?php echo 'D'.$row['cid'];?>" value="<?php echo $row['description']; ?>" />
-				</td>
-				<td class="change">
-					<select name="<?php echo 'U'.$row['cid'];?>">
-<?php
-		foreach($userdata as $user) {
-?>						<option value="<?php echo $user['uid'];?>" 
-								<?php if ($user['uid'] == $row['uid']) echo 'selected="selected"' ;?>>
-							<?php echo $user['name'] ;?>
-						</option>
-<?php
-		}
-?>					</select>
-				</td>
-				<td class="change">
-					<input type="radio" name="default"	value="<?php echo $row['cid'];?>" 
-						<?php if($cid == $row['cid']) echo 'checked="checked"' ;?> />
-				</td>
-				<td></td>
-			</tr>
-		</form>
-<?php
-	}
-?>		<form id="create_comp">
-			<tr>
-				<td><input type="text" name="Dcreate" value="" /></td>
-				<td><select name="Ucreate">
-<?php
-	foreach($userdata as $user) {
-?>					<option value="<?php echo $user['uid'];?>" 
-						<?php if ($user['uid'] == $uid) echo 'selected="selected"' ;?>>
-						<?php echo $user['name'] ;?></option>
-<?php
-	}
-?>					</select></td>
-				<td><input type="checkbox" name="setdefault"	value="set" checked="checked" /></td>
-				<td><input type="submit" value="Create" /></td>
-			</tr>
-		</form>
-		</tbody>
-	</table>					
 </div>
 <?php
 } else {
 //Competition administration
 ?><div id="competition">
-
+</div>
 <?php
 }
 ?><div id="copyright">MBball <span id="version"></span> &copy; 2008 Alan Chandler.  Licenced under the GPL</div>
