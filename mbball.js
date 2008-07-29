@@ -4,6 +4,12 @@ var MBBall = new Class({
 		this.requestOptions = {'uid':me.uid,'pass':me.password};
 		var span=$('version');
 		span.set('text',version);
+// Need to update all the  dates
+		var datespans = $$('span.date');
+		datespans.each(function (datespan,i) {
+			var d = new Date(datespan.get('text').toInt()*1000);
+			datespan.set('text',d.toLocaleString());
+		});
 	},
 	logout: function () {
 		var logoutRequest = new Request ({url: 'logout.php',autoCancel:true}).get($merge(myRequestOptions,
