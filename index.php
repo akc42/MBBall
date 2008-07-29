@@ -12,7 +12,7 @@ define('MBBALL_PATH', dirname($_SERVER['SCRIPT_FILENAME']).'/');
 require_once(MBBALL_PATH.'../forum/SSI.php');
 //If not logged in to the forum, not allowed any further so redirect to page to say so
 if($user_info['is_guest']) {
-	header( 'Location: http://www.melindasbackups.com/static/Football.htm' ) ;
+	header( 'Location: /static/Football.htm' ) ;
 	exit;
 };
 
@@ -45,16 +45,17 @@ if(in_array(SMF_FOOTBALL,$groups)) {
 if(isset($_GET['cid'])) {
 	$cid = $_GET['cid'];
 } else {
-	$result = dbQuery('SELECT cid FROM default_competition;');
+	$result = dbQuery('SELECT cid,version FROM default_competition;');
 	if(dbNumRows($result) != 1 ) {
 		die("Database is corrupt - default_competition should have a single row");
 	}
 	$row=dbFetchRow($result);
+	$version = $row['version'];
 	if (!is_null($row['cid'])) {
 		$cid = $row['cid'];
 	} else {
 		if(in_array(SMF_FOOTBALL,$groups)) {
-			header( 'Location: admin.php?uid='.$uid.'&pass='.$password.'&global=true' ) ; 
+			header( 'Location: admin.php?uid='.$uid.'&pass='.$password.'&v='.$version.'&global=true' ) ; 
 		} else {
 			header( 'Location: nostart.html' ) ;
 		};
@@ -67,7 +68,7 @@ $result = dbQuery('SELECT * FROM Competition WHERE cid = '.dbMakeSafe($cid).';')
 if (dbNumRows($result) == 0) {
 	//This competition doesn't exist yet
 	if(in_array(SMF_FOOTBALL,$groups)) {
-		header( 'Location: admin.php?uid='.$uid.'&pass='.$password.'&global=true&cid='.$cid ) ;
+		header( 'Location: admin.php?uid='.$uid.'&pass='.$password.'&v='.$version.'&global=true&cid='.$cid ) ;
 	} else {
 		header( 'Location: nostart.html' ) ;
 	};
@@ -111,14 +112,14 @@ dbFree($result)
 <body>
 <script type="text/javascript">
 	<!--
-
+var manager;
 window.addEvent('domready', function() {
-	MBball.init({uid: <?php echo $uid;?>, 
+	manager = new MBBUser(<?php echo $version;?>,{uid: <?php echo $uid;?>, 
 				name: '<?php echo $name ; ?>',
 				password : '<?php echo sha1("Football".$uid); ?>'});
 });	
 window.addEvent('unload', function() {
-	MBball.logout();
+	manager.logout();
 	
 });
 
@@ -252,7 +253,7 @@ if(in_array(SMF_FOOTBALL,$groups)) {
 <?php
 		$menu=true;
 	}
-?>	<li><a href="admin.php?<?php echo 'uid='.$uid.'&pass='.$password.'&global=true';?>">Global Admin</a></li>
+?>	<li><a href="admin.php?<?php echo 'uid='.$uid.'&pass='.$password.'&v='.$version.'&global=true';?>">Global Admin</a></li>
 </li>
 <?php
 }
@@ -263,7 +264,7 @@ if($admin) {
 <?php
 		$menu=true;
 	}
-?>	<li><a href="admin.php?<?php echo 'uid='.$uid.'&pass='.$password.'&cid='.dbMakeSafe($cid);?>">Administration</a>?>
+?>	<li><a href="admin.php?<?php echo 'uid='.$uid.'&pass='.$password.'&v='.$version.'&cid='.dbMakeSafe($cid);?>">Administration</a>?>
 <?php 
 }
 

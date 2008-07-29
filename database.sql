@@ -340,7 +340,8 @@ COMMENT ON COLUMN conference.confid IS 'Conference 3 letter acronym';
 --
 
 CREATE TABLE default_competition (
-    cid integer
+    cid integer,
+    version character varying
 );
 
 
@@ -351,6 +352,13 @@ ALTER TABLE public.default_competition OWNER TO alan;
 --
 
 COMMENT ON TABLE default_competition IS 'This will have a single row containing the key of the default competition';
+
+
+--
+-- Name: COLUMN default_competition.version; Type: COMMENT; Schema: public; Owner: alan
+--
+
+COMMENT ON COLUMN default_competition.version IS 'Version no of system';
 
 
 --
@@ -947,8 +955,8 @@ NFC	National Football Conference
 -- Data for Name: default_competition; Type: TABLE DATA; Schema: public; Owner: alan
 --
 
-COPY default_competition (cid) FROM stdin;
-\N
+COPY default_competition (cid, version) FROM stdin;
+\N	v0.1
 \.
 
 

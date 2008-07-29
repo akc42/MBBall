@@ -1,5 +1,5 @@
 <?php
-if(!(isset($_GET['uid']) && isset($_GET['pass']) ))
+if(!(isset($_GET['uid']) && isset($_GET['pass']) && isset($_GET['v'])))
 	die('Hacking attempt - wrong parameters');
 $uid = $_GET['uid'];
 if ($_GET['pass'] != sha1("Football".$uid))
@@ -24,15 +24,17 @@ require_once('db.php');
 <script type="text/javascript">
 	<!--
 
+var manager;
 window.addEvent('domready', function() {
-	MBball.init({uid: <?php echo $uid;?>, 
+	manager = new MBBAdmin(<?php echo $version;?>,{uid: <?php echo $uid;?>, 
 				name: '<?php echo $name ; ?>',
 				password : '<?php echo sha1("Football".$uid); ?>'});
 });	
 window.addEvent('unload', function() {
-	MBball.logout();
+	manager.logout();
 	
 });
+
 
 	// -->
 </script>
