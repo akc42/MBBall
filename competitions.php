@@ -10,19 +10,9 @@ $resultusers = dbQuery('SELECT uid,name FROM participant WHERE last_logon > now(
 				ORDER BY admin_experience DESC, name;');
 $userdata = dbFetch($resultusers);
 $result = dbQuery('SELECT description,uid,name FROM competition c LEFT JOIN participant p ON c.administrator = p.uid ORDER BY cid DESC  ;');
-if(dbNumRows($result) > 0) {
-	$resultdefault = dbQuery('SELECT cid FROM default_competition;');
-	if(dbNumRows($resultdefault) != 1 ) {
-		die("Database is corrupt - default_competition should have a single row");
-	}
-	$row=dbFetchRow($resultdefault);
-	if (!is_null($row['cid'])) {
-		$cid = $row['cid'];
-	} else {
-		$cid = 0;
-	}
-
 ?>	<form id="default_competition" action="setdefault.php?<?php echo 'uid='.$uid.'&pass='.$password;?>">
+		<input type="hidden" name="uid" value="<?php echo $uid; ?>" />
+		<input type="hidden" name="pass" value="<?php echo $password; ?>" />
 		<table>
 			<caption>Football Competitions</caption>
 			<thead>
@@ -35,29 +25,44 @@ if(dbNumRows($result) > 0) {
 			</thead>
 			<tbody>
 <?php
+if(dbNumRows($result) > 0) {
+	$resultdefault = dbQuery('SELECT cid FROM default_competition;');
+	if(dbNumRows($resultdefault) != 1 ) {
+		die("Database is corrupt - default_competition should have a single row");
+	}
+	$row=dbFetchRow($resultdefault);
+	if (!is_null($row['cid'])) {
+		$cid = $row['cid'];
+	} else {
+		$cid = 0;
+	}
+
 	while($row = dbFetchRow($result)) {
 ?>
 				<tr>
-					<td id="<?php echo 'D'.$row['cid'];?>" class="form"><?php echo $row['description']; ?></td>
-					<td id="<?php echo 'U'.$row['cid'];?>" class="form"><?php echo $row['name'];?></td>
+					<td id="<?php echo 'D'.$row['cid'];?>" class="clickable"><?php echo $row['description']; ?></td>
+					<td id="<?php echo 'U'.$row['cid'];?>" class="clickable"><?php echo $row['name'];?></td>
 					<td>
-						<input class="change" type="radio" name="default" value="<?php echo $row['cid'];?>" 
+						<input type="radio" name="default" value="<?php echo $row['cid'];?>" 
 							<?php if($cid == $row['cid']) echo 'checked="checked"' ;?> />
 					</td>
 					<td></td>
 				</tr>
 <?php
 	}
+}
 ?>			</tbody>
 		</table>
 	</form>
-<?php
-} 
-?>	<form id="update" action="updatecomp.php?<?php echo 'uid='.$uid.'&pass='.$password;?>">
+<hr/>
+	<form id="update" action="updatecomp.php?<?php echo 'uid='.$uid.'&pass='.$password;?>">
+		<input type="hidden" name="uid" value="<?php echo $uid; ?>" />
+		<input type="hidden" name="pass" value="<?php echo $password; ?>" />
+		<input id = "cid" type="hidden" name="cid" value="0"/>
 		<table>
 			<tbody>
 				<tr>
-					<td><input id="Dcreate" type="text" name="Dcreate" value="" /></td>
+					<td><input id="desc" type="text" name="Dcreate" value="" /></td>
 					<td>
 						<select name="Ucreate">
 <?php
