@@ -28,28 +28,72 @@ var MBBUser = new Class({
 
 var MBBAdmin = new Class({
 	Extends: MBBall,
-	initialize: function(version,me) {
+	initialize: function(version,me,cid) {
 		this.parent(version,me);
-		var cc = $('competitions');
-		if(cc) {
-			var req = new Request.HTML({
-				url:'competitions.php', 
-				onSuccess: function(html) {
-					cc.set('text', '');
-			//Inject the new DOM elements into the results div.
-					cc.adopt(html);
-				},
-		//Our request will most likely succeed, but just in case, we'll add an
-		//onFailure method which will let the user know what happened.
-				onFailure: function() {
-					cc.set('text', 'Failed to read competition data');
-				}
-			});
-			req.get(this.requestOptions);
+		this.admin = $('admin');
+		var adminclass = this;
+		this.getCompetitions = new Request.HTML({
+			url:'competitions.php', 
+			onSuccess: function(html) {
+				adminclass.admin.set('text', '');
+				adminclass.admin.adopt(html);
+		//Got the content now we have to add the events to it
+				$$('input.default').each(function(rb,i) {
+					rb.addEvent('change',function(e) {
+						$('default_competition').send();
+					});
+				}); 
+				$$('td.compdata').each(function (comp,i) {
+					comp.addEvent('click',function(e) {
+						//Make the update form hold this entry
+						editComp(comp.id.substr(1).toInt());
+					});
+				});
+				$('createform').addEvent('submit', function(e) {
+					e.stop();
+					var desc = $('desc');
+					if(desc.value == '') {
+						desc.addClass('error');
+						desc.value= 'Please specify a Title for the Competition'
+					} else {
+						desc.removeClass('error');
+						this.set('send',{onSuccess:function(html) {
+							adminclass.manageComps();
+						}}); 
+						this.send();
+					}
+				});
+				
+			},
+	//Our request will most likely succeed, but just in case, we'll add an
+	//onFailure method which will let the user know what happened.
+			onFailure: function() {
+				adminclass.admin.set('text', 'Failed to read competition data');
+			}
+		});
+		this.getCompetition = new Request.HTML({
+			url:'competition.php',
+			onSuccess: function(html) {
+				adminclass.admin.set('text','');
+				adminclass.admin.adopt(html);
+			
+//Lots more stuff
+			},
+	//Our request will most likely succeed, but just in case, we'll add an
+	//onFailure method which will let the user know what happened.
+			onFailure: function() {
+				adminclass.admin.set('text', 'Failed to read competition data');
+			}
+		});
+		if(cid==0) { 
+			this.manageComps();
+		} else {
+			this.manageComp(cid);
 		}
-		var c = $('competition');
-		if(c) {
-		}
-// other stuff
+	},
+	manageComps: function() {
+		this.getCompetitions.get(this.requestOptions);
+	},
+	editComp: function() {
 	}
 });

@@ -923,7 +923,7 @@ ALTER SEQUENCE competition_cid_seq OWNED BY competition.cid;
 -- Name: competition_cid_seq; Type: SEQUENCE SET; Schema: public; Owner: alan
 --
 
-SELECT pg_catalog.setval('competition_cid_seq', 1, true);
+SELECT pg_catalog.setval('competition_cid_seq', 3, true);
 
 
 --
@@ -1589,6 +1589,16 @@ REVOKE ALL ON TABLE team FROM PUBLIC;
 REVOKE ALL ON TABLE team FROM alan;
 GRANT ALL ON TABLE team TO alan;
 GRANT SELECT ON TABLE team TO melindas_ball;
+
+
+--
+-- Name: competition_cid_seq; Type: ACL; Schema: public; Owner: alan
+--
+
+REVOKE ALL ON SEQUENCE competition_cid_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE competition_cid_seq FROM alan;
+GRANT ALL ON SEQUENCE competition_cid_seq TO alan;
+GRANT SELECT,UPDATE ON SEQUENCE competition_cid_seq TO melindas_ball;
 
 
 --

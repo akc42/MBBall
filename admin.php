@@ -2,8 +2,11 @@
 if(!(isset($_GET['uid']) && isset($_GET['pass']) && isset($_GET['v'])))
 	die('Hacking attempt - wrong parameters');
 $uid = $_GET['uid'];
+$password = $_GET['pass'];
 if ($_GET['pass'] != sha1("Football".$uid))
-	die('Hacking attempt got: '.$_GET['pass'].' expected: '.sha1("Key".$uid));
+	die('Hacking attempt got: '.$_GET['pass'].' expected: '.sha1("Football".$uid));
+if (!isset($_GET['global']) && !isset($_GET['cid']))
+	die('Hacking attempt - need cid or global');
 define ('BALL',1);   //defined so we can control access to some of the files.
 require_once('db.php');
 
@@ -12,7 +15,7 @@ require_once('db.php');
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<title>Melinda's Backups Chat</title>
+	<title>Melinda's Backups Football Pool Administration</title>
 	<link rel="stylesheet" type="text/css" href="ball.css" title="mbstyle"/>
 	<!--[if lt IE 7]>
 		<link rel="stylesheet" type="text/css" href="ball-ie.css"/>
@@ -24,16 +27,16 @@ require_once('db.php');
 <script type="text/javascript">
 	<!--
 
-var manager;
+var MBBmgr;
 window.addEvent('domready', function() {
-	manager = new MBBAdmin('<?php echo $_GET['v'];?>',{uid: '<?php echo $uid;?>', 
-				password : '<?php echo sha1("Football".$uid); ?>'});
+	MBBmgr = new MBBAdmin('<?php echo $_GET['v'];?>',{uid: '<?php echo $uid;?>', 
+				password : '<?php echo $password; ?>'},
+				<?php if(isset($_GET['global'])) {echo '0' ;}else{ echo $_GET['cid'];}?>);
 });	
 window.addEvent('unload', function() {
-	manager.logout();
+	MBBmgr.logout();
 	
 });
-
 
 	// -->
 </script>
@@ -57,30 +60,8 @@ window.addEvent('unload', function() {
 	</tr>  </tbody>
 </table>
 <div id="content">
-<?php
-/* there are going to be basically two types of content here.  
-
-1) 	If the 'global' parameter is set, then we are the global administrator
-	and are going to edit the details of the "competition" records - define
-	basic parameters like who is the administrator, and which competition is
-	default, and create new competitions.
-
-2)	If the 'global' parameter is not set, when it will be local to that one
-	comeptition.  In this case the functions are to edit the basic data for
-	a competition and to add rounds, with optional bonus questions and matches */
-
-if(isset($_GET['global'])) {
-//Global administration
-?><div id="competitions">
-</div>
-<?php
-} else {
-//Competition administration
-?><div id="competition">
-</div>
-<?php
-}
-?><div id="copyright">MBball <span id="version"></span> &copy; 2008 Alan Chandler.  Licenced under the GPL</div>
+<div id="admin"></div>
+<div id="copyright">MBball <span id="version"></span> &copy; 2008 Alan Chandler.  Licenced under the GPL</div>
 </div>
 </body>
 

@@ -95,13 +95,43 @@ $gap = $row['gap'];   //difference from match time that picks close
 $playoff_deadline=$row['pp_deadline']; //is set will be the cutoff point for playoff predictions, if 0 there is no playoff quiz
 $registration_open = ($row['open'] == 't'); //is the competition open for registration
 $approval_required = ($row['bb_approval'] == 't'); //BB approval is required
-dbFree($result)
+dbFree($result);
+
+
+
+
+$result = dbQuery('SELECT * FROM registration 
+			WHERE uid = '.dbMakeSafe($uid).' AND cid = '.dbMakeSafe($cid).';');
+if(dbNumRows($result) <> 0) {
+	$signup = true;
+	$row = dbFetchRow($result);
+	if ($approval_required && $row['bb_approved'] != 't' && in_array(BABY_BACKUP,$groups)) {
+		$registered = false;
+	} else {
+		$registered = true;
+	}
+	if(!(in_array(SMF_FOOTBALL,$groups)  || $admin)) { //update already done if global or ordinary administrator
+			//Don't touch admin experience - might not be admin now, but could have been in past
+		if(in_array(BABY_BACKUP,$groups)) {
+			dbQuery('UPDATE participant SET last_logon = now(), is_bb = TRUE, name = '
+				.dbMakeSafe($name).', email = '.dbMakeSafe($email).' WHERE uid = '.dbMakeSafe($uid).';');
+		} else {
+		
+			dbQuery('UPDATE participant SET last_logon = now(), is_bb = FALSE, name = '
+				.dbMakeSafe($name).', email = '.dbMakeSafe($email).' WHERE uid = '.dbMakeSafe($uid).';');
+		}
+	}
+} else {
+	$signedup = false;
+	$registered = false;
+}
+dbFree($result);
 
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<title>Melinda's Backups Chat</title>
+	<title>Melinda's Backups Football Pool</title>
 	<link rel="stylesheet" type="text/css" href="ball.css" title="mbstyle"/>
 	<!--[if lt IE 7]>
 		<link rel="stylesheet" type="text/css" href="ball-ie.css"/>
@@ -112,18 +142,20 @@ dbFree($result)
 <body>
 <script type="text/javascript">
 	<!--
-var manager;
+var MBBmgr;
 window.addEvent('domready', function() {
-	manager = new MBBUser('<?php echo $version;?>',{uid: '<?php echo $uid;?>', 
+	MBBmgr = new MBBUser('<?php echo $version;?>',{uid: '<?php echo $uid;?>', 
 				password : '<?php echo sha1("Football".$uid); ?>'});
 });	
 window.addEvent('unload', function() {
-	manager.logout();
+	MBBmgr.logout();
 	
 });
 
 	// -->
 </script>
+<span class="preload1"></span>
+<span class="preload2"></span>
 
 <table id="header" align="center" border="0" cellpadding="0" cellspacing="0" width="100%" >
 <tbody>
@@ -143,47 +175,10 @@ window.addEvent('unload', function() {
 		</td>
 	</tr>  </tbody>
 </table>
+
+<ul id="menu">
+	<li><a href="/forum"><span>Return to the Forum</span></a></li>
 <?php
-
-
-
-
-$menu = false;
-//Are we registered for the competition yet?
-$result = dbQuery('SELECT * FROM registration 
-			WHERE uid = '.dbMakeSafe($uid).' AND cid = '.dbMakeSafe($cid).';');
-if(dbNumRows($result) == 0) {
-	//We are not registered for this competition
-	$registered = false;
-
-	// Does competition allow registration at this time
-	if($registration_open) {
-		//yes so provide a link to register this user
-?><ul id="menu">
-	<li><a id="register" href="register.php?<?php echo 'uid='.$uid.'&pass='.$password.'&cid='.$cid; ?>">Register	</a></li>
-<?php
-		$menu=true;
-	}
-} else {
-	$row = dbFetchRow($result);
-	if ($approval_required && $row['bb_approved'] != 't' && in_array(BABY_BACKUP,$groups)) {
-		$registered = false;
-	} else {
-		$registered = true;
-	}
-	if(!(in_array(SMF_FOOTBALL,$groups)  || $admin)) { //update already done if global or ordinary administrator
-			//Don't touch admin experience - might not be admin now, but could have been in past
-		if(in_array(BABY_BACKUP,$groups)) {
-			dbQuery('UPDATE participant SET last_logon = now(), is_bb = TRUE, name = '
-				.dbMakeSafe($name).', email = '.dbMakeSafe($email).' WHERE uid = '.dbMakeSafe($uid).';');
-		} else {
-		
-			dbQuery('UPDATE participant SET last_logon = now(), is_bb = FALSE, name = '
-				.dbMakeSafe($name).', email = '.dbMakeSafe($email).' WHERE uid = '.dbMakeSafe($uid).';');
-		}
-	}
-}
-dbFree($result);
 $result = dbQuery('SELECT r.rid AS rid, r.name AS name FROM round r JOIN match m USING (cid,rid) WHERE r.cid = '.dbMakeSafe($cid)
 	.' AND m.open IS TRUE GROUP BY r.rid, r.name ORDER BY rid DESC ;');  //find rounds where at least one match is open
 if (dbNumRows($result) > 0) {
@@ -197,12 +192,8 @@ if (dbNumRows($result) > 0) {
 
 	if (dbNumRows($result) >1 ) {
 		// more than one round, so we need to have a menu for the others
-		if (!$menu) {
-?><ul id="menu">
-<?php
-		$menu=true;
-		}
-?>	<li>Rounds
+?>	<li><a href="#"><span class="down">Rounds<span><!--[if gte IE 7]><!--></a><!--<![endif]-->
+		<!--[if lte IE 6]><table><tr><td><![endif]-->
 		<ul>
 <?php 
 
@@ -215,63 +206,58 @@ if (dbNumRows($result) > 0) {
 			}
 		} while ($row = dbFetchRow($result));
 ?>		</ul>
+		<!--[if lte IE 6]></td></tr></table></a><![endif]-->
 	</li>
 <?php
 	}
 }
-dbFreeResult($result);
+dbFree($result);
 
 // The following select should select the cid and name of all competitions that are in a state
 // where there is at least one open match or it is taking registrations and we are not yet registered
-$sql = 'SELECT c.cid AS cid, c.name AS name FROM competition c LEFT JOIN registration r ON c.cid = r.cid AND r.uid  = '.dbMakeSafe($uid);
-$sql .= ' LEFT JOIN match m USING (cid) WHERE cid <> '.dbMakeSafe($cid);
-$sql .= ' AND ((r.uid IS NULL AND c.open IS TRUE ) OR m.open IS TRUE) GROUP BY c.cid, c.name ORDER BY c.cid DESC ; ';
+$sql = 'SELECT c.cid AS cid, c.description AS name FROM competition c LEFT JOIN registration r ON c.cid = r.cid AND r.uid  = '.dbMakeSafe($uid);
+$sql .= ' LEFT JOIN match m ON r.cid = m.cid WHERE c.cid <> '.dbMakeSafe($cid);
+$sql .= ' AND ((r.uid IS NULL AND c.open IS TRUE ) OR m.open IS TRUE) GROUP BY c.cid, c.description ORDER BY c.cid DESC ; ';
 $result = dbQuery($sql);
 
 if (dbNumRows($result) > 0) {
-	if (!$menu) {
-?><ul id="menu">
-<?php
-		$menu=true;
-	}
-?>	<li>Competitions
+?>	<li><a href="#"><span class="down">Competitions<span><!--[if gte IE 7]><!--></a><!--<![endif]-->
+		<!--[if lte IE 6]><table><tr><td><![endif]-->
 		<ul>
 <?php 
 	while ($row = dbFetchRow($result)) {
 ?>			<li><a href="index.php?<?php echo 'cid='.$row['cid'] ; ?>"><?php echo $row['name'] ;?></a></li>
 <?php	}
 ?>		</ul>
+		<!--[if lte IE 6]></td></tr></table></a><![endif]-->
+
 	</li>
 <?php
 }
-dbFreeResult($result);
+dbFree($result);
 if(in_array(SMF_FOOTBALL,$groups)) {
 // Am Global Administrator - let me also do Admin thinks
-	if (!$menu) {
-?><ul id="menu">
-<?php
-		$menu=true;
-	}
-?>	<li><a href="admin.php?<?php echo 'uid='.$uid.'&pass='.$password.'&v='.$version.'&global=true';?>">Global Admin</a></li>
-</li>
+?>	<li><a href="admin.php?<?php echo 'uid='.$uid.'&pass='.$password.'&v='.$version.'&global=true';?>"><span>Global Admin</span></a></li>
+
 <?php
 }
 if($admin) {
 // Am Administrator of this competition - let me also do Admin thinks
-	if (!$menu) {
-?><ul id="menu">
-<?php
-		$menu=true;
-	}
-?>	<li><a href="admin.php?<?php echo 'uid='.$uid.'&pass='.$password.'&v='.$version.'&cid='.dbMakeSafe($cid);?>">Administration</a>?>
+?>	<li><a href="admin.php?<?php echo 'uid='.$uid.'&pass='.$password.'&v='.$version.'&cid='.dbMakeSafe($cid);?>"><span>Administration</span></a></li>
 <?php 
 }
-
-if ($menu) {
 ?></ul>
 <div id="content">
 <?php
+	// Does competition allow registration at this time
+if($registration_open && !$signedup && !$admin) {
+?><div id="registeruser">
+<!-- registration block to be floated right -->
+</div>
+<?php		
 }
+
+
 //Lets get the conference and div lists as this is data useful throughout this page
 $confs = array();
 $divs = array(); 
@@ -279,15 +265,15 @@ $result = dbQuery('SELECT * FROM conference ORDER BY confid;');
 while($row = dbFetchRow($result)) {
 	$confs[$row['confid']] = $row['name'];
 }
-dbFreeResult($result);
+dbFree($result);
 $result = dbQuery('SELECT * FROM division ORDER BY divid;');
 while($row = dbFetchRow($result)) {
 	$divs[$row['divid']] = $row['name'];
 }
-dbFreeResult($result);
+dbFree($result);
 
 // It would be good to have a set of team names. 
-$sql = 'SELECT *  FROM team_in_competition t JOIN JOIN team USING (tid)'; 
+$sql = 'SELECT *  FROM team_in_competition t JOIN team USING (tid)'; 
 $sql .= ' WHERE t.cid = '.dbMakeSafe($cid).' ORDER BY confid,divid,tid;';
 $result = dbQuery($sql);
 if(dbNumRows($result) > 0 ) {
@@ -381,16 +367,17 @@ if(dbNumRows($result) > 0 ) {
 	</div>
 <?php
 }
-dbFreeResult($result);
-//We will need round data for both several things - so get it now
-$resultround = dbQuery('SELECT * FROM round WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' ;');
+dbFree($result);
 $haverounddata = false;
-if(dbNumRows($resultround) !=0) {  //OK we have a round - so now we need to get it
-	$rounddata = dbFetchRow($resultround);
-	$haverounddata = true;
-}
-dbFreeResult($resultround);
-		
+if(isset($rid)) {
+	//We will need round data for both several things - so get it now
+	$resultround = dbQuery('SELECT * FROM round WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' ;');
+	if(dbNumRows($resultround) !=0) {  //OK we have a round - so now we need to get it
+		$rounddata = dbFetchRow($resultround);
+		$haverounddata = true;
+	}
+	dbFree($resultround);
+}		
 
 if ($registered) {
 	if($haverounddata) {  //OK we have a round - so now we need to do the picks for this round
@@ -458,7 +445,7 @@ $time_at_top = time();
 		</table>
 <?php
 		}
-		dbFreeResult($result);
+		dbFree($result);
 		if ($rounddata['valid_question']) {
 ?>		<table>
 		<caption>Bonus Question</caption>
@@ -531,7 +518,7 @@ $result=dbQuery('SELECT tid FROM div_winner_pick WHERE cid = '.dbMakeSafe($cid).
 		while($row = dbFetchRow($result)) {
 			$dw[$row['tid']] = 1;
 		}
-dbFreeResult($result);
+dbFree($result);
 $result=dbQuery('SELECT tid FROM wildcard_pick WHERE cid = '.dbMakeSafe($cid).' AND uid = '.dbMakeSafe($uid).';');
 		$wild = array();
 		while($row = dbFetchRow($result)) {
@@ -713,7 +700,7 @@ $bqops = dbNumRows($resultbq);
 		</thead>
 		<tbody>
 <?php
-dbFreeResult($result);
+dbFree($result);
 	// now we have completed the body we need to get the users resultant score
 $sql = 'SELECT u.name AS name, u.uid AS uid,b.score AS rscore, r.score AS score';
 $sql .= ' FROM round_score r JOIN participant u USING (uid)';
@@ -785,7 +772,7 @@ $resultmatch = dbQuery($sql);
 			$i++;
 		}
 	}
-	dbFreeResult($result);
+	dbFree($result);
 ?>		</tbody>	
 	</table>
 </div>
@@ -852,20 +839,20 @@ $result = dbQuery($sql);
 				}
 			}
 		}
-		dbFreeResult($resultplay);
+		dbFree($resultplay);
 		unset($playoff_selections);
 ?>				<td><?php echo $row['score'];?></td>
 			</tr>
 <?php
 	}
-	dbFreeResult($result);
+	dbFree($result);
 ?>		</tbody>
 	</table>
 </div>
 <?php
 }
 
-
+if(isset($rid)) {
 ?><div id="overall_results">
 	<table>
 		<caption>Overall Results</caption>
@@ -877,7 +864,7 @@ $result = dbQuery($sql);
 ?>				<th><?php echo $row['name']; ?></th>
 <?php
 	}
-	dbFreeResult($result);
+	dbFree($result);
 	if($playoff_deadline != 0) {
 ?>				<th>PlayOffs</th>
 <?php
@@ -908,7 +895,9 @@ $sql .= ' GROUP BY u.name, p.score ORDER BY total DESC;';
 ?>		</tbody>
 	</table>
 </div>
-<div id="copyright">MBball <span id="version"></span> &copy; 2008 Alan Chandler.  Licenced under the GPL</div>
+<?php
+}
+?><div id="copyright">MBball <span id="version"></span> &copy; 2008 Alan Chandler.  Licenced under the GPL</div>
 </div>
 </body>
 

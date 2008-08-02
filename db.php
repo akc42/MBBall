@@ -15,6 +15,8 @@ header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); // Date in the past
 	function dbQuery($sql) {
 		$result = pg_query($sql);
 		if (!$result) {
+			echo $sql;
+			echo "\n\n";
 			die('database query failed: '.pg_last_error());
 		}
 		return $result;
