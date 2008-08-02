@@ -151,7 +151,7 @@ way to fit your requirements.
 input {width: 100px;}
 input.calendar {width: 74px;}
 button.calendar {
-	background: url(calendar-icon.gif);
+	background: url(images/calendar-icon.gif);
 	border: 0;
 	cursor: pointer;
 	float: left;
@@ -160,4 +160,15 @@ button.calendar {
 	width: 20px;
 }
 button.calendar:hover,button.calendar.active {background-position: left bottom;}
+
+button.cross {
+	background: url(images/cross.gif);
+	border: 0;
+	cursor: pointer;
+	float: left;
+	height: 16px;
+	width: 16px;
+}
+
+button.cross:hover {background-position:left bottom;}
 
