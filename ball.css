@@ -1,11 +1,4 @@
 /*
- * Date:	03.09.2007
- *
- * File:	css/SMF Default Theme - Core.css
- * Project:	AJAX_CHAT
- *
- * Author:	Sebastian Tschan
- * Website:	https://blueimp.net
  *
  * License:	GPL
  * 
@@ -95,7 +88,8 @@ body, td, th
 	font-size:0.8em;
 	background-color:#4A7DB5;
 	background-image:none;
-	color:#000;
+	color:#fff;
+	padding:20px;
 }
 
 #copyright {
@@ -103,6 +97,54 @@ body, td, th
 	top:5px;
 	right:5px;
 }
+
+.notice {
+	margin:10px;
+	padding:5px;
+	width:200px;
+	border:3px solid #CCE2E5;
+	background-color:#FFCFCD
+	color:#000;
+}
+/* multi - select styling - used to select teams*/
+
+#teams {
+	float:right;
+	width:450px;
+}
+
+div.holder {
+	display:block;
+	width:200px;
+	float:left;
+	padding:5px;
+}
+
+div.holder a { 
+	display:block; 
+	width:100px; 
+	border:1px solid #ccc;
+	background:#eee;
+	padding:10px;
+}
+
+div.holder select {
+	margin-top:70px;
+	width:180px;
+	padding:5px;
+	height:300px;
+}
+
+div.holder option {
+	padding:0 2px;
+}
+
+div.holder h2 {
+	position:absolute;
+	top:10px;
+	left:5px;
+}
+
 #/* ================================================================ 
 This copyright notice must be kept untouched in the stylesheet at 
 all times.
@@ -147,6 +189,19 @@ way to fit your requirements.
 #menu :hover ul li a {display:block; font-size:11px; height:20px; width:90px; line-height:20px; text-indent:5px; color:#000; text-decoration:none;}
 #menu :hover ul li a:hover {background:#3a93d2; color:#fff;}
 
+
+
+button.cross {
+	background: url(images/cross.gif);
+	border: 0;
+	cursor: pointer;
+	float: left;
+	height: 16px;
+	width: 16px;
+}
+
+button.cross:hover, button.cross.active {background-position:left bottom;}
+
 /* calender stuff */
 input {width: 100px;}
 input.calendar {width: 74px;}
@@ -160,15 +215,4 @@ button.calendar {
 	width: 20px;
 }
 button.calendar:hover,button.calendar.active {background-position: left bottom;}
-
-button.cross {
-	background: url(images/cross.gif);
-	border: 0;
-	cursor: pointer;
-	float: left;
-	height: 16px;
-	width: 16px;
-}
-
-button.cross:hover {background-position:left bottom;}
-
+  

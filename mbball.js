@@ -1,35 +1,46 @@
 var MBBall = new Class({
-	initialize: function(version,me) {
+	initialize: function(version,me,el) {
 		this.me = me;
 		this.requestOptions = {'uid':me.uid,'pass':me.password};
 		var span=$('version');
 		span.set('text',version);
-// Need to update all the  dates
-		var datespans = $$('span.date');
-		datespans.each(function (datespan,i) {
-			var d = new Date(datespan.get('text').toInt()*1000);
-			datespan.set('text',d.toLocaleString());
+		//sets up all date time fields under the supplied element
+		var datespans = el.getElements('.time');
+		datespans.each(function(datespan,i) {
+			var d;
+			el.removeClass('time');
+			switch (datespan.get('tag')) {
+			case "span":
+				d = datespan.get('text');
+				if(d == '' || d=='0') return;
+				el.set('text',new Date(d.toInt()*1000).toLocalString().substr(0,24));
+				break;
+			case "input":
+				d=datespan.value;
+				if(d == '' || d=='0') return;
+				el.value = new Date(d.toInt()*1000).toLocalString().substr(0,24);
+				break;
+			default:
+				break;
+			}
 		});
-	},
-	logout: function () {
-		var logoutRequest = new Request ({url: 'logout.php',autoCancel:true}).get($merge(myRequestOptions,
-				{'mbball':version},MooTools,
-				{'browser':Browser.Engine.name+Browser.Engine.version,'platform':Browser.Platform.name}));
-	}
+	}	
 });
+
 
 var MBBUser = new Class({
 	Extends: MBBall,
 	initialize: function(version,me) {
-		this.parent(version,me);
+		this.parent(version,me,$('content'));
 // other stuff
 	}
 });
 
+
 var MBBAdmin = new Class({
 	Extends: MBBall,
 	initialize: function(version,me,cid) {
-		this.parent(version,me);
+		this.parent(version,me,$('admin'));
 		this.admin = $('admin');
 		var adminclass = this;
 		this.getCompetitions = new Request.HTML({
@@ -88,12 +99,13 @@ var MBBAdmin = new Class({
 		if(cid==0) { 
 			this.manageComps();
 		} else {
-			this.manageComp(cid);
+			this.editComp(cid);
 		}
 	},
 	manageComps: function() {
 		this.getCompetitions.get(this.requestOptions);
 	},
-	editComp: function() {
+	editComp: function(cid) {
+		this.getCompetition.get($merge(this.requestOptions,{'cid':cid}));
 	}
 });

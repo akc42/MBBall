@@ -33,10 +33,6 @@ window.addEvent('domready', function() {
 				password : '<?php echo $password; ?>'},
 				<?php if(isset($_GET['global'])) {echo '0' ;}else{ echo $_GET['cid'];}?>);
 });	
-window.addEvent('unload', function() {
-	MBBmgr.logout();
-	
-});
 
 	// -->
 </script>

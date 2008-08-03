@@ -18,6 +18,7 @@ if($user_info['is_guest']) {
 
 // SMF membergroup IDs for the groups that we have used to define characteristics which control Chat Group
 define('SMF_FOOTBALL',		21);  //Group that can administer 
+define('SMF_BABY',		10);  //Baby backup
 define('MBBALL_ICON_PATH', '/football/images/');
 
 $groups =& $user_info['groups'];
@@ -95,6 +96,7 @@ $gap = $row['gap'];   //difference from match time that picks close
 $playoff_deadline=$row['pp_deadline']; //is set will be the cutoff point for playoff predictions, if 0 there is no playoff quiz
 $registration_open = ($row['open'] == 't'); //is the competition open for registration
 $approval_required = ($row['bb_approval'] == 't'); //BB approval is required
+$condition = $row['condition'];
 dbFree($result);
 
 
@@ -140,22 +142,19 @@ dbFree($result);
 	<script src="mbball.js" type="text/javascript" charset="UTF-8"></script>
 </head>
 <body>
+<span class="preload1"></span>
+<span class="preload2"></span>
 <script type="text/javascript">
 	<!--
+
 var MBBmgr;
 window.addEvent('domready', function() {
 	MBBmgr = new MBBUser('<?php echo $version;?>',{uid: '<?php echo $uid;?>', 
 				password : '<?php echo sha1("Football".$uid); ?>'});
 });	
-window.addEvent('unload', function() {
-	MBBmgr.logout();
-	
-});
 
 	// -->
 </script>
-<span class="preload1"></span>
-<span class="preload2"></span>
 
 <table id="header" align="center" border="0" cellpadding="0" cellspacing="0" width="100%" >
 <tbody>
@@ -243,7 +242,7 @@ if(in_array(SMF_FOOTBALL,$groups)) {
 }
 if($admin) {
 // Am Administrator of this competition - let me also do Admin thinks
-?>	<li><a href="admin.php?<?php echo 'uid='.$uid.'&pass='.$password.'&v='.$version.'&cid='.dbMakeSafe($cid);?>"><span>Administration</span></a></li>
+?>	<li><a href="admin.php?<?php echo 'uid='.$uid.'&pass='.$password.'&v='.$version.'&cid='.$cid;?>"><span>Administration</span></a></li>
 <?php 
 }
 ?></ul>
@@ -252,7 +251,28 @@ if($admin) {
 	// Does competition allow registration at this time
 if($registration_open && !$signedup && !$admin) {
 ?><div id="registeruser">
+	<form id="register" action="register.php">
+		<input type="hidden" name="uid" value="<?php echo $uid;?>" />
+		<input type="hidden" name="pass" value="<?php echo $password;?>" />
+		<input type="hidden" name="cid" value="<?php echo $cid;?>" />
 <!-- registration block to be floated right -->
+	<h1>Register for this Competition</h2>
+<?php 
+	if($condition == '') {
+?>		<input type="submit" value="Register" />
+<?php
+	} else {
+?>	<p><?php echo $name ;?>, In order to enter the competition you must agree to the following condition:-</p>
+	<p><?php echo $condition;?></p>
+		<input type="submit" value="I Agree" />
+<?php
+	}
+	if (in_array(SMF_BABY,$groups) && $approval_required) {
+?>	<p><sup>*</sup>Baby Backups will require special approval from the competition administrator (<?php echo $admName ;?>).
+	Please contact her/him if you are a Baby Backup</p>
+<?php
+	}
+?>	</form>
 </div>
 <?php		
 }
@@ -895,6 +915,10 @@ $sql .= ' GROUP BY u.name, p.score ORDER BY total DESC;';
 ?>		</tbody>
 	</table>
 </div>
+<?php
+} else { 
+?>
+	<p class="notice" >Unfortunately there is no results from this competition to display right now.  Please come back later</p>
 <?php
 }
 ?><div id="copyright">MBball <span id="version"></span> &copy; 2008 Alan Chandler.  Licenced under the GPL</div>
