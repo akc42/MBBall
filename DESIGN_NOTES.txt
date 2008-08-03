@@ -20,14 +20,24 @@ register.php  - allows user to register himself for a competition
 
 admin.php - admin (to be expanded)
 
+This autoloads one of two parts 
+
+competitions.php (a list of competitions + ability to create a new competition)
+competition.php (the detail of a competition + autoload of either rounds.php or round.php)
+
+rounds.php - list of rounds in competition + ability to create new round
+round.php (detail of round + autoload of matches.php)
+
+matches.php (allows editing the details of matches from list of teams)
+
 
 
 DATES AND TIMES
 
 Dates and times (of matches mainly) need to be displayed in the local time of the user.  This is only known at the javascript level and not php.  In order to manage this - all times will be held in seconds since 1970 (unix time) and converted to local time via javaascript.  All time to be output as
 
-<span class="time">12345678</span>
+<span class="time">12345678</span> or <input class="time type="text" value="12345678" />
 
 where 12345678 is the actual value of the date required in unix time.
 
-The init function of javascript will look for all span elements like this and convert to a local time display.
+The init function of javascript will look for all span  like this and convert to a local time display. In terms of coming the otherway, javascript will need to intercept the  input and parse it using the Date.parse() function.  Due to a bug in the Firefox timezone display, which means it outputs the correct time but the wrong value of GMT or BST (don't know about other timezones) the parsing the otherway does not work unless the last 4 characters of the time and date are left off.
