@@ -22,7 +22,7 @@ $result = dbQuery('SELECT cid,description,uid,name FROM competition c LEFT JOIN 
 					<th>Title</th>
 					<th>Competition Administrator</th>
 					<th>Default</th>
-					<th></th>
+					<th>DEL</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -42,13 +42,13 @@ if(dbNumRows($result) > 0) {
 	while($row = dbFetchRow($result)) {
 ?>
 				<tr>
-					<td id="<?php echo 'D'.$row['cid'];?>" class="compdata"><?php echo $row['description']; ?></td>
+					<td id="<?php echo 'T'.$row['cid'];?>" class="compdata"><?php echo $row['description']; ?></td>
 					<td id="<?php echo 'U'.$row['cid'];?>" class="compdata"><?php echo $row['name'];?>
 					<td>
 						<input class="default" type="radio" name="default" value="<?php echo $row['cid'];?>" 
 							<?php if($cid == $row['cid']) echo 'checked="checked"' ;?> />
 					</td>
-					<td></td>
+					<td><div id="<?php echo 'D'.$row['cid']; ?>" class="del"></div></td>
 				</tr>
 <?php
 	}

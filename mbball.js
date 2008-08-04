@@ -1,7 +1,37 @@
+var MBBmove = function(from, to){$(from).getSelected().inject($(to));}
+var MBBRequestOptions;
+/*  Class to load a SubPage from 'url' into the 'div'. 'addParams' are additional
+ *  parameters to send in the call request
+ *  On success call
+ *	initializePage(div).  
+ *  If the load fails, message is the text to fill the div with
+*/
+var MBBSubPage = new Class({
+	initialize:function(owner,url,div,initializeSubPage,message) {
+		this.owner = owner;
+		this.div = div;
+		var iSP = initalizeSubPage.bind(this);
+		this.request = new Request.HTML({
+			url: url,
+			onSuccess: function(html) {
+				div.set('text','');
+				div.adopt(html);
+				iSP(div);
+			},
+			onFailure: function(){
+				var output = message || '<p>Failed to Read Page from '+url+'<p>';
+				div.set('text',output);
+			}
+		});
+	},
+	loadPage: function(params) {
+		this.request.get($merge(MBBRequestOptions,params || {});
+	}
+});
 var MBBall = new Class({
 	initialize: function(version,me,el) {
 		this.me = me;
-		this.requestOptions = {'uid':me.uid,'pass':me.password};
+		MBBRequestOptions = {'uid':me.uid,'pass':me.password};
 		var span=$('version');
 		span.set('text',version);
 		//sets up all date time fields under the supplied element
@@ -43,12 +73,12 @@ var MBBAdmin = new Class({
 		this.parent(version,me,$('admin'));
 		this.admin = $('admin');
 		var adminclass = this;
-		this.getCompetitions = new Request.HTML({
-			url:'competitions.php', 
-			onSuccess: function(html) {
-				adminclass.admin.set('text', '');
-				adminclass.admin.adopt(html);
-		//Got the content now we have to add the events to it
+		this.competitions = new MBBSubPage(
+			this,
+			'competitions.php',
+			$('admin'),
+			function (div) {
+				var owner = this.owner;
 				$$('input.default').each(function(rb,i) {
 					rb.addEvent('change',function(e) {
 						$('default_competition').send();
@@ -57,7 +87,7 @@ var MBBAdmin = new Class({
 				$$('td.compdata').each(function (comp,i) {
 					comp.addEvent('click',function(e) {
 						//Make the update form hold this entry
-						editComp(comp.id.substr(1).toInt());
+						owner.competition.loadPage(comp.id.substr(1).toInt());
 					});
 				});
 				$('createform').addEvent('submit', function(e) {
@@ -69,43 +99,52 @@ var MBBAdmin = new Class({
 					} else {
 						desc.removeClass('error');
 						this.set('send',{onSuccess:function(html) {
-							adminclass.manageComps();
+							owner.competitions.loadPage();
 						}}); 
 						this.send();
 					}
 				});
-				
-			},
-	//Our request will most likely succeed, but just in case, we'll add an
-	//onFailure method which will let the user know what happened.
-			onFailure: function() {
-				adminclass.admin.set('text', 'Failed to read competition data');
 			}
-		});
-		this.getCompetition = new Request.HTML({
-			url:'competition.php',
-			onSuccess: function(html) {
-				adminclass.admin.set('text','');
-				adminclass.admin.adopt(html);
-			
+		);
+		this.competition = new MBBSubPage (
+			this,
+			'competition.php',
+			$('admin'),
+			function (div) {
+				// Set up team in competition selection process
+				$('add').addEvent('click', MBBmove.pass(['tnic', 'tic']));
+				$('remove').addEvent('click',	MBBmove.pass(['tic','tnic']));
+				$('addall').addEvent('click',function() {
+					$('tnic').getElements('option').each(function (option,i) {
+						option.set('selected','selected');
+					});
+					MBBmove.pass(['tnic','tic']);
+				});
+
+				// Validate competition Details and Change Dates to seconds since 1970
+				$('compform').addEvent('submit', function(e) {
+						e.stop();
+				});
 //Lots more stuff
-			},
-	//Our request will most likely succeed, but just in case, we'll add an
-	//onFailure method which will let the user know what happened.
-			onFailure: function() {
-				adminclass.admin.set('text', 'Failed to read competition data');
+
+				this.rounds = new MBBSubPage(this,'rounds.php',$('rounddata'), function(div) {
+					//Initialise to click on a round to load single round
+				});
+				this.round	= new MBBSubPage(this,'round.php',$('rounddata'),function(div) {
+					//Initialise Round Data Form
+					this.matches = new MBBSubPage(this,'matches.php',$('matchdata'),function (div) {
+					});
+					this.match = new MBBSubPage(this,'match.php',$('matchdata'),function(div) {
+					})
+					this.matches.loadPage();
+				});
+				this.rounds.loadPage();	
 			}
-		});
+		};
 		if(cid==0) { 
-			this.manageComps();
+			this.competitions.loadPage();
 		} else {
-			this.editComp(cid);
+			this.competition.loadPage(cid);
 		}
-	},
-	manageComps: function() {
-		this.getCompetitions.get(this.requestOptions);
-	},
-	editComp: function(cid) {
-		this.getCompetition.get($merge(this.requestOptions,{'cid':cid}));
 	}
 });
