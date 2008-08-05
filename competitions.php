@@ -8,10 +8,18 @@ if ($password != sha1("Football".$uid))
 
 define ('BALL',1);   //defined so we can control access to some of the files.
 require_once('db.php');
+
 $resultusers = dbQuery('SELECT uid,name FROM participant WHERE last_logon > now() - interval \'1 year 1 month\' AND is_bb IS NOT TRUE
 				ORDER BY admin_experience DESC, name;');
 $userdata = dbFetch($resultusers);
-$result = dbQuery('SELECT cid,description,uid,name FROM competition c LEFT JOIN participant p ON c.administrator = p.uid ORDER BY cid DESC  ;');
+
+$sql = 'SELECT cid,description,uid,name FROM competition c LEFT JOIN participant p ON c.administrator = p.uid';
+if(!isset($_GET['global']) {
+	// When not global administrator, only see competitions for which are administrator
+	$sql .= ' WHERE c.administrator ='.dbMakeSafe($uid);
+}
+$sql .= ' ORDER BY cid DESC ;'
+$result = dbQuery($sql);
 ?>	<form id="default_competition" action="setdefault.php">
 		<input type="hidden" name="uid" value="<?php echo $uid; ?>" />
 		<input type="hidden" name="pass" value="<?php echo $password; ?>" />
@@ -19,10 +27,10 @@ $result = dbQuery('SELECT cid,description,uid,name FROM competition c LEFT JOIN 
 			<caption>Football Competitions</caption>
 			<thead>
 				<tr>
-					<th>Title</th>
-					<th>Competition Administrator</th>
-					<th>Default</th>
-					<th>DEL</th>
+					<th class="ctitle">Title</th>
+					<th class="user">Competition Administrator</th>
+					<th class="radio">Default</th>
+					<th></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -34,25 +42,26 @@ if(dbNumRows($result) > 0) {
 	}
 	$row=dbFetchRow($resultdefault);
 	if (!is_null($row['cid'])) {
-		$cid = $row['cid'];
+		$dcid = $row['cid'];
 	} else {
-		$cid = 0;
+		$dcid = 0;
 	}
 
 	while($row = dbFetchRow($result)) {
 ?>
-				<tr>
-					<td id="<?php echo 'T'.$row['cid'];?>" class="compdata"><?php echo $row['description']; ?></td>
-					<td id="<?php echo 'U'.$row['cid'];?>" class="compdata"><?php echo $row['name'];?>
+				<tr id="<?php echo 'C'.$row['cid'];?>" class="complink">
+					<td><?php echo $row['description']; ?></td>
+					<td ><?php echo $row['name'];?></td>
 					<td>
 						<input class="default" type="radio" name="default" value="<?php echo $row['cid'];?>" 
-							<?php if($cid == $row['cid']) echo 'checked="checked"' ;?> />
+							<?php if($dcid == $row['cid']) echo 'checked="checked"' ;?> />
 					</td>
 					<td><div id="<?php echo 'D'.$row['cid']; ?>" class="del"></div></td>
 				</tr>
 <?php
 	}
 }
+dbFree($result);
 ?>			</tbody>
 		</table>
 	</form>

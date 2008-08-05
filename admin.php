@@ -30,8 +30,9 @@ require_once('db.php');
 var MBBmgr;
 window.addEvent('domready', function() {
 	MBBmgr = new MBBAdmin('<?php echo $_GET['v'];?>',{uid: '<?php echo $uid;?>', 
-				password : '<?php echo $password; ?>'},
-				<?php if(isset($_GET['global'])) {echo '0' ;}else{ echo $_GET['cid'];}?>);
+				password : '<?php echo $password; ?>',
+				admin :<?php if(isset($_GET['global'])) {echo 'true';} else {echo 'false';}?>},
+				<?php if(isset($_GET['cid'])) {echo $_GET['cid'] ;}else{ echo '0';}?>);
 });	
 
 	// -->
@@ -55,9 +56,27 @@ window.addEvent('domready', function() {
 		</td>
 	</tr>  </tbody>
 </table>
+<ul id="menu">
+	<li><a href="/forum"><span>Return to the Forum</span></a></li>
+	<li><a href="/football"><span>Return the User Page</span></a></li>
+</ul>
 <div id="content">
-<div id="admin"></div>
-<div id="copyright">MBball <span id="version"></span> &copy; 2008 Alan Chandler.  Licenced under the GPL</div>
+<div id="teams">
+</div>
+<div id="competitions">
+</div>
+<div id="competition">
+</div>
+<div id="rounds">
+</div>
+<div id="round">
+</div>
+<div id="options">
+<div>
+<div id="matches">
+</div>
+
+<div id="copyright"><hr/>MBball <span id="version"></span> &copy; 2008 Alan Chandler.  Licenced under the GPL</div>
 </div>
 </body>
 

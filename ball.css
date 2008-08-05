@@ -92,11 +92,15 @@ body, td, th
 	padding:20px;
 }
 
+/*
 #copyright {
 	position: absolute;
 	top:5px;
 	right:5px;
 }
+*/
+.hidden {display:none;}
+
 
 .notice {
 	margin:10px;
@@ -191,7 +195,7 @@ way to fit your requirements.
 
 
 
-button.cross {
+div.del {
 	background: url(images/cross.gif);
 	border: 0;
 	cursor: pointer;
@@ -200,19 +204,20 @@ button.cross {
 	width: 16px;
 }
 
-button.cross:hover, button.cross.active {background-position:left bottom;}
+div.del:hover, div.del.active {background-position:left bottom;}
 
-/* calender stuff */
-input {width: 100px;}
-input.calendar {width: 74px;}
-button.calendar {
-	background: url(images/calendar-icon.gif);
-	border: 0;
-	cursor: pointer;
-	float: left;
-	height: 20px;
-	margin-right: 6px;
-	width: 20px;
+/* min height dealt with */
+/* for understanding browsers */
+.container {
+width:20em;
+padding:0.5em;
+border:1px solid #000;
+min-height:8em; 
+height:auto;
 }
-button.calendar:hover,button.calendar.active {background-position: left bottom;}
-  
+/* for Internet Explorer */
+/*\*/
+* html .container {
+height: 8em;
+}
+/**/

@@ -1,16 +1,16 @@
 var MBBmove = function(from, to){$(from).getSelected().inject($(to));}
 var MBBRequestOptions;
-/*  Class to load a SubPage from 'url' into the 'div'. 'addParams' are additional
- *  parameters to send in the call request
+/*  Class to load a SubPage from 'url' into the 'div'. 
  *  On success call
  *	initializePage(div).  
  *  If the load fails, message is the text to fill the div with
 */
+
 var MBBSubPage = new Class({
 	initialize:function(owner,url,div,initializeSubPage,message) {
 		this.owner = owner;
 		this.div = div;
-		var iSP = initalizeSubPage.bind(this);
+		var iSP = initializeSubPage.bind(this);
 		this.request = new Request.HTML({
 			url: url,
 			onSuccess: function(html) {
@@ -25,9 +25,10 @@ var MBBSubPage = new Class({
 		});
 	},
 	loadPage: function(params) {
-		this.request.get($merge(MBBRequestOptions,params || {});
+		this.request.get($merge(MBBRequestOptions,params || {}));
 	}
 });
+
 var MBBall = new Class({
 	initialize: function(version,me,el) {
 		this.me = me;
@@ -59,9 +60,9 @@ var MBBall = new Class({
 
 
 var MBBUser = new Class({
-	Extends: MBBall,
+//	Extends: MBBall,
 	initialize: function(version,me) {
-		this.parent(version,me,$('content'));
+//		this.parent(version,me,$('content'));
 // other stuff
 	}
 });
@@ -130,21 +131,25 @@ var MBBAdmin = new Class({
 				this.rounds = new MBBSubPage(this,'rounds.php',$('rounddata'), function(div) {
 					//Initialise to click on a round to load single round
 				});
-				this.round	= new MBBSubPage(this,'round.php',$('rounddata'),function(div) {
+				this.round = new MBBSubPage(this,'round.php',$('rounddata'),function(div) {
 					//Initialise Round Data Form
-					this.matches = new MBBSubPage(this,'matches.php',$('matchdata'),function (div) {
+					this.matches = new MBBSubPage(this,'matches.php',$('matches'),function (div) {
 					});
-					this.match = new MBBSubPage(this,'match.php',$('matchdata'),function(div) {
+					this.match = new MBBSubPage(this,'options.php',$('options'),function(div) {
 					})
 					this.matches.loadPage();
 				});
 				this.rounds.loadPage();	
 			}
-		};
-		if(cid==0) { 
-			this.competitions.loadPage();
+		);
+		if(cid==0) {
+			if(this.me.admin) {
+				this.competitions.loadPage({'global':true});
+			} else {
+				this.competitions.loadPage();
+			}
 		} else {
-			this.competition.loadPage(cid);
+			this.competition.loadPage({'cid':cid});
 		}
 	}
 });

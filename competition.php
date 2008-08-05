@@ -28,7 +28,7 @@ if($comp = dbFetchRow($resultcomp)) {
 	}
 	dbFree($result);
 ?>			</select>  
-			<input type="button" value="Remove &gt;" />
+			<input id="remove" type="button" value="Remove &gt;" />
 			<input type="submit" value="Save" />
 		</form>
 	</div>

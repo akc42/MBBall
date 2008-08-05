@@ -142,6 +142,7 @@ dbFree($result);
 	<script src="mbball.js" type="text/javascript" charset="UTF-8"></script>
 </head>
 <body>
+<!-- these two spans seem to help the menu -->
 <span class="preload1"></span>
 <span class="preload2"></span>
 <script type="text/javascript">
@@ -921,7 +922,7 @@ $sql .= ' GROUP BY u.name, p.score ORDER BY total DESC;';
 	<p class="notice" >Unfortunately there is no results from this competition to display right now.  Please come back later</p>
 <?php
 }
-?><div id="copyright">MBball <span id="version"></span> &copy; 2008 Alan Chandler.  Licenced under the GPL</div>
+?><div id="copyright"><hr />MBball <span id="version"></span> &copy; 2008 Alan Chandler.  Licenced under the GPL</div>
 </div>
 </body>
 

@@ -43,11 +43,11 @@ dbFree($result);
 		<input type="hidden" name="uid" value="<?php echo $uid; ?>" />
 		<input type="hidden" name="pass" value="<?php echo $password; ?>" />
 		<input type="hidden" name="cid" value="<?php echo $cid; ?>" />
-		<input type="hidden" name="rid" value="<?php echo $nextrid; ?> />
+		<input type="hidden" name="rid" value="<?php echo $nextrid; ?>" />
 		<table>
 			<tbody>
 				<tr>
-					<td><?php echo $nextrid; ?>
+					<td><?php echo $nextrid; ?></td>
 					<td><input id="rname2" type="text" name="rname" value="Round <?php echo nextrid;?>" /></td>
 					<td><input id="ou2" type="checkbox" name="ou" /></td>
 					<td><input type="submit" value="Create" /></td>
