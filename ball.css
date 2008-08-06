@@ -5,14 +5,12 @@
  */
 
 html {
-	overflow:hidden;
 }
 
 body {
 	padding:0px;
 	margin:0px;
 	background-color: #efefef;
-	overflow:hidden;
 	width:100%;
 	height:100%;
 }
@@ -79,77 +77,9 @@ body, td, th
 }
 
 
-#content {
-	position:relative;
-	top:0px;
-	left:0px;
-	width:100%;
-	font-family:Verdana, Arial, Helvetica, sans-serif;
-	font-size:0.8em;
-	background-color:#4A7DB5;
-	background-image:none;
-	color:#fff;
-	padding:20px;
-}
-
-/*
-#copyright {
-	position: absolute;
-	top:5px;
-	right:5px;
-}
-*/
 .hidden {display:none;}
 
-
-.notice {
-	margin:10px;
-	padding:5px;
-	width:200px;
-	border:3px solid #CCE2E5;
-	background-color:#FFCFCD
-	color:#000;
-}
-/* multi - select styling - used to select teams*/
-
-#teams {
-	float:right;
-	width:450px;
-}
-
-div.holder {
-	display:block;
-	width:200px;
-	float:left;
-	padding:5px;
-}
-
-div.holder a { 
-	display:block; 
-	width:100px; 
-	border:1px solid #ccc;
-	background:#eee;
-	padding:10px;
-}
-
-div.holder select {
-	margin-top:70px;
-	width:180px;
-	padding:5px;
-	height:300px;
-}
-
-div.holder option {
-	padding:0 2px;
-}
-
-div.holder h2 {
-	position:absolute;
-	top:10px;
-	left:5px;
-}
-
-#/* ================================================================ 
+/* ================================================================ 
 This copyright notice must be kept untouched in the stylesheet at 
 all times.
 
@@ -193,6 +123,16 @@ way to fit your requirements.
 #menu :hover ul li a {display:block; font-size:11px; height:20px; width:90px; line-height:20px; text-indent:5px; color:#000; text-decoration:none;}
 #menu :hover ul li a:hover {background:#3a93d2; color:#fff;}
 
+#content {
+	font-family:Verdana, Arial, Helvetica, sans-serif;
+	font-size:0.8em;
+	background-color:#4A7DB5;
+	background-image:none;
+	color:#fff;
+	padding:20px;
+	overflow:auto;
+}
+
 
 
 div.del {
@@ -202,22 +142,78 @@ div.del {
 	float: left;
 	height: 16px;
 	width: 16px;
+	padding:0;
 }
 
-div.del:hover, div.del.active {background-position:left bottom;}
+div.del:hover, div.del:active {background-position:left bottom;}
 
-/* min height dealt with */
-/* for understanding browsers */
-.container {
-width:20em;
-padding:0.5em;
-border:1px solid #000;
-min-height:8em; 
-height:auto;
+#options {
+	vertical-align:top;
+	width:15em;
+	background-color:#CCEDFF;
+}
+
+#matches {
+	vertical-align:top;
+	background-color:#CCEDFF;
+}
+
+
+#optiond {
+	width:13em;
+	border:1px solid black;
+}
+
+textarea#condition, textarea#question {
+	height:8em;
+}
+
+#option {
+	width:30px;
+	height:30px;
+	float:right;
+	background-color:#339900;
+	border:2px solid #CCCCFF;
+}
+
+#match {
+	width:30px;
+	height:30px;
+	background-color:#CCCCCC;
+	border:2px solid #CCCCFF;
+}
+
+#value {width:2em;}
+
+#answer {width:2em;}
+
+.comment {background-color:#FFFFCC;}
+.comment textarea{
+	width:12em;
+	min-height:4em; 
+	height:auto;
 }
 /* for Internet Explorer */
 /*\*/
-* html .container {
-height: 8em;
+* html .comment {
+height: 4em;
 }
 /**/
+caption {font-size:normal; font-weight:bold;}
+table.layout table td {
+	background-color:white;
+	border:1px solid #CCCCFF;
+}
+
+table.layout table.form td, table.layout td {background-color:#FFFFCC;}
+th {font-size:x-small;font-weight:normal;}
+td, div {padding:2px;}
+
+.ctitle {width:12em;}
+.user {width:12em;}
+.option1{width:12em;}
+table.layout table.form td.submit{width:8em; text-align:center;background-color:#993300;}
+.time,.datetime {width:12em;}
+.option2{width:8em;}
+.team {width:5em;}
+

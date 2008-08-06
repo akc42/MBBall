@@ -14,11 +14,11 @@ $resultusers = dbQuery('SELECT uid,name FROM participant WHERE last_logon > now(
 $userdata = dbFetch($resultusers);
 
 $sql = 'SELECT cid,description,uid,name FROM competition c LEFT JOIN participant p ON c.administrator = p.uid';
-if(!isset($_GET['global']) {
+if(!isset($_GET['global'])) {
 	// When not global administrator, only see competitions for which are administrator
 	$sql .= ' WHERE c.administrator ='.dbMakeSafe($uid);
 }
-$sql .= ' ORDER BY cid DESC ;'
+$sql .= ' ORDER BY cid DESC ;';
 $result = dbQuery($sql);
 ?>	<form id="default_competition" action="setdefault.php">
 		<input type="hidden" name="uid" value="<?php echo $uid; ?>" />
@@ -29,7 +29,7 @@ $result = dbQuery($sql);
 				<tr>
 					<th class="ctitle">Title</th>
 					<th class="user">Competition Administrator</th>
-					<th class="radio">Default</th>
+					<th class="option1">Default</th>
 					<th></th>
 				</tr>
 			</thead>
@@ -69,24 +69,33 @@ dbFree($result);
 	<form id="createform" action="createcomp.php">
 		<input type="hidden" name="uid" value="<?php echo $uid; ?>" />
 		<input type="hidden" name="pass" value="<?php echo $password; ?>" />
-		<table>
+		<table class="form">
+			<caption>Create Competition</caption>
 			<tbody>
 				<tr>
-					<td><input id="desc" type="text" name="desc" value="" /></td>
 					<td>
-						<select id="adm" name="adm">
+			<label>Competition Title<br/>
+			<input id="desc" name="desc" type="text" class="ctitle" value="<?php echo $comp['description'];?>" /></label>
+					</td>
+					<td>
+			<label>Administrator<br/>
+			<select id="adm" name="adm" class="user">
 <?php
 	foreach($userdata as $user) {
-?>							<option value="<?php echo $user['uid'];?>" 
-									<?php if ($user['uid'] == $uid) echo 'selected="selected"' ;?>>
-								<?php echo $user['name'] ;?>
-							</option>
+?>				<option value="<?php echo $user['uid'];?>" 
+					<?php if ($user['uid'] == $uid) echo 'selected="selected"' ;?>>
+					<?php echo $user['name'] ;?>
+				</option>
 <?php
 	}
-?>						</select>
+?>			</select></label>
 					</td>
-					<td><input id="def" type="checkbox" name="setdefault" value="set" /></td>
-					<td><input id="create" type="submit" value="Create" /></td>
+					<td class="option1">
+			<label><input id="def" type="checkbox" name="setdefault" value="set" />Set as default</label>
+					</td>
+					<td class="submit">
+						<input type="submit" value="Create" />
+					</td>
 				</tr>
 			</tbody>
 		</table>

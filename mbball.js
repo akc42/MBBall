@@ -1,4 +1,3 @@
-var MBBmove = function(from, to){$(from).getSelected().inject($(to));}
 var MBBRequestOptions;
 /*  Class to load a SubPage from 'url' into the 'div'. 
  *  On success call
@@ -30,16 +29,19 @@ var MBBSubPage = new Class({
 });
 
 var MBBall = new Class({
-	initialize: function(version,me,el) {
+	initialize: function(version,me) {
 		this.me = me;
 		MBBRequestOptions = {'uid':me.uid,'pass':me.password};
 		var span=$('version');
 		span.set('text',version);
+	},
+	adjustDates: function (el) {
 		//sets up all date time fields under the supplied element
 		var datespans = el.getElements('.time');
 		datespans.each(function(datespan,i) {
 			var d;
 			el.removeClass('time');
+			el.addClass('datetime');
 			switch (datespan.get('tag')) {
 			case "span":
 				d = datespan.get('text');
@@ -60,9 +62,9 @@ var MBBall = new Class({
 
 
 var MBBUser = new Class({
-//	Extends: MBBall,
+	Extends: MBBall,
 	initialize: function(version,me) {
-//		this.parent(version,me,$('content'));
+		this.parent(version,me);
 // other stuff
 	}
 });
@@ -71,13 +73,12 @@ var MBBUser = new Class({
 var MBBAdmin = new Class({
 	Extends: MBBall,
 	initialize: function(version,me,cid) {
-		this.parent(version,me,$('admin'));
-		this.admin = $('admin');
-		var adminclass = this;
+		var params = {};
+		this.parent(version,me);
 		this.competitions = new MBBSubPage(
 			this,
 			'competitions.php',
-			$('admin'),
+			$('competitions'),
 			function (div) {
 				var owner = this.owner;
 				$$('input.default').each(function(rb,i) {
@@ -110,46 +111,55 @@ var MBBAdmin = new Class({
 		this.competition = new MBBSubPage (
 			this,
 			'competition.php',
-			$('admin'),
+			$('competition'),
 			function (div) {
-				// Set up team in competition selection process
-				$('add').addEvent('click', MBBmove.pass(['tnic', 'tic']));
-				$('remove').addEvent('click',	MBBmove.pass(['tic','tnic']));
-				$('addall').addEvent('click',function() {
-					$('tnic').getElements('option').each(function (option,i) {
-						option.set('selected','selected');
-					});
-					MBBmove.pass(['tnic','tic']);
-				});
-
 				// Validate competition Details and Change Dates to seconds since 1970
 				$('compform').addEvent('submit', function(e) {
 						e.stop();
 				});
 //Lots more stuff
 
-				this.rounds = new MBBSubPage(this,'rounds.php',$('rounddata'), function(div) {
+				this.rounds = new MBBSubPage(this,'rounds.php',$('rounds'), function(div) {
+					var rid;
+					if (div.getElement('div')) {
+						rid = div.getElement('div').get('id').substr(1).toInt();
+					} else {
+						rid=0;
+					}
+					var maxround = rid;
 					//Initialise to click on a round to load single round
-				});
-				this.round = new MBBSubPage(this,'round.php',$('rounddata'),function(div) {
-					//Initialise Round Data Form
-					this.matches = new MBBSubPage(this,'matches.php',$('matches'),function (div) {
+					this.round = new MBBSubPage(this,'round.php',$('round'),function(div) {
+						var answer =$('answer').value.toInt();
+						//Initialise Round Data Form
+						this.matches = new MBBSubPage(this,'matches.php',$('matches'),function (div) {
+						});
+						this.options = new MBBSubPage(this,'options.php',$('options'),function(div) {
+						})
+						this.teams = new MBBSubPage(this,'teams.php',$('teams'),function (div) {
+							$('addall').addEvent('click',function() {
+							});
+						});
+						this.matches.loadPage($merge(params,{'rid':rid}));
+						this.options.loadPage($merge(params,{'rid':rid,'answer':answer}));
+						this.teams.loadPage($merge(params,{'rid':rid}));
 					});
-					this.match = new MBBSubPage(this,'options.php',$('options'),function(div) {
-					})
-					this.matches.loadPage();
+					this.newround = new MBBSubPage(this,'newround.php',$('newround'),function(div) {
+
+					});
+					this.round.loadPage($merge(params,{'rid':rid}));
+					this.newround.loadPage($merge(params,{'rid':maxround+1}));
 				});
-				this.rounds.loadPage();	
+				this.rounds.loadPage(params);	
 			}
 		);
-		if(cid==0) {
-			if(this.me.admin) {
-				this.competitions.loadPage({'global':true});
-			} else {
-				this.competitions.loadPage();
-			}
-		} else {
-			this.competition.loadPage({'cid':cid});
+		if (this.me.admin) {
+			$extend(params,{'global':true});
+		}
+		this.competitions.loadPage(params);
+		if(cid!=0) {
+			$extend(params,{'cid':cid});
+			this.competition.loadPage(params);
+
 		}
 	}
 });

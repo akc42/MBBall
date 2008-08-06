@@ -1,5 +1,5 @@
 <?php
-if(!(isset($_GET['uid']) && isset($_GET['pass']) && isset($_GET['cid']) && isset($_GET['rid'])))
+if(!(isset($_GET['uid']) && isset($_GET['pass']) && isset($_GET['cid']) && isset($_GET['rid']) ))
 	die('Hacking attempt - wrong parameters');
 $uid = $_GET['uid'];
 $password = $_GET['pass'];
@@ -17,46 +17,65 @@ dbFree($result);
 $optionresult = dbQuery('SELECT count(*) FROM option WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' ;');
 $optdata= dbFetch($optionresult);
 
-?><form id="roundform" action="updateround.php" >
+?>
+<form id="roundform" action="updateround.php" >
 	<input type="hidden" name="uid" value="<?php echo $uid;?>" />
 	<input type="hidden" name="pass" value="<?php echo $pass;?>" />
 	<input type="hidden" name="cid" value="<?php echo $cid;?>" />
 	<input type="hidden" name="rid" value="<?php echo $rid;?>" />
-	<div id="questiond">
+	<table class="form">
+		<caption>Round Details</caption>
+		<tbody>
+			<tr>
+				<td>
+		<label>Round Name<br/>
+		<input id="rname" type="text" name="rname" class="rname" value="<?php echo $row['name'];?>"/></label>
+				</td>
+				<td rowspan="3" colspan="2">
 		<label>Question<br/>
 			<textarea id="question" name="question"><?php echo $row['question'];?></textarea>
 		</label>
-	<div>
-	<div id="rnamed"><label>Name<br/>
-		<input id="rname" type="text" name="rname" value="<?php echo $row['name'];?>"/></label>
-	</div>
-	<div id="oud">
+				</td>
+			</tr>
+			<tr>
+				<td class="option1">
 		<label><input id="ou" name="ou" type="checkbox" <?php if($row['ou_round'] == 't') echo 'checked="checked"';?> />Use Over Under Selection</label>
-	</div>
-	<div id="valued">
-		<label>Points for correct pick</br>
+				</td>
+			</tr>
+			<tr>
+				<td>
+		<label>Points for correct pick<br/>
 			<input id="value" name="value" type="text" value="<?php echo $row['value'];?>" />
 		</label>
-	</div>
-	<div id="validquestiond">
+				</td>
+			</tr>
+			<tr>
+				<td>
 		<label><input id=validquestion" name="validquestion" type="checkbox" 
 			<?php if ($row['valid_question'] == 't') echo 'checked="checked"';?> />Valid Question?</label>
-	</div>
-	<div id="deadlined">
+				</td>
+				<td>
+		<label>Answer<br/>
+			<input id="answer" name="answer" value="<?php echo $row['answer'];?>" 
+				<?php if($optdata['count'] > 0) echo 'disabled="disabled"';?> />
+		</label>
+				</td>
+				<td>
+		<div id="option"></div> <!-- marker to start option drag to create new option float right -->
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
 		<label>Deadline for answering question<br/>
 			<input id="deadline" type="text" class="time" value="<?php echo $row['deadline'];;?>"/>
 		</label>
-	</div>
-	<div id="submitd">
+				</td>
+				<td class="submit">
 		<input type="submit" value="Update" />
-	</div>
-	<div id="answerd">
-		<label>Answer<br/>
-			<input id="answer" name="answer" value="<?php echo $row['answer'];?>" 
-				<?php if($optdata['count') > 0) echo 'disabled="disabled"';?> />
-		</label>
-	</div>
+				</td>
+			</tr>
+		</tbody>
+	</table>
 </form>
-<div id="option"></div> <!-- marker to start option drag to create new option -->
 <div id="match"></div> <!-- market to start match drag to create new match -->
 

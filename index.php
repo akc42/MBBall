@@ -152,6 +152,7 @@ var MBBmgr;
 window.addEvent('domready', function() {
 	MBBmgr = new MBBUser('<?php echo $version;?>',{uid: '<?php echo $uid;?>', 
 				password : '<?php echo sha1("Football".$uid); ?>'});
+	MBBmgr.adjustDates($('content'));
 });	
 
 	// -->
@@ -237,14 +238,15 @@ if (dbNumRows($result) > 0) {
 dbFree($result);
 if(in_array(SMF_FOOTBALL,$groups)) {
 // Am Global Administrator - let me also do Admin thinks
-?>	<li><a href="admin.php?<?php echo 'uid='.$uid.'&pass='.$password.'&v='.$version.'&global=true';?>"><span>Global Admin</span></a></li>
+?>	<li><a href="admin.php?<?php echo 'uid='.$uid.'&pass='.$password.'&v='.$version.'&global=true&cid='.$cid;?>"><span>Global Admin</span></a></li>
 
 <?php
-}
-if($admin) {
+} else {
+	if($admin) {
 // Am Administrator of this competition - let me also do Admin thinks
 ?>	<li><a href="admin.php?<?php echo 'uid='.$uid.'&pass='.$password.'&v='.$version.'&cid='.$cid;?>"><span>Administration</span></a></li>
 <?php 
+	}
 }
 ?></ul>
 <div id="content">

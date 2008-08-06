@@ -61,20 +61,15 @@ window.addEvent('domready', function() {
 	<li><a href="/football"><span>Return the User Page</span></a></li>
 </ul>
 <div id="content">
-<div id="teams">
-</div>
-<div id="competitions">
-</div>
-<div id="competition">
-</div>
-<div id="rounds">
-</div>
-<div id="round">
-</div>
-<div id="options">
-<div>
-<div id="matches">
-</div>
+<table class="layout">
+	<tbody>
+		<tr><td colspan="3"><div id="competitions"></div></td></tr>
+		<tr><td colspan="2"><div id="competition"></div></td><td rowspan="3"><div id="rounds"></div></td></tr>
+		<tr><td colspan="2"><div id="newround"></div></td></tr>
+		<tr><td><div id="round"></div></td><td id="options"></td></tr>
+		<tr><td colspan="2" id="matches"></td><td><div id="teams"></div></td></tr>
+	<tbody>
+</table>
 
 <div id="copyright"><hr/>MBball <span id="version"></span> &copy; 2008 Alan Chandler.  Licenced under the GPL</div>
 </div>

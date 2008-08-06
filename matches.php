@@ -17,7 +17,8 @@ require_once('db.php');
 	<form action="match.php" >
 		<input type="hidden" value="<?php echo $cid;?>"/>
 		<input type="hidden" value="<?php echo $rid;?>"/>
-		<label class="open"><input type="checkbox" name="open" /><span>Open</span></label><div class="hid"></div><div class="aid">
+		<label class="open"><input type="checkbox" name="open" /><span>Open</span></label>
+		<div class="hid"></div><div class="aid"></div>
 		<input type="text" class="mtime" />
 		<input type="text" class="cscore" /><input type="text" class="hscore" /><input type="text" class="ascore" />
 		<textarea class="comment"></textarea>
@@ -27,7 +28,7 @@ require_once('db.php');
 
 <?php
 $result = dbQuery('SELECT * FROM match WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' ;');
-while($row = dbFetchRow($optionresult)) {
+while($row = dbFetchRow($result)) {
 ?><div class="matchd">
 	<form action="match.php" >
 		<input type="hidden" value="<?php echo $cid;?>"/>
@@ -42,7 +43,7 @@ while($row = dbFetchRow($optionresult)) {
 			<?php if(!isset($_GET['ou'])) echo 'disabled="disabled"';?> />
 		<input type="text" class="hscore" value="<?php echo $row['hscore'];?>"/>
 		<input type="text" class="ascore" value="<?php echo $row['ascore'];?>"/>
-		<textarea class="comment"><?php echo ['comment'];?></textarea>
+		<textarea class="comment"><?php echo $row['comment'];?></textarea>
 		<input type="submit" class="submit" value="Save" />
 	</form> 
 <?php
