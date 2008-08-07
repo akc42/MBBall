@@ -68,7 +68,7 @@ window.addEvent('domready', function() {
 		<tr><td colspan="2"><div id="newround"></div></td></tr>
 		<tr><td><div id="round"></div></td><td id="options"></td></tr>
 		<tr><td colspan="2" id="matches"></td><td><div id="teams"></div></td></tr>
-	<tbody>
+	</tbody>
 </table>
 
 <div id="copyright"><hr/>MBball <span id="version"></span> &copy; 2008 Alan Chandler.  Licenced under the GPL</div>

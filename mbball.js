@@ -40,18 +40,18 @@ var MBBall = new Class({
 		var datespans = el.getElements('.time');
 		datespans.each(function(datespan,i) {
 			var d;
-			el.removeClass('time');
-			el.addClass('datetime');
+			datespan.removeClass('time');
+			datespan.addClass('datetime');
 			switch (datespan.get('tag')) {
 			case "span":
 				d = datespan.get('text');
 				if(d == '' || d=='0') return;
-				el.set('text',new Date(d.toInt()*1000).toLocalString().substr(0,24));
+				datespan.set('text',new Date(d.toInt()*1000).toLocalString().substr(0,24));
 				break;
 			case "input":
 				d=datespan.value;
 				if(d == '' || d=='0') return;
-				el.value = new Date(d.toInt()*1000).toLocalString().substr(0,24);
+				datespan.value = new Date(d.toInt()*1000).toLocalString().substr(0,24);
 				break;
 			default:
 				break;
@@ -73,7 +73,7 @@ var MBBUser = new Class({
 var MBBAdmin = new Class({
 	Extends: MBBall,
 	initialize: function(version,me,cid) {
-		var params = {};
+		var params = {'cid':cid};
 		this.parent(version,me);
 		this.competitions = new MBBSubPage(
 			this,
@@ -81,15 +81,39 @@ var MBBAdmin = new Class({
 			$('competitions'),
 			function (div) {
 				var owner = this.owner;
+				var deleteReq = new Request ({
+					url:'deletecomp.php',
+					method:'get',
+					onSuccess: function(response) {
+						owner.competitions.loadPage(params);
+					}
+				});
 				$$('input.default').each(function(rb,i) {
 					rb.addEvent('change',function(e) {
 						$('default_competition').send();
+						if (params.cid == 0) {
+//------------------------------------ if we have no display now we can 							
+						}
 					});
 				}); 
-				$$('td.compdata').each(function (comp,i) {
+				div.getElements('.selectthis').each(function (comp,i) {
 					comp.addEvent('click',function(e) {
 						//Make the update form hold this entry
-						owner.competition.loadPage(comp.id.substr(1).toInt());
+						params.cid = comp.id.substr(1).toInt()
+						owner.competition.loadPage(params);
+					});
+				});
+				div.getElements('.del').each(function (comp,i) {
+					comp.addEvent('click', function(e) {
+						e.stop();
+						if(confirm('Deleting a Competition will delete all the Rounds and Matches associated with it. Do you wish to Proceed?')) {
+							var cid = comp.id.substr(1).toInt()
+							if (params.cid == cid) {
+								//We are deleting the page on display so stop detail comp being displayed
+								params.cid=0;
+							}
+							deleteReq.get($merge(MBBRequestOptions,{'cid': cid}));
+						}
 					});
 				});
 				$('createform').addEvent('submit', function(e) {
@@ -106,60 +130,59 @@ var MBBAdmin = new Class({
 						this.send();
 					}
 				});
-			}
-		);
-		this.competition = new MBBSubPage (
-			this,
-			'competition.php',
-			$('competition'),
-			function (div) {
-				// Validate competition Details and Change Dates to seconds since 1970
-				$('compform').addEvent('submit', function(e) {
-						e.stop();
-				});
-//Lots more stuff
-
-				this.rounds = new MBBSubPage(this,'rounds.php',$('rounds'), function(div) {
-					var rid;
-					if (div.getElement('div')) {
-						rid = div.getElement('div').get('id').substr(1).toInt();
-					} else {
-						rid=0;
-					}
-					var maxround = rid;
-					//Initialise to click on a round to load single round
-					this.round = new MBBSubPage(this,'round.php',$('round'),function(div) {
-						var answer =$('answer').value.toInt();
-						//Initialise Round Data Form
-						this.matches = new MBBSubPage(this,'matches.php',$('matches'),function (div) {
+				this.competition = new MBBSubPage (
+					this,
+					'competition.php',
+					$('competition'),
+					function (div) {
+						MBBmgr.adjustDates(div);
+						// Validate competition Details and Change Dates to seconds since 1970
+						$('compform').addEvent('submit', function(e) {
+								e.stop();
 						});
-						this.options = new MBBSubPage(this,'options.php',$('options'),function(div) {
-						})
-						this.teams = new MBBSubPage(this,'teams.php',$('teams'),function (div) {
-							$('addall').addEvent('click',function() {
+		//Lots more stuff
+		
+						this.rounds = new MBBSubPage(this,'rounds.php',$('rounds'), function(div) {
+							var rid;
+							if (div.getElement('div')) {
+								rid = div.getElement('div').get('id').substr(1).toInt();
+							} else {
+								rid=0;
+							}
+							var maxround = rid;
+							//Initialise to click on a round to load single round
+							this.round = new MBBSubPage(this,'round.php',$('round'),function(div) {
+								var answer =$('answer').value.toInt();
+								//Initialise Round Data Form
+								this.matches = new MBBSubPage(this,'matches.php',$('matches'),function (div) {
+								});
+								this.options = new MBBSubPage(this,'options.php',$('options'),function(div) {
+								})
+								this.teams = new MBBSubPage(this,'teams.php',$('teams'),function (div) {
+									$('addall').addEvent('click',function() {
+									});
+								});
+								this.matches.loadPage($merge(params,{'rid':rid}));
+								this.options.loadPage($merge(params,{'rid':rid,'answer':answer}));
+								this.teams.loadPage($merge(params,{'rid':rid}));
 							});
+							this.newround = new MBBSubPage(this,'newround.php',$('newround'),function(div) {
+		
+							});
+							this.round.loadPage($merge(params,{'rid':rid}));
+							this.newround.loadPage($merge(params,{'rid':maxround+1}));
 						});
-						this.matches.loadPage($merge(params,{'rid':rid}));
-						this.options.loadPage($merge(params,{'rid':rid,'answer':answer}));
-						this.teams.loadPage($merge(params,{'rid':rid}));
-					});
-					this.newround = new MBBSubPage(this,'newround.php',$('newround'),function(div) {
-
-					});
-					this.round.loadPage($merge(params,{'rid':rid}));
-					this.newround.loadPage($merge(params,{'rid':maxround+1}));
-				});
-				this.rounds.loadPage(params);	
+						this.rounds.loadPage(params);	
+					}
+				);
+				if(params.cid!=0) {
+					this.competition.loadPage(params);
+				}
 			}
 		);
 		if (this.me.admin) {
 			$extend(params,{'global':true});
 		}
 		this.competitions.loadPage(params);
-		if(cid!=0) {
-			$extend(params,{'cid':cid});
-			this.competition.loadPage(params);
-
-		}
 	}
 });

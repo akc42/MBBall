@@ -49,9 +49,9 @@ if(dbNumRows($result) > 0) {
 
 	while($row = dbFetchRow($result)) {
 ?>
-				<tr id="<?php echo 'C'.$row['cid'];?>" class="complink">
-					<td><?php echo $row['description']; ?></td>
-					<td ><?php echo $row['name'];?></td>
+				<tr>
+					<td id="<?php echo 'C'.$row['cid'];?>" class="selectthis"><?php echo $row['description']; ?></td>
+					<td id="<?php echo 'A'.$row['cid'];?>" class="selectthis"><?php echo $row['name'];?></td>
 					<td>
 						<input class="default" type="radio" name="default" value="<?php echo $row['cid'];?>" 
 							<?php if($dcid == $row['cid']) echo 'checked="checked"' ;?> />

@@ -217,3 +217,8 @@ table.layout table.form td.submit{width:8em; text-align:center;background-color:
 .option2{width:8em;}
 .team {width:5em;}
 
+
+.selectthis {
+	cursor:pointer;
+}
+

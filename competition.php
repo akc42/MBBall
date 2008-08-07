@@ -59,7 +59,7 @@ if($comp = dbFetchRow($resultcomp)) {
 			<tr>
 				<td class="option2">	
 		<label><input id="open" name="open" type="checkbox" value="set" 
-			<?php if ($comp['open'] == 't') echo 'checked="checked"' ;?>/>Open</label>
+			<?php if ($comp['open'] == 't') echo 'checked="checked"' ;?>/>Can Register</label>
 				</td>
 				<td class="option1" colspan="2">
 		<label><input id="bbapproval" name="bbaproval" type="checkbox" value="set"
