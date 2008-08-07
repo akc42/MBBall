@@ -1438,7 +1438,7 @@ GRANT SELECT ON TABLE bonus_score TO melindas_ball;
 REVOKE ALL ON TABLE competition FROM PUBLIC;
 REVOKE ALL ON TABLE competition FROM alan;
 GRANT ALL ON TABLE competition TO alan;
-GRANT SELECT,INSERT,REFERENCES,UPDATE ON TABLE competition TO melindas_ball;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE competition TO melindas_ball;
 
 
 --
