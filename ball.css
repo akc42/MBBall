@@ -155,11 +155,15 @@ div.del:hover, div.del:active {background-position:left bottom;}
 #options {
 	vertical-align:top;
 	width:15em;
-	background-color:#CCEDFF;
+	background-color:#339900;
 }
 
 #matches {
 	vertical-align:top;
+	background-color:#CCEDFF;
+}
+
+#tic {
 	background-color:#CCEDFF;
 }
 
@@ -173,17 +177,8 @@ textarea#condition, textarea#question {
 }
 
 #option {
-	width:30px;
-	height:30px;
-	float:right;
+	text-align:right;
 	background-color:#339900;
-	border:2px solid #CCCCFF;
-}
-
-#match {
-	width:30px;
-	height:30px;
-	background-color:#CCCCCC;
 	border:2px solid #CCCCFF;
 }
 

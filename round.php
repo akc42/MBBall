@@ -51,23 +51,24 @@ if($rid != 0 && $cid !=0) {
 			</tr>
 			<tr>
 				<td>
-		<label><input id=validquestion" name="validquestion" type="checkbox" 
-			<?php if ($row['valid_question'] == 't') echo 'checked="checked"';?> />Valid Question?</label>
+		<label><input id="roundopen" name="open" type="checkbox" 
+			<?php if ($row['open'] == 't') echo 'checked="checked"';?> />Round Open</label>
 				</td>
 				<td>
+		<label><input id="validquestion" name="validquestion" type="checkbox" 
+			<?php if ($row['valid_question'] == 't') echo 'checked="checked"';?> />Valid Question?</label>
+				</td>
+				<td id="option">
 		<label>Answer<br/>
 			<input id="answer" name="answer" value="<?php echo $row['answer'];?>" 
 				<?php if($optdata['count'] > 0) echo 'disabled="disabled"';?> />
 		</label>
 				</td>
-				<td>
-		<div id="option"></div> <!-- marker to start option drag to create new option float right -->
-				</td>
 			</tr>
 			<tr>
 				<td colspan="2">
 		<label>Deadline for answering question<br/>
-			<input id="deadline" type="text" class="time" value="<?php echo $row['deadline'];;?>"/>
+			<input id="deadline" name="deadline" type="text" class="time" value="<?php echo $row['deadline'];;?>"/>
 		</label>
 				</td>
 				<td class="submit">

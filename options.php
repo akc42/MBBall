@@ -16,7 +16,7 @@ if($rid != 0 && $cid !=0) {
 	$optionresult = dbQuery('SELECT * FROM option WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' ORDER BY oid;');
 	$noopts = 0;
 ?><table>
-	<caption>Question Options</caption>
+	<caption>Answer Options</caption>
 	<tbody>
 <?php
 	while($row = dbFetchRow($optionresult)) {
