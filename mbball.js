@@ -154,6 +154,7 @@ var MBBAdmin = new Class({
 						e.stop();
 						//Make the update form hold this entry
 						params.cid = comp.id.substr(1).toInt()
+						params.rid = 0;
 						owner.competition.loadPage(params);
 					});
 				});
@@ -164,6 +165,7 @@ var MBBAdmin = new Class({
 							var deleteReq = new MBBReq('deletecomp.php',$('compserr'),function (response) {
 								if (params.cid == response.cid) {
 									params.cid = 0;
+									params.rid = 0;
 									owner.competition.loadPage(params);
 								}
 								owner.competitions.loadPage(params);
@@ -183,7 +185,7 @@ var MBBAdmin = new Class({
 						var createReq = new MBBReq('createcomp.php',$('compserr'), function(response) {
 							if (params.cid == 0) {
 								params.cid = response.cid;
-								onwer.competition.loadPage(params);
+								owner.competition.loadPage(params);
 							}
 							owner.competitions.loadPage(params);
 						});
@@ -197,6 +199,7 @@ var MBBAdmin = new Class({
 			'competition.php',
 			$('competition'),
 			function (div) {
+				var owner = this.owner;
 				if(params.cid != 0) {
 					//We only want to do this if there is a competition to get
 					MBBmgr.adjustDates(div);
@@ -213,24 +216,19 @@ var MBBAdmin = new Class({
 						if(validated) {
 							var updateReq = new MBBReq('updatecomp.php',$('compserr'), function(response) {
 								MBBmgr.adjustDates(div);
-								//Shouldn't need to load page as its all there
+								//Shouldn't need to load page as its all there (but we might have updated the summary)
+								owner.competitions.loadPage(params);
 							});
 							updateReq.post($('compform'));
 						}
 					});
 				}
 				this.rounds = new MBBSubPage(this,'rounds.php',$('rounds'), function(div) {
-					var rid;
-					if (div.getElement('div')) {
-						rid = div.getElement('div').get('id').substr(1).toInt();
-					} else {
-						rid=0;
-					}
-					var maxround = rid;
+					var maxround;
 					//Initialise to click on a round to load single round
 					this.round = new MBBSubPage(this,'round.php',$('round'),function(div) {
 						var answer;
-						if(rid != 0) {
+						if(params.rid != 0) {
 							answer =$('answer').value.toInt();
 						} else {
 							answer =0;
@@ -246,21 +244,71 @@ var MBBAdmin = new Class({
 								});
 							}
 						});
-						this.matches.loadPage($merge(params,{'rid':rid}));
-						this.options.loadPage($merge(params,{'rid':rid,'answer':answer}));
-						this.teams.loadPage($merge(params,{'rid':rid}));
+						this.matches.loadPage(params);
+						this.options.loadPage($merge(params,{'answer':answer}));
+						this.teams.loadPage(params);
 					});
+					if (params.cid != 0) {
+						if (params.rid == 0) {
+							if (div.getElement('div')) {
+								params.rid = div.getElement('div').get('id').substr(1).toInt();
+								this.round.loadPage(params);
+							} else {
+								params.rid=0;
+							}
+							maxround = params.rid;
+						}
+						if (params.rid != 0) {
+							//selects a round
+							div.getElements('.selectthis').each(function (comp,i) {
+								comp.addEvent('click',function(e) {
+									e.stop();
+									//Make the update form hold this entry
+									params.rid = comp.id.substr(1).toInt()
+									owner.competition.rounds.round.loadPage(params);
+								});
+							});
+							// allows you to delete a round
+							div.getElements('.del').each(function (comp,i) {
+								comp.addEvent('click', function(e) {
+									e.stop();
+									if(confirm('Deleting a Round will delete all the Matches associated with it. Do you wish to Proceed?')) {
+										var deleteReq = new MBBReq('deleteround.php',$('compserr'),function (response) {
+											maxround--;
+											if (params.cid == response.cid && params.rid == response.rid) {
+												params.rid = 0;
+												owner.competition.rounds.round.loadPage(params);
+											}
+											if (params.cid == response.cid && params.rid > response.rid ){
+												// all above will have had their numbers changed
+												params.rid--;
+												owner.competition.rounds.round.loadPage(params);
+											}
+											owner.competition.rounds.loadPage(params);
+										});
+										deleteReq.get({'cid': params.cid,'rid':comp.id.substr(1).toInt()});
+									}
+								});
+							});
+						}
+					}
 					this.newround = new MBBSubPage(this,'newround.php',$('newround'),function(div) {
-						$('createroundform').addEvent('submit',function(e) {
-							e.stop();
-							this.set('send',{onSuccess: function (html) {
-								owner.competition.rounds.loadPage(params);
-							}});
-							this.send('createround.php');
-						});
+						if(params.cid !=0) {
+							$('createroundform').addEvent('submit',function(e) {
+								e.stop();
+								var createReq = new MBBReq('createround.php',$('compserr'),function(response) {
+									maxround++;
+									if(params.rid == 0) {
+										params.rid = response.rid;
+										owner.competition.round.loadPage(params);
+									}
+									owner.competition.rounds.loadPage(params);
+								});
+								createReq.post($('createroundform'));
+							});
+						}
 					});
-					this.round.loadPage($merge(params,{'rid':rid}));
-					this.newround.loadPage($merge(params,{'rid':maxround+1}));
+					this.newround.loadPage($merge(params,{'mr':maxround+1}));
 				});
 				this.rounds.loadPage(params);	
 			}

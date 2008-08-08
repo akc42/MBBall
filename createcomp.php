@@ -18,7 +18,7 @@ if (dbNumRows($result) == 0) {
 dbFree($result);
 
 dbQuery('INSERT INTO competition (description,administrator) VALUES ('.dbPostSafe($_POST['desc']).','.$adm.');');
-$result=dbQuery('SELECT lastval() ;');
+$result=dbQuery('SELECT currval(\'competition_cid_seq\') AS lastval ;');
 $row=dbFetchRow($result);
 $lastval = $row['lastval'];
 dbFree($result);

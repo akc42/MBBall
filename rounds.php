@@ -25,9 +25,9 @@ if ($cid != 0) {
 <?php
 	while($row = dbFetchRow($result)) {
 		$rid = $row['rid'];
-?>		<tr id="<?php echo 'R'.$rid;?>">
-			<td><?php echo $rid; ?></td>
-			<td><?php echo $row['name'];?>
+?>		<tr>
+			<td id="<?php echo 'R'.$rid;?>" class="selectthis"><?php echo $rid; ?></td>
+			<td id="<?php echo 'S'.$rid;?>" class="selectthis"><?php echo $row['name'];?>
 			<td><div id="<?php echo 'E'.$rid; ?>" class="del"></div></td>
 		</tr>
 <?php

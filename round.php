@@ -12,7 +12,7 @@ if($rid != 0 && $cid !=0) {
 	define ('BALL',1);   //defined so we can control access to some of the files.
 	require_once('db.php');
 	$result = dbQuery('SELECT * FROM round WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' ;');
-	$row = dbFetch($result);
+	$row = dbFetchRow($result);
 	dbFree($result);
 	$optionresult = dbQuery('SELECT count(*) FROM option WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' ;');
 	$optdata= dbFetch($optionresult);
@@ -20,7 +20,7 @@ if($rid != 0 && $cid !=0) {
 ?>
 <form id="roundform" action="updateround.php" >
 	<input type="hidden" name="uid" value="<?php echo $uid;?>" />
-	<input type="hidden" name="pass" value="<?php echo $pass;?>" />
+	<input type="hidden" name="pass" value="<?php echo $password;?>" />
 	<input type="hidden" name="cid" value="<?php echo $cid;?>" />
 	<input type="hidden" name="rid" value="<?php echo $rid;?>" />
 	<table class="form">
@@ -77,7 +77,6 @@ if($rid != 0 && $cid !=0) {
 		</tbody>
 	</table>
 </form>
-<div id="match"></div> <!-- market to start match drag to create new match -->
 <?php
 } else {
 ?><p>There is no Round information to display right now</p>
