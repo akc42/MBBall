@@ -5,6 +5,12 @@ header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); // Date in the past
 
 	if (!defined('BALL'))
 		die('Hacking attempt...');
+//  These are the patterns that we will use to search for some simple bbcode sequences
+	$search[0]='/\[b\](.*?)\[\/b\]/';
+	$search[1]='/\[s\](.*?)\[\/s\]/';
+	$replace[0]='<b>$1</b>';
+	$replace[1]='<del>$1</del>';
+
 	$db_server = 'localhost';
 	$db_name = 'melindas_ball';
 	$db_user = 'melindas_ball';
@@ -23,6 +29,12 @@ header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); // Date in the past
 	}
 	function dbMakeSafe($value) {
 		return "'".pg_escape_string($value)."'" ;
+	}
+	function dbPostSafe($text) {
+		return dbMakeSafe(htmlentities($text,ENT_QUOTES,'UTF-8',false));
+	}
+	function dbBBcode($text) {
+		return preg_replace($search,$replace,$text);
 	}
 	function dbNumRows($result) {
 		return pg_num_rows($result);

@@ -78,6 +78,7 @@ body, td, th
 
 
 .hidden {display:none;}
+.error {background-color:#FF9999;font-weight:bold;}
 
 /* ================================================================ 
 This copyright notice must be kept untouched in the stylesheet at 
@@ -147,6 +148,10 @@ div.del {
 
 div.del:hover, div.del:active {background-position:left bottom;}
 
+#rounds {
+	vertical-align:top;
+}
+
 #options {
 	vertical-align:top;
 	width:15em;
@@ -157,7 +162,6 @@ div.del:hover, div.del:active {background-position:left bottom;}
 	vertical-align:top;
 	background-color:#CCEDFF;
 }
-
 
 #optiond {
 	width:13em;
@@ -186,6 +190,7 @@ textarea#condition, textarea#question {
 #value {width:2em;}
 
 #answer {width:2em;}
+#gap {width:4em;}
 
 .comment {background-color:#FFFFCC;}
 .comment textarea{
@@ -213,7 +218,7 @@ td, div {padding:2px;}
 .user {width:12em;}
 .option1{width:12em;}
 table.layout table.form td.submit{width:8em; text-align:center;background-color:#993300;}
-.time,.datetime {width:12em;}
+.time,.datetime {width:14em;}
 .option2{width:8em;}
 .team {width:5em;}
 

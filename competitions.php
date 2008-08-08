@@ -53,7 +53,7 @@ if(dbNumRows($result) > 0) {
 					<td id="<?php echo 'C'.$row['cid'];?>" class="selectthis"><?php echo $row['description']; ?></td>
 					<td id="<?php echo 'A'.$row['cid'];?>" class="selectthis"><?php echo $row['name'];?></td>
 					<td>
-						<input class="default" type="radio" name="default" value="<?php echo $row['cid'];?>" 
+						<input class="default" type="radio" name="defcomps" value="<?php echo $row['cid'];?>" 
 							<?php if($dcid == $row['cid']) echo 'checked="checked"' ;?> />
 					</td>
 					<td><div id="<?php echo 'D'.$row['cid']; ?>" class="del"></div></td>
@@ -66,6 +66,7 @@ dbFree($result);
 		</table>
 	</form>
 <hr/>
+<p id="compserr"></p>
 	<form id="createform" action="createcomp.php">
 		<input type="hidden" name="uid" value="<?php echo $uid; ?>" />
 		<input type="hidden" name="pass" value="<?php echo $password; ?>" />

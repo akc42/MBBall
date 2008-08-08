@@ -8,9 +8,10 @@ if ($password != sha1("Football".$uid))
 	die('Hacking attempt got: '.$password.' expected: '.sha1("Football".$uid));
 $cid = $_GET['cid'];
 $rid = $_GET['rid'];
+if($rid != 0 && $cid !=0) {
 
-define ('BALL',1);   //defined so we can control access to some of the files.
-require_once('db.php');
+	define ('BALL',1);   //defined so we can control access to some of the files.
+	require_once('db.php');
 
 
 ?><div id="matchtemplate" class="matchd hidden">
@@ -27,8 +28,8 @@ require_once('db.php');
 </div>
 
 <?php
-$result = dbQuery('SELECT * FROM match WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' ;');
-while($row = dbFetchRow($result)) {
+	$result = dbQuery('SELECT * FROM match WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' ;');
+	while($row = dbFetchRow($result)) {
 ?><div class="matchd">
 	<form action="match.php" >
 		<input type="hidden" value="<?php echo $cid;?>"/>
@@ -48,5 +49,9 @@ while($row = dbFetchRow($result)) {
 	</form> 
 <?php
 
+	}
+	dbFree($result);
+} else {
+?><p>No Match information available right now</p>
+<?php
 }
-dbFree($result);

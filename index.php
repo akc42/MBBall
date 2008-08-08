@@ -250,6 +250,10 @@ if(in_array(SMF_FOOTBALL,$groups)) {
 }
 ?></ul>
 <div id="content">
+	<table class="layout">
+		<tbody>
+			<tr>
+				<td>
 <?php
 	// Does competition allow registration at this time
 if($registration_open && !$signedup && !$admin) {
@@ -829,9 +833,11 @@ if ($playoff_deadline != 0) {
 <?php
 	foreach($confs as $confid => $conference) {
 		foreach($divs as $divid => $division) {
-			foreach($teams[$confid][$divid] as $team) {
+			if(isset($teams[$confid][$divid])) {
+				foreach($teams[$confid][$divid] as $team) {
 ?>				<th><?php echo $team['tid'];?></th>
 <?php
+				}
 			}
 		}
 	}
@@ -840,9 +846,9 @@ if ($playoff_deadline != 0) {
 		<tbody>
 <?php
 $sql = 'SELECT u.name AS name, u.uid AS uid, p.score AS score';
-$sql .= ' FROM playoff_score p JOIN user USING (uid)';
+$sql .= ' FROM playoff_score p JOIN participant u USING (uid)';
 $sql .= ' WHERE cid = '.dbMakeSafe($cid);
-$$sql .= ' ORDER BY score DESC;';
+$sql .= ' ORDER BY score DESC;';
 $result = dbQuery($sql);
 	while($row = dbFetchRow($result)) {
 		$playoff_selections = array();
@@ -924,7 +930,11 @@ $sql .= ' GROUP BY u.name, p.score ORDER BY total DESC;';
 	<p class="notice" >Unfortunately there is no results from this competition to display right now.  Please come back later</p>
 <?php
 }
-?><div id="copyright"><hr />MBball <span id="version"></span> &copy; 2008 Alan Chandler.  Licenced under the GPL</div>
+?>				</td>
+			</tr>
+		</tbody>
+	</table>	
+<div id="copyright"><hr />MBball <span id="version"></span> &copy; 2008 Alan Chandler.  Licenced under the GPL</div>
 </div>
 </body>
 

@@ -13,13 +13,14 @@ var MBBSubPage = new Class({
 		this.request = new Request.HTML({
 			url: url,
 			onSuccess: function(html) {
-				div.set('text','');
+				div.empty();
 				div.adopt(html);
 				iSP(div);
 			},
 			onFailure: function(){
 				var output = message || '<p>Failed to Read Page from '+url+'<p>';
-				div.set('text',output);
+				div.empty();
+				div.adopt(output);
 			}
 		});
 	},
@@ -27,6 +28,29 @@ var MBBSubPage = new Class({
 		this.request.get($merge(MBBRequestOptions,params || {}));
 	}
 });
+
+var MBBReq = new Class({
+	initialize: function (url,errorEl,success) {
+		this.req = new Request.JSON({
+			url:url,
+			onComplete: function(response,html) {
+				if(response) {
+					success(response);
+				} else {
+					errorEl.set('text',html);
+				}
+			}
+		});
+	},
+	get:function(params) {
+		this.req.get($merge(MBBRequestOptions,params));
+	},
+	post: function (params) {
+		this.req.post(params);
+	}
+});
+
+
 
 var MBBall = new Class({
 	initialize: function(version,me) {
@@ -45,19 +69,50 @@ var MBBall = new Class({
 			switch (datespan.get('tag')) {
 			case "span":
 				d = datespan.get('text');
-				if(d == '' || d=='0') return;
-				datespan.set('text',new Date(d.toInt()*1000).toLocalString().substr(0,24));
+				if(d == '' || d=='0') {
+					datespan.set('text','');
+					break;
+				}
+				datespan.set('text',new Date(d.toInt()*1000).toLocaleString().substr(0,24));
 				break;
 			case "input":
 				d=datespan.value;
-				if(d == '' || d=='0') return;
-				datespan.value = new Date(d.toInt()*1000).toLocalString().substr(0,24);
+				if(d == '' || d=='0') {
+					datespan.value = '';
+					break;
+				}
+				datespan.value = new Date(d.toInt()*1000).toLocaleString().substr(0,24);
 				break;
 			default:
 				break;
 			}
 		});
-	}	
+	},
+	parseDate: function(el) {
+		var secs
+		el.removeClass('error');
+		if (el.value == '' || el.value == '0') {
+			secs = 0;
+		} else {
+			secs = Date.parse(el.value)/1000;
+			if(isNaN(secs)) {
+				el.addClass('error');
+				return false;
+			}
+		}
+		el.value = secs;
+		el.removeClass('datetime');
+		el.addClass('time');
+		return true;
+	},
+	intValidate: function(el) {
+		el.removeClass('error');
+		if (isNaN(el.value.toInt())) {
+			el.addClass('error');
+			return false;
+		}
+		return true;
+	}
 });
 
 
@@ -73,7 +128,7 @@ var MBBUser = new Class({
 var MBBAdmin = new Class({
 	Extends: MBBall,
 	initialize: function(version,me,cid) {
-		var params = {'cid':cid};
+		var params = {'cid':cid, 'rid':0};
 		this.parent(version,me);
 		this.competitions = new MBBSubPage(
 			this,
@@ -81,23 +136,22 @@ var MBBAdmin = new Class({
 			$('competitions'),
 			function (div) {
 				var owner = this.owner;
-				var deleteReq = new Request ({
-					url:'deletecomp.php',
-					method:'get',
-					onSuccess: function(response) {
-						owner.competitions.loadPage(params);
-					}
-				});
 				$$('input.default').each(function(rb,i) {
+					if(params.cid == 0 && rb.checked) params.cid = rb.value; 
 					rb.addEvent('change',function(e) {
-						$('default_competition').send();
-						if (params.cid == 0) {
-//------------------------------------ if we have no display now we can 							
-						}
+						var dcReq = new MBBReq('setdefault.php',$('compserr'), function (response) {
+							if(params.cid ==0) {
+								params.cid = response.cid;
+								owner.competition.loadPage(params);
+							}
+						});	
+						if(params.cid == 0 && rb.checked) params.cid = rb.value; 
+						dcReq.post($('default_competition'));
 					});
 				}); 
 				div.getElements('.selectthis').each(function (comp,i) {
 					comp.addEvent('click',function(e) {
+						e.stop();
 						//Make the update form hold this entry
 						params.cid = comp.id.substr(1).toInt()
 						owner.competition.loadPage(params);
@@ -107,12 +161,14 @@ var MBBAdmin = new Class({
 					comp.addEvent('click', function(e) {
 						e.stop();
 						if(confirm('Deleting a Competition will delete all the Rounds and Matches associated with it. Do you wish to Proceed?')) {
-							var cid = comp.id.substr(1).toInt()
-							if (params.cid == cid) {
-								//We are deleting the page on display so stop detail comp being displayed
-								params.cid=0;
-							}
-							deleteReq.get($merge(MBBRequestOptions,{'cid': cid}));
+							var deleteReq = new MBBReq('deletecomp.php',$('compserr'),function (response) {
+								if (params.cid == response.cid) {
+									params.cid = 0;
+									owner.competition.loadPage(params);
+								}
+								owner.competitions.loadPage(params);
+							});
+							deleteReq.get({'cid':comp.id.substr(1).toInt()});
 						}
 					});
 				});
@@ -124,65 +180,96 @@ var MBBAdmin = new Class({
 						desc.value= 'Please specify a Title for the Competition'
 					} else {
 						desc.removeClass('error');
-						this.set('send',{onSuccess:function(html) {
-							owner.competitions.loadPage();
-						}}); 
-						this.send();
+						var createReq = new MBBReq('createcomp.php',$('compserr'), function(response) {
+							if (params.cid == 0) {
+								params.cid = response.cid;
+								onwer.competition.loadPage(params);
+							}
+							owner.competitions.loadPage(params);
+						});
+						createReq.post($('createform'));
 					}
 				});
-				this.competition = new MBBSubPage (
-					this,
-					'competition.php',
-					$('competition'),
-					function (div) {
-						MBBmgr.adjustDates(div);
-						// Validate competition Details and Change Dates to seconds since 1970
-						$('compform').addEvent('submit', function(e) {
-								e.stop();
-						});
-		//Lots more stuff
-		
-						this.rounds = new MBBSubPage(this,'rounds.php',$('rounds'), function(div) {
-							var rid;
-							if (div.getElement('div')) {
-								rid = div.getElement('div').get('id').substr(1).toInt();
-							} else {
-								rid=0;
-							}
-							var maxround = rid;
-							//Initialise to click on a round to load single round
-							this.round = new MBBSubPage(this,'round.php',$('round'),function(div) {
-								var answer =$('answer').value.toInt();
-								//Initialise Round Data Form
-								this.matches = new MBBSubPage(this,'matches.php',$('matches'),function (div) {
-								});
-								this.options = new MBBSubPage(this,'options.php',$('options'),function(div) {
-								})
-								this.teams = new MBBSubPage(this,'teams.php',$('teams'),function (div) {
-									$('addall').addEvent('click',function() {
-									});
-								});
-								this.matches.loadPage($merge(params,{'rid':rid}));
-								this.options.loadPage($merge(params,{'rid':rid,'answer':answer}));
-								this.teams.loadPage($merge(params,{'rid':rid}));
-							});
-							this.newround = new MBBSubPage(this,'newround.php',$('newround'),function(div) {
-		
-							});
-							this.round.loadPage($merge(params,{'rid':rid}));
-							this.newround.loadPage($merge(params,{'rid':maxround+1}));
-						});
-						this.rounds.loadPage(params);	
-					}
-				);
-				if(params.cid!=0) {
-					this.competition.loadPage(params);
-				}
 			}
 		);
+		this.competition = new MBBSubPage (
+			this,
+			'competition.php',
+			$('competition'),
+			function (div) {
+				if(params.cid != 0) {
+					//We only want to do this if there is a competition to get
+					MBBmgr.adjustDates(div);
+					// Validate competition Details and Change Dates to seconds since 1970
+					$('compform').addEvent('submit', function(e) {
+						e.stop();
+						var validated = true;
+						if(!MBBmgr.parseDate($('playoffdeadline'))) {
+							validated = false;
+						}
+						if(!MBBmgr.intValidate($('gap'))) {
+							validated = false;
+						}
+						if(validated) {
+							var updateReq = new MBBReq('updatecomp.php',$('compserr'), function(response) {
+								MBBmgr.adjustDates(div);
+								//Shouldn't need to load page as its all there
+							});
+							updateReq.post($('compform'));
+						}
+					});
+				}
+				this.rounds = new MBBSubPage(this,'rounds.php',$('rounds'), function(div) {
+					var rid;
+					if (div.getElement('div')) {
+						rid = div.getElement('div').get('id').substr(1).toInt();
+					} else {
+						rid=0;
+					}
+					var maxround = rid;
+					//Initialise to click on a round to load single round
+					this.round = new MBBSubPage(this,'round.php',$('round'),function(div) {
+						var answer;
+						if(rid != 0) {
+							answer =$('answer').value.toInt();
+						} else {
+							answer =0;
+						}
+						//Initialise Round Data Form
+						this.matches = new MBBSubPage(this,'matches.php',$('matches'),function (div) {
+						});
+						this.options = new MBBSubPage(this,'options.php',$('options'),function(div) {
+						})
+						this.teams = new MBBSubPage(this,'teams.php',$('teams'),function (div) {
+							if (params.cid != 0) {
+								$('addall').addEvent('click',function() {
+								});
+							}
+						});
+						this.matches.loadPage($merge(params,{'rid':rid}));
+						this.options.loadPage($merge(params,{'rid':rid,'answer':answer}));
+						this.teams.loadPage($merge(params,{'rid':rid}));
+					});
+					this.newround = new MBBSubPage(this,'newround.php',$('newround'),function(div) {
+						$('createroundform').addEvent('submit',function(e) {
+							e.stop();
+							this.set('send',{onSuccess: function (html) {
+								owner.competition.rounds.loadPage(params);
+							}});
+							this.send('createround.php');
+						});
+					});
+					this.round.loadPage($merge(params,{'rid':rid}));
+					this.newround.loadPage($merge(params,{'rid':maxround+1}));
+				});
+				this.rounds.loadPage(params);	
+			}
+				);
 		if (this.me.admin) {
 			$extend(params,{'global':true});
 		}
 		this.competitions.loadPage(params);
+		this.competition.loadPage(params);
+
 	}
 });

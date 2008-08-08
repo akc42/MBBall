@@ -6,11 +6,11 @@ $password = $_GET['pass'];
 if ($password != sha1("Football".$uid))
 	die('Hacking attempt got: '.$password.' expected: '.sha1("Football".$uid));
 $cid = $_GET['cid'];
-
-define ('BALL',1);   //defined so we can control access to some of the files.
-require_once('db.php');
-$result = dbQuery('SELECT rid,name,ou_round FROM round WHERE cid = '.dbMakeSafe($cid).' ORDER BY rid DESC ;');
-
+if ($cid != 0) {
+	define ('BALL',1);   //defined so we can control access to some of the files.
+	require_once('db.php');
+	$result = dbQuery('SELECT rid,name,ou_round FROM round WHERE cid = '.dbMakeSafe($cid).' ORDER BY rid DESC ;');
+	
 ?>
 <table>
 	<caption>Rounds</caption>
@@ -23,16 +23,21 @@ $result = dbQuery('SELECT rid,name,ou_round FROM round WHERE cid = '.dbMakeSafe(
 	</thead>
 	<tbody>
 <?php
-while($row = dbFetchRow($result)) {
-	$rid = $row['rid'];
+	while($row = dbFetchRow($result)) {
+		$rid = $row['rid'];
 ?>		<tr id="<?php echo 'R'.$rid;?>">
 			<td><?php echo $rid; ?></td>
 			<td><?php echo $row['name'];?>
-			<td><div id="<?php echo 'D'.$rid; ?>" class="del"></div></td>
+			<td><div id="<?php echo 'E'.$rid; ?>" class="del"></div></td>
 		</tr>
 <?php
-}
-dbFree($result);
+	}
+	dbFree($result);
 
 ?>	</tbody>
 </table>
+<?php
+} else {
+?><p>No Round Data</p>
+<?php
+}

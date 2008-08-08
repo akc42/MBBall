@@ -8,15 +8,15 @@ if ($password != sha1("Football".$uid))
 	die('Hacking attempt got: '.$password.' expected: '.sha1("Football".$uid));
 $cid = $_GET['cid'];
 $rid = $_GET['rid'];
-
-define ('BALL',1);   //defined so we can control access to some of the files.
-require_once('db.php');
-$result = dbQuery('SELECT * FROM round WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' ;');
-$row = dbFetch($result);
-dbFree($result);
-$optionresult = dbQuery('SELECT count(*) FROM option WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' ;');
-$optdata= dbFetch($optionresult);
-
+if($rid != 0 && $cid !=0) {
+	define ('BALL',1);   //defined so we can control access to some of the files.
+	require_once('db.php');
+	$result = dbQuery('SELECT * FROM round WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' ;');
+	$row = dbFetch($result);
+	dbFree($result);
+	$optionresult = dbQuery('SELECT count(*) FROM option WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' ;');
+	$optdata= dbFetch($optionresult);
+	dbFree($optionresult);
 ?>
 <form id="roundform" action="updateround.php" >
 	<input type="hidden" name="uid" value="<?php echo $uid;?>" />
@@ -78,4 +78,8 @@ $optdata= dbFetch($optionresult);
 	</table>
 </form>
 <div id="match"></div> <!-- market to start match drag to create new match -->
-
+<?php
+} else {
+?><p>There is no Round information to display right now</p>
+<?php
+}

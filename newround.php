@@ -7,10 +7,12 @@ $password = $_GET['pass'];
 if ($password != sha1("Football".$uid))
 	die('Hacking attempt got: '.$password.' expected: '.sha1("Football".$uid));
 $cid = $_GET['cid'];
-$rid = $_GET['rid'];
+if($cid !=0) {
 
-define ('BALL',1);   //defined so we can control access to some of the files.
-require_once('db.php');
+	$rid = $_GET['rid'];
+	
+	define ('BALL',1);   //defined so we can control access to some of the files.
+	require_once('db.php');
 ?>
 <form id="createroundform" action="createround.php">
 	<input type="hidden" name="uid" value="<?php echo $uid; ?>" />
@@ -29,4 +31,9 @@ require_once('db.php');
 		</tbody>
 	</table>
 </form>
+<?php
+} else {
+?><p>Cannot create New Round right now</p>
+<?php
+}
 
