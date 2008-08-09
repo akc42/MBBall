@@ -351,6 +351,7 @@ var MBBAdmin = new Class({
 								if(!lock.checked) {
 									var addAll = new MBBReq('addalltic.php',$('compserr'), function (response) {
 										var teams = response.teams;
+										$('tnic').empty();
 										var tic = $('tic').empty();
 										teams.each(function(team,i) {	
 											tic.adopt(makeTeam(team));
