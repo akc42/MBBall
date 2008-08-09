@@ -34,7 +34,7 @@ if(in_array(SMF_FOOTBALL,$groups)) {
 	dbQuery('BEGIN;');
 	$result=dbQuery('SELECT * FROM participant WHERE uid = '.dbMakeSafe($uid).';');
 	if(dbNumRows($result) > 0) {
-		dbQuery('UPDATE participant SET last_logon = now(), admin_experience = TRUE, name = '
+		dbQuery('UPDATE participant SET last_logon = extract(epoch from now()), admin_experience = TRUE, name = '
 				.dbMakeSafe($name).', email = '.dbMakeSafe($email).' WHERE uid = '.dbMakeSafe($uid).';');
 	} else {
 		dbQuery('INSERT INTO participant (uid,name,email,last_logon, admin_experience) VALUES ('
@@ -42,16 +42,16 @@ if(in_array(SMF_FOOTBALL,$groups)) {
 	}
 	dbQuery('COMMIT;');
 }
+$result = dbQuery('SELECT cid,version FROM default_competition;');
+if(dbNumRows($result) != 1 ) {
+	die("<p>Database is <b>corrupt</b> - default_competition should have a single row.<br/>Please contact webmaster@melindasbackup.com</p>");
+}
+$row=dbFetchRow($result);
+$version = $row['version'];
 
 if(isset($_GET['cid'])) {
 	$cid = $_GET['cid'];
 } else {
-	$result = dbQuery('SELECT cid,version FROM default_competition;');
-	if(dbNumRows($result) != 1 ) {
-		die("Database is corrupt - default_competition should have a single row");
-	}
-	$row=dbFetchRow($result);
-	$version = $row['version'];
 	if (!is_null($row['cid'])) {
 		$cid = $row['cid'];
 	} else {
@@ -62,8 +62,8 @@ if(isset($_GET['cid'])) {
 		};
 		exit;
 	}
-	dbFree($result);	
 }
+dbFree($result);	
 
 $result = dbQuery('SELECT * FROM Competition WHERE cid = '.dbMakeSafe($cid).';');
 if (dbNumRows($result) == 0) {
@@ -84,7 +84,7 @@ if ($uid == $row['administrator']) {
 	dbQuery('BEGIN;');
 	$result=dbQuery('SELECT * FROM participant WHERE uid = '.dbMakeSafe($uid).';');
 	if(dbNumRows($result) > 0) {
-		dbQuery('UPDATE participant SET last_logon = now(), admin_experience = TRUE, name = '
+		dbQuery('UPDATE participant SET last_logon = extract(epoch from now()), admin_experience = TRUE, name = '
 				.dbMakeSafe($name).', email = '.dbMakeSafe($email).' WHERE uid = '.dbMakeSafe($uid).';');
 	} else {
 		dbQuery('INSERT INTO participant (uid,name,email,last_logon, admin_experience) VALUES ('
@@ -115,11 +115,11 @@ if(dbNumRows($result) <> 0) {
 	if(!(in_array(SMF_FOOTBALL,$groups)  || $admin)) { //update already done if global or ordinary administrator
 			//Don't touch admin experience - might not be admin now, but could have been in past
 		if(in_array(BABY_BACKUP,$groups)) {
-			dbQuery('UPDATE participant SET last_logon = now(), is_bb = TRUE, name = '
+			dbQuery('UPDATE participant SET last_logon = extract(epoch from now()), is_bb = TRUE, name = '
 				.dbMakeSafe($name).', email = '.dbMakeSafe($email).' WHERE uid = '.dbMakeSafe($uid).';');
 		} else {
 		
-			dbQuery('UPDATE participant SET last_logon = now(), is_bb = FALSE, name = '
+			dbQuery('UPDATE participant SET last_logon = extract(epoch from now()), is_bb = FALSE, name = '
 				.dbMakeSafe($name).', email = '.dbMakeSafe($email).' WHERE uid = '.dbMakeSafe($uid).';');
 		}
 	}
