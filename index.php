@@ -34,7 +34,7 @@ if(in_array(SMF_FOOTBALL,$groups)) {
 	dbQuery('BEGIN;');
 	$result=dbQuery('SELECT * FROM participant WHERE uid = '.dbMakeSafe($uid).';');
 	if(dbNumRows($result) > 0) {
-		dbQuery('UPDATE participant SET last_logon = extract(epoch from now()), admin_experience = TRUE, name = '
+		dbQuery('UPDATE participant SET last_logon = DEFAULT, admin_experience = TRUE, name = '
 				.dbMakeSafe($name).', email = '.dbMakeSafe($email).' WHERE uid = '.dbMakeSafe($uid).';');
 	} else {
 		dbQuery('INSERT INTO participant (uid,name,email,last_logon, admin_experience) VALUES ('
@@ -84,7 +84,7 @@ if ($uid == $row['administrator']) {
 	dbQuery('BEGIN;');
 	$result=dbQuery('SELECT * FROM participant WHERE uid = '.dbMakeSafe($uid).';');
 	if(dbNumRows($result) > 0) {
-		dbQuery('UPDATE participant SET last_logon = extract(epoch from now()), admin_experience = TRUE, name = '
+		dbQuery('UPDATE participant SET last_logon = DEFAULT, admin_experience = TRUE, name = '
 				.dbMakeSafe($name).', email = '.dbMakeSafe($email).' WHERE uid = '.dbMakeSafe($uid).';');
 	} else {
 		dbQuery('INSERT INTO participant (uid,name,email,last_logon, admin_experience) VALUES ('
@@ -115,11 +115,11 @@ if(dbNumRows($result) <> 0) {
 	if(!(in_array(SMF_FOOTBALL,$groups)  || $admin)) { //update already done if global or ordinary administrator
 			//Don't touch admin experience - might not be admin now, but could have been in past
 		if(in_array(BABY_BACKUP,$groups)) {
-			dbQuery('UPDATE participant SET last_logon = extract(epoch from now()), is_bb = TRUE, name = '
+			dbQuery('UPDATE participant SET last_logon = DEFAULT, is_bb = TRUE, name = '
 				.dbMakeSafe($name).', email = '.dbMakeSafe($email).' WHERE uid = '.dbMakeSafe($uid).';');
 		} else {
 		
-			dbQuery('UPDATE participant SET last_logon = extract(epoch from now()), is_bb = FALSE, name = '
+			dbQuery('UPDATE participant SET last_logon = DEFAULT, is_bb = FALSE, name = '
 				.dbMakeSafe($name).', email = '.dbMakeSafe($email).' WHERE uid = '.dbMakeSafe($uid).';');
 		}
 	}

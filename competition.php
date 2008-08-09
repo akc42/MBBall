@@ -33,7 +33,7 @@ if ($cid != 0) {
 		<label>Administrator<br/>
 		<select id="administrator" name="adm" class="user">
 <?php
-			$resultusers = dbQuery('SELECT uid,name FROM participant WHERE last_logon > now() - interval \'1 year 1 month\' AND
+			$resultusers = dbQuery('SELECT uid,name FROM participant WHERE last_logon > extract(epoch from now()) - 31536000 AND
 							 is_bb IS NOT TRUE ORDER BY admin_experience DESC, name;');
 			$userdata = dbFetch($resultusers);
 			dbFree($resultusers);

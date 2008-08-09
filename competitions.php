@@ -9,7 +9,7 @@ if ($password != sha1("Football".$uid))
 define ('BALL',1);   //defined so we can control access to some of the files.
 require_once('db.php');
 
-$resultusers = dbQuery('SELECT uid,name FROM participant WHERE last_logon > now() - interval \'1 year 1 month\' AND is_bb IS NOT TRUE
+$resultusers = dbQuery('SELECT uid,name FROM participant WHERE last_logon > extract(epoch from now()) - 31536000 AND is_bb IS NOT TRUE
 				ORDER BY admin_experience DESC, name;');
 $userdata = dbFetch($resultusers);
 

@@ -424,7 +424,7 @@ CREATE TABLE participant (
     uid integer NOT NULL,
     name character varying,
     email character varying,
-    last_logon date DEFAULT now() NOT NULL,
+    last_logon bigint DEFAULT 0 NOT NULL,
     admin_experience boolean DEFAULT false NOT NULL,
     is_bb boolean DEFAULT false NOT NULL
 );
