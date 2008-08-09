@@ -60,37 +60,14 @@ COMMENT ON COLUMN div_winner_pick.confid IS 'Conference ID';
 COMMENT ON COLUMN div_winner_pick.divid IS 'Division ID';
 COMMENT ON COLUMN div_winner_pick.tid IS 'Team who will win division';
 COMMENT ON COLUMN div_winner_pick.uid IS 'User ID';
-
-
---
--- Name: COLUMN div_winner_pick.submit_time; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN div_winner_pick.submit_time IS 'Time of submission';
-
-
---
--- Name: division; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
---
 
 CREATE TABLE division (
     divid character(1) NOT NULL,
     name character varying(6)
 );
 
-
-ALTER TABLE public.division OWNER TO alan;
-
---
--- Name: TABLE division; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON TABLE division IS 'Football Conference Division';
-
-
---
--- Name: match; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
---
 
 CREATE TABLE match (
     rid integer NOT NULL,
@@ -105,83 +82,16 @@ CREATE TABLE match (
     match_time bigint
 );
 
-
-ALTER TABLE public.match OWNER TO alan;
-
---
--- Name: COLUMN match.rid; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN match.rid IS 'round id';
-
-
---
--- Name: COLUMN match.hid; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN match.hid IS 'home team id';
-
-
---
--- Name: COLUMN match.aid; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN match.aid IS 'Away Team ID';
-
-
---
--- Name: COLUMN match.comment; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN match.comment IS 'Administrator Comment for this Match';
-
-
---
--- Name: COLUMN match.ascore; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN match.ascore IS 'Away Team Score';
-
-
---
--- Name: COLUMN match.hscore; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN match.hscore IS 'Home Team Score';
-
-
---
--- Name: COLUMN match.cid; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN match.cid IS 'Competition ID';
-
-
---
--- Name: COLUMN match.combined_score; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN match.combined_score IS 'Value of Combined Score for an over/under question (add 0.5 to this for the question)';
-
-
---
--- Name: COLUMN match.open; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN match.open IS 'True if Match is set up and ready';
-
-
---
--- Name: COLUMN match.match_time; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN match.match_time IS 'Time match is due to be played';
-
-
-
---
--- Name: option_pick; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
---
 
 CREATE TABLE option_pick (
     uid integer NOT NULL,
@@ -557,8 +467,8 @@ COMMENT ON COLUMN participant.is_bb IS 'user is a baby backup';
 CREATE TABLE team (
     tid character(3) NOT NULL,
     name character varying(50) NOT NULL,
-    logo character varying(80),
-    url character varying(100),
+    logo character varying(80) DEFAULT NULL,
+    url character varying(100) DEFAULT NULL, 
     confid character(3),
     divid character(1)
 );

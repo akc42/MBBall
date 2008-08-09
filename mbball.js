@@ -268,7 +268,96 @@ var MBBAdmin = new Class({
 					})
 					this.teams = new MBBSubPage(this,'teams.php',$('teams'),function (div) {
 						if (params.cid != 0) {
-							$('addall').addEvent('click',function() {
+							var lock = $('lock');
+							var tnicClicked;
+							var dragStart = function(e) {
+								if(lock.checked) {
+									e.stop();
+									//Start drag
+								}
+							};
+							var teamClicked = function (e) {
+								e.stop();
+								if(!lock.checked) {
+									var team = this;
+									var remTiC = new MBBReq('remtic.php',$('compserr'), function (response) {
+										var div = new Element('div');
+										var span = new Element('span',{
+											'class':'tid',
+											'events': {'click':tnicClicked},
+											'text':response.tid
+										}).inject(div);
+										if($$('#tnic div').every(function(item,i) {
+											if(item.getElement('span').get('text') > response.tid) {
+												div.inject(item,'before');
+												return false;
+											}
+											return true;
+										})) {
+											$('tnic').adopt(div);
+										} 
+										team.getParent().dispose();
+									});
+									remTiC.get({'cid':params.cid,'tid':team.get('text')});	
+								}
+							};
+							var changeMpStatus = function(e) {
+								var mpReq = new MBBReq('updatepostate.php',$('compserr'),function(response) {
+								});
+								mpReq.get({'cid':params.cid,'tid':this.name,'mp':this.checked});
+							};
+							var makeTeam = function(team) {
+								var div = new Element('div',{'events':{
+									'click':teamClicked,
+									'mousedown':dragStart
+								}});
+								var input = new Element('input',
+									{'type':'checkbox','name':team,'events':{'change':changeMpStatus}}
+								).inject(div);
+								var span = new Element('span',{
+									'class':'tid',
+									'events': {'click':tnicClicked},
+									'text':team
+								}).inject(div);
+								return div;
+							};
+							var tnicClicked = function(e) {
+								e.stop();
+								if(!lock.checked) {
+									var team=this;
+									var addTiC = new MBBReq('addtic.php',$('compserr'), function (response) {
+										var div = makeTeam(response.tid);
+										if($$('#tic div').every(function(item,i) {
+											if(item.getElement('span').get('text') > response.tid) {
+												div.inject(item,'before');
+												return false;
+											}
+											return true;
+										})) {
+											$('tic').adopt(div);
+										} 
+										team.getParent().dispose();
+									});
+									addTiC.get({'cid':params.cid,'tid':team.get('text')});
+								}
+							};
+							var ticElements = $$('#tic span');
+							ticElements.addEvent('click',teamClicked);
+							ticElements.addEvent('mousedown', dragStart);
+							$$('#tnic span').addEvent('click',tnicClicked);
+							$$('#tic input').addEvent('change',changeMpStatus);
+							$('addall').addEvent('click',function(e) {
+								e.stop();
+								if(!lock.checked) {
+									var addAll = new MBBReq('addalltic.php',$('compserr'), function (response) {
+										var teams = response.teams;
+										var tic = $('tic').empty();
+										teams.each(function(team,i) {	
+											tic.adopt(makeTeam(team));
+										});
+									});
+									addAll.get({'cid':params.cid});
+								}
 							});
 						}
 					});
@@ -280,12 +369,12 @@ var MBBAdmin = new Class({
 					if (params.rid == 0) {
 						if (div.getElement('div')) {
 							params.rid = div.getElement('div').get('id').substr(1).toInt();
-							this.round.loadPage(params);
 						} else {
 							params.rid=0;
 						}
 						maxround = params.rid;
 					}
+					this.round.loadPage(params);
 					if (params.rid != 0) {
 						//selects a round
 						div.getElements('.selectthis').each(function (comp,i) {

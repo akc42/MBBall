@@ -165,6 +165,11 @@ div.del:hover, div.del:active {background-position:left bottom;}
 
 #tic {
 	background-color:#CCEDFF;
+	cursor:pointer;
+}
+
+#tnic {
+	cursor:pointer;
 }
 
 #optiond {
@@ -215,7 +220,7 @@ td, div {padding:2px;}
 table.layout table.form td.submit{width:8em; text-align:center;background-color:#993300;}
 .time,.datetime {width:14em;}
 .option2{width:8em;}
-.team {width:5em;}
+.tid {width:5em;}
 
 
 .selectthis {

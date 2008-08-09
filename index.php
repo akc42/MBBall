@@ -345,14 +345,14 @@ if(dbNumRows($result) > 0 ) {
 ?>				<tr>
 					<td class="po_b1" colspan="2" rowspan="<?php echo $no_of_rows;?>"><?php echo $conference;?></td>
 <?php
-			for ($i = 0; $i < $no_of_rows-1;$i++) {
+			for ($i = 0; $i < $no_of_rows;$i++) {
 				if( $i != 0) {
 ?>				<tr>
 <?php
 				}
 				foreach($divs as $divid => $division) {
-					if(isset($teams[$config][$divid][$i])) { //only if this entry is set
-						$row=$teams[$config][$divid][$i];
+					if(isset($teams[$confid][$divid][$i])) { //only if this entry is set
+						$row=$teams[$confid][$divid][$i];
 						if($row['mp']) {
 ?>					<td class="in_po">
 <?php
@@ -376,12 +376,15 @@ if(dbNumRows($result) > 0 ) {
 						if(!is_null($row['logo'])) {
 							$logopath = MBBALL_ICON_PATH.$row['logo'];
 							if (!is_null($row['url'])) {			
-								echo '<a href="'.$row['url'].'"><img src="'.$logopath.' alt="team logo" /></a>';
+								echo '<a href="'.$row['url'].'"><img src="'.$logopath.'" alt="team logo" /></a>';
 							} else {
-								echo '<img src="'.$logopath.' alt="team logo" />';
+								echo '<img src="'.$logopath.'" alt="team logo" />';
 							}
 						}
 ?>					</td>
+<?php
+					} else {
+?>					<td colspan="3"></td>
 <?php
 					}
 				}
