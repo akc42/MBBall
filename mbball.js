@@ -459,7 +459,7 @@ var MBBAdmin = new Class({
 						div.getElements('.del').each(function (comp,i) {
 							comp.addEvent('click', function(e) {
 								e.stop();
-								if(confirm('This we Un-Register this User from this Competition. Do you wish to Proceed?')) {
+								if(confirm('This will Un-Register this User from this Competition. Do you wish to Proceed?')) {
 									var deleteReq = new MBBReq('deleteregistration.php',$('compserr'),function (response) {
 										owner.adminreg.loadPage($merge(params,{'bbar':$('bbapproval').checked}));
 									});
