@@ -438,6 +438,7 @@ var MBBAdmin = new Class({
 					}
 				});
 				this.adminreg = new MBBSubPage(this,'adminreg.php',$('registered'),function(div) {
+					var owner = this.owner;
 					if(params.cid !=0) {
 						MBBmgr.adjustDates(div);
 						$('bbapproval').addEvent('change', function(e) {
@@ -447,13 +448,24 @@ var MBBAdmin = new Class({
 						});
 						$$('#registered input.bbapprove').addEvent('change',function(e) {
 							e.stop();
-							if(confirm('You are changing the approval status of a Baby Backup for a competition. Are you sure you want to do this?')) {
+							if(confirm('You are changing the approval status of a Baby Backup for this Competition. Are you sure you want to do this?')) {
 								var updateBBa = new MBBReq('bbapprove.php',$('compserr'),function(response) {
 								});
 								updateBBa.get($merge(params,{'bbuid':this.name,'approval':this.checked}));
 							} else {
 								this.checked = !this.checked;
 							}
+						});
+						div.getElements('.del').each(function (comp,i) {
+							comp.addEvent('click', function(e) {
+								e.stop();
+								if(confirm('This we Un-Register this User from this Competition. Do you wish to Proceed?')) {
+									var deleteReq = new MBBReq('deleteregistration.php',$('compserr'),function (response) {
+										owner.adminreg.loadPage($merge(params,{'bbar':$('bbapproval').checked}));
+									});
+									deleteReq.get({'cid': params.cid,'ruid':comp.id.substr(1).toInt()});
+								}
+							});
 						});
 					}
 				});

@@ -25,6 +25,7 @@ if ($cid != 0) {
 			<th>Is a BB</th>
 			<th>BB Approved</th>
 			<th>As been a Admin</th>
+			<th>DEL</td>
 		</tr>
 	</thead>
 	<tbody>
@@ -57,6 +58,7 @@ if ($cid != 0) {
 ?>								 />
 			</td>
 			<td><input type="checkbox" disabled="disabled" <?php if($row['admin_experience'] == 't') echo 'checked="checked"';?> /></td>
+			<td><div id="<?php echo 'F'.$uid; ?>" class="del"></div></td>
 		</tr>
 <?php
 	}
