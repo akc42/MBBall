@@ -223,7 +223,7 @@ COMMENT ON COLUMN pick.submit_time IS 'Time of submission';
 CREATE TABLE registration (
     uid integer NOT NULL,
     cid integer NOT NULL,
-    agree_time bigint,
+    agree_time bigint DEFAULT EXTRACT('epoch'FROM now()) NOT NULL ,
     bb_approved boolean DEFAULT false NOT NULL
 );
 

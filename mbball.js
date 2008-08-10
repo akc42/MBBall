@@ -118,9 +118,20 @@ var MBBall = new Class({
 
 var MBBUser = new Class({
 	Extends: MBBall,
-	initialize: function(version,me) {
+	initialize: function(version,me,params) {
 		this.parent(version,me);
-// other stuff
+		var regdiv = $('registration');
+		if(regdiv) { //exists means registration is open
+			regdiv.getElementbyId('register').addEvent('submit', function(e) {
+				e.stop();
+				if(confirm("Click OK to register for the competition and agree to the condition")) {
+					var regReq = new MBBReq('register.php',$('regerror'), function(response) {
+						window.location.reload(true); //reload the page to pick up self
+					});
+					regReq.get(params);
+				}
+			});
+		}
 	}
 });
 
