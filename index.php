@@ -1,4 +1,7 @@
 <?php
+
+$version = "v0.3";
+
 /* A new version of chat
 	Copyright (c) 2008 Alan Chandler
 	Licenced under the GPL
@@ -49,7 +52,7 @@ if(dbNumRows($result) != 1 ) {
 	die("<p>Database is <b>corrupt</b> - default_competition should have a single row.<br/>Please contact webmaster@melindasbackup.com</p>");
 }
 $row=dbFetchRow($result);
-$version = $row['version'];
+$version .= '('.$row['version'].')';
 
 if(isset($_GET['cid'])) {
 	$cid = $_GET['cid'];
