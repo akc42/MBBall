@@ -12,19 +12,26 @@ while($row = dbFetchRow($result)) {
 <?php
 }
 dbFree($result);
+?>			<th>Rounds Total</th>
+<?php
 	if($playoff_deadline != 0) {
-?>			<th>PlayOffs</th>
+?>			<th>PlayOffs Total</th>
 <?php
 }
-?>			<th>Total</th>
+?>			<th>Grand Total</th>
 		</tr>
 	</thead>
 	<tbody>
 <?php
-$sql = 'SELECT u.name AS name, p.score AS pscore, sum(r.score) AS rscores, p.score+sum(r.score) AS total';
-$sql .= ' FROM participant u JOIN registration reg USING (uid) JOIN playoff_score p USING (cid,uid) JOIN round_score r USING (cid,uid)';
-$sql .= ' WHERE cid = '.dbMakeSafe($cid).' AND rid <= '.dbMakeSafe($rid);
-$sql .= ' GROUP BY u.name, p.score ORDER BY total DESC;';
+if ($rid != 0) {
+	$sql = 'SELECT u.name AS name, p.score AS pscore, sum(r.score) AS rscore, p.score+sum(r.score) AS total';
+	$sql .= ' FROM participant u JOIN registration reg USING (uid) JOIN playoff_score p USING (cid,uid) JOIN round_score r USING (cid,uid)';
+	$sql .= ' WHERE cid = '.dbMakeSafe($cid).' AND rid <= '.dbMakeSafe($rid);
+	$sql .= ' GROUP BY u.name, p.score ORDER BY total DESC;';
+} else {
+	$sql .= 'SELECT u.name AS name, 0 AS pscore, 0 AS rscore, 0 AS total';
+	$sql .= ' FROM participant u JOIN registration reg USING (uid) WHERE cid = '.dbMakeSafe($cid).' ORDER BY u.name;';
+}
 $result = dbQuery($sql);
 while($row = dbFetchRow($result)) {
 ?>		<tr>
@@ -36,7 +43,8 @@ while($row = dbFetchRow($result)) {
 ?>			<td><?php echo $rscore['score'];?></td>				
 <?php
 	}
-?>		</tr>
+?>			<td><?php echo $row['rscore'];?></td><td><?php echo $row['pscore'];?></td><td><?php echo $row['total'];?></td>
+		</tr>
 <?php
 }
 ?>	</tbody>
