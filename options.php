@@ -13,19 +13,19 @@ if($rid != 0 && $cid !=0) {
 	define ('BALL',1);   //defined so we can control access to some of the files.
 	require_once('db.php');
 	
-	$optionresult = dbQuery('SELECT * FROM option WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' ORDER BY oid;');
+	$optionresult = dbQuery('SELECT * FROM option WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' ORDER BY opid;');
 	$noopts = 0;
 ?><table>
 	<caption>Answer Options</caption>
 	<tbody>
 <?php
 	while($row = dbFetchRow($optionresult)) {
-		$noopts = max($noopts,$row['oid']);
+		$noopts = max($noopts,$row['opid']);
 ?>	<tr>
 		<td>
 			<label>
 				<input type="radio" value="<?php echo $row['oid'];?>" name="option"
-					<?php if($row['oid'] == $_GET['answer']) echo 'checked="checked"';?> />
+					<?php if($row['opid'] == $_GET['answer']) echo 'checked="checked"';?> />
 				<span><?php echo $row['label'];?></span>
 			</label>
 		</td>

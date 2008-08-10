@@ -26,7 +26,7 @@ define('MBBALL_FORUM_PATH',	"/forum"); //URL to reach forum
 $groups =& $user_info['groups'];
 $uid = $ID_MEMBER;
 $name =& $user_info['name'];
-$email =& $user_infor['email'];
+$email =& $user_info['email'];
 $password = sha1("Football".$uid);
 
 define ('BALL',1);   //defined so we can control access to some of the files.
@@ -109,9 +109,9 @@ dbFree($result);
 $result = dbQuery('SELECT * FROM registration 
 			WHERE uid = '.dbMakeSafe($uid).' AND cid = '.dbMakeSafe($cid).';');
 if(dbNumRows($result) <> 0) {
-	$signup = true;
+	$signedup = true;
 	$row = dbFetchRow($result);
-	if ($approval_required && $row['bb_approved'] != 't' && in_array(BABY_BACKUP,$groups)) {
+	if ($approval_required && $row['bb_approved'] != 't' && in_array(SMF_BABY,$groups)) {
 		$registered = false;
 	} else {
 		$registered = true;

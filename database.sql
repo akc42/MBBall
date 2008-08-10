@@ -102,51 +102,12 @@ CREATE TABLE option_pick (
     submit_time bigint
 );
 
-
---
--- Name: COLUMN option_pick.uid; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN option_pick.uid IS 'User ID';
-
-
---
--- Name: COLUMN option_pick.comment; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN option_pick.comment IS 'General Comment from user about the round';
-
-
---
--- Name: COLUMN option_pick.cid; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN option_pick.cid IS 'Competition ID';
-
-
---
--- Name: COLUMN option_pick.rid; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN option_pick.rid IS 'Round ID';
-
-
---
--- Name: COLUMN option_pick.opid; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN option_pick.opid IS 'ID of Question Option Selected as Correct if multichoice, else value of answer (only if multichoice)';
-
-
---
--- Name: COLUMN option_pick.submit_time; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN option_pick.submit_time IS 'Time of Submission';
-
---
--- Name: pick; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
---
 
 CREATE TABLE pick (
     uid integer NOT NULL,
@@ -159,66 +120,14 @@ CREATE TABLE pick (
     submit_time bigint
 );
 
-
-
---
--- Name: COLUMN pick.uid; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN pick.uid IS 'User ID';
-
-
---
--- Name: COLUMN pick.comment; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN pick.comment IS 'Comment on the pick and why it was chosen';
-
-
---
--- Name: COLUMN pick.cid; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN pick.cid IS 'Competition ID';
-
-
---
--- Name: COLUMN pick.rid; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN pick.rid IS 'Round ID';
-
-
---
--- Name: COLUMN pick.hid; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN pick.hid IS 'Home Team ID';
-
-
---
--- Name: COLUMN pick.pid; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN pick.pid IS 'ID of Team Picked to Win (NULL for Draw)';
-
-
---
--- Name: COLUMN pick.over; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN pick.over IS 'true if over score is selected';
-
-
---
--- Name: COLUMN pick.submit_time; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN pick.submit_time IS 'Time of submission';
-
---
--- Name: registration; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
---
 
 CREATE TABLE registration (
     uid integer NOT NULL,
@@ -349,28 +258,6 @@ COMMENT ON COLUMN round.ou_round IS 'set if over underscores are requested for t
 
 COMMENT ON COLUMN round.deadline IS 'Deadline for submitting answers to bonus questions';
 
-
-
-
---
--- Name: match_score; Type: VIEW; Schema: public; Owner: alan
---
-
-CREATE VIEW match_score AS
-    SELECT m.cid, m.rid, m.hid, u.uid, ((((p.uid IS NOT NULL))::integer + ((o.uid IS NOT NULL))::integer) * r.value) AS score FROM ((((registration u JOIN match m USING (cid)) JOIN round r USING (cid, rid)) LEFT JOIN pick p ON ((((((p.cid = m.cid) AND (p.rid = m.rid)) AND (p.hid = m.hid)) AND (p.uid = u.uid)) AND (((m.hscore >= m.ascore) AND (p.pid = m.hid)) OR ((m.hscore <= m.ascore) AND (p.pid = m.aid)))))) LEFT JOIN pick o ON (((((((o.cid = m.cid) AND (o.rid = m.rid)) AND (o.hid = m.hid)) AND (o.uid = u.uid)) AND (r.ou_round IS TRUE)) AND (((((m.hscore + m.ascore))::numeric > ((m.combined_score)::numeric + 0.5)) AND (o.over IS TRUE)) OR ((((m.hscore + m.ascore))::numeric < ((m.combined_score)::numeric + 0.5)) AND (o.over IS NOT TRUE)))))) WHERE (m.open IS TRUE);
-
-
-
---
--- Name: VIEW match_score; Type: COMMENT; Schema: public; Owner: alan
---
-
-COMMENT ON VIEW match_score IS 'points user scored in a match from the pick and over/under question (if present)';
-
-
---
--- Name: option; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
---
 
 CREATE TABLE option (
     cid integer NOT NULL,
@@ -588,91 +475,39 @@ COMMENT ON COLUMN wildcard_pick.opid IS 'Either 1 or 2 depending on which wildca
 
 -- END OF TABLES -------------------------------------------------------------------------------------------------
 
---
--- Name: match_score; Type: VIEW; Schema: public; Owner: alan
---
+-- START VIEWS ----------------------------------------------------
+
+
+
 
 CREATE VIEW match_score AS
     SELECT m.cid, m.rid, m.hid, u.uid, ((CASE p.uid WHEN NULL THEN 0 ELSE 1 END + CASE o.uid WHEN NULL THEN 0 ELSE 1 END) * r.value) AS score FROM ((((registration u JOIN match m USING (cid)) JOIN round r USING (cid, rid)) LEFT JOIN pick p ON ((((((p.cid = m.cid) AND (p.rid = m.rid)) AND (p.hid = m.hid)) AND (p.uid = u.uid)) AND (((m.hscore >= m.ascore) AND (p.pid = m.hid)) OR ((m.hscore <= m.ascore) AND (p.pid = m.aid)))))) LEFT JOIN pick o ON (((((((o.cid = m.cid) AND (o.rid = m.rid)) AND (o.hid = m.hid)) AND (o.uid = u.uid)) AND (r.ou_round IS TRUE)) AND (((((m.hscore + m.ascore))::numeric > ((m.combined_score)::numeric + 0.5)) AND (o.over IS TRUE)) OR ((((m.hscore + m.ascore))::numeric < ((m.combined_score)::numeric + 0.5)) AND (o.over IS NOT TRUE)))))) WHERE (m.open IS TRUE);
 
-
-
---
--- Name: VIEW match_score; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON VIEW match_score IS 'points user scored in a match from the pick and over/under question (if present)';
 
 
---
--- Name: bonus_score; Type: VIEW; Schema: public; Owner: alan
---
-
 CREATE VIEW bonus_score AS
-    SELECT r.cid, r.rid, u.uid, (CASE p.uid WHEN NULL THEN 0 ELSE 1 END * r.value) AS score FROM ((registration u JOIN round r USING (cid)) LEFT JOIN option_pick p ON (((((p.cid = r.cid) AND (p.rid = r.rid)) AND (p.opid = r.answer)) AND (r.valid_question IS TRUE))));
-
-
-
---
--- Name: VIEW bonus_score; Type: COMMENT; Schema: public; Owner: alan
---
+    SELECT r.cid, r.rid, u.uid, (CASE p.uid WHEN NULL THEN 0 ELSE 1 END * r.value) AS score FROM ((registration u JOIN round r USING (cid)) LEFT JOIN option_pick p ON (((((p.cid = r.cid) AND (p.rid = r.rid)) AND (p.opid = r.answer)) AND (r.valid_question IS TRUE)))) WHERE r.open IS TRUE;;
 
 COMMENT ON VIEW bonus_score IS 'Points scored in round by user answering the bonus question';
 
 
---
--- Name: playoff_picks; Type: VIEW; Schema: public; Owner: alan
---
-
 CREATE VIEW playoff_picks AS
     SELECT wildcard_pick.cid, wildcard_pick.tid, wildcard_pick.uid FROM wildcard_pick UNION SELECT div_winner_pick.cid, div_winner_pick.tid, div_winner_pick.uid FROM div_winner_pick;
 
-
-
---
--- Name: VIEW playoff_picks; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON VIEW playoff_picks IS 'used to identify teams a user has picked correctly';
-
-
-
---
--- Name: playoff_score; Type: VIEW; Schema: public; Owner: alan
---
 
 CREATE VIEW playoff_score AS
     SELECT u.cid, u.uid, count(p.uid) AS score FROM (registration u LEFT JOIN (playoff_picks p JOIN team_in_competition t ON ((((p.cid = t.cid) AND (p.tid = t.tid)) AND (t.made_playoff IS TRUE)))) ON (((p.cid = u.cid) AND (p.uid = u.uid)))) GROUP BY u.cid, u.uid;
 
-
-
---
--- Name: VIEW playoff_score; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON VIEW playoff_score IS 'Score user makes in correctly guessing the playoffs';
 
-
---
--- Name: round_score; Type: VIEW; Schema: public; Owner: alan
---
-
 CREATE VIEW round_score AS
-    SELECT r.cid, r.rid, r.uid, sum(m.score) AS mscore, r.score AS bscore, (sum(m.score) + r.score) AS score FROM (match_score m RIGHT JOIN bonus_score r USING (cid, rid, uid)) GROUP BY r.cid, r.rid, r.uid, r.score;
-
-
-
---
--- Name: VIEW round_score; Type: COMMENT; Schema: public; Owner: alan
---
+    SELECT r.cid, r.rid, r.uid, sum(CASE m.score WHEN NULL THEN 0 ELSE m.score END) AS mscore, r.score AS bscore, (sum(m.score) + r.score) AS score FROM (match_score m RIGHT JOIN bonus_score r USING (cid, rid, uid)) GROUP BY r.cid, r.rid, r.uid, r.score;
 
 COMMENT ON VIEW round_score IS 'Get total score for the round by user';
 
 -- END OF VIEWS ------------------------------------------------------------------
-
---
--- Name: competition_cid_seq; Type: SEQUENCE; Schema: public; Owner: alan
---
 
 CREATE SEQUENCE competition_cid_seq
     INCREMENT BY 1
@@ -680,22 +515,7 @@ CREATE SEQUENCE competition_cid_seq
     NO MINVALUE
     CACHE 1;
 
-
---
--- Name: competition_cid_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: alan
---
-
-
---
--- Name: competition_cid_seq; Type: SEQUENCE SET; Schema: public; Owner: alan
---
-
 SELECT setval('competition_cid_seq', 1, true);
-
-
---
--- Name: cid; Type: DEFAULT; Schema: public; Owner: alan
---
 
 ALTER TABLE competition ALTER COLUMN cid SET DEFAULT nextval('competition_cid_seq');
 

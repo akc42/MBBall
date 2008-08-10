@@ -122,7 +122,7 @@ var MBBUser = new Class({
 		this.parent(version,me);
 		var regdiv = $('registration');
 		if(regdiv) { //exists means registration is open
-			regdiv.getElementbyId('register').addEvent('submit', function(e) {
+			regdiv.getElementById('register').addEvent('submit', function(e) {
 				e.stop();
 				if(confirm("Click OK to register for the competition and agree to the condition")) {
 					var regReq = new MBBReq('register.php',$('regerror'), function(response) {

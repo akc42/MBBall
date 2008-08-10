@@ -32,8 +32,8 @@ while($row = dbFetchRow($result)) {
 <?php
 	$resultround = dbQuery('SELECT score FROM round_score WHERE cid = '.dbMakeSafe($cid).' AND
 				 rid <= '.dbMakeSafe($rid).' AND uid = '.dbMakeSafe($uid).' ORDER BY rid DESC;');
-		while ($rscore = dbFetchRow($resultround)) {
-?>			<td><?php echo $row['score'];?></td>				
+	while ($rscore = dbFetchRow($resultround)) {
+?>			<td><?php echo $rscore['score'];?></td>				
 <?php
 	}
 ?>		</tr>
