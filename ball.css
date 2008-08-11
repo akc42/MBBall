@@ -76,9 +76,11 @@ body, td, th
 	margin-left:auto;
 }
 
-
+table {table-layout: fixed;}
 .hidden {display:none;}
 .error {background-color:#FF9999;font-weight:bold;}
+[disabled],[readonly] {background-color:#EEEEEE;color:black;}
+.clear {clear:both;float:none;}
 
 /* ================================================================ 
 This copyright notice must be kept untouched in the stylesheet at 
@@ -210,7 +212,8 @@ div.del:hover, div.del:active {background-position:left bottom;}
 }
 
 textarea#condition, textarea#question {
-	height:8em;
+	height:10em;
+	padding:0.5em;
 }
 
 #option {
@@ -250,7 +253,7 @@ td, div {padding:2px;}
 .user {width:12em;}
 .option1{width:12em;}
 table.layout table.form td.submit{width:8em; text-align:center;background-color:#993300;}
-.time,.datetime {width:14em;}
+.time,.datetime {width:11em;}
 .option2{width:8em;}
 .tid {width:5em;}
 
@@ -258,4 +261,32 @@ table.layout table.form td.submit{width:8em; text-align:center;background-color:
 .selectthis {
 	cursor:pointer;
 }
+
+.inmatch {background-color:red;}
+
+div.match {width:184px;border:2px solid black; padding:2px;background-color:red; float:left;}
+div.match div {padding:1px;}
+div.match div.del {margin-left:2px;}
+div.match span {background-color:white; border:1px inset black;vertical-align:center; }
+div.match .open {width:56px; height:22px; float:left;border:1px solid blue;background-color:#ddd;}
+div.match .hid, div.match .aid { 
+	width:46px; 
+	height:21px; 
+	float:left;
+	border:1px solid blue;
+	background-color:#ddd;
+	text-align:center;
+	padding:2px 1px 1px 1px;}
+div.match .hscore , div.match .ascore,div.match .cscore {
+	float:left;
+	border:1px solid blue;
+	background-color:#ddd;
+}
+
+div.match .hscore input, div.match .ascore input {width:42px;}
+
+div.match .cscore input {width:52px;}
+
+div.match .comment, div.match .mtime {width:176px;float:left;border:1px solid blue;background-color:#ddd;}
+div.match .comment textarea, div.match .mtime input {width:172px;}
 

@@ -34,10 +34,7 @@ if($rid != 0 && $cid !=0) {
 <?php
 	}
 	dbFree($optionresult);
-?>	<tr class="hidden">
-		<td><label><input type="radio" name="option" value="<?php echo $noopts+1;?>" /><span></span></label></td>
-	</tr>
-	</tbody>
+?>	</tbody>
 </table>
 <?php
 } else {

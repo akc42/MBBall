@@ -73,7 +73,7 @@ var MBBall = new Class({
 					datespan.set('text','');
 					break;
 				}
-				datespan.set('text',new Date(d.toInt()*1000).toLocaleString().substr(0,24));
+				datespan.set('text',new Date(d.toInt()*1000).toLocaleString().substr(0,21));
 				break;
 			case "input":
 				d=datespan.value;
@@ -81,7 +81,7 @@ var MBBall = new Class({
 					datespan.value = '';
 					break;
 				}
-				datespan.value = new Date(d.toInt()*1000).toLocaleString().substr(0,24);
+				datespan.value = new Date(d.toInt()*1000).toLocaleString().substr(0,21);
 				break;
 			default:
 				break;
@@ -207,8 +207,15 @@ var MBBAdmin = new Class({
 				//We only want to do this if there is a competition to get
 				MBBmgr.adjustDates(div);
 				// Validate competition Details and Change Dates to seconds since 1970
-				$('compform').addEvent('submit', function(e) {
+	
+				//if anything in the form changes
+				div.getElements('input').extend(div.getElements('select')).extend(div.getElements('textarea')).addEvent('change', function(e) {
 					e.stop();
+					if(this.id =='bbapproval') {
+						$$('#registered input.bbapprove').each(function (item) {
+							item.readOnly = !e.target.checked;
+						});
+					}
 					var validated = true;
 					if(!MBBmgr.parseDate($('playoffdeadline'))) {
 						validated = false;
@@ -240,8 +247,14 @@ var MBBAdmin = new Class({
 						} else {
 							answer = elAns.value.toInt();
 						}
-						$('roundform').addEvent('submit', function(e) {
+						div.getElements('input').extend(div.getElements('textarea')).addEvent('change', function(e) {
 							e.stop();
+							if (this.id == 'ou') {
+								//if ou changes then all the matches combined scores are diabled or not
+								$$('.cscore').each(function(item) {
+									item.input.readOnly = ! e.target.checked;
+								});
+							}
 							var validated = true;
 							if(!MBBmgr.parseDate($('deadline'))) {
 								validated = false;
@@ -274,6 +287,39 @@ var MBBAdmin = new Class({
 					}
 					//Initialise Round Data Form
 					this.matches = new MBBSubPage(this,'matches.php',$('matches'),function (div) {
+						if (params.cid !=0 && params.rid != 0) {
+							MBBmgr.adjustDates(div);
+							div.getElements('input').extend(div.getElements('textarea')).addEvent('change', function(e) {
+								var validated = true;
+								var td = this.getParent();
+								if(td.hasClass('mtime') && !MBBmgr.parseDate(this)){
+									validated = false;
+								}
+								if(td.hasClass('.csscore') || td.hasClass('hscore') || td.hasClass('ascore')) {
+									if(!MBBmgr.intValidate(this)) {
+										validated = false;
+									}
+								}
+								if (validated) {
+									var updateReq = new MBBReq('updatematch.php',$('compserr'), function(response) {
+										MBBmgr.adjustDates(div);
+										//Should not be necessary to update page
+									});
+									updateReq.post(e.target.getParents('form')[0]);
+								} else {
+									//If we failed to validate we need to adjust dates back
+									MBBmgr.adjustDates(div);
+								}
+							});
+							div.getElement('.hid').addEvent('click',function(e) {
+								e.stop();
+								// switch hid and aid over
+							});
+							div.getElement('.aid').addEvent('click',function(e) {
+								e.stop();
+								// remove aid from match
+							});
+						}
 					});
 					this.options = new MBBSubPage(this,'options.php',$('options'),function(div) {
 					})
@@ -281,12 +327,6 @@ var MBBAdmin = new Class({
 						if (params.cid != 0) {
 							var lock = $('lock');
 							var tnicClicked;
-							var dragStart = function(e) {
-								if(lock.checked) {
-									e.stop();
-									//Start drag
-								}
-							};
 							var teamClicked = function (e) {
 								e.stop();
 								if(!lock.checked) {
@@ -318,21 +358,18 @@ var MBBAdmin = new Class({
 								mpReq.get({'cid':params.cid,'tid':this.name,'mp':this.checked});
 							};
 							var makeTeam = function(team) {
-								var div = new Element('div',{'events':{
-									'click':teamClicked,
-									'mousedown':dragStart
-								}});
+								var div = new Element('div');
 								var input = new Element('input',
 									{'type':'checkbox','name':team,'events':{'change':changeMpStatus}}
 								).inject(div);
 								var span = new Element('span',{
 									'class':'tid',
-									'events': {'click':tnicClicked},
+									'events': {'click':teamClicked},
 									'text':team
 								}).inject(div);
 								return div;
 							};
-							var tnicClicked = function(e) {
+							tnicClicked = function(e) {
 								e.stop();
 								if(!lock.checked) {
 									var team=this;
@@ -352,9 +389,7 @@ var MBBAdmin = new Class({
 									addTiC.get({'cid':params.cid,'tid':team.get('text')});
 								}
 							};
-							var ticElements = $$('#tic span');
-							ticElements.addEvent('click',teamClicked);
-							ticElements.addEvent('mousedown', dragStart);
+							$$('#tic span').addEvent('click',teamClicked);
 							$$('#tnic span').addEvent('click',tnicClicked);
 							$$('#tic input').addEvent('change',changeMpStatus);
 							$('addall').addEvent('click',function(e) {
@@ -373,7 +408,7 @@ var MBBAdmin = new Class({
 							});
 						}
 					});
-					this.matches.loadPage(params);
+					this.matches.loadPage($merge(params,{'ou':$('ou').checked }));
 					this.options.loadPage($merge(params,{'answer':answer}));
 					this.teams.loadPage(params);
 				});
@@ -441,11 +476,6 @@ var MBBAdmin = new Class({
 					var owner = this.owner;
 					if(params.cid !=0) {
 						MBBmgr.adjustDates(div);
-						$('bbapproval').addEvent('change', function(e) {
-							$$('#registered input.bbapprove').each(function (item) {
-								item.disabled = !e.target.checked;
-							});
-						});
 						$$('#registered input.bbapprove').addEvent('change',function(e) {
 							e.stop();
 							if(confirm('You are changing the approval status of a Baby Backup for this Competition. Are you sure you want to do this?')) {

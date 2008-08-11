@@ -72,7 +72,7 @@ COMMENT ON TABLE division IS 'Football Conference Division';
 CREATE TABLE match (
     rid integer NOT NULL,
     hid character(3) NOT NULL,
-    aid character(3) NOT NULL,
+    aid character(3) ,
     comment text,
     ascore integer,
     hscore integer,

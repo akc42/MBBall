@@ -24,7 +24,7 @@ if ($cid != 0) {
 			<th>When Registered</th>
 			<th>Is a BB</th>
 			<th>BB Approved</th>
-			<th>As been a Admin</th>
+			<th>Been Admin</th>
 			<th>DEL</td>
 		</tr>
 	</thead>
@@ -36,7 +36,7 @@ if ($cid != 0) {
 			<td><?php echo $row['email'];?></td>
 			<td><span class="time"><?php echo $row['last_logon']; ?></span></td>
 			<td><span class="time"><?php echo $row['agree_time']; ?></span></td>
-			<td><input type="checkbox" disabled="disabled" <?php if($row['is_bb'] == 't') echo 'checked="checked"';?> /></td>
+			<td><input type="checkbox" readonly <?php if($row['is_bb'] == 't') echo 'checked';?> /></td>
 			<td>
 				<input type="checkbox" name="<?php echo $row['uid'];?>"
 <?php 
@@ -44,20 +44,20 @@ if ($cid != 0) {
 ?>					class="bbapprove"
 <?php
 			 if($_GET['bbar'] == 'false') {
-?>					disabled="disabled"
+?>					readonly
 <?php
 			}
 		} else {
-?>					disabled="disabled"
+?>					readonly
 <?php
 		}		 
 		if($row['bb_approved'] == 't') {
-?>					checked="checked"
+?>					checked
 <?php
 		}
 ?>								 />
 			</td>
-			<td><input type="checkbox" disabled="disabled" <?php if($row['admin_experience'] == 't') echo 'checked="checked"';?> /></td>
+			<td><input type="checkbox" readonly <?php if($row['admin_experience'] == 't') echo 'checked';?> /></td>
 			<td><div id="<?php echo 'F'.$uid; ?>" class="del"></div></td>
 		</tr>
 <?php

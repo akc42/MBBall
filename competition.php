@@ -39,7 +39,7 @@ if ($cid != 0) {
 			dbFree($resultusers);
 			foreach($userdata as $user) {
 ?>			<option value="<?php echo $user['uid'];?>" 
-				<?php if ($user['uid'] == $comp['administrator']) echo 'selected="selected"' ;?>>
+				<?php if ($user['uid'] == $comp['administrator']) echo 'selected' ;?>>
 					<?php echo $user['name'] ;?></option>
 <?php
 			}
@@ -51,19 +51,19 @@ if ($cid != 0) {
 <?php
 		}
 ?>				</td>
-				<td class="comment" rowspan="3">
+				<td class="comment" rowspan="4">
 		<label>Condition for joining competition<br/>
 		<textarea id="condition" name="condition"><?php echo $comp['condition'];?></textarea></label>
 				</td>
 			</tr>
 			<tr>
 				<td class="option2">	
-		<label><input id="open" name="open" type="checkbox" value="set" 
-			<?php if ($comp['open'] == 't') echo 'checked="checked"' ;?>/>Can Register</label>
+		<label><input id="open" name="open" type="checkbox" 
+			<?php if ($comp['open'] == 't') echo 'checked' ;?>/>Can Register</label>
 				</td>
 				<td class="option1" colspan="2">
-		<label><input id="bbapproval" name="bbapproval" type="checkbox" value="set"
-			<?php if ($comp['bb_approval'] == 't') echo 'checked="checked"' ;?>/>BB's need Approval</label>
+		<label><input id="bbapproval" name="bbapproval" type="checkbox"
+			<?php if ($comp['bb_approval'] == 't') echo 'checked' ;?>/>BB's need Approval</label>
 				</td>
 			</tr>
 			<tr>
@@ -75,9 +75,6 @@ if ($cid != 0) {
 			<tr>
 				<td colspan="3"><label>Pick Deadline (minutes before match time)<br/>
 					<input id="gap" name="gap" value="<?php echo intval($comp['gap']/60);?>" /></label>
-				<td class="submit">
-					<input type="submit" value="Update" />
-				</td>
 			</tr>
 		</tbody>
 	</table>

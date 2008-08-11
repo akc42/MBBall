@@ -27,11 +27,11 @@ if($rid != 0 && $cid !=0) {
 		<caption>Round Details</caption>
 		<tbody>
 			<tr>
-				<td>
+				<td colspan="2">
 		<label>Round Name<br/>
 		<input id="rname" type="text" name="rname" class="rname" value="<?php echo $row['name'];?>"/></label>
 				</td>
-				<td rowspan="3" colspan="2">
+				<td rowspan="4" colspan="2">
 		<label>Question<br/>
 			<textarea id="question" name="question"><?php echo $row['question'];?></textarea>
 		</label>
@@ -58,21 +58,18 @@ if($rid != 0 && $cid !=0) {
 		<label><input id="validquestion" name="validquestion" type="checkbox" 
 			<?php if ($row['valid_question'] == 't') echo 'checked="checked"';?> />Valid Question?</label>
 				</td>
+			</tr>
+			<tr>
+				<td colspan="3">
+		<label>Deadline for answering question<br/>
+			<input id="deadline" name="deadline" type="text" class="time" value="<?php echo $row['deadline'];;?>"/>
+		</label>
+				</td>
 				<td id="option">
 		<label>Answer<br/>
 			<input id="answer" name="answer" value="<?php echo $row['answer'];?>" 
 				<?php if($optdata['count'] > 0) echo 'disabled="disabled"';?> />
 		</label>
-				</td>
-			</tr>
-			<tr>
-				<td colspan="2">
-		<label>Deadline for answering question<br/>
-			<input id="deadline" name="deadline" type="text" class="time" value="<?php echo $row['deadline'];;?>"/>
-		</label>
-				</td>
-				<td class="submit">
-		<input type="submit" value="Update" />
 				</td>
 			</tr>
 		</tbody>

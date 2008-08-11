@@ -31,15 +31,14 @@ if( $cid !=0) {
 		<tr>
 			<td id="tic">
 <?php
-	$sql = 'SELECT tid,made_playoff AS mp FROM team_in_competition t LEFT JOIN'; 
-	$sql .= ' (SELECT hid FROM match UNION SELECT aid AS tid FROM match';
-	$sql .= ' WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).') AS m';
-	$sql .= ' ON tid=hid WHERE cid = '.dbMakeSafe($cid);
+	$sql = 'SELECT tid,hid,made_playoff AS mp FROM team_in_competition t LEFT JOIN'; 
+ 	$sql .= ' (SELECT cid, rid, hid FROM match UNION SELECT cid, rid, aid AS hid FROM match)';
+	$sql .= ' AS m ON t.cid = m.cid AND rid= '.dbMakeSafe($rid).' AND t.tid=m.hid WHERE t.cid = '.dbMakeSafe($cid);
 	$sql .= ' ORDER BY tid;';
 	$result = dbQuery($sql);
 	while($row = dbFetchRow($result)) {
 ?>	<div <?php if(!is_null($row['hid'])) echo 'class="inmatch"';?>>
-		<input type="checkbox" name="<?php echo $row['tid'];?>" <?php if($row['mp'] == 't') echo 'checked="checked"';?> />
+		<input type="checkbox" name="<?php echo $row['tid'];?>" <?php if($row['mp'] == 't') echo 'checked';?> />
 		<span class="tid"><?php echo $row['tid'];?></span>
 	</div>
 <?php
@@ -60,7 +59,7 @@ if( $cid !=0) {
 		</tr>
 		<tr>
 			<td>
-				<label><input id="lock" type="checkbox" <?php if($ticexists) echo 'checked="checked"';?> />Lock</label>
+				<label><input id="lock" type="checkbox" <?php if($ticexists) echo 'checked';?> />Lock</label>
 			</td>
 			<td>
 				<input id="addall" type="button" value="&lt;&lt; Add All"/>  
