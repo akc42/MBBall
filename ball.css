@@ -168,6 +168,71 @@ way to fit your requirements.
 	text-align:center;
 }
 
+.in_po {background-color:#
+#registration {
+        background-color:white;
+        padding:2em;
+        border:3px solid red;
+}
+
+#registration h1 {
+        color:blue;
+        text-align:center;
+}
+
+#registration .condition {
+        margin:1em;
+        border:2px solid black;
+        padding:2em;
+}
+#registration .bbcond {
+        color:#990000;
+        font-size:x-small;
+}
+
+#registration .bbcond i {
+        color:black;
+}
+
+#agree {
+        padding:1em;
+        text-align:center;
+}
+
+.in_po {background-color:#
+
+#registration {
+        background-color:white;
+        padding:2em;
+        border:3px solid red;
+}
+
+#registration h1 {
+        color:blue;
+        text-align:center;
+}
+
+#registration .condition {
+        margin:1em;
+        border:2px solid black;
+        padding:2em;
+}
+#registration .bbcond {
+        color:#990000;
+        font-size:x-small;
+}
+
+#registration .bbcond i {
+        color:black;
+}
+
+#agree {
+        padding:1em;
+        text-align:center;
+}
+
+td.in_po {background-color:#8eff4aff;)
+span.in_po(font-size:0.6em;}
 
 /* mainly administration stuff below here */
 div.del {

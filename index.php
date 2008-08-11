@@ -180,7 +180,8 @@ window.addEvent('domready', function() {
 	MBBmgr = new MBBUser('<?php echo $version;?>',
 				{uid: <?php echo $uid;?>, 
 				password : '<?php echo sha1("Football".$uid); ?>'},
-				{cid: <?php echo $cid;?>, rid: <?php echo $rid;?>}
+				{cid: <?php echo $cid;?>, rid: <?php echo $rid;?>},
+                             'errormessage'
 	);
 	MBBmgr.adjustDates($('content'));
 });	
@@ -266,6 +267,7 @@ if(in_array(SMF_FOOTBALL,$groups)) {
 }
 ?></ul>
 <div id="content">
+ <div id="errormessage"></div>
 	<table class="layout">
 		<tbody>
 <?php

@@ -33,7 +33,9 @@ window.addEvent('domready', function() {
 	MBBmgr = new MBBAdmin('<?php echo $_GET['v'];?>',{uid: '<?php echo $uid;?>', 
 				password : '<?php echo $password; ?>',
 				admin :<?php if(isset($_GET['global'])) {echo 'true';} else {echo 'false';}?>},
-				<?php if(isset($_GET['cid'])) {echo $_GET['cid'] ;}else{ echo '0';}?>);
+				<?php if(isset($_GET['cid'])) {echo $_GET['cid'] ;}else{ echo '0';}?>,
+                                'errormessage'
+                             );
 });	
 
 	// -->
@@ -62,6 +64,7 @@ window.addEvent('domready', function() {
 	<li><a href="/football"><span>Return the User Page</span></a></li>
 </ul>
 <div id="content">
+<div id="errormessage"></div>
 <table class="layout">
 	<tbody>
 		<tr><td colspan="3"><div id="competitions"></div></td></tr>
