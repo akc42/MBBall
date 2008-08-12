@@ -23,7 +23,7 @@ if (dbNumRows($result) != 0) {
 	dbQuery('COMMIT ;');
 	echo '{"cid":'.$cid.',"rid":'.$rid.'}';
 } else {
-  echo '<p>Competition already Deleted</p>';
+  echo '<p>Related Competition Does Not Exist</p>';
 	dbQuery('ROLLBACK ;');
 }
 dbFree($result);

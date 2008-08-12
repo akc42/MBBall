@@ -14,28 +14,42 @@ if($rid != 0 && $cid !=0) {
 	require_once('db.php');
 	
 	$optionresult = dbQuery('SELECT * FROM option WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' ORDER BY opid;');
-	$noopts = 0;
-?><table>
-	<caption>Answer Options</caption>
-	<tbody>
+	$noopts = dbNumRows($optionresult);
+?><form id="optionform">
+<table>
+     <caption>Multichoice Answers</caption>
+	<thead>
+		<tr>
+			<th>Correct</th>
+			<th>Choice</th>
+			<th>DEL</th>
+		</tr>
+	</thead>
+
+     <tbody>
+<?php 
+     if ($noopts != 0) {
+?>       <tr>
+         <td><input id="nullanswer" type="radio" name="option" value="0" <?php if ($_GET['answer'] == 0) echo 'checked';?> /></td>
+         <td colspans="2"><span>No Answer Set Yet</span></td>
+         </tr>
 <?php
-	while($row = dbFetchRow($optionresult)) {
-		$noopts = max($noopts,$row['opid']);
+     }
+     while($row = dbFetchRow($optionresult)) {
+	$opid = $row['opid'];
+	$noopts = max($noopts,$opid);
 ?>	<tr>
-		<td>
-			<label>
-				<input type="radio" value="<?php echo $row['oid'];?>" name="option"
-					<?php if($row['opid'] == $_GET['answer']) echo 'checked="checked"';?> />
-				<span><?php echo $row['label'];?></span>
-			</label>
-		</td>
-	 
+	  <td><input type="radio" value="<?php echo $opid ;?>" name="option" <?php if($opid == $_GET['answer']) echo 'checked';?> /></td>
+	  <td><input type="text" name="<?php echo $opid; ?>" value="<?php echo $row['label'];?>" /></td>
+	  <td><div id="<?php echo 'O'.$opid; ?>" class="del"></div></td>
 	</tr>
 <?php
-	}
-	dbFree($optionresult);
+     }
+     dbFree($optionresult);
 ?>	</tbody>
 </table>
+<input id="noopts" type="hidden" name="noopts" value="<?php echo $noopts;?>" />
+</form>
 <?php
 } else {
 ?><p>No Option information available right now</p>

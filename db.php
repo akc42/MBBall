@@ -38,7 +38,8 @@ header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); // Date in the past
 		return "'".pg_escape_string($value)."'" ;
 	}
 	function dbPostSafe($text) {
-		return dbMakeSafe(htmlentities($text,ENT_QUOTES,'UTF-8',false));
+	  if ($text == '') return 'NULL';
+	  return dbMakeSafe(htmlentities($text,ENT_QUOTES,'UTF-8',false));
 	}
 	function dbBBcode($text) {
 		global $search,$replace;

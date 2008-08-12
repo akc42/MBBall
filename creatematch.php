@@ -18,15 +18,17 @@ if (dbNumRows($result) == 0) {
   dbQuery('INSERT INTO match(cid, rid, hid) VALUES ('.dbMakeSafe($cid).','.dbMakeSafe($rid).','.dbMakeSafe($hid).');');
   dbQuery('COMMIT ;');
 ?><form action="#" >
-  <input type="hidden" name="cid" value="<?php echo $cid;?>"/>
-  <input type="hidden" name="rid" value="<?php echo $rid;?>"/>
-  <input type="hidden" name="hid" value="<?php echo $hid;?>" />
-  <input type="hidden" name="aid" />
-  <div class="hid"><span><?php echo $hid;?></span></div>
-  <div class="aid"><span>---</span></div>
-  <div class="open"><label><input type="checkbox" name="open" />Open</label></div>
-  <div class="del"></div>
-  <div class="hscore"><input type="text" /></div>
+     <input type="hidden" name="uid" value="<?php echo $uid;?>" />
+     <input type="hidden" name="pass" value="<?php echo $password;?>" />
+     <input type="hidden" name="cid" value="<?php echo $cid;?>"/>
+     <input type="hidden" name="rid" value="<?php echo $rid;?>"/>
+     <input type="hidden" name="hid" value="<?php echo $hid;?>" />
+     <input type="hidden" name="aid" />
+     <div class="hid"><span><?php echo $hid ;?></span></div>
+     <div class="aid"><span>---</span></div>
+     <div class="open"><label><input type="checkbox" name="open" />Open</label></div>
+     <div class="del"></div>
+     <div class="hscore"><input type="text" /></div>
   <div class="ascore"><input type="text" /></div>
   <div class="cscore"><input type="text"  /></div>
   <div class="mtime"><input type="text" class="time" /></div>
