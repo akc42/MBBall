@@ -1,69 +1,61 @@
-var MBBRequestOptions;
-var MMBErrorDiv;
 /*  Class to load a SubPage from 'url' into the 'div'. 
  *  On success call
  *	initializePage(div).  
  *  If the load fails, message is the text to fill the div with
 */
-var MBBCreateDiv = function(obj) {
-	var div = new Element('div',{'class':'match'});
-	var tree = new Hash({'root':div});
-	obj.items.each(function(item){
-		var el = new Element(item.type,item.params);
-		tree.extend({item.name:el});
-		el.inject(tree.get(item.parent));
-	});
-	return div;
-}											}
+
+var MBBRequestOptions;
 
 var MBBSubPage = new Class({
-	initialize:function(owner,url,div,initializeSubPage,message) {
-		this.owner = owner;
-		this.div = div;
-		var iSP = initializeSubPage.bind(this);
-		this.request = new Request.HTML({
-			url: url,
-			onSuccess: function(html) {
-				div.empty();
-				div.adopt(html);
-				iSP(div);
-			},
-			onFailure: function(){
-				var output = message || '<p>Failed to Read Page from '+url+'<p>';
-				div.empty();
-				div.adopt(output);
-			}
-		});
-	},
-	loadPage: function(params) {
-		this.request.get($merge(MBBRequestOptions,params || {}));
-	}
+  initialize:function(owner,url,div,initializeSubPage,message) {
+    this.owner = owner;
+    this.div = div;
+    var iSP = initializeSubPage.bind(this);
+    this.request = new Request.HTML({
+      url: url,
+      onSuccess: function(html) {
+        div.empty();
+        div.adopt(html);
+        iSP(div);
+      },
+      onFailure: function(){
+        var output = message || '<p>Failed to Read Page from '+url+'<p>';
+        div.empty();
+        div.adopt(output);
+      }
+    });
+  },
+  loadPage: function(params) {
+    this.request.get($merge(MBBRequestOptions,params || {}));
+  }
 });
+
+var MMBErrorDiv;
 
 var MBBReq = new Class({
-	initialize: function (url,success) {
-		this.req = new Request.JSON({
-			url:url,
-			onComplete: function(response,html) {
-				if(response) {
-					success(response);
-				} else {
-					MBBErrorDiv.empty();
-					MBBErrorDiv.adopt(html);
-				}
-			}
-		});
-	},
-	get:function(params) {
-		this.req.get($merge(MBBRequestOptions,params));
-	},
-	post: function (params) {
-		this.req.post(params);
-	}
+  initialize: function (url,success) {
+    this.req = new Request.JSON({
+      url:url,
+      onComplete: function(response,html) {
+        if(response) {
+          success(response);
+        } else {
+          MBBErrorDiv.empty();
+          MBBErrorDiv.adopt(html);
+        }
+      }
+     });
+  },
+  get:function(params) {
+    this.req.get($merge(MBBRequestOptions,params));
+  },
+  post: function (params) {
+    this.req.post(params);
+  }
 });
 
 
-
+					
 var MBBall = new Class({
 	initialize: function(version,me,errordiv) {
 		this.me = me;
@@ -131,8 +123,8 @@ var MBBall = new Class({
 
 var MBBUser = new Class({
 	Extends: MBBall,
-	initialize: function(version,me,params) {
-		this.parent(version,me);
+	initialize: function(version,me,params,errordiv) {
+		this.parent(version,me,errordiv);
 		var regdiv = $('registration');
 		if(regdiv) { //exists means registration is open
 			regdiv.getElementById('register').addEvent('submit', function(e) {
@@ -151,9 +143,9 @@ var MBBUser = new Class({
 
 var MBBAdmin = new Class({
 	Extends: MBBall,
-	initialize: function(version,me,cid) {
+	initialize: function(version,me,cid,errordiv) {
 		var params = {'cid':cid, 'rid':0};
-		this.parent(version,me);
+		this.parent(version,me,errordiv);
 		this.competitions = new MBBSubPage(this,'competitions.php',$('competitions'),function (div) {
 			var owner = this.owner;
 			$$('input.default').each(function(rb,i) {
@@ -286,24 +278,34 @@ var MBBAdmin = new Class({
 								e.target.getFirst().set('text') = response.hid;
 								e.target.getNext().getFirst().set('text') = response.aid;
 							});
-							switchReq.get($merge(params,{'hid':this.getElement('span').get('text'))));
+							switchReq.get($merge(params,{'hid':this.getElement('span').get('text')}));
 							
 						});
 						div.getElement('.aid').addEvent('click',function(e) {
 							e.stop();
+                            var removeaidReq = new MBBReq('removeaid.php',function(response){
 							// remove aid from match
+                                div.getElement('input[name=aid]').value = '';
+                                e.target.getNext().getFirst().set('text') = '';
+                                $('T'+response.aid).removeClass('inmatch');
+                           });
+                            removeaidReq.get($merge(params,{'hid':div.getElement('input[name=hid]').value}))
 						});
 						div.getElement('.del').addEvent('click',function(e) {
+                            e.stop(); 
 							if(confirm('This will delete the match.  Are you sure?')) {
-								var deleteReq = MBBReq('deletematch.php,function(response) {
-									div.destroy();
-									
+								var deleteReq = new MBBReq('deletematch.php',function(response) {
+									div.dispose();
+									$('T'+response.hid).removeClass('inmatch');
+                                    $('T'+response.aid).removeClass('inmatch');
+								});
+                                deleteReq.get($merge(params,{'hid':div.getElement('input[name=hid]').value}));
 							}
 						});
 					}
 					if(params.rid != 0) {
 						MBBmgr.adjustDates(div);
-						elAns =$(answer');
+						elAns =$('answer');
 						if(elAns.value == '') {
 							answer = 0;
 						} else {
@@ -353,7 +355,7 @@ var MBBAdmin = new Class({
 							MBBmgr.adjustDates(div);
 							div.getElements('.match').each(function(match) {
 								setMatchEvents(match);
-							}
+							});
 						}
 					});
 					this.options = new MBBSubPage(this,'options.php',$('options'),function(div) {
@@ -367,7 +369,7 @@ var MBBAdmin = new Class({
 								var team = this;
 								if(!lock.checked) {
 									var remTiC = new MBBReq('remtic.php',function (response) {
-										var div = new Element('div',{'id':'S'+response.tid);
+										var div = new Element('div',{'id':'S'+response.tid});
 										var span = new Element('span',{
 											'class':'tid',
 											'events': {'click':tnicClicked},
@@ -390,14 +392,15 @@ var MBBAdmin = new Class({
 									if(!this.getParent().hasClass('inmatch')) {
 										var teamName = this.get('text');
 										if ($$('.match').every(function(match) {
-											var aidSpan = match.getElement('input[name=aid]').value; 
-											if(aidSpan.get('text') == '') {
+											var aidSpan = match.getElement('input[name=aid]'); 
+											if(aidSpan.value == '') {
 												// found a match so we can add this team to it
 												var addaidReq = new MBBReq('addaid.php', function(response) {
-													aidSpan.set('text') = teamName;
+													aidSpan.value = teamName;
+													match.getElement('div.aid').getFirst().set('text',teamName);
 													team.getParent().addClass('inmatch');
 												});
-												aidaidReq.get($merge(params,{
+												addaidReq.get($merge(params,{
 													'hid':match.getElement('input[name=hid]').value,
 													'aid':teamName}));
 												return false;
@@ -405,16 +408,14 @@ var MBBAdmin = new Class({
 											return true;
 										})){
 											// Was no match with missing AID, so create new match
-											var matchReq = new MBBReq('creatematch.php', function(response) {
-												// Need to create a new match element and insert it
-												// The response will say how, so we need to parse it
-												var match = MBBCreateDiv(response);
-												match.inject($('matches'));
-												if (!$('ou').checked) match.getElement('.cscore').readOnly=true;
+											var match = new Element('div',{'class':'match'});
+											match.inject($('matches'));
+											var matchPage = new MBBSubPage(this,'creatematch.php',match, function(div) {
+												if (!$('ou').checked)  match.getElement('.cscore').readOnly=true;
 												setMatchEvents(match);
 												team.getParent().addClass('inmatch');
 											});
-											matchReq.get($merge(params,{'hid':teamName}));
+											matchPage.loadPage($merge(params,{'hid':teamName}));
 										}
 									}
 								}
@@ -543,7 +544,7 @@ var MBBAdmin = new Class({
 					var owner = this.owner;
 					if(params.cid !=0) {
 						MBBmgr.adjustDates(div);
-						$$('#registered input.bbapprove').addEvent('change',function(e) {
+					$$('#registered input.bbapprove').addEvent('change',function(e) {
 							e.stop();
 							if(confirm('You are changing the approval status of a Baby Backup for this Competition. Are you sure you want to do this?')) {
 								var updateBBa = new MBBReq('bbapprove.php',function(response) {

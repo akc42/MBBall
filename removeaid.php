@@ -1,5 +1,5 @@
 <?php
-if(!(isset($_GET['uid']) && isset($_GET['pass'])  && isset($_GET['cid']) && isset($_GET['rid']) && isset($_GET['hid']) && isset($_GET['aid']) ))
+if(!(isset($_GET['uid']) && isset($_GET['pass'])  && isset($_GET['cid']) && isset($_GET['rid']) && isset($_GET['hid']) ))
 	die('Hacking attempt - wrong parameters');
 $uid = $_GET['uid'];
 $password = $_GET['pass'];
@@ -11,18 +11,17 @@ require_once('db.php');
 $cid=$_GET['cid'];
 $rid=$_GET['rid'];
 $hid=$_GET['hid'];
-$aid=$_GET['aid'];
 
 dbQuery('BEGIN ;');
 $result=dbQuery('SELECT * FROM match WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' AND hid = '.dbMakeSafe($hid).';');
-if ($row = dbFetchRow($result) && is_null($row['aid'])) {
-  dbQuery('UPDATE  match  SET aid = '.dbMakeSafe($aid).' WHERE cid = '.dbMakeSafe($cid).' AND rid = '
+if ($row = dbFetchRow($result) && !is_null($row['aid'])) {
+  dbQuery('UPDATE  match  SET aid = NULL WHERE cid = '.dbMakeSafe($cid).' AND rid = '
                     .dbMakeSafe($rid).' AND hid = '.dbMakeSafe($hid).';');
   dbQuery('COMMIT ;');
-    echo '{"cid":'.$cid.',"rid":'.$rid.',"hid":"'.$hid.'","aid":"'.$aid.'"}';
+    echo '{"cid":'.$cid.',"rid":'.$rid.',"hid":"'.$hid.'","aid":"'.$row['aid'].'"}';
   
 } else {
-?><p>Match doesn\'t exist or Away Team already Assigned</p>
+?><p>Match doesn't exist or Away Team not present</p>
 <?php
 	dbQuery('ROLLBACK ;');
 }

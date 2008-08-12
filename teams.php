@@ -37,8 +37,9 @@ if( $cid !=0) {
 	$sql .= ' ORDER BY tid;';
 	$result = dbQuery($sql);
 	while($row = dbFetchRow($result)) {
-?>	<div id="<?php echo 'T'.$row['hid'];?>" <?php if(!is_null($row['hid'])) echo 'class="inmatch"';?>>
-		<input type="checkbox" name="<?php echo $row['tid'];?>" <?php if($row['mp'] == 't') echo 'checked';?> />
+?>	<div id="<?php echo 'T'.$row['tid'];?>" <?php if(!is_null($row['hid']))echo 'class="inmatch"';?>>
+		<input type="checkbox" name="<?php echo $row['tid'];?>" <?php
+if($row['mp'] == 't') echo 'checked';?> />
 		<span class="tid"><?php echo $row['tid'];?></span>
 	</div>
 <?php

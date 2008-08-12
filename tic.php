@@ -37,7 +37,7 @@ foreach($confs as $confid => $conference) {
 				if($row['mp']) {
 ?>			<td class="in_po">
 <?php
-			   echo $row['tid'].'<span class="in_po"><br/>(In PO)</span>'
+			   echo $row['tid'].'<span class="in_po"><br/>(In PO)</span>';
 				} else {
 ?>			<td>
 <?php						

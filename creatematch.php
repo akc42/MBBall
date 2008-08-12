@@ -17,34 +17,27 @@ $result=dbQuery('SELECT * FROM match WHERE cid = '.dbMakeSafe($cid).' AND rid = 
 if (dbNumRows($result) == 0) {
   dbQuery('INSERT INTO match(cid, rid, hid) VALUES ('.dbMakeSafe($cid).','.dbMakeSafe($rid).','.dbMakeSafe($hid).');');
   dbQuery('COMMIT ;');
-  echo '{"items":[{"name":"form","type":"form","params":{"action":"#"},"parent":"root"},
-                       {"name":"cid","type":"input","params":{"type":"hidden","name":"cid","value":'.$cid.'},"parent":"form"},
-                       {"name":"rid","type":"input","params":{"type":"hidden","name":"rid","value":'.$rid.'},"parent":"form"},
-                       {"name":"ihid","type":"input","params":{"type":"hidden","name":"hid","value":'.$hid.'},"parent":"form"},
-                       {"name":"iaid","type":"input","params":{"type":"hidden","name":"aid"},"parent":"form"},
-                       {"name":"dhid","type":"div","params":{"class":"hid"},"parent":"form"},
-                       {"name":"shid","type":"span","params":{"text":"'.$hid.'"},"parent":"dhid"},
-                       {"name":"daid","type":"div","params":{"class":"aid"},"parent":"form"},
-                       {"name":"said","type":"span","params":{"text":"---"},"parent":"daid"},
-                       {"name":"lopen","type":"label","params":{},"parent":"form"},
-                       {"name":"iopen","type":"input","params":{"type":"checkbox","name":"open"},"parent":"lopen"},
-                       {"name":"sopen","type":"span","params":{"text":"Open"},"parent":"lopen"},
-                       {"name":"ddel","type":"div","params":{"class":"del"},"parent":"form"},
-                       {"name":"dhs","type":"div","params":{"class":"hscore"},"parent":"form"},
-                       {"name":"ihs","type":"input","params":{"type":"text",},"parent":"dhs"},
-                       {"name":"das","type":"div","params":{"class":"ascore"},"parent":"form"},
-                       {"name":"ias","type":"input","params":{"type":"text",},"parent":"das"},
-                       {"name":"dcs","type":"div","params":{"class":"cscore"},"parent":"form"},
-                       {"name":"ics","type":"input","params":{"type":"text",},"parent":"dcs"},
-                       {"name":"dmt","type":"div","params":{"class":"mtime"},"parent":"form"},
-                       {"name":"imt","type":"input","params":{"type":"text",},"parent":"dmt"},
-                       {"name":"dcmt","type":"div","params":{"class":"comment"},"parent":"form"},
-                       {"name":"tcmt","type":"textarea","params":{},"parent":"dcmt"},
-                       {"name":"clear","type":"div","params":{"class":"clear"},"parent":"root"},
-                      ]}';
+?><form action="#" >
+  <input type="hidden" name="cid" value="<?php echo $cid;?>"/>
+  <input type="hidden" name="rid" value="<?php echo $rid;?>"/>
+  <input type="hidden" name="hid" value="<?php echo $hid;?>" />
+  <input type="hidden" name="aid" />
+  <div class="hid"><span><?php echo $hid;?></span></div>
+  <div class="aid"><span>---</span></div>
+  <div class="open"><label><input type="checkbox" name="open" />Open</label></div>
+  <div class="del"></div>
+  <div class="hscore"><input type="text" /></div>
+  <div class="ascore"><input type="text" /></div>
+  <div class="cscore"><input type="text"  /></div>
+  <div class="mtime"><input type="text" class="time" /></div>
+  <div class="comment"><textarea></textarea></div>
+</form> 
+<div class="clear"></div>
+<?php
 } else {
-  echo '<p>Match alread exists</p>';
-	dbQuery('ROLLBACK ;');
+?><p>Match already exists</p>
+<?php
+  dbQuery('ROLLBACK ;');
 }
 dbFree($result);
 

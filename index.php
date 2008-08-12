@@ -295,7 +295,7 @@ if($registration_allowed) {
 ?>			<tr><td colspan="4"><div id="picks"><?php require_once('picks.php');?></div></td></tr>
 <?php
 }*/
-?>			<tr><td colspan="4"><div id="tic"><?php require_once('tic.php');?></div></td></tr>
+?>			<tr><td colspan="4"><div id="tics"><?php require_once('tic.php');?></div></td></tr>
 		</tbody>
 	</table>	
 	<div id="copyright"><hr />MBball <span id="version"></span> &copy; 2008 Alan Chandler.  Licenced under the GPL</div>

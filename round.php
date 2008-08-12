@@ -60,17 +60,19 @@ if($rid != 0 && $cid !=0) {
 				</td>
 			</tr>
 			<tr>
-				<td colspan="3">
+				<td colspan="2">
 		<label>Deadline for answering question<br/>
 			<input id="deadline" name="deadline" type="text" class="time" value="<?php echo $row['deadline'];;?>"/>
 		</label>
 				</td>
-				<td id="option">
+				<td>
 		<label>Answer<br/>
 			<input id="answer" name="answer" value="<?php echo $row['answer'];?>" 
 				<?php if($optdata['count'] > 0) echo 'disabled="disabled"';?> />
 		</label>
 				</td>
+                <td id="option">
+                </td>
 			</tr>
 		</tbody>
 	</table>
