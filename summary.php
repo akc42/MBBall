@@ -4,7 +4,7 @@ if (!defined('BALL'))
 ?><table>
 	<caption>Overall Results</caption>
 	<thead>
-		<tr><th>Name</th>
+		<tr><th class="user_name">Name</th>
 <?php
 $result = dbQuery('SELECT name FROM round WHERE open IS TRUE AND cid = '.dbMakeSafe($cid).' AND rid <= '.dbMakeSafe($rid).' ORDER BY rid DESC;');
 while($row = dbFetchRow($result)) {
@@ -35,7 +35,7 @@ if ($rid != 0) {
 $result = dbQuery($sql);
 while($row = dbFetchRow($result)) {
 ?>		<tr>
-			<td><?php echo $row['name'];?></td>
+			<td class="user_name"><?php echo $row['name'];?></td>
 <?php
 	$resultround = dbQuery('SELECT score FROM round_score WHERE cid = '.dbMakeSafe($cid).' AND
 				 rid <= '.dbMakeSafe($rid).' AND uid = '.dbMakeSafe($uid).' ORDER BY rid DESC;');

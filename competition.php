@@ -39,8 +39,7 @@ if ($cid != 0) {
 			dbFree($resultusers);
 			foreach($userdata as $user) {
 ?>			<option value="<?php echo $user['uid'];?>" 
-				<?php if ($user['uid'] == $comp['administrator']) echo 'selected' ;?>>
-					<?php echo $user['name'] ;?></option>
+				<?php if ($user['uid'] == $comp['administrator']) echo 'selected="selected"' ;?>><?php echo $user['name'] ;?></option>
 <?php
 			}
 ?>		</select></label>

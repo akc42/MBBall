@@ -122,9 +122,9 @@ way to fit your requirements.
 /* keep the 'next' level invisible by placing it off screen. */
 #menu ul {position:absolute; left:-9999px; top:-9999px; width:0; height:0; margin:0; padding:0; list-style:none;}
 
-#menu :hover ul {left:0; top:31px; background: #fff; padding:3px; border:1px solid #3a93d2; white-space:nowrap; width:1500px; height:auto; z-index:300;}
+#menu :hover ul {left:0; top:31px; background: #fff; padding:3px; border:1px solid #3a93d2; white-space:nowrap; width:150px; height:auto; z-index:300;}
 #menu :hover ul li {display:block; height:20px; position:relative; float:left; width:150px; font-weight:normal;}
-#menu :hover ul li a {display:block; font-size:11px; height:20px; width:1500px; line-height:20px; text-indent:5px; color:#000; text-decoration:none;}
+#menu :hover ul li a {display:block; font-size:11px; height:20px; width:150px; line-height:20px; text-indent:5px; color:#000; text-decoration:none;}
 #menu :hover ul li a:hover {background:#3a93d2; color:#fff;}
 
 #content {
@@ -168,6 +168,8 @@ way to fit your requirements.
 	padding:1em;
 	text-align:center;
 }
+
+.user_name{width:10em;}
 
 
 table.layout table td.in_po {background-color:#99FF99;}

@@ -142,7 +142,7 @@ var MBBUser = new Class({
 					var regReq = new MBB.req('register.php',$('regerror'), function(response) {
 						window.location.reload(true); //reload the page to pick up self
 					});
-					regReq.get(params);
+                    regReq.post($('register'));
 				}
 			});
 		}
@@ -604,7 +604,6 @@ var MBBAdmin = new Class({
 							e.stop();
 							var createReq = new MBB.req('createround.php',function(response) {
 								maxround++;
-								//this loads round if it needs to but not otherwise
 								owner.competition.rounds.loadPage(params);
 							});
 							createReq.post($('createroundform'));

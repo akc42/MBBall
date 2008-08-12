@@ -5,6 +5,10 @@ if (!defined('BALL'))
 	<input type="hidden" name="uid" value="<?php echo $uid;?>" />
 	<input type="hidden" name="pass" value="<?php echo $password;?>" />
 	<input type="hidden" name="cid" value="<?php echo $cid;?>" />
+    <input type="hidden" name="name" value="<?php echo $name;?>" />
+    <input type="hidden" name="email" value="<?php echo $email;?>" />
+    <input type="hidden" name="bb" value="<?php echo (in_array(SMF_BABY,$groups))?'true':'false';?>" />
+   
 <!-- registration block to be floated right -->
 	<h1>Register for this Competition</h2>
 <?php 
