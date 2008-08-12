@@ -83,10 +83,8 @@ dbFree($result);
 			<select id="adm" name="adm" class="user">
 <?php
 	foreach($userdata as $user) {
-?>				<option value="<?php echo $user['uid'];?>" 
-					<?php if ($user['uid'] == $uid) echo 'selected="selected"' ;?>>
-					<?php echo $user['name'] ;?>
-				</option>
+?>				<option value="<?php echo $user['uid'];?>"
+                    <?php if ($user['uid'] == $uid) echo 'selected="selected"' ;?>><?php echo $user['name'] ;?></option>
 <?php
 	}
 ?>			</select></label>

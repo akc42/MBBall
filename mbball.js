@@ -429,7 +429,7 @@ var MBBAdmin = new Class({
 								maxround++;
 								if(params.rid == 0) {
 									params.rid = response.rid;
-									owner.competition.round.loadPage(params);
+									owner.competition.rounds.round.loadPage(params);
 								}
 								owner.competition.rounds.loadPage(params);
 							});
