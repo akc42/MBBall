@@ -166,6 +166,8 @@ way to fit your requirements.
 	text-align:center;
 }
 
+.user_name{width:10em;}
+
 
 /* mainly administration stuff below here */
 div.del {

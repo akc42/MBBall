@@ -128,7 +128,7 @@ var MBBUser = new Class({
 					var regReq = new MBBReq('register.php',$('regerror'), function(response) {
 						window.location.reload(true); //reload the page to pick up self
 					});
-					regReq.get(params);
+                    regReq.post($('register'));
 				}
 			});
 		}

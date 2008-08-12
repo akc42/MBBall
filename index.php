@@ -1,6 +1,6 @@
 <?php
 
-$version = "v0.5";
+$version = "v0.6";
 
 /* A new version of chat
 	Copyright (c) 2008 Alan Chandler
@@ -40,10 +40,10 @@ if(in_array(SMF_FOOTBALL,$groups)) {
 	$result=dbQuery('SELECT * FROM participant WHERE uid = '.dbMakeSafe($uid).';');
 	if(dbNumRows($result) > 0) {
 		dbQuery('UPDATE participant SET last_logon = DEFAULT, admin_experience = TRUE, name = '
-				.dbMakeSafe($name).', email = '.dbMakeSafe($email).' WHERE uid = '.dbMakeSafe($uid).';');
+				.dbPostSafe($name).', email = '.dbPostSafe($email).' WHERE uid = '.dbMakeSafe($uid).';');
 	} else {
 		dbQuery('INSERT INTO participant (uid,name,email,last_logon, admin_experience) VALUES ('
-				.dbMakeSafe($uid).','.dbMakeSafe($name).','.dbMakeSafe($email).', DEFAULT,TRUE);');
+				.dbMakeSafe($uid).','.dbPostSafe($name).','.dbPostSafe($email).', DEFAULT,TRUE);');
 	}
 	dbQuery('COMMIT;');
 }
@@ -90,10 +90,10 @@ if ($uid == $row['administrator']) {
 	$result=dbQuery('SELECT * FROM participant WHERE uid = '.dbMakeSafe($uid).';');
 	if(dbNumRows($result) > 0) {
 		dbQuery('UPDATE participant SET last_logon = DEFAULT, admin_experience = TRUE, name = '
-				.dbMakeSafe($name).', email = '.dbMakeSafe($email).' WHERE uid = '.dbMakeSafe($uid).';');
+				.dbPostSafe($name).', email = '.dbPostSafe($email).' WHERE uid = '.dbMakeSafe($uid).';');
 	} else {
 		dbQuery('INSERT INTO participant (uid,name,email,last_logon, admin_experience) VALUES ('
-				.dbMakeSafe($uid).','.dbMakeSafe($name).','.dbMakeSafe($email).', DEFAULT,TRUE);');
+				.dbMakeSafe($uid).','.dbPostSafe($name).','.dbPostSafe($email).', DEFAULT,TRUE);');
 	}
 	dbQuery('COMMIT;');
 }
@@ -121,13 +121,13 @@ if(dbNumRows($result) <> 0) {
 	}
 	if(!(in_array(SMF_FOOTBALL,$groups)  || $admin)) { //update already done if global or ordinary administrator
 			//Don't touch admin experience - might not be admin now, but could have been in past
-		if(in_array(BABY_BACKUP,$groups)) {
+            if(in_array(SMF_BABY,$groups)) {
 			dbQuery('UPDATE participant SET last_logon = DEFAULT, is_bb = TRUE, name = '
-				.dbMakeSafe($name).', email = '.dbMakeSafe($email).' WHERE uid = '.dbMakeSafe($uid).';');
+				.dbPostSafe($name).', email = '.dbPostSafe($email).' WHERE uid = '.dbMakeSafe($uid).';');
 		} else {
 		
 			dbQuery('UPDATE participant SET last_logon = DEFAULT, is_bb = FALSE, name = '
-				.dbMakeSafe($name).', email = '.dbMakeSafe($email).' WHERE uid = '.dbMakeSafe($uid).';');
+				.dbPostSafe($name).', email = '.dbPostSafe($email).' WHERE uid = '.dbMakeSafe($uid).';');
 		}
 	}
 } else {
