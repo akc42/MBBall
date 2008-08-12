@@ -12,13 +12,13 @@ while($row = dbFetchRow($result)) {
 <?php
 }
 dbFree($result);
-?>			<th>Rounds Total</th>
+?>			<th>Rounds<br/>Total</th>
 <?php
 	if($playoff_deadline != 0) {
-?>			<th>PlayOffs Total</th>
+?>			<th>PlayOffs<br/>Total</th>
 <?php
 }
-?>			<th>Grand Total</th>
+?>			<th>Grand<br/>Total</th>
 		</tr>
 	</thead>
 	<tbody>
