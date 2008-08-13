@@ -356,8 +356,14 @@ var MBBAdmin = new Class({
 						} else {
 							answer = elAns.value.toInt();
 						}
-						$('roundform').addEvent('submit', function(e) {
+						div.getElements('input').extend(div.getElements('textarea')).addEvent('change', function(e) {
 							e.stop();
+							if (this.id == 'ou') {
+								//if ou changes then all the matches combined scores are diabled or not
+								$$('.cscore').each(function(item) {
+									item.input.readOnly = ! e.target.checked;
+								});
+							}
 							var validated = true;
 							if(!MBB.parseDate($('deadline'))) {
 								validated = false;
@@ -365,14 +371,8 @@ var MBBAdmin = new Class({
 							if (!MBB.intValidate($('value'))) {
 								validated = false;
 							}
-							if (elAns.value != '') {
-								if (!MBB.intValidate(elAns)) {
-									validated = false;
-								} else {
-									answer = elAns.value;
-								}
-							} else {
-								answer = 0;
+							if (!MBB.intValidate(elAns)) {
+								validated = false;
 							}
 							if(validated) {
 								var updateReq = new MBB.req('updateround.php', function(response) {
