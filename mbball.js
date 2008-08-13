@@ -222,7 +222,7 @@ var MBBAdmin = new Class({
 			var owner = this.owner;
 			if(params.cid != 0) {
 				//We only want to do this if there is a competition to get
-				MBBmgr.adjustDates(div);
+				MBB.adjustDates(div);
 				// Validate competition Details and Change Dates to seconds since 1970
 				$('compform').addEvent('submit', function(e) {
 					e.stop();
@@ -235,13 +235,13 @@ var MBBAdmin = new Class({
 					}
 					if(validated) {
 						var updateReq = new MBB.req('updatecomp.php', function(response) {
-							MBBmgr.adjustDates(div);
+							MBB.adjustDates(div);
 							//Shouldn't need to load page as its all there (but we might have updated the summary)
 							owner.competitions.loadPage(params);
 						});
 						updateReq.post($('compform'));
 					} else {
-						MBBmgr.adjustDates(div);
+						MBB.adjustDates(div);
 					}
 				});
 			}
@@ -250,7 +250,7 @@ var MBBAdmin = new Class({
 				this.round = new MBB.subPage(this,'round.php',$('round'),function(div) {
 					var answer;
 					if(params.rid != 0) {
-						MBBmgr.adjustDates(div);
+						MBB.adjustDates(div);
 						elAns =$('answer');
 						if(elAns.value == '') {
 							answer = 0;
@@ -277,13 +277,13 @@ var MBBAdmin = new Class({
 							}
 							if(validated) {
 								var updateReq = new MBB.req('updateround.php', function(response) {
-									MBBmgr.adjustDates(div);
+									MBB.adjustDates(div);
 									//Should not be necessary to update page
 								});
 								updateReq.post($('roundform'));
 							} else {
 								//If we failed to validate we need to adjust dates back
-								MBBmgr.adjustDates(div);
+								MBB.adjustDates(div);
 							}
 						});
 					} else {
@@ -457,7 +457,7 @@ var MBBAdmin = new Class({
 				this.adminreg = new MBB.subPage(this,'adminreg.php',$('registered'),function(div) {
 					var owner = this.owner;
 					if(params.cid !=0) {
-						MBBmgr.adjustDates(div);
+						MBB.adjustDates(div);
 						$('bbapproval').addEvent('change', function(e) {
 							$$('#registered input.bbapprove').each(function (item) {
 								item.disabled = !e.target.checked;
