@@ -29,7 +29,7 @@ $result = dbQuery($sql);
 				<tr>
 					<th class="ctitle">Title</th>
 					<th class="user">Competition Administrator</th>
-					<th class="option1">Default</th>
+					<th class="radio">Default</th>
 					<th></th>
 				</tr>
 			</thead>

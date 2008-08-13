@@ -16,9 +16,9 @@ if ($cid != 0) {
 	<caption>Rounds</caption>
 	<thead>
 		<tr>
-			<th>No</th>
+			<th class="radio">No</th>
 			<th>Round Name</th>
-			<th>DEL</th>
+			<th class="del_head">DEL</th>
 		</tr>
 	</thead>
 	<tbody>

@@ -20,9 +20,9 @@ if($rid != 0 && $cid !=0) {
      <caption>Multichoice Answers</caption>
 	<thead>
 		<tr>
-			<th>Correct</th>
-			<th>Choice</th>
-			<th>DEL</th>
+			<th class="radio">Correct</th>
+			<th class="option_choice">Choice</th>
+			<th class="del_head">DEL</th>
 		</tr>
 	</thead>
 

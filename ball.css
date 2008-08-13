@@ -188,7 +188,8 @@ div.del {
 }
 
 div.del:hover, div.del:active {background-position:left bottom;}
-
+.del_head{width:18px;}
+.radio{width:2em;}
 #rounds {
 	vertical-align:top;
 }
@@ -197,6 +198,7 @@ div.del:hover, div.del:active {background-position:left bottom;}
 	vertical-align:top;
 	width:30em;
 	background-color:#339900;
+	color:#FFFFCC;
 }
 
 #matches {
@@ -215,20 +217,19 @@ div.del:hover, div.del:active {background-position:left bottom;}
     width:5em;
 }
 
-#optiond {
-	width:13em;
-	border:1px solid black;
-}
-
 textarea#condition, textarea#question {
 	height:10em;
 	padding:0.5em;
 }
 
+#optionform table{width:100%;}
+
 #option {
-	text-align:right;
+	text-align:center;
+	color:#FFFFCC;
+	font-weight:bold;
 	background-color:#339900;
-	border:2px solid #CCCCFF;
+	border:4px solid #CCCCFF;
     width:30px;   
 }
 

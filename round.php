@@ -71,8 +71,7 @@ if($rid != 0 && $cid !=0) {
 				<?php if($optdata['count'] > 0) echo 'disabled="disabled"';?> />
 		</label>
 				</td>
-                <td id="option">
-                </td>
+                <td id="option"><p>Click for<br/>MultiChoice<br/>Option</p></td>
 			</tr>
 		</tbody>
 	</table>
