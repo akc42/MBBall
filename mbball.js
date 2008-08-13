@@ -329,6 +329,25 @@ var MBBAdmin = new Class({
 					  });
 					  changeAnsReq.get($merge(params,{'opid':this.name}));
 					};
+					var deleteAnswer = function(e) {
+						e.stop();
+						var deleteAnsReq = new MBB.req('deleteans.php', function(response) {
+							if(--noopts <= 0) {
+							// No more options left - so we are back to the traditional answer
+								$('nullanswer').getParents('tr').dispose();
+								$('answer').readOnly = false;
+								$('answer').value = '';
+								answer = 0;
+							} else {
+								if (response.opid == answer) {
+									$('nullanswer').checked = true;
+									$('answer').value = 0;
+									answer = 0;
+								}
+							}
+							e.target.getParents('tr').dispose();
+						});
+					};
 					if(params.rid != 0) {
 						MBB.adjustDates(div);
 						elAns =$('answer');
