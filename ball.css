@@ -210,17 +210,30 @@ div.del:hover, div.del:active {background-position:left bottom;}
 #tic {
 	background-color:#CCEDFF;
 	cursor:pointer;
-    width:8em;
+    width:80px;
 }
 
 #tnic {
 	cursor:pointer;
-    width:5em;
+    width:30px;
 }
 
+#addall {
+	background: url(images/all.gif);
+	border: 0;
+	cursor: pointer;
+	float: left;
+	height: 16px;
+	width: 16px;
+	padding:0;
+}
+
+#addall:hover, #addall:active {background-position:left bottom;}
+
+
 textarea#condition, textarea#question {
-	height:10em;
-	padding:0.5em;
+	height:100px;
+	padding:3px;
 }
 
 #optionform table{width:100%;}
@@ -245,14 +258,14 @@ textarea#condition, textarea#question {
 
 .comment {background-color:#FFFFCC;}
 .comment textarea {
-	width:12em;
-	min-height:4em; 
+	width:160px;
+	min-height:56px;; 
 	height:auto;
 }
 /* for Internet Explorer */
 /*\*/
 * html .comment {
-height: 4em;
+height: 56px;
 }
 /**/
 
@@ -266,13 +279,13 @@ table.layout table.form td, table.layout td {background-color:#FFFFCC;}
 th {font-size:x-small;font-weight:normal;}
 td, div {padding:2px;}
 
-.ctitle {width:12em;}
-.user {width:12em;}
+.ctitle {width:160px;}
+.user {width:180px;}
 .option1{width:12em;}
 table.layout table.form td.submit{width:8em; text-align:center;background-color:#993300;}
-.time,.datetime {width:11em;}
+.time,.datetime {width:160px;}
 .option2{width:8em;}
-.tid {width:5em;}
+.tid {width:46px;}
 
 
 .selectthis {
@@ -281,7 +294,7 @@ table.layout table.form td.submit{width:8em; text-align:center;background-color:
 
 .inmatch {background-color:red;}
 
-div.match {width:184px;border:2px solid black; padding:2px;background-color:red; float:left;}
+div.match {width:181px;border:2px solid black; padding:2px;background-color:red; float:left;}
 div.match div {padding:1px;}
 div.match div.del {margin-left:2px;}
 div.match span {background-color:white; border:1px inset black;vertical-align:center; }

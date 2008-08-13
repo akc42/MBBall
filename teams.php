@@ -62,9 +62,7 @@ if($row['mp'] == 't') echo 'checked';?> />
 			<td>
 				<label><input id="lock" type="checkbox" <?php if($ticexists) echo 'checked';?> />Lock</label>
 			</td>
-			<td>
-				<input id="addall" type="button" value="&lt;All"/>
-			</td>
+			<td><div id="addall"></div></td>
 		</tr>
 	</tbody>
 </table>
