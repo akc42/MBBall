@@ -230,7 +230,8 @@ textarea#condition, textarea#question {
 	font-weight:bold;
 	background-color:#339900;
 	border:4px solid #CCCCFF;
-    width:30px;   
+    width:30px;
+	cursor:pointer;
 }
 
 #value {width:2em;}
