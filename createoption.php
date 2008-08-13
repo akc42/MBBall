@@ -13,9 +13,17 @@ $rid=$_GET['rid'];
 $opid=$_GET['opid'];
 
 dbQuery('BEGIN ;');
+$result=dbQuery('SELECT count(*) FROM option WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).';');
+$row=dbFetchRow($result);
+dbFree($result);
+
 $result=dbQuery('SELECT * FROM option WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' AND opid = '.dbMakeSafe($opid).';');
 if (dbNumRows($result) == 0) {
   dbQuery('INSERT INTO option(cid, rid, opid) VALUES ('.dbMakeSafe($cid).','.dbMakeSafe($rid).','.dbMakeSafe($opid).');');
+  if ($row['count'] == 0) {
+  	//This is the first option created for this round
+  	dbQuery('UPDATE round SET answer = 0 WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).';');
+  }
   dbQuery('COMMIT ;');
 	
   echo '{"cid":'.$cid.',"rid":'.$rid.',"opid":'.$opid.'}';

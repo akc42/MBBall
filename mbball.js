@@ -316,7 +316,7 @@ var MBBAdmin = new Class({
 						e.stop();
 						if(this.checked) {
 							var changeAnsReq = new MBB.req('changeselans.php', function(response) {
-					      	answer = response.answer;
+					      	answer = response.opid;
 					      	$('answer').value = answer;
 							});
 					    	changeAnsReq.get($merge(params,{'opid':this.value}));
@@ -416,6 +416,8 @@ var MBBAdmin = new Class({
 												})
 											)
 										).inject($('optionform').getElement('tbody'));
+										answer = 0;
+										$('answer').value = 0;
 									}
 									var option = new Element('tr').adopt(
 										new Element('td').adopt(
@@ -463,7 +465,7 @@ var MBBAdmin = new Class({
 					});
 					this.options = new MBB.subPage(this,'options.php',$('options'),function(div) {
 						if (params.cid != 0 && params.rid != 0) {
-							noopts = $('noopts').value;
+							noopts = $('noopts').value.toInt();
 							if (noopts != 0) $('answer').readOnly = true;
 							div.getElements('input[name=option]').addEvent('change',changeSelectedAnswer)
 								.getParent().getNext().getFirst().addEvent('change',changeAnswer)

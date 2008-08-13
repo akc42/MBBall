@@ -169,7 +169,7 @@ way to fit your requirements.
 	text-align:center;
 }
 
-.user_name{width:10em;}
+.user_name{width:140px;}
 
 
 table.layout table td.in_po {background-color:#99FF99;}
@@ -189,14 +189,15 @@ div.del {
 
 div.del:hover, div.del:active {background-position:left bottom;}
 .del_head{width:18px;}
-.radio{width:2em;}
+.radio{width:22px;}
+
 #rounds {
 	vertical-align:top;
 }
 
 #options {
 	vertical-align:top;
-	width:30em;
+	width:200px;
 	background-color:#339900;
 	color:#FFFFCC;
 }
@@ -233,6 +234,9 @@ textarea#condition, textarea#question {
     width:30px;
 	cursor:pointer;
 }
+
+.option_input {width:192px;}
+.option_choice {width:200px;}
 
 #value {width:2em;}
 
