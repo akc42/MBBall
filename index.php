@@ -1,6 +1,6 @@
 <?php
 
-$version = "v0.6";
+$version = "v0.7";
 
 /* A new version of chat
 	Copyright (c) 2008 Alan Chandler
@@ -183,7 +183,7 @@ window.addEvent('domready', function() {
 				{cid: <?php echo $cid;?>, rid: <?php echo $rid;?>},
                              'errormessage'
 	);
-	MBBmgr.adjustDates($('content'));
+	MBB.adjustDates($('content'));
 });	
 
 	// -->
