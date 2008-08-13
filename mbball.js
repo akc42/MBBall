@@ -388,6 +388,31 @@ var MBBAdmin = new Class({
 								MBB.adjustDates(div);
 							}
 						});
+						// if user clicks on create option area we need to create an option
+						if (noopts) { //if set option page must have loaded
+							var newOptionReq = new MBB.req('creatoption.php', function(response) {
+								$('answer').readOnly = true;
+						    	if (noopts == 0) {
+						    	//We just created our first option, so we also have to create the no answer row first
+									var nuloption = new Element('tr').adopt(
+										new Element('td').adopt(
+											new Element('input',{'id':'nullanswer','type':'radio','name':'option','value':0,'events':{'change':changeSelectedAnswer}}))).adopt(
+										new Element('td',{'colspan':2}).adopt(
+											new Element('span',{'text':'No Answer Set Yet'}))).inject(
+										$('optionform').getElement('tbody'));
+						    	}
+						    	var option = new Element('tr').adopt(
+									new Element('td').adopt(
+										new Element('input',{'type':'radio','name':'option','value':response.opid,'events':{'change':changeSelectedAnswer}}))).adopt(
+									new Element('td').adopt(
+										new Element('input',{'type':'text', 'name':response.opid,'events':{'change':changeAnswer}}))).adopt(
+									new Element('td').adopt(
+										new Element('div',{'id':'O'+response.opid,'class':'del','events':{'click':deleteAnswer}}))).inject(
+									$('optionform').getElement('tbody'));
+						    	noopts = response.opid; //should be one more than before (no need to update hidden input - its ignored
+						 	});
+						 	newOptionReq.get($merge(params,{'opid':nopts+1}));
+						}
 					} else {
 						answer =0;
 					}
