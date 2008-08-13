@@ -1,63 +1,134 @@
-var MBBRequestOptions;
-/*  Class to load a SubPage from 'url' into the 'div'. 
- *  On success call
- *	initializePage(div).  
- *  If the load fails, message is the text to fill the div with
+/* MBB - Melindas Backuos Ball application 
+ * (c) 2008 Alan Chandler - licenced under the GPL
 */
-
-var MBBSubPage = new Class({
-	initialize:function(owner,url,div,initializeSubPage,message) {
-		this.owner = owner;
-		this.div = div;
-		var iSP = initializeSubPage.bind(this);
-		this.request = new Request.HTML({
-			url: url,
-			onSuccess: function(html) {
-				div.empty();
-				div.adopt(html);
-				iSP(div);
-			},
-			onFailure: function(){
-				var output = message || '<p>Failed to Read Page from '+url+'<p>';
-				div.empty();
-				div.adopt(output);
-			}
-		});
-	},
-	loadPage: function(params) {
-		this.request.get($merge(MBBRequestOptions,params || {}));
-	}
-});
-
-var MBBReq = new Class({
-	initialize: function (url,errorEl,success) {
-		this.req = new Request.JSON({
-			url:url,
-			onComplete: function(response,html) {
-				if(response) {
-					success(response);
-				} else {
-					errorEl.set('text',html);
+MBB = function() {
+  var reqOpts;
+  var errorDiv;
+  return {
+    setErrorDiv: function(div) {
+      errorDiv = div;
+    },
+    setRO : function(ro) {
+      reqOpts = ro;
+    },
+   subPage : new Class({
+      initialize:function(owner,url,div,initializeSubPage,message) {
+	    this.owner = owner;
+	    this.div = div;
+	    var iSP = initializeSubPage.bind(this);
+	    this.request = new Request.HTML({
+            url: url,
+	    onSuccess: function(html) {
+	        div.empty();
+	        div.adopt(html);
+	        iSP(div);
+	    },
+	    onFailure: function(){
+	        var output = message || '<p>Failed to Read Page from '+url+'<p>';
+	        div.empty();
+	        div.adopt(output);
+	    }
+	    });
+    },
+    loadPage: function(params) {
+	    this.request.get($merge(reqOpts,params || {}));
+    }
+  }),
+  req: new Class({
+      initialize: function (url,success) {
+        this.req = new Request.JSON({
+          url:url,
+          onComplete: function(response,html) {
+            if(response) {
+	      success(response);
+	    } else {
+	      errorDiv.empty();
+	      errorDiv.adopt(html);
+	    }
+	  }
+	});
+      },
+      get:function(params) {
+	 this.req.get($merge(reqOpts,params));
+      },
+      post: function (params) {
+	this.req.post(params);
+      }
+    }),
+    adjustDates: function (el) {
+	//sets up all date time fields under the supplied element
+		var datespans = el.getElements('.time');
+		datespans.each(function(datespan,i) {
+			var d;
+			datespan.removeClass('time');
+			datespan.addClass('datetime');
+			switch (datespan.get('tag')) {
+			case "span":
+				d = datespan.get('text');
+				if(d == '' || d=='0') {
+					datespan.set('text','');
+					break;
 				}
+				datespan.set('text',new Date(d.toInt()*1000).toLocaleString().substr(0,21));
+				break;
+			case "input":
+				d=datespan.value;
+				if(d == '' || d=='0') {
+					datespan.value = '';
+					break;
+				}
+				datespan.value = new Date(d.toInt()*1000).toLocaleString().substr(0,21);
+				break;
+			default:
+				break;
 			}
 		});
 	},
-	get:function(params) {
-		this.req.get($merge(MBBRequestOptions,params));
+	parseDate: function(el) {
+		var secs
+		el.removeClass('error');
+		if (el.value == '' || el.value == '0') {
+			secs = 0;
+		} else {
+			secs = Date.parse(el.value)/1000;
+			if(isNaN(secs)) {
+				el.addClass('error');
+				return false;
+			}
+		}
+		el.value = secs;
+		el.removeClass('datetime');
+		el.addClass('time');
+		return true;
 	},
-	post: function (params) {
-		this.req.post(params);
+	intValidate: function(el) {
+		el.removeClass('error');
+		if(el.value == '') return false;
+		if (isNaN(el.value.toInt())) {
+			el.addClass('error');
+			return false;
+		}
+		return true;
+	},
+	textValidate: function(el) {
+	  el.removeClass('error');
+	  if(el.value = '') {
+	  	el.addClass('.error');
+        return false;
+     }      
+	  return true;
 	}
-});
 
-
+  };
+}();
 
 var MBBall = new Class({
-	initialize: function(version,me) {
+	initialize: function(version,me,errordiv) {
 		this.me = me;
-		MBBRequestOptions = {'uid':me.uid,'pass':me.password};
+		MBB.setRO({'uid':me.uid,'pass':me.password});
 		var span=$('version');
 		span.set('text',version);
+		MBB.setErrorDiv ($(errordiv));
 	},
 	adjustDates: function (el) {
 		//sets up all date time fields under the supplied element
@@ -118,14 +189,14 @@ var MBBall = new Class({
 
 var MBBUser = new Class({
 	Extends: MBBall,
-	initialize: function(version,me,params) {
-		this.parent(version,me);
+	initialize: function(version,me,params,errordiv) {
+		this.parent(version,me,errordiv);
 		var regdiv = $('registration');
 		if(regdiv) { //exists means registration is open
 			regdiv.getElementById('register').addEvent('submit', function(e) {
 				e.stop();
 				if(confirm("Click OK to register for the competition and agree to the condition")) {
-					var regReq = new MBBReq('register.php',$('regerror'), function(response) {
+					var regReq = new MBB.req('register.php',$('regerror'), function(response) {
 						window.location.reload(true); //reload the page to pick up self
 					});
                     regReq.post($('register'));
@@ -138,15 +209,15 @@ var MBBUser = new Class({
 
 var MBBAdmin = new Class({
 	Extends: MBBall,
-	initialize: function(version,me,cid) {
+	initialize: function(version,me,cid,errordiv) {
+		this.parent(version,me,errordiv);
 		var params = {'cid':cid, 'rid':0};
-		this.parent(version,me);
-		this.competitions = new MBBSubPage(this,'competitions.php',$('competitions'),function (div) {
+		this.competitions = new MBB.subPage(this,'competitions.php',$('competitions'),function (div) {
 			var owner = this.owner;
 			$$('input.default').each(function(rb,i) {
 				if(params.cid == 0 && rb.checked) params.cid = rb.value; 
 				rb.addEvent('change',function(e) {
-					var dcReq = new MBBReq('setdefault.php',$('compserr'), function (response) {
+					var dcReq = new MBB.req('setdefault.php',$('compserr'), function (response) {
 						if(params.cid ==0) {
 							params.cid = response.cid;
 							owner.competition.loadPage(params);
@@ -169,7 +240,7 @@ var MBBAdmin = new Class({
 				comp.addEvent('click', function(e) {
 					e.stop();
 					if(confirm('Deleting a Competition will delete all the Rounds and Matches associated with it. Do you wish to Proceed?')) {
-						var deleteReq = new MBBReq('deletecomp.php',$('compserr'),function (response) {
+						var deleteReq = new MBB.req('deletecomp.php',$('compserr'),function (response) {
 							if (params.cid == response.cid) {
 								params.cid = 0;
 								params.rid = 0;
@@ -189,7 +260,7 @@ var MBBAdmin = new Class({
 					desc.value= 'Please specify a Title for the Competition'
 				} else {
 					desc.removeClass('error');
-					var createReq = new MBBReq('createcomp.php',$('compserr'), function(response) {
+					var createReq = new MBB.req('createcomp.php',$('compserr'), function(response) {
 						if (params.cid == 0) {
 							params.cid = response.cid;
 							owner.competition.loadPage(params);
@@ -200,7 +271,7 @@ var MBBAdmin = new Class({
 				}
 			});
 		});
-		this.competition = new MBBSubPage (this,'competition.php',$('competition'),function (div) {
+		this.competition = new MBB.subPage (this,'competition.php',$('competition'),function (div) {
 			var maxround;
 			var owner = this.owner;
 			if(params.cid != 0) {
@@ -210,14 +281,14 @@ var MBBAdmin = new Class({
 				$('compform').addEvent('submit', function(e) {
 					e.stop();
 					var validated = true;
-					if(!MBBmgr.parseDate($('playoffdeadline'))) {
+					if(!MBB.parseDate($('playoffdeadline'))) {
 						validated = false;
 					}
-					if(!MBBmgr.intValidate($('gap'))) {
+					if(!MBB.intValidate($('gap'))) {
 						validated = false;
 					}
 					if(validated) {
-						var updateReq = new MBBReq('updatecomp.php',$('compserr'), function(response) {
+						var updateReq = new MBB.req('updatecomp.php',$('compserr'), function(response) {
 							MBBmgr.adjustDates(div);
 							//Shouldn't need to load page as its all there (but we might have updated the summary)
 							owner.competitions.loadPage(params);
@@ -228,9 +299,9 @@ var MBBAdmin = new Class({
 					}
 				});
 			}
-			this.rounds = new MBBSubPage(this,'rounds.php',$('rounds'), function(div) {
+			this.rounds = new MBB.subPage(this,'rounds.php',$('rounds'), function(div) {
 				//Initialise to click on a round to load single round
-				this.round = new MBBSubPage(this,'round.php',$('round'),function(div) {
+				this.round = new MBB.subPage(this,'round.php',$('round'),function(div) {
 					var answer;
 					if(params.rid != 0) {
 						MBBmgr.adjustDates(div);
@@ -243,14 +314,14 @@ var MBBAdmin = new Class({
 						$('roundform').addEvent('submit', function(e) {
 							e.stop();
 							var validated = true;
-							if(!MBBmgr.parseDate($('deadline'))) {
+							if(!MBB.parseDate($('deadline'))) {
 								validated = false;
 							}
-							if (!MBBmgr.intValidate($('value'))) {
+							if (!MBB.intValidate($('value'))) {
 								validated = false;
 							}
 							if (elAns.value != '') {
-								if (!MBBmgr.intValidate(elAns)) {
+								if (!MBB.intValidate(elAns)) {
 									validated = false;
 								} else {
 									answer = elAns.value;
@@ -259,7 +330,7 @@ var MBBAdmin = new Class({
 								answer = 0;
 							}
 							if(validated) {
-								var updateReq = new MBBReq('updateround.php',$('compserr'), function(response) {
+								var updateReq = new MBB.req('updateround.php',$('compserr'), function(response) {
 									MBBmgr.adjustDates(div);
 									//Should not be necessary to update page
 								});
@@ -273,11 +344,11 @@ var MBBAdmin = new Class({
 						answer =0;
 					}
 					//Initialise Round Data Form
-					this.matches = new MBBSubPage(this,'matches.php',$('matches'),function (div) {
+					this.matches = new MBB.subPage(this,'matches.php',$('matches'),function (div) {
 					});
-					this.options = new MBBSubPage(this,'options.php',$('options'),function(div) {
+					this.options = new MBB.subPage(this,'options.php',$('options'),function(div) {
 					})
-					this.teams = new MBBSubPage(this,'teams.php',$('teams'),function (div) {
+					this.teams = new MBB.subPage(this,'teams.php',$('teams'),function (div) {
 						if (params.cid != 0) {
 							var lock = $('lock');
 							var tnicClicked;
@@ -291,7 +362,7 @@ var MBBAdmin = new Class({
 								e.stop();
 								if(!lock.checked) {
 									var team = this;
-									var remTiC = new MBBReq('remtic.php',$('compserr'), function (response) {
+									var remTiC = new MBB.req('remtic.php',$('compserr'), function (response) {
 										var div = new Element('div');
 										var span = new Element('span',{
 											'class':'tid',
@@ -313,7 +384,7 @@ var MBBAdmin = new Class({
 								}
 							};
 							var changeMpStatus = function(e) {
-								var mpReq = new MBBReq('updatepostate.php',$('compserr'),function(response) {
+								var mpReq = new MBB.req('updatepostate.php',$('compserr'),function(response) {
 								});
 								mpReq.get({'cid':params.cid,'tid':this.name,'mp':this.checked});
 							};
@@ -336,7 +407,7 @@ var MBBAdmin = new Class({
 								e.stop();
 								if(!lock.checked) {
 									var team=this;
-									var addTiC = new MBBReq('addtic.php',$('compserr'), function (response) {
+									var addTiC = new MBB.req('addtic.php',$('compserr'), function (response) {
 										var div = makeTeam(response.tid);
 										if($$('#tic div').every(function(item,i) {
 											if(item.getElement('span').get('text') > response.tid) {
@@ -360,7 +431,7 @@ var MBBAdmin = new Class({
 							$('addall').addEvent('click',function(e) {
 								e.stop();
 								if(!lock.checked) {
-									var addAll = new MBBReq('addalltic.php',$('compserr'), function (response) {
+									var addAll = new MBB.req('addalltic.php',$('compserr'), function (response) {
 										var teams = response.teams;
 										$('tnic').empty();
 										var tic = $('tic').empty();
@@ -402,7 +473,7 @@ var MBBAdmin = new Class({
 							comp.addEvent('click', function(e) {
 								e.stop();
 								if(confirm('Deleting a Round will delete all the Matches associated with it. Do you wish to Proceed?')) {
-									var deleteReq = new MBBReq('deleteround.php',$('compserr'),function (response) {
+									var deleteReq = new MBB.req('deleteround.php',$('compserr'),function (response) {
 										maxround--;
 										if (params.cid == response.cid && params.rid == response.rid) {
 											params.rid = 0;
@@ -421,11 +492,11 @@ var MBBAdmin = new Class({
 						});
 					}
 				}
-				this.newround = new MBBSubPage(this,'newround.php',$('newround'),function(div) {
+				this.newround = new MBB.subPage(this,'newround.php',$('newround'),function(div) {
 					if(params.cid !=0) {
 						$('createroundform').addEvent('submit',function(e) {
 							e.stop();
-							var createReq = new MBBReq('createround.php',$('compserr'),function(response) {
+							var createReq = new MBB.req('createround.php',$('compserr'),function(response) {
 								maxround++;
 								if(params.rid == 0) {
 									params.rid = response.rid;
@@ -437,7 +508,7 @@ var MBBAdmin = new Class({
 						});
 					}
 				});
-				this.adminreg = new MBBSubPage(this,'adminreg.php',$('registered'),function(div) {
+				this.adminreg = new MBB.subPage(this,'adminreg.php',$('registered'),function(div) {
 					var owner = this.owner;
 					if(params.cid !=0) {
 						MBBmgr.adjustDates(div);
@@ -449,7 +520,7 @@ var MBBAdmin = new Class({
 						$$('#registered input.bbapprove').addEvent('change',function(e) {
 							e.stop();
 							if(confirm('You are changing the approval status of a Baby Backup for this Competition. Are you sure you want to do this?')) {
-								var updateBBa = new MBBReq('bbapprove.php',$('compserr'),function(response) {
+								var updateBBa = new MBB.req('bbapprove.php',$('compserr'),function(response) {
 								});
 								updateBBa.get($merge(params,{'bbuid':this.name,'approval':this.checked}));
 							} else {
@@ -460,7 +531,7 @@ var MBBAdmin = new Class({
 							comp.addEvent('click', function(e) {
 								e.stop();
 								if(confirm('This will Un-Register this User from this Competition. Do you wish to Proceed?')) {
-									var deleteReq = new MBBReq('deleteregistration.php',$('compserr'),function (response) {
+									var deleteReq = new MBB.req('deleteregistration.php',$('compserr'),function (response) {
 										owner.adminreg.loadPage($merge(params,{'bbar':$('bbapproval').checked}));
 									});
 									deleteReq.get({'cid': params.cid,'ruid':comp.id.substr(1).toInt()});
