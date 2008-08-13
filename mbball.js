@@ -441,18 +441,12 @@ var MBBAdmin = new Class({
 						if (params.cid != 0) {
 							var lock = $('lock');
 							var tnicClicked;
-							var dragStart = function(e) {
-								if(lock.checked) {
-									e.stop();
-									//Start drag
-								}
-							};
 							var teamClicked = function (e) {
 								e.stop();
 								if(!lock.checked) {
 									var team = this;
 									var remTiC = new MBB.req('remtic.php', function (response) {
-										var div = new Element('div');
+										var div = new Element('div',{'id':'S'+response.tid});
 										var span = new Element('span',{
 											'class':'tid',
 											'events': {'click':tnicClicked},
@@ -470,6 +464,37 @@ var MBBAdmin = new Class({
 										team.getParent().dispose();
 									});
 									remTiC.get({'cid':params.cid,'tid':team.get('text')});	
+								} else {
+									//only do something if not already in a match
+									if(!this.getParent().hasClass('inmatch')) {
+										var teamName = this.get('text');
+										if ($$('.match').every(function(match) {
+											var aidSpan = match.getElement('input[name=aid]'); 
+											if(aidSpan.value == '') {
+												// found a match so we can add this team to it
+												var addaidReq = new MBB.req('addaid.php', function(response) {
+													aidSpan.value = teamName;
+													match.getElement('div.aid').getFirst().set('text',teamName);
+													team.getParent().addClass('inmatch');
+												});
+												addaidReq.get($merge(params,{
+													'hid':match.getElement('input[name=hid]').value,
+													'aid':teamName}));
+												return false;
+											}
+											return true;
+										})){
+											// Was no match with missing AID, so create new match
+											var match = new Element('div',{'class':'match'});
+											match.inject($('matches'));
+											var matchPage = new MBB.subPage(this,'creatematch.php',match, function(div) {
+												if (!$('ou').checked)  match.getElement('.cscore').readOnly=true;
+												setMatchEvents(match);
+												team.getParent().addClass('inmatch');
+											});
+											matchPage.loadPage($merge(params,{'hid':teamName}));
+										}
+									}
 								}
 							};
 							var changeMpStatus = function(e) {
@@ -512,9 +537,7 @@ var MBBAdmin = new Class({
 									addTiC.get({'cid':params.cid,'tid':team.get('text')});
 								}
 							};
-							var ticElements = $$('#tic span');
-							ticElements.addEvent('click',teamClicked);
-							ticElements.addEvent('mousedown', dragStart);
+							$$('#tic span').addEvent('click',teamClicked);
 							$$('#tnic span').addEvent('click',tnicClicked);
 							$$('#tic input').addEvent('change',changeMpStatus);
 							$('addall').addEvent('click',function(e) {
