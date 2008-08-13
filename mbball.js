@@ -516,11 +516,6 @@ var MBBAdmin = new Class({
 					var owner = this.owner;
 					if(params.cid !=0) {
 						MBB.adjustDates(div);
-						$('bbapproval').addEvent('change', function(e) {
-							$$('#registered input.bbapprove').each(function (item) {
-								item.disabled = !e.target.checked;
-							});
-						});
 						$$('#registered input.bbapprove').addEvent('change',function(e) {
 							e.stop();
 							if(confirm('You are changing the approval status of a Baby Backup for this Competition. Are you sure you want to do this?')) {
