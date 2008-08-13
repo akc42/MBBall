@@ -305,7 +305,8 @@ var MBBAdmin = new Class({
 								var deleteReq = new MBB.req('deletematch.php',function(response) {
 									div.dispose();
 									$('T'+response.hid).removeClass('inmatch');
-									$('T'+response.aid).removeClass('inmatch');
+									var aid = $('T'+response.aid);
+									if(aid) aid.removeClass('inmatch'); //only if not null
 								});
 								deleteReq.get($merge(params,{'hid':div.getElement('input[name=hid]').value}));
 							}
