@@ -60,7 +60,7 @@ if($row['mp'] == 't') echo 'checked';?> />
 		</tr>
 		<tr>
 			<td>
-				<label><input id="lock" type="checkbox" <?php if($ticexists) echo 'checked';?> />Lock</label>
+				<label id="lock_cell"><input id="lock" type="checkbox" <?php if($ticexists) echo 'checked';?> />Lock</label>
 			</td>
 			<td><div id="addall"></div></td>
 		</tr>

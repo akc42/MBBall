@@ -1,5 +1,5 @@
 <?php
-if(!(isset($_GET['uid']) && isset($_GET['pass']) && isset($_GET['cid']) && isset($_GET['rid']) && isset($_GET['ou'])))
+if(!(isset($_GET['uid']) && isset($_GET['pass']) && isset($_GET['cid']) && isset($_GET['rid'])))
 	die('Hacking attempt - wrong parameters');
 $uid = $_GET['uid'];
 $password = $_GET['pass'];
@@ -9,7 +9,8 @@ if ($password != sha1("Football".$uid))
 $cid = $_GET['cid'];
 $rid = $_GET['rid'];
 if($rid != 0 && $cid !=0) {
-
+	if (!isset($_GET['ou']))
+		die('Hacking attempt - wrong parameters');
 	define ('BALL',1);   //defined so we can control access to some of the files.
 	require_once('db.php');
 

@@ -572,6 +572,8 @@ var MBBAdmin = new Class({
 										team.getParent().dispose();
 									});
 									addTiC.get({'cid':params.cid,'tid':team.get('text')});
+								} else {
+									$('lock_cell').highlight('#F00');
 								}
 							};
 							$$('#tic span').addEvent('click',teamClicked);
@@ -589,12 +591,19 @@ var MBBAdmin = new Class({
 										});
 									});
 									addAll.get({'cid':params.cid});
+								} else {
+									$('lock_cell').highlight('#F00');
 								}
 							});
 						}
 					});
-					this.matches.loadPage($merge(params,{'ou':$('ou').checked }));
-					this.options.loadPage($merge(params,{'answer':answer}));
+					if (params.rid != 0){
+						this.matches.loadPage($merge(params,{'ou':$('ou').checked }));
+						this.options.loadPage($merge(params,{'answer':answer}));
+					} else {
+						this.matches.loadPage(params);
+						this.options.loadPage(params);
+					}
 					this.teams.loadPage(params);
 				});
 				if (params.cid != 0) {
