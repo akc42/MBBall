@@ -323,11 +323,13 @@ var MBBAdmin = new Class({
 						}
 					};
 					var changeAnswer = function(e) {
-					  e.stop();
-					  var changeAnsReq = new MBB.req('changeans.php', function(response) {
-					    //Nothing to do here?
-					  });
-					  changeAnsReq.get($merge(params,{'opid':this.name}));
+						e.stop();
+						if(MBB.textValidate(this)) {
+					  		var changeAnsReq = new MBB.req('changeans.php', function(response) {
+								//Nothing to do here?
+							});
+							changeAnsReq.get($merge(params,{'opid':this.name,'label':this.value}));
+						}
 					};
 					var deleteAnswer = function(e) {
 						e.stop();
