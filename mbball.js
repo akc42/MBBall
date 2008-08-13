@@ -322,6 +322,13 @@ var MBBAdmin = new Class({
 					    	changeAnsReq.get($merge(params,{'opid':this.value}));
 						}
 					};
+					var changeAnswer = function(e) {
+					  e.stop();
+					  var changeAnsReq = new MBB.req('changeans.php', function(response) {
+					    //Nothing to do here?
+					  });
+					  changeAnsReq.get($merge(params,{'opid':this.name}));
+					};
 					if(params.rid != 0) {
 						MBB.adjustDates(div);
 						elAns =$('answer');
