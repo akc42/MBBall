@@ -219,8 +219,14 @@ var MBBAdmin = new Class({
 				//We only want to do this if there is a competition to get
 				MBB.adjustDates(div);
 				// Validate competition Details and Change Dates to seconds since 1970
-				$('compform').addEvent('submit', function(e) {
+				//if anything in the form changes then submit automatically
+				div.getElements('input').extend(div.getElements('select')).extend(div.getElements('textarea')).addEvent('change', function(e) {
 					e.stop();
+					if(this.id =='bbapproval') {
+						$$('#registered input.bbapprove').each(function (item) {
+							item.readOnly = !e.target.checked;
+						});
+					}
 					var validated = true;
 					if(!MBB.parseDate($('playoffdeadline'))) {
 						validated = false;
