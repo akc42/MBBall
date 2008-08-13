@@ -503,16 +503,13 @@ var MBBAdmin = new Class({
 								mpReq.get({'cid':params.cid,'tid':this.name,'mp':this.checked});
 							};
 							var makeTeam = function(team) {
-								var div = new Element('div',{'events':{
-									'click':teamClicked,
-									'mousedown':dragStart
-								}});
+								var div = new Element('div',{'id':'T'+team});
 								var input = new Element('input',
 									{'type':'checkbox','name':team,'events':{'change':changeMpStatus}}
 								).inject(div);
 								var span = new Element('span',{
 									'class':'tid',
-									'events': {'click':tnicClicked},
+									'events': {'click':teamClicked},
 									'text':team
 								}).inject(div);
 								return div;
