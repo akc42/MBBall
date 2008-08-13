@@ -506,10 +506,6 @@ var MBBAdmin = new Class({
 							e.stop();
 							var createReq = new MBB.req('createround.php',function(response) {
 								maxround++;
-								if(params.rid == 0) {
-									params.rid = response.rid;
-									owner.competition.rounds.round.loadPage(params);
-								}
 								owner.competition.rounds.loadPage(params);
 							});
 							createReq.post($('createroundform'));
