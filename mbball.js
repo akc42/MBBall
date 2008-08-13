@@ -200,12 +200,7 @@ var MBBAdmin = new Class({
 			});
 			$('createform').addEvent('submit', function(e) {
 				e.stop();
-				var desc = $('desc');
-				if(desc.value == '') {
-					desc.addClass('error');
-					desc.value= 'Please specify a Title for the Competition'
-				} else {
-					desc.removeClass('error');
+				if(MBB.textValidate($('desc'))) {
 					var createReq = new MBB.req('createcomp.php', function(response) {
 						if (params.cid == 0) {
 							params.cid = response.cid;
