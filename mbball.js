@@ -250,6 +250,67 @@ var MBBAdmin = new Class({
 				//Initialise to click on a round to load single round
 				this.round = new MBB.subPage(this,'round.php',$('round'),function(div) {
 					var answer;
+					var noopts;
+					
+					var setMatchEvents = function (div) {
+						div.getElements('input').extend(div.getElements('textarea')).addEvent('change', function(e) {
+							var validated = true;
+							var surroundDiv = this.getParent();
+							if(surroundDiv.hasClass('mtime') && !MBB.parseDate(this)){
+								validated = false;
+							}
+							if(surroundDiv.hasClass('.csscore') 
+									|| surroundDiv.hasClass('hscore') 
+									|| surroundDiv.hasClass('ascore')) {
+								if(!MBB.intValidate(this)) {
+									validated = false;
+								}
+							}
+							if (validated) {
+								var updateReq = new MBB.req('updatematch.php',function(response) {
+									MBB.adjustDates(div);
+									//Should not be necessary to update page
+								});
+								updateReq.post(e.target.getParents('form')[0]);
+							} else {
+								//If we failed to validate we need to adjust dates back
+								MBB.adjustDates(div);
+							}
+						});
+						div.getElement('.hid').addEvent('click',function(e) {
+							e.stop();
+							// switch aid/hid over
+							var switchReq = new MBB.req('switchhid.php',function(response){
+								div.getElement('input[name=hid]').value = response.hid;
+								div.getElement('input[name=aid]').value = response.aid;
+								e.target.getFirst().set('text') = response.hid;
+								e.target.getNext().getFirst().set('text') = response.aid;
+							});
+							switchReq.get($merge(params,{'hid':this.getElement('span').get('text')}));
+							
+						});
+						div.getElement('.aid').addEvent('click',function(e) {
+							e.stop();
+							var removeaidReq = new MBB.req('removeaid.php',function(response){
+							// remove aid from match
+							  div.getElement('input[name=aid]').value = '';
+							  e.target.getNext().getFirst().set('text') = '';
+							  $('T'+response.aid).removeClass('inmatch');
+							});
+							removeaidReq.get($merge(params,{'hid':div.getElement('input[name=hid]').value}))
+						});
+						div.getElement('.del').addEvent('click',function(e) {
+						  e.stop(); 
+							if(confirm('This will delete the match.  Are you sure?')) {
+								var deleteReq = new MBB.req('deletematch.php',function(response) {
+									div.dispose();
+									$('T'+response.hid).removeClass('inmatch');
+									$('T'+response.aid).removeClass('inmatch');
+								});
+								deleteReq.get($merge(params,{'hid':div.getElement('input[name=hid]').value}));
+							}
+						});
+					};
 					if(params.rid != 0) {
 						MBB.adjustDates(div);
 						elAns =$('answer');
@@ -391,7 +452,7 @@ var MBBAdmin = new Class({
 							});
 						}
 					});
-					this.matches.loadPage(params);
+					this.matches.loadPage($merge(params,{'ou':$('ou').checked }));
 					this.options.loadPage($merge(params,{'answer':answer}));
 					this.teams.loadPage(params);
 				});
