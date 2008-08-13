@@ -424,6 +424,7 @@ var MBBAdmin = new Class({
 											new Element('input',{
 												'type':'radio',
 												'name':'option',
+												'class':'option_select',
 												'value':response.opid,
 												'events':{'change':changeSelectedAnswer}
 											})
@@ -466,12 +467,16 @@ var MBBAdmin = new Class({
 					this.options = new MBB.subPage(this,'options.php',$('options'),function(div) {
 						if (params.cid != 0 && params.rid != 0) {
 							noopts = $('noopts').value.toInt();
-							if (noopts != 0) $('answer').readOnly = true;
-							div.getElements('input[name=option]').addEvent('change',changeSelectedAnswer)
-								.getParent().getNext().getFirst().addEvent('change',changeAnswer)
-								.getParent().getNext().getFirst().addEvent('click',deleteAnswer);
+							if (noopts != 0) {
+								$('answer').readOnly = true;
+								$('nullanswer').addEvent('change',changeSelectedAnswer);
+								var of = $('optionform');
+								of.getElements('.option_select').addEvent('change',changeSelectedAnswer);
+								of.getElements('.option_input').addEvent('change',changeAnswer);
+								of.getElements('.del').addEvent('click',deleteAnswer);
+							}
 						}
-					})
+					});
 					this.teams = new MBB.subPage(this,'teams.php',$('teams'),function (div) {
 						if (params.cid != 0) {
 							var lock = $('lock');

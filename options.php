@@ -39,7 +39,7 @@ if($rid != 0 && $cid !=0) {
 	$opid = $row['opid'];
 	$noopts = max($noopts,$opid);
 ?>	<tr>
-	  <td><input type="radio" value="<?php echo $opid ;?>" name="option" <?php if($opid == $_GET['answer']) echo 'checked';?> /></td>
+	  <td><input type="radio" value="<?php echo $opid ;?>" name="option" <?php if($opid == $_GET['answer']) echo 'checked';?> class="option_select"/></td>
 	  <td><input type="text" name="<?php echo $opid; ?>" value="<?php echo $row['label'];?>" class="option_input"/></td>
 	  <td><div id="<?php echo 'O'.$opid; ?>" class="del"></div></td>
 	</tr>
