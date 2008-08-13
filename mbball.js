@@ -443,8 +443,8 @@ var MBBAdmin = new Class({
 							var tnicClicked;
 							var teamClicked = function (e) {
 								e.stop();
+								var team = this;
 								if(!lock.checked) {
-									var team = this;
 									var remTiC = new MBB.req('remtic.php', function (response) {
 										var div = new Element('div',{'id':'S'+response.tid});
 										var span = new Element('span',{
