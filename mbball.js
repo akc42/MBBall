@@ -374,6 +374,9 @@ var MBBAdmin = new Class({
 							if (!MBB.intValidate(elAns)) {
 								validated = false;
 							}
+							if (!MBB.textValidate($('rname'))) {
+								validated = false;
+							}
 							if(validated) {
 								var updateReq = new MBB.req('updateround.php', function(response) {
 									MBB.adjustDates(div);
