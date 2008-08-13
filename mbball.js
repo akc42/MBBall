@@ -418,6 +418,12 @@ var MBBAdmin = new Class({
 					}
 					//Initialise Round Data Form
 					this.matches = new MBB.subPage(this,'matches.php',$('matches'),function (div) {
+						if (params.cid !=0 && params.rid != 0) {
+							MBB.adjustDates(div);
+							div.getElements('.match').each(function(match) {
+								setMatchEvents(match);
+							});
+						}
 					});
 					this.options = new MBB.subPage(this,'options.php',$('options'),function(div) {
 					})
