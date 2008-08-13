@@ -311,6 +311,17 @@ var MBBAdmin = new Class({
 							}
 						});
 					};
+					var changeSelectedAnswer = function(e) {
+					  //called when an option has been selected as the correct answer
+						e.stop();
+						if(this.checked) {
+							var changeAnsReq = new MBB.req('changeselans.php', function(response) {
+					      	answer = response.answer;
+					      	$('answer').value = answer;
+							});
+					    	changeAnsReq.get($merge(params,{'opid':this.value}));
+						}
+					};
 					if(params.rid != 0) {
 						MBB.adjustDates(div);
 						elAns =$('answer');
