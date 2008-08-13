@@ -112,8 +112,8 @@ MBB = function() {
 	},
 	textValidate: function(el) {
 	  el.removeClass('error');
-	  if(el.value = '') {
-	  	el.addClass('.error');
+	  if(el.value == '') {
+	  	el.addClass('error');
         return false;
      }      
 	  return true;
