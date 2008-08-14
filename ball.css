@@ -203,6 +203,8 @@ div.del:hover, div.del:active {background-position:left bottom;}
 }
 
 #matches {
+	width:772px;
+	padding:0px;
 	vertical-align:top;
 	background-color:#CCEDFF;
 }
@@ -294,7 +296,7 @@ table.layout table.form td.submit{width:8em; text-align:center;background-color:
 
 .inmatch {background-color:red;}
 
-div.match {width:181px;border:2px solid black; padding:2px;background-color:red; float:left;}
+div.match {width:181px;border:2px solid black; padding:2px;background-color:red; float:left;margin:2px;}
 div.match div {padding:1px;}
 div.match div.del {margin-left:2px;}
 div.match span {background-color:white; border:1px inset black;vertical-align:center; }

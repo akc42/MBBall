@@ -45,7 +45,7 @@ if (dbNumRows($result) != 0) {
 	if(isset($_POST['comment'])) {
 		$sql .= ', comment = '.dbPostSafe($_POST['comment']);
 	}else {
-		$sql .= ', hscore = NULL';
+		$sql .= ', comment = NULL';
 	}
 	$sql .= ' WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' AND hid = '.dbMakeSafe($hid).';';
 	dbQuery($sql);

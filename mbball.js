@@ -256,30 +256,23 @@ var MBBAdmin = new Class({
 						div.getElements('input').extend(div.getElements('textarea')).addEvent('change', function(e) {
 							var validated = true;
 							var surroundDiv = this.getParent();
-							if(surroundDiv.hasClass('mtime') && !MBB.parseDate(this)){
-								validated = false;
-							}
-							if(surroundDiv.hasClass('.csscore') 
+							if(surroundDiv.hasClass('.csscore')
 									|| surroundDiv.hasClass('hscore') 
 									|| surroundDiv.hasClass('ascore')) {
 								if(!MBB.intValidate(this)) {
 									validated = false;
 								}
 							}
+							// We need to always validate the date - so it gets converted to the correct serial number
+							if(!MBB.parseDate(div.getElement('input[name=mtime]'))) {
+								validated = false;
+							}
 							if (validated) {
 								var updateReq = new MBB.req('updatematch.php',function(response) {
 									MBB.adjustDates(div);
 									//Should not be necessary to update page
 								});
-								var form;
-								switch(this.name) {
-									case 'open':
-										form = surroundDiv.getParent().getParent();
-										break;
-									default:
-										form = surroundDiv.getParent();
-								}
-								updateReq.post(form);
+								updateReq.post(div.getElement('form'));
 							} else {
 								//If we failed to validate we need to adjust dates back
 								MBB.adjustDates(div);

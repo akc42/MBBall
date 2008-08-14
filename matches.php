@@ -14,7 +14,7 @@ if($rid != 0 && $cid !=0) {
 	define ('BALL',1);   //defined so we can control access to some of the files.
 	require_once('db.php');
 
-	$result = dbQuery('SELECT * FROM match WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' ;');
+	$result = dbQuery('SELECT * FROM match WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' ORDER BY hid ;');
 	while($row = dbFetchRow($result)) {
 
 ?><div class="match">
