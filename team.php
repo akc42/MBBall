@@ -16,9 +16,14 @@ while($row = dbFetchRow($result)) {
 dbFree($result);
 
 
+
 $teams = array(array());
 $sizes = array(array());
-
+foreach($confs as $confid => $conference) {
+	foreach($divs as $divid => $division) {
+		$sizes[$confid][$divid] = 0;
+	}
+} 
 // It would be good to have a set of team names. 
 $sql = 'SELECT *  FROM team_in_competition t JOIN team USING (tid)'; 
 $sql .= ' WHERE t.cid = '.dbMakeSafe($cid).' ORDER BY confid,divid,tid;';
@@ -32,11 +37,7 @@ if(dbNumRows($result) > 0 ) {
 		$pick['url']=$row['url'];
 		$pick['mp'] = ($row['made_playoff'] == 't');
 		$teams[$row['confid']][$row['divid']][] = $pick;
-		if (isset($sizes[$row['confid']][$row['divid']])) {
-			$sizes[$row['confid']][$row['divid']]++;
-		} else {
-			$sizes[$row['confid']][$row['divid']] = 1;
-		}
+		$sizes[$row['confid']][$row['divid']]++;
 	}
 }
 dbFree($result);

@@ -175,6 +175,7 @@ way to fit your requirements.
 table.layout table td.in_po {background-color:#99FF99;}
 
 span.in_po {font-size:0.6em;}
+td p.no_team {background-color:#CCFFFF;}
 
 /* mainly administration stuff below here */
 div.del {
