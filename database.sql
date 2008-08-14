@@ -99,6 +99,20 @@ COMMENT ON COLUMN match.combined_score IS 'Value of Combined Score for an over/u
 COMMENT ON COLUMN match.open IS 'True if Match is set up and ready';
 COMMENT ON COLUMN match.match_time IS 'Time match is due to be played';
 
+CREATE TABLE option (
+    cid integer NOT NULL,
+    rid integer NOT NULL,
+    opid integer NOT NULL,
+    label character varying
+);
+
+COMMENT ON TABLE option IS 'Holds one possible answer to the round question';
+
+COMMENT ON COLUMN option.cid IS 'Competition ID';
+COMMENT ON COLUMN option.rid IS 'Round ID';
+COMMENT ON COLUMN option.opid IS 'Option ID';
+COMMENT ON COLUMN option.label IS 'Simple Label for this option';
+
 CREATE TABLE option_pick (
     uid integer NOT NULL,
     comment text,
@@ -114,6 +128,20 @@ COMMENT ON COLUMN option_pick.cid IS 'Competition ID';
 COMMENT ON COLUMN option_pick.rid IS 'Round ID';
 COMMENT ON COLUMN option_pick.opid IS 'ID of Question Option Selected as Correct if multichoice, else value of answer (only if multichoice)';
 COMMENT ON COLUMN option_pick.submit_time IS 'Time of Submission';
+
+CREATE TABLE participant (
+    uid integer NOT NULL,
+    name character varying,
+    email character varying,
+    last_logon bigint DEFAULT 0 NOT NULL,
+    admin_experience boolean DEFAULT false NOT NULL,
+    is_bb boolean DEFAULT false NOT NULL
+);
+
+COMMENT ON TABLE participant IS 'forum user who will participate in one or more competitions';
+COMMENT ON COLUMN participant.last_logon IS 'last time user connected';
+COMMENT ON COLUMN participant.admin_experience IS 'Set true if user has ever been administrator';
+COMMENT ON COLUMN participant.is_bb IS 'user is a baby backup';
 
 CREATE TABLE pick (
     uid integer NOT NULL,
@@ -170,35 +198,6 @@ COMMENT ON COLUMN round.value IS 'Value given for a correct pick or answer';
 COMMENT ON COLUMN round.name IS 'Name of the Round';
 COMMENT ON COLUMN round.ou_round IS 'set if over underscores are requested for this round';
 COMMENT ON COLUMN round.deadline IS 'Deadline for submitting answers to bonus questions';
-
-
-CREATE TABLE option (
-    cid integer NOT NULL,
-    rid integer NOT NULL,
-    opid integer NOT NULL,
-    label character varying(14)
-);
-
-COMMENT ON TABLE option IS 'Holds one possible answer to the round question';
-
-COMMENT ON COLUMN option.cid IS 'Competition ID';
-COMMENT ON COLUMN option.rid IS 'Round ID';
-COMMENT ON COLUMN option.opid IS 'Option ID';
-COMMENT ON COLUMN option.label IS 'Simple Label for this option';
-
-CREATE TABLE participant (
-    uid integer NOT NULL,
-    name character varying,
-    email character varying,
-    last_logon bigint DEFAULT 0 NOT NULL,
-    admin_experience boolean DEFAULT false NOT NULL,
-    is_bb boolean DEFAULT false NOT NULL
-);
-
-COMMENT ON TABLE participant IS 'forum user who will participate in one or more competitions';
-COMMENT ON COLUMN participant.last_logon IS 'last time user connected';
-COMMENT ON COLUMN participant.admin_experience IS 'Set true if user has ever been administrator';
-COMMENT ON COLUMN participant.is_bb IS 'user is a baby backup';
 
 CREATE TABLE team (
     tid character(3) NOT NULL,
