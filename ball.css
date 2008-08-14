@@ -272,14 +272,16 @@ height: 56px;
 }
 /**/
 
-caption {font-size:normal; font-weight:bold;}
+caption,#picks h1 {font-size:small; font-weight:bold;text-align:center;}
+
 table.layout table td {
 	background-color:white;
 	border:1px solid #CCCCFF;
 }
 
 table.layout table.form td, table.layout td {background-color:#FFFFCC;}
-th {font-size:x-small;font-weight:normal;}
+table.layout table.form th, table.layout th, table.layout td.conference {background-color:#4A7DB5;color:#EFEFEF}
+table.layout td.conference , th {font-size:x-small;font-weight:normal;}
 td, div {padding:2px;}
 
 .ctitle {width:160px;}

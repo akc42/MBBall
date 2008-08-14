@@ -24,7 +24,7 @@ foreach($divs as $division) {
 foreach($confs as $confid => $conference) {
 	$no_of_rows = max($sizes[$confid]);
 ?>		<tr>
-			<td colspan="2" rowspan="<?php echo ($no_of_rows == 0)?1:$no_of_rows;?>"><?php echo $conference;?></td>
+			<td class="conference" colspan="2" rowspan="<?php echo ($no_of_rows == 0)?1:$no_of_rows;?>"><?php echo $conference;?></td>
 <?php
 	if($no_of_rows != 0) {
 		for ($i = 0; $i < $no_of_rows;$i++) {
