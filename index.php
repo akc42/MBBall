@@ -272,26 +272,26 @@ if(in_array(SMF_FOOTBALL,$groups)) {
 		<tbody>
 <?php
 if($registered && $rid !=0) {
-?>			<tr><td colspan="4"><div id="registered"><?php require_once('userpick.php');?></div></td></tr>
+?>			<tr><td colspan="2"><div id="registered"><?php require_once('userpick.php');?></div></td></tr>
 <?php
 }
 if($registration_allowed) {
 ?>			<tr>
-				<td colspan="3"><div id="summary"><?php require_once ('summary.php');?></div></td>
+				<td><div id="summary"><?php require_once ('summary.php');?></div></td>
 				<td id="r"><div id="registration"><?php require_once ('registration.php');?></div></td>
 			</tr>
 <?php
 } else {
-?>			<tr><td colspan="4"><div id="summary"><?php require_once ('summary.php');?></div></td></tr>
+?>			<tr><td colspan="2"><div id="summary"><?php require_once ('summary.php');?></div></td></tr>
 <?php
 }
-?>			<tr><td colspan="4"><div id="picks"><?php require_once('picks.php');?></div></td></tr>
+?>			<tr><td colspan="2"><div id="picks"><?php require_once('picks.php');?></div></td></tr>
 <?php
 if ($playoff_deadline != 0) {
-?>			<tr><td colspan="4"><div id="popicks"><?php //require('playoff.php');?></div></td></tr>
+?>			<tr><td colspan="2"><div id="popicks"><?php //require('playoff.php');?></div></td></tr>
 <?php
 }
-?>			<tr><td colspan="4"><div id="tics"><?php require_once('tic.php');?></div></td></tr>
+?>			<tr><td colspan="2"><div id="tics"><?php require_once('tic.php');?></div></td></tr>
 		</tbody>
 	</table>	
 	<div id="copyright"><hr />MBball <span id="version"></span> &copy; 2008 Alan Chandler.  Licenced under the GPL</div>
