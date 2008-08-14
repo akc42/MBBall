@@ -28,11 +28,11 @@ if (dbNumRows($result) == 0) {
      <div class="aid"><span>---</span></div>
      <div class="open"><label><input type="checkbox" name="open" />Open</label></div>
      <div class="del"></div>
-     <div class="hscore"><input type="text" /></div>
-  <div class="ascore"><input type="text" /></div>
-  <div class="cscore"><input type="text"  /></div>
-  <div class="mtime"><input type="text" class="time" /></div>
-  <div class="comment"><textarea></textarea></div>
+     <div class="hscore"><input type="text" name="hscore"/></div>
+  <div class="ascore"><input type="text" name="ascore"/></div>
+  <div class="cscore"><input type="text" name="cscore" /></div>
+  <div class="mtime"><input type="text" name="mtime" class="time" /></div>
+  <div class="comment"><textarea name="comment"></textarea></div>
 </form> 
 <div class="clear"></div>
 <?php

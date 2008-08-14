@@ -14,15 +14,16 @@ $hid=$_GET['hid'];
 
 dbQuery('BEGIN ;');
 $result=dbQuery('SELECT * FROM match WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' AND hid = '.dbMakeSafe($hid).';');
-if ($row=dbFetchRow($result) && !is_null($row['aid'])) {
-  $aid = $hid
-  $hid = $row['aid']
-  
-  dbQuery('UPDATE MATCH SET hid = aid, aid = hid WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' AND hid = '.dbMakeSafe($hid).';');
-  dbQuery('COMMIT ;');
-  echo '{"cid":'.$cid.',"rid":'.$rid.',"hid":'.$hid.',"aid":'.$aid.'}';
+$row=dbFetchRow($result);
+if ($row && !is_null($row['aid'])) {
+	dbQuery('UPDATE match SET hid = aid, aid = hid WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' AND hid = '.dbMakeSafe($hid).';');
+	$aid = $hid;
+	$hid = $row['aid'];
+	dbQuery('COMMIT ;');
+	echo '{"cid":'.$cid.',"rid":'.$rid.',"hid":"'.$hid.'","aid":"'.$aid.'"}';
 } else {
-  echo '<p>Match doesn't exist or has null aid</p>';
+?><p>Match doesn't exist or has null aid</p>
+<?php
 	dbQuery('ROLLBACK ;');
 }
 dbFree($result);

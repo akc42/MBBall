@@ -307,6 +307,9 @@ div.match .hid, div.match .aid {
 	background-color:#ddd;
 	text-align:center;
 	padding:2px 1px 1px 1px;}
+div.match .hid span, div.match .aid span {
+	cursor:pointer;
+}
 div.match .hscore , div.match .ascore,div.match .cscore {
 	float:left;
 	border:1px solid blue;

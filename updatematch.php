@@ -1,7 +1,5 @@
 <?php
-if(!(isset($_POST['uid']) && isset($_POST['pass'])  && isset($_POST['cid']) && isset($_POST['rid']) && isset($_POST['hid'])
-	&& isset($_POST['aid']) && isset($_POST['open']) && isset($_POST['hscore']) && isset($_POST['ascore']) 
-     && isset($_POST['cscore']) && isset($_POST['mtime']) && isset($_POST['comment']) ))
+if(!(isset($_POST['uid']) && isset($_POST['pass'])  && isset($_POST['cid']) && isset($_POST['rid']) && isset($_POST['hid']) ))
 	die('Hacking attempt - wrong parameters');
 $uid = $_POST['uid'];
 $password = $_POST['pass'];
@@ -9,37 +7,54 @@ if ($password != sha1("Football".$uid))
 	die('Hacking attempt got: '.$password.' expected: '.sha1("Football".$uid));
 define ('BALL',1);   //defined so we can control access to some of the files.
 require_once('db.php');
+$cid=$_POST['cid'];
+$rid=$_POST['rid'];
+$hid=$_POST['hid'];
 
+dbQuery('BEGIN ;');
 
-$sql = 'UPDATE match SET name = '.dbPostSafe($_POST['rname']).', value = '.dbMakeSafe($_POST['value']);
-$sql .= ', deadline = '.dbMakeSafe($_POST['deadline']); 
-if (isset($_POST['open'])) {
-	$sql .= ', open = TRUE';
-} else {
-	$sql .= ', open = FALSE';
-}
-if (isset($_POST['ou'])) {
-	$sql .= ', ou_round = TRUE';
-} else {
-	$sql .= ', ou_round = FALSE';
-}
-if (isset($_POST['validquestion'])) {
-	$sql .= ', valid_question = TRUE';
-	if(isset($_POST['answer'])) {
-		$sql .= ', answer ='.dbMakeSafe($_POST['answer']);
+$result=dbQuery('SELECT * FROM match WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' AND hid = '.dbMakeSafe($hid).';');
+
+if (dbNumRows($result) != 0) {
+	$sql = 'UPDATE match SET';
+	if(isset($_POST['open'])) {
+		$sql .= ' open = TRUE';
 	} else {
-		$sql .= ', answer = NULL';
+		$sql .= ' open = FALSE';
 	}
-} else {
-	$sql .= ', valid_question = FALSE, answer = NULL';
-}
-if(isset($_POST['question'])) {
-	$sql .= ', question = '.dbPostSafe($_POST['question']);
-} else {
-	$sql .= ', question = \'\'';
-}
+	if(isset($_POST['hscore'])) {
+		$sql .= ', hscore = '.dbMakeSafe($_POST['hscore']);
+	}else {
+		$sql .= ', hscore = NULL';
+	}
+	if(isset($_POST['ascore'])) {
+		$sql .= ', ascore = '.dbMakeSafe($_POST['ascore']);
+	}else {
+		$sql .= ', ascore = NULL';
+	}
+	if(isset($_POST['cscore'])) {
+		$sql .= ', combined_score = '.dbMakeSafe($_POST['cscore']);
+	}else {
+		$sql .= ', combined_score = NULL';
+	}
+	if(isset($_POST['mtime'])) {
+		$sql .= ', match_time = '.dbMakeSafe($_POST['mtime']);
+	}else {
+		$sql .= ', match_time = NULL';
+	}
+	if(isset($_POST['comment'])) {
+		$sql .= ', comment = '.dbPostSafe($_POST['comment']);
+	}else {
+		$sql .= ', hscore = NULL';
+	}
+	$sql .= ' WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' AND hid = '.dbMakeSafe($hid).';';
+	dbQuery($sql);
+	dbQuery('COMMIT ;');
+	echo '{"cid":'.$cid.',"rid":'.$rid.',"hid":"'.$hid.'"}';
 
-$sql .= ' WHERE cid = '.dbMakeSafe($_POST['cid']).' AND rid = '.dbMakeSafe($_POST['rid']).';';
-dbQuery($sql);
-
-echo '{"cid":'.$_POST['cid'].',"rid":'.$_POST['rid'].'}';
+} else {
+?><p>Match does not exist</p>
+<?php
+	dbQuery('ROLLBACK;');
+}
+dbFree($result);

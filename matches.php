@@ -18,7 +18,7 @@ if($rid != 0 && $cid !=0) {
 	while($row = dbFetchRow($result)) {
 
 ?><div class="match">
-     <form action="#" >
+     <form  action="#" >
      <input type="hidden" name="uid" value="<?php echo $uid;?>" />
      <input type="hidden" name="pass" value="<?php echo $password;?>" />
 		<input type="hidden" name="cid" value="<?php echo $cid;?>"/>
@@ -32,19 +32,19 @@ if($rid != 0 && $cid !=0) {
 					</div>
 					<div class="del"></div>
 					<div class="hscore">
-		<input type="text" value="<?php echo $row['hscore'];?>"/>
+		<input type="text" name="hscore" value="<?php echo $row['hscore'];?>"/>
 					</div>
 					<div class="ascore">
-		<input type="text" value="<?php echo $row['ascore'];?>"/>
+		<input type="text" name="ascore" value="<?php echo $row['ascore'];?>"/>
 					</div>
 					<div class="cscore">
-		<input type="text" value="<?php echo $row['combined_score'];?>" <?php if($_GET['ou'] != 'true') echo 'disabled';?> />
+		<input type="text" name="cscore" value="<?php echo $row['combined_score'];?>" <?php if($_GET['ou'] != 'true') echo 'disabled';?> />
 					</div>
 					<div class="mtime">
-		<input type="text" class="time" value="<?php echo $row['match_time'];?>" />
+		<input type="text" class="time" name="mtime" value="<?php echo $row['match_time'];?>" />
 					</div>
 					<div class="comment">
-		<textarea><?php echo $row['comment'];?></textarea>
+		<textarea name="comment"><?php echo $row['comment'];?></textarea>
 					</div>
 	</form> 
 	<div class="clear"></div>

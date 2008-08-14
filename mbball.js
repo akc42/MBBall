@@ -271,7 +271,15 @@ var MBBAdmin = new Class({
 									MBB.adjustDates(div);
 									//Should not be necessary to update page
 								});
-								updateReq.post(e.target.getParents('form')[0]);
+								var form;
+								switch(this.name) {
+									case 'open':
+										form = surroundDiv.getParent().getParent();
+										break;
+									default:
+										form = surroundDiv.getParent();
+								}
+								updateReq.post(form);
 							} else {
 								//If we failed to validate we need to adjust dates back
 								MBB.adjustDates(div);
@@ -280,24 +288,30 @@ var MBBAdmin = new Class({
 						div.getElement('.hid').addEvent('click',function(e) {
 							e.stop();
 							// switch aid/hid over
-							var switchReq = new MBB.req('switchhid.php',function(response){
-								div.getElement('input[name=hid]').value = response.hid;
-								div.getElement('input[name=aid]').value = response.aid;
-								e.target.getFirst().set('text') = response.hid;
-								e.target.getNext().getFirst().set('text') = response.aid;
-							});
-							switchReq.get($merge(params,{'hid':this.getElement('span').get('text')}));
-							
+							var aid = div.getElement('input[name=aid]');
+							if(aid.value != null && aid.value != '' ) {
+								// Can only switch if aid exists
+								var switchReq = new MBB.req('switchhid.php',function(response){
+									div.getElement('input[name=hid]').value = response.hid;
+									aid.value = response.aid;
+									e.target.set('text',response.hid);
+									div.getElement('.aid').getFirst().set('text',response.aid);
+								});
+								switchReq.get($merge(params,{'hid':this.getElement('span').get('text')}));
+							}
 						});
 						div.getElement('.aid').addEvent('click',function(e) {
 							e.stop();
-							var removeaidReq = new MBB.req('removeaid.php',function(response){
-							// remove aid from match
-							  div.getElement('input[name=aid]').value = '';
-							  e.target.getNext().getFirst().set('text') = '';
-							  $('T'+response.aid).removeClass('inmatch');
-							});
-							removeaidReq.get($merge(params,{'hid':div.getElement('input[name=hid]').value}))
+							var aid = div.getElement('input[name=aid]');
+							if(aid.value != null && aid.value != '' ) {
+								var removeaidReq = new MBB.req('removeaid.php',function(response){
+								// remove aid from match
+									aid.value = null;
+									e.target.set('text','---');
+									$('T'+response.aid).removeClass('inmatch');
+								});
+								removeaidReq.get($merge(params,{'hid':div.getElement('input[name=hid]').value}));
+							}
 						});
 						div.getElement('.del').addEvent('click',function(e) {
 						  e.stop(); 
@@ -335,12 +349,14 @@ var MBBAdmin = new Class({
 					var deleteAnswer = function(e) {
 						e.stop();
 						var deleteAnsReq = new MBB.req('deleteans.php', function(response) {
-							if(--noopts <= 0) {
-							// No more options left - so we are back to the traditional answer
-								$('nullanswer').getParents('tr').dispose();
+							e.target.getParent().getParent().dispose();
+							var nullAnsRow = $('nullanswer').getParent().getParent();
+							if(nullAnsRow.getNext() == null) {
+								nullAnsRow.dispose();
 								$('answer').readOnly = false;
 								$('answer').value = '';
 								answer = 0;
+								noopts = 0;
 							} else {
 								if (response.opid == answer) {
 									$('nullanswer').checked = true;
@@ -348,8 +364,8 @@ var MBBAdmin = new Class({
 									answer = 0;
 								}
 							}
-							e.target.getParents('tr').dispose();
 						});
+						deleteAnsReq.get($merge(params,{'opid':this.get('id').substr(1).toInt()}));
 					};
 					if(params.rid != 0) {
 						MBB.adjustDates(div);

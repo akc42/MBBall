@@ -15,12 +15,13 @@ $aid=$_GET['aid'];
 
 dbQuery('BEGIN ;');
 $result=dbQuery('SELECT * FROM match WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' AND hid = '.dbMakeSafe($hid).';');
-if ($row = dbFetchRow($result) && is_null($row['aid'])) {
+$row = dbFetchRow($result);
+
+if ($row && is_null($row['aid'])) {
   dbQuery('UPDATE  match  SET aid = '.dbMakeSafe($aid).' WHERE cid = '.dbMakeSafe($cid).' AND rid = '
                     .dbMakeSafe($rid).' AND hid = '.dbMakeSafe($hid).';');
   dbQuery('COMMIT ;');
     echo '{"cid":'.$cid.',"rid":'.$rid.',"hid":"'.$hid.'","aid":"'.$aid.'"}';
-  
 } else {
 ?><p>Match doesn\'t exist or Away Team already Assigned</p>
 <?php

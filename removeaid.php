@@ -11,10 +11,10 @@ require_once('db.php');
 $cid=$_GET['cid'];
 $rid=$_GET['rid'];
 $hid=$_GET['hid'];
-
 dbQuery('BEGIN ;');
 $result=dbQuery('SELECT * FROM match WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' AND hid = '.dbMakeSafe($hid).';');
-if ($row = dbFetchRow($result) && !is_null($row['aid'])) {
+$row = dbFetchRow($result);
+if ($row && !is_null($row['aid'])) {
   dbQuery('UPDATE  match  SET aid = NULL WHERE cid = '.dbMakeSafe($cid).' AND rid = '
                     .dbMakeSafe($rid).' AND hid = '.dbMakeSafe($hid).';');
   dbQuery('COMMIT ;');
