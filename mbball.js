@@ -410,7 +410,7 @@ var MBBAdmin = new Class({
 						// if user clicks on create option area we need to create an option
 						$('option').addEvent('click', function(e) {
 							e.stop();
-							if (noopts) { //if set option page must have loaded
+							if (typeof(noopts) == 'number' ) { //if set option page must have loaded
 								var newOptionReq = new MBB.req('createoption.php', function(response) {
 									$('answer').readOnly = true;
 									if (noopts == 0) {
