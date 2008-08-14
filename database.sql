@@ -1,5 +1,11 @@
-COMMENT ON DATABASE melindas_ball IS 'Melindas Backups Football Pool Competitions Database';
 
+-- Copyright (c) 2008 Alan Chandler - Licenced under the GPL, See COPYING.txt in this directory
+
+--
+-- Database version 3 (See copy of data to default_competition below)
+--
+
+COMMENT ON DATABASE melindas_ball IS 'Melindas Backups Football Pool Competitions Database';
 
 SET search_path = public, pg_catalog;
 
@@ -136,45 +142,11 @@ CREATE TABLE registration (
     bb_approved boolean DEFAULT false NOT NULL
 );
 
-
---
--- Name: TABLE registration; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON TABLE registration IS 'Record of users registerd with a competition';
-
-
---
--- Name: COLUMN registration.uid; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN registration.uid IS 'User ID';
-
-
---
--- Name: COLUMN registration.cid; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN registration.cid IS 'Competition ID';
-
-
---
--- Name: COLUMN registration.agree_time; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN registration.agree_time IS 'Time Agreed to Competition Conditions';
-
-
---
--- Name: COLUMN registration.bb_approved; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN registration.bb_approved IS 'Set if BB has been approved to play';
-
-
---
--- Name: round; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
---
 
 CREATE TABLE round (
     rid integer NOT NULL,
@@ -188,74 +160,15 @@ CREATE TABLE round (
     deadline bigint
 );
 
-
---
--- Name: TABLE round; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON TABLE round IS 'Round in Competition';
-
-
---
--- Name: COLUMN round.rid; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN round.rid IS 'Round Number';
-
-
---
--- Name: COLUMN round.cid; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN round.cid IS 'Competition ID';
-
-
---
--- Name: COLUMN round.question; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN round.question IS 'Bonus Question Text';
-
-
---
--- Name: COLUMN round.valid_question; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN round.valid_question IS 'Set once a valid bonus question has been set up';
-
-
---
--- Name: COLUMN round.answer; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN round.answer IS 'If not null an answer to a numeric question or opid of mutichoice question';
-
-
---
--- Name: COLUMN round.value; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN round.value IS 'Value given for a correct pick or answer';
-
-
---
--- Name: COLUMN round.name; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN round.name IS 'Name of the Round';
-
-
---
--- Name: COLUMN round.ou_round; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN round.ou_round IS 'set if over underscores are requested for this round';
-
-
---
--- Name: COLUMN round.deadline; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN round.deadline IS 'Deadline for submitting answers to bonus questions';
 
 
@@ -266,46 +179,12 @@ CREATE TABLE option (
     label character varying(14)
 );
 
-
-
---
--- Name: TABLE option; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON TABLE option IS 'Holds one possible answer to the round question';
 
-
---
--- Name: COLUMN option.cid; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN option.cid IS 'Competition ID';
-
-
---
--- Name: COLUMN option.rid; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN option.rid IS 'Round ID';
-
-
---
--- Name: COLUMN option.opid; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN option.opid IS 'Option ID';
-
-
---
--- Name: COLUMN option.label; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN option.label IS 'Simple Label for this option';
-
-
---
--- Name: participant; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
---
 
 CREATE TABLE participant (
     uid integer NOT NULL,
@@ -316,40 +195,10 @@ CREATE TABLE participant (
     is_bb boolean DEFAULT false NOT NULL
 );
 
-
-
---
--- Name: TABLE participant; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON TABLE participant IS 'forum user who will participate in one or more competitions';
-
-
---
--- Name: COLUMN participant.last_logon; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN participant.last_logon IS 'last time user connected';
-
-
---
--- Name: COLUMN participant.admin_experience; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN participant.admin_experience IS 'Set true if user has ever been administrator';
-
-
---
--- Name: COLUMN participant.is_bb; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN participant.is_bb IS 'user is a baby backup';
-
-
-
---
--- Name: team; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
---
 
 CREATE TABLE team (
     tid character(3) NOT NULL,
@@ -360,26 +209,8 @@ CREATE TABLE team (
     divid character(1)
 );
 
-
-
---
--- Name: COLUMN team.confid; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN team.confid IS 'Conference Team Plays in ';
-
-
---
--- Name: COLUMN team.divid; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN team.divid IS 'division team plays in';
-
-
-
---
--- Name: team_in_competition; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
---
 
 CREATE TABLE team_in_competition (
     tid character(3) NOT NULL,
@@ -387,31 +218,9 @@ CREATE TABLE team_in_competition (
     made_playoff boolean DEFAULT false NOT NULL
 );
 
-
-
---
--- Name: COLUMN team_in_competition.tid; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN team_in_competition.tid IS 'Team ID';
-
-
---
--- Name: COLUMN team_in_competition.cid; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN team_in_competition.cid IS 'Competition ID';
-
-
---
--- Name: COLUMN team_in_competition.made_playoff; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN team_in_competition.made_playoff IS 'True if team made playoffs';
-
---
--- Name: wildcard_pick; Type: TABLE; Schema: public; Owner: alan; Tablespace: 
---
 
 CREATE TABLE wildcard_pick (
     cid integer NOT NULL,
@@ -422,54 +231,12 @@ CREATE TABLE wildcard_pick (
     opid smallint DEFAULT 1 NOT NULL
 );
 
-
-
---
--- Name: TABLE wildcard_pick; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON TABLE wildcard_pick IS 'Users Pick of WildCard Entries for each conference';
-
-
---
--- Name: COLUMN wildcard_pick.cid; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN wildcard_pick.cid IS 'Competition ID';
-
-
---
--- Name: COLUMN wildcard_pick.confid; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN wildcard_pick.confid IS 'Conference ID';
-
-
---
--- Name: COLUMN wildcard_pick.uid; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN wildcard_pick.uid IS 'User ID';
-
-
---
--- Name: COLUMN wildcard_pick.tid; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN wildcard_pick.tid IS 'Pick';
-
-
---
--- Name: COLUMN wildcard_pick.submit_time; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN wildcard_pick.submit_time IS 'Time of Submission';
-
-
---
--- Name: COLUMN wildcard_pick.opid; Type: COMMENT; Schema: public; Owner: alan
---
-
 COMMENT ON COLUMN wildcard_pick.opid IS 'Either 1 or 2 depending on which wildcard pick for the conference it is';
 
 
@@ -478,16 +245,14 @@ COMMENT ON COLUMN wildcard_pick.opid IS 'Either 1 or 2 depending on which wildca
 -- START VIEWS ----------------------------------------------------
 
 
-
-
 CREATE VIEW match_score AS
-    SELECT m.cid, m.rid, m.hid, u.uid, ((CASE p.uid WHEN NULL THEN 0 ELSE 1 END + CASE o.uid WHEN NULL THEN 0 ELSE 1 END) * r.value) AS score FROM ((((registration u JOIN match m USING (cid)) JOIN round r USING (cid, rid)) LEFT JOIN pick p ON ((((((p.cid = m.cid) AND (p.rid = m.rid)) AND (p.hid = m.hid)) AND (p.uid = u.uid)) AND (((m.hscore >= m.ascore) AND (p.pid = m.hid)) OR ((m.hscore <= m.ascore) AND (p.pid = m.aid)))))) LEFT JOIN pick o ON (((((((o.cid = m.cid) AND (o.rid = m.rid)) AND (o.hid = m.hid)) AND (o.uid = u.uid)) AND (r.ou_round IS TRUE)) AND (((((m.hscore + m.ascore))::numeric > ((m.combined_score)::numeric + 0.5)) AND (o.over IS TRUE)) OR ((((m.hscore + m.ascore))::numeric < ((m.combined_score)::numeric + 0.5)) AND (o.over IS NOT TRUE)))))) WHERE (m.open IS TRUE);
+    SELECT m.cid, m.rid, m.hid, u.uid, ((CASE WHEN p.uid IS NULL THEN 0 ELSE 1 END + CASE WHEN o.uid IS NULL THEN 0 ELSE 1 END) * r.value) AS score FROM ((((registration u JOIN match m USING (cid)) JOIN round r USING (cid, rid)) LEFT JOIN pick p ON ((((((p.cid = m.cid) AND (p.rid = m.rid)) AND (p.hid = m.hid)) AND (p.uid = u.uid)) AND (((m.hscore >= m.ascore) AND (p.pid = m.hid)) OR ((m.hscore <= m.ascore) AND (p.pid = m.aid)))))) LEFT JOIN pick o ON (((((((o.cid = m.cid) AND (o.rid = m.rid)) AND (o.hid = m.hid)) AND (o.uid = u.uid)) AND (r.ou_round IS TRUE)) AND (((((m.hscore + m.ascore))::numeric > ((m.combined_score)::numeric + 0.5)) AND (o.over IS TRUE)) OR ((((m.hscore + m.ascore))::numeric < ((m.combined_score)::numeric + 0.5)) AND (o.over IS NOT TRUE)))))) WHERE (m.open IS TRUE);
 
 COMMENT ON VIEW match_score IS 'points user scored in a match from the pick and over/under question (if present)';
 
 
 CREATE VIEW bonus_score AS
-    SELECT r.cid, r.rid, u.uid, (CASE p.uid WHEN NULL THEN 0 ELSE 1 END * r.value) AS score FROM ((registration u JOIN round r USING (cid)) LEFT JOIN option_pick p ON (((((p.cid = r.cid) AND (p.rid = r.rid)) AND (p.opid = r.answer)) AND (r.valid_question IS TRUE)))) WHERE r.open IS TRUE;;
+    SELECT r.cid, r.rid, u.uid, (CASE WHEN p.uid IS NULL THEN 0 ELSE 1 END * r.value) AS score FROM ((registration u JOIN round r USING (cid)) LEFT JOIN option_pick p ON (((((p.cid = r.cid) AND (p.rid = r.rid)) AND (p.opid = r.answer)) AND (r.valid_question IS TRUE)))) WHERE r.open IS TRUE;;
 
 COMMENT ON VIEW bonus_score IS 'Points scored in round by user answering the bonus question';
 
@@ -503,7 +268,7 @@ CREATE VIEW playoff_score AS
 COMMENT ON VIEW playoff_score IS 'Score user makes in correctly guessing the playoffs';
 
 CREATE VIEW round_score AS
-    SELECT r.cid, r.rid, r.uid, sum(CASE m.score WHEN NULL THEN 0 ELSE m.score END) AS mscore, r.score AS bscore, (sum(m.score) + r.score) AS score FROM (match_score m RIGHT JOIN bonus_score r USING (cid, rid, uid)) GROUP BY r.cid, r.rid, r.uid, r.score;
+    SELECT r.cid, r.rid, r.uid, sum(CASE WHEN m.score IS NULL THEN 0 ELSE m.score END) AS mscore, r.score AS bscore, (sum(m.score) + r.score) AS score FROM (match_score m RIGHT JOIN bonus_score r USING (cid, rid, uid)) GROUP BY r.cid, r.rid, r.uid, r.score;
 
 COMMENT ON VIEW round_score IS 'Get total score for the round by user';
 
@@ -535,7 +300,7 @@ NFC	National Football Conference
 --
 
 COPY default_competition (cid, version) FROM stdin;
-\N	v0.1
+\N	3
 \.
 
 
@@ -593,266 +358,102 @@ KC 	Kansas City Chiefs	KC_logo-50x50.gif		AFC	W
 
 -- END OF DATA ----------------------------------------------------------
 
-
-
---
--- Name: competition_pkey; Type: CONSTRAINT; Schema: public; Owner: alan; Tablespace: 
---
+-- PRIMARY KEY CONTRAINTS -----------------------------------------------
 
 ALTER TABLE ONLY competition
     ADD CONSTRAINT competition_pkey PRIMARY KEY (cid);
 
-
---
--- Name: conference_pkey; Type: CONSTRAINT; Schema: public; Owner: alan; Tablespace: 
---
-
 ALTER TABLE ONLY conference
     ADD CONSTRAINT conference_pkey PRIMARY KEY (confid);
-
-
---
--- Name: div_winner_pick_pkey; Type: CONSTRAINT; Schema: public; Owner: alan; Tablespace: 
---
 
 ALTER TABLE ONLY div_winner_pick
     ADD CONSTRAINT div_winner_pick_pkey PRIMARY KEY (cid, confid, divid, uid);
 
-
---
--- Name: division_pkey; Type: CONSTRAINT; Schema: public; Owner: alan; Tablespace: 
---
-
 ALTER TABLE ONLY division
     ADD CONSTRAINT division_pkey PRIMARY KEY (divid);
-
-
---
--- Name: match_pkey; Type: CONSTRAINT; Schema: public; Owner: alan; Tablespace: 
---
 
 ALTER TABLE ONLY match
     ADD CONSTRAINT match_pkey PRIMARY KEY (rid, hid, cid);
 
-
---
--- Name: question_option_pkey; Type: CONSTRAINT; Schema: public; Owner: alan; Tablespace: 
---
-
 ALTER TABLE ONLY option
     ADD CONSTRAINT question_option_pkey PRIMARY KEY (cid, rid, opid);
-
-
---
--- Name: answer_pkey; Type: CONSTRAINT; Schema: public; Owner: alan; Tablespace: 
---
 
 ALTER TABLE ONLY option_pick
     ADD CONSTRAINT answer_pkey PRIMARY KEY (uid, cid, rid);
 
-
---
--- Name: user_pkey; Type: CONSTRAINT; Schema: public; Owner: alan; Tablespace: 
---
-
 ALTER TABLE ONLY participant
     ADD CONSTRAINT user_pkey PRIMARY KEY (uid);
-
-
---
--- Name: pick_pkey; Type: CONSTRAINT; Schema: public; Owner: alan; Tablespace: 
---
 
 ALTER TABLE ONLY pick
     ADD CONSTRAINT pick_pkey PRIMARY KEY (cid, rid, hid, uid);
 
-
---
--- Name: registration_pkey; Type: CONSTRAINT; Schema: public; Owner: alan; Tablespace: 
---
-
 ALTER TABLE ONLY registration
     ADD CONSTRAINT registration_pkey PRIMARY KEY (cid, uid);
-
-
---
--- Name: round_pkey; Type: CONSTRAINT; Schema: public; Owner: alan; Tablespace: 
---
 
 ALTER TABLE ONLY round
     ADD CONSTRAINT round_pkey PRIMARY KEY (cid, rid);
 
-
---
--- Name: team_in_competition_pkey; Type: CONSTRAINT; Schema: public; Owner: alan; Tablespace: 
---
-
 ALTER TABLE ONLY team_in_competition
     ADD CONSTRAINT team_in_competition_pkey PRIMARY KEY (cid, tid);
-
-
---
--- Name: team_pkey; Type: CONSTRAINT; Schema: public; Owner: alan; Tablespace: 
---
 
 ALTER TABLE ONLY team
     ADD CONSTRAINT team_pkey PRIMARY KEY (tid);
 
-
---
--- Name: wildcard_pick_pkey; Type: CONSTRAINT; Schema: public; Owner: alan; Tablespace: 
---
-
 ALTER TABLE ONLY wildcard_pick
     ADD CONSTRAINT wildcard_pick_pkey PRIMARY KEY (cid, confid, uid, opid);
 
---
--- Name: default_competition_cid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
---
+-- -----Foreign Key Contraints
 
 ALTER TABLE ONLY default_competition
     ADD CONSTRAINT default_competition_cid_fkey FOREIGN KEY (cid) REFERENCES competition(cid) ON UPDATE CASCADE ON DELETE SET NULL;
 
-
---
--- Name: div_winner_pick_cid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
---
-
 ALTER TABLE ONLY div_winner_pick
     ADD CONSTRAINT div_winner_pick_cid_fkey FOREIGN KEY (cid, tid) REFERENCES team_in_competition(cid, tid) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: div_winner_pick_confid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
---
-
 ALTER TABLE ONLY div_winner_pick
     ADD CONSTRAINT div_winner_pick_confid_fkey FOREIGN KEY (confid) REFERENCES conference(confid) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: div_winner_pick_divid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
---
-
 ALTER TABLE ONLY div_winner_pick
     ADD CONSTRAINT div_winner_pick_divid_fkey FOREIGN KEY (divid) REFERENCES division(divid) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: div_winner_pick_uid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
---
-
 ALTER TABLE ONLY div_winner_pick
     ADD CONSTRAINT div_winner_pick_uid_fkey FOREIGN KEY (uid) REFERENCES participant(uid) ON UPDATE RESTRICT ON DELETE CASCADE;
 
-
---
--- Name: match_cid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
---
-
 ALTER TABLE ONLY match
     ADD CONSTRAINT match_cid_fkey FOREIGN KEY (cid, rid) REFERENCES round(cid, rid) ON UPDATE RESTRICT ON DELETE CASCADE;
-
-
---
--- Name: match_cid_fkey1; Type: FK CONSTRAINT; Schema: public; Owner: alan
---
-
 ALTER TABLE ONLY match
     ADD CONSTRAINT match_cid_fkey1 FOREIGN KEY (cid, aid) REFERENCES team_in_competition(cid, tid) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: match_cid_fkey2; Type: FK CONSTRAINT; Schema: public; Owner: alan
---
-
 ALTER TABLE ONLY match
     ADD CONSTRAINT match_cid_fkey2 FOREIGN KEY (cid, hid) REFERENCES team_in_competition(cid, tid) ON UPDATE CASCADE ON DELETE CASCADE;
-
 
 ALTER TABLE ONLY option
     ADD CONSTRAINT option_cid_fkey FOREIGN KEY (cid,rid)  REFERENCES round(cid,rid) ON UPDATE CASCADE ON DELETE CASCADE;
 
---
--- Name: answer_cid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
---
-
 ALTER TABLE ONLY option_pick
     ADD CONSTRAINT answer_cid_fkey FOREIGN KEY (cid, rid,opid) REFERENCES option(cid, rid,opid) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: answer_uid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
---
-
 ALTER TABLE ONLY option_pick
     ADD CONSTRAINT answer_uid_fkey FOREIGN KEY (uid) REFERENCES participant(uid) ON UPDATE CASCADE ON DELETE CASCADE;
 
-
---
--- Name: pick_cid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
---
-
 ALTER TABLE ONLY pick
     ADD CONSTRAINT pick_cid_fkey FOREIGN KEY (cid, rid, hid) REFERENCES match(cid, rid, hid) ON UPDATE RESTRICT ON DELETE CASCADE;
-
-
---
--- Name: pick_uid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
---
-
 ALTER TABLE ONLY pick
     ADD CONSTRAINT pick_uid_fkey FOREIGN KEY (uid) REFERENCES participant(uid) ON UPDATE RESTRICT ON DELETE CASCADE;
 
-
---
--- Name: registration_cid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
---
-
 ALTER TABLE ONLY registration
     ADD CONSTRAINT registration_cid_fkey FOREIGN KEY (cid) REFERENCES competition(cid) ON UPDATE RESTRICT ON DELETE CASCADE;
-
-
---
--- Name: registration_uid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
---
-
 ALTER TABLE ONLY registration
     ADD CONSTRAINT registration_uid_fkey FOREIGN KEY (uid) REFERENCES participant(uid) ON UPDATE RESTRICT ON DELETE CASCADE;
-
-
---
--- Name: round_cid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
---
 
 ALTER TABLE ONLY round
     ADD CONSTRAINT round_cid_fkey FOREIGN KEY (cid) REFERENCES competition(cid) ON UPDATE RESTRICT ON DELETE CASCADE;
 
-
---
--- Name: team_confid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
---
-
 ALTER TABLE ONLY team
     ADD CONSTRAINT team_confid_fkey FOREIGN KEY (confid) REFERENCES conference(confid) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: team_div_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
---
-
 ALTER TABLE ONLY team
     ADD CONSTRAINT team_div_fkey FOREIGN KEY (divid) REFERENCES division(divid) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: team_in_competition_cid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alan
---
 
 ALTER TABLE ONLY team_in_competition
     ADD CONSTRAINT team_in_competition_cid_fkey FOREIGN KEY (cid) REFERENCES competition(cid) ON UPDATE RESTRICT ON DELETE CASCADE;
 ALTER TABLE ONLY team_in_competition
     ADD CONSTRAINT team_in_competition_tid_fkey FOREIGN KEY (tid) REFERENCES team(tid) ON UPDATE CASCADE ON DELETE CASCADE;
+
 ALTER TABLE ONLY wildcard_pick
     ADD CONSTRAINT wildcard_pick_cid_fkey FOREIGN KEY (cid, uid) REFERENCES registration(cid, uid) ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE ONLY wildcard_pick
@@ -890,8 +491,4 @@ GRANT SELECT ON TABLE round_score TO melindas_ball;
 -- Appears Postgres 7.4 does not have control on access to sequences
 -- GRANT SELECT,UPDATE ON SEQUENCE competition_cid_seq TO melindas_ball;
 
-
---
--- PostgreSQL database dump complete
---
-
+-- End
