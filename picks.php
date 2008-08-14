@@ -2,6 +2,16 @@
 // Copyright (c) 2008 Alan Chandler - licenced under the GPL (see COPYING.txt in this directory)
 if (!defined('BALL'))
 	die('Hacking attempt...');
+
+// we need to get the users resultant score
+$sql = 'SELECT u.name , u.uid , r.mscore,r.bscore,r.score, p.opid, p.comment';
+$sql .= ' FROM round_score r JOIN participant u USING (uid)';
+$sql .= ' LEFT JOIN option_pick p USING (cid,rid,uid)';
+$sql .= ' WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid);
+$sql .= ' ORDER BY score DESC;';
+$resultuser = dbQuery($sql);
+
+
 $isAQuestion = ($rounddata['valid_question'] == 't');
 $ouRound = ($rounddata['ou_round'] == 't');
 $totalHasBeenOutput = false;
@@ -43,8 +53,10 @@ while ($moreMatchesToCome) {
 ?>			</th>
 <?php
 		}
+
 ?>			<th rowspan="2">Points for<br/>Correct Pick</th>
 <?php
+
 		// if we have less than eight matches left and there is noly the overall total to output we should do it rather than create a new table
 		if($nom < 8 && !$isAQuestion) {
 			$totalHasBeenOutput = true;
@@ -77,8 +89,8 @@ while ($moreMatchesToCome) {
 <?php
 			dbRestartQuery($result);  //put the results back to the start so we can interate over them again
 			while($row = dbFetchRow($result)) {
-				//This is an over or under guessing round, so we need to also show the over/under results
-				$cs = $row['combined_score']+0.5;
+			//This is an over or under guessing round, so we need to also show the over/under results
+			$cs = $row['combined_score']+0.5;
 				if(!(is_null($row['hscore']) || is_null($row['ascore']))) {
 					$scores=$row['hscore']+$row['ascore'];
 ?>			<th><?php echo $cs;?></th>
@@ -93,94 +105,92 @@ while ($moreMatchesToCome) {
 		</tr>
 <?php
 		}
-?>
-		</thead>
-		<tbody>
-<?php
 	
-	dbFree($result);
-/*
-	// we need to get the users resultant score
-$sql = 'SELECT u.name AS name, u.uid AS uid,r.score AS rscore, r.score AS score';
-$sql .= ' FROM round_score r JOIN participant u USING (uid)';
-$sql .= ' WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid);
-$sql .= ' ORDER BY score DESC;';
-$result = dbQuery($sql);
-$sql = 'SELECT * FROM round_score r JOIN match m USING (cid,rid) JOIN team t ON t.tid = m.hid';
-$sql .= ' LEFT JOIN pick p USING (cid,rid,hid,uid)'; 
-$sql .= ' WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' AND m.open IS TRUE ORDER BY r.score DESC, t.confid, t.divid, m.hid;'; 
-$resultmatch = dbQuery($sql);
-	if ($matchdata = dbFetch($resultmatch)) {
-		$i = 0;
-		while ($row = dbFetchRow($result)) {
-			for($match = $i*$nomatches;$match++;$match < ($i+1)*$nomatches) {
+?>	</thead>
+	<tbody>
+<?php
+		while ($userdata = dbFetchRow($resultuser)) {
 ?>			<tr>
-				<td><?php echo $row['name'];?></td>
+				<td rowspan="2"><?php echo $userdata['name'];?></td>
 <?php
-				if($rounddata['ou_round']) {
-?>				<td <?php if(!is_null($matchdata[$match]['pid']) && !is_null($matchdata[$match]['hscore']) &&
-						 !is_null($matchdata[$match]['ascore']) && 
-						($matchdata[$match]['pid'] == $matchdata[$match]['hid'] &&
-						$matchdata[$match]['hscore']>$matchdata[$match]['ascore']) ||
-						($matchdata[$match]['pid'] == $matchdata[$match]['aid'] && 
-						$matchdata[$match]['hscore']<$matchdata[$match]['ascore']))
-							echo 'class="win"' ;?>>
-					<?php if(!is_null($matchdata[$match]['pid'])) echo $matchdata[$match]['pid'];?>
-				</td>
-				<td <?php if(!is_null($matchdata[$match]['over']) && !is_null($matchdata[$match]['hscore']) &&
-						 !is_null($matchdata[$match]['ascore']) &&
-						($matchdata[$match]['over'] == 't' && 
-						($matchdata[$match]['combined_score']+0.5 < $matchdata[$match]['hscore']+$matchdata[$match]['ascore'])) || 
-						(!$matchdata[$match]['over'] == 't' && 
-						($matchdata[$match]['combined_score']+0.5 > $matchdata[$match]['hscore']+$matchdata[$match]['ascore'])))
-							echo 'class="win"';?>>
-					<?php if(!is_null($matchdata[$match]['over'])) echo ($matchdata[$match]['over'] == 't')?'Over':'Under';?>
-				</td>
+			dbRestartQuery($result);
+			while ($row=dbFetchRow($result)) {
+				$pick = dbQuery('SELECT * FROM pick WHERE cid = '.dbMakeSafe($cid)
+							.' AND rid = '.dbMakeSafe($rid).' AND hid = \''.$row['hid'].'\' AND uid = '.$userdata['uid'].';');
+				if($pickdata = dbFetchRow($pick)) {
+					if(!is_null($row['hscore']) && !is_null($row['ascore'])) {
+						if ((($row['hscore']>$row['ascore'])?$row['hid']:$row['aid']) == $pickdata['pid']) {
+?>				<td class="win">
 <?php
-				} else {
-?>				<td colspan="2" <?php if(!is_null($matchdata[$match]['pid']) && !is_null($matchdata[$match]['hscore']) &&
-						!is_null($matchdata[$match]['ascore']) && 
-						($matchdata[$match]['pid'] == $matchdata[$match]['hid'] &&
-						 $matchdata[$match]['hscore']>$matchdata[$match]['ascore']) ||
-						($matchdata[$match]['pid'] == $matchdata[$match]['aid'] && 
-						$matchdata[$match]['hscore']<$matchdata[$match]['ascore']))
-							echo 'class="win"' ;?>>
-					<?php if(!is_null($matchdata[$match]['pid'])) echo $matchdata[$match]['pid'];?>
-				</td>
+							echo $pickdata['pid'].'<span class="win"><br/>(Right)</span>';
+						} else {
+?>				<td>
 <?php
-				}
-				if($rounddata['valid_question'] == 't') {
-					if($bqopts > 0) {
-				// this is a multichoice question, so get results and output them
-					dbRestartQuery($resultbq);  //reset lost of options to start
-						while ($optdata = dbFetchRow($resultbq)) {
-?>				<td <?php if($optdata['oid'] == $rounddata['answer'] && $row['rscore'] > 0) 
-					echo 'class="win"';?>><?php if($row['rscore'] > 0) echo 'X';?></td>
+							echo $pickdata['pid'];
+						}
+?>				</td>
+<?php
+						if($ouRound) {
+							if ($row['hscore']+$row['ascore'] > $row['combined_score']+0.5) {
+								if($pickdata['over'] == 't') {
+?>				<td class="win">Over<span class="win"><br/>(Right)</span></td>
+<?php
+								} else {
+?>				<td>Under</td>
+<?php
+								}
+							} else {
+								if ($pickdata['over'] == 't') {
+?>				<td>Over</td>
+<?php
+								} else {
+?>				<td class="win">Under<span class="win"><br/>(Right)</span></td>
+<?php
+								}
+							}
+						} else {
+?>				<td></td>
 <?php
 						}
 					} else {
-?>				<td <?php if($row['rscore'] > 0) echo 'class="win"';?>>
-					<?php if($row['rscore'] > 0) echo $rounddata['answer'];?></td>
+?>				<td colspan="2"></td>
 <?php
 					}
 				}
-?>				<td><?php echo $row['score']; ?></td>	
-			</tr>
+			}
+			if($totalHasBeenOutput) {
+?>				<td rowspan="2"><?php echo $userdata['score'];?></td>
 <?php
 			}
-			$i++;
+?>			</tr>
+			<tr>
+<?php
+			dbRestartQuery($result);
+			while ($row=dbFetchRow($result)) {
+				$pick = dbQuery('SELECT * FROM pick WHERE cid = '.dbMakeSafe($cid)
+					.' AND rid = '.dbMakeSafe($rid).' AND hid = \''.$row['hid'].'\' AND uid = '.$userdata['uid'].';');
+				if($pickdata = dbFetchRow($pick)) {
+?>				<td colspan="2"><?php echo dbBBcode($pickdata['comment']);?></td>
+<?php
+				} else {
+?>				<td colspan="2"></td>
+<?php
+				}
+			}
+?>			</tr>
+<?php
 		}
-	}
-	dbFree($result);
-*/
+		dbFree($result);
+
 ?>	</tbody>
 </table>
-<table>
 <?php
+		dbRestartQuery($resultuser);
 		if($nom < 8) {
-			$moreMatchesToCome = false;
+				$moreMatchesToCome = false;
 		} else {
 			$startMatch += 8;
+			dbRestartQuery($resultuser);
 		}
 	} else {
 		$moreMatchesToCome = false;
@@ -228,15 +238,52 @@ if(!$totalHasBeenOutput) {
 ?>	</thead>
 	<tbody>
 <?php
+	while ($userdata = dbFetchRow($resultuser)) {
 
-
-//  Need per user data against these headings
-
+?>		<tr>
+			<td><?php echo $userdata['name'];?></td>
+<?php
+		if($isAQuestion) {
+			if($bqopts > 0) {
+				// this is a multichoice question, so get results and output them
+				dbRestartQuery($resultbq);  //reset lost of options to start
+				while ($optdata = dbFetchRow($resultbq)) {
+					if($optdata['opid'] == $userdata['opid']) {
+						if($userdata['opid'] == $rounddata['answer']) {
+?>			<td class="win">X<span class="win"><br/>(Right)</span></td>
+<?php
+						} else {
+?>			<td>X</td>
+<?php
+						}
+					
+					} else {
+						if($userdata['opid'] == $rounddata['answer']) {
+?>			<td class="win"><?php echo $userdata['opid'];?><span class="win"><br/>(Right)</span></td>
+<?php
+						} else {
+?>			<td><?php echo $userdata['opid'];?></td>
+<?php
+						}
+					}
+				}
+			} else{
+				if($userdata['opid'] == $rounddata['answer']) {
+?>			<td class="win"><?php echo $userdata['opid'];?><span class="win"><br/>(Right)</span></td>
+<?php
+				} else {
+?>			<td><?php echo $userdata['opid'];?></td>
+<?php
+				}
+			}	
+?>			<td><?php echo $userdata['bscore'];?></td><td><?php echo $userdata['mscore'];?></td>
+<?php
+		}	
+?>			<td><?php echo $userdata['score'];?></td>
+		</tr>
+<?php
+	}
 ?>	</tbody>
 </table>
 <?php
 }
-
-
-
-
