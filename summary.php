@@ -24,12 +24,12 @@ dbFree($result);
 	<tbody>
 <?php
 if ($rid != 0) {
-	$sql = 'SELECT u.name AS name, p.score AS pscore, sum(r.score) AS rscore, p.score+sum(r.score) AS total';
+	$sql = 'SELECT u.uid, u.name AS name, p.score AS pscore, sum(r.score) AS rscore, p.score+sum(r.score) AS total';
 	$sql .= ' FROM participant u JOIN registration reg USING (uid) JOIN playoff_score p USING (cid,uid) JOIN round_score r USING (cid,uid)';
 	$sql .= ' WHERE cid = '.dbMakeSafe($cid).' AND rid <= '.dbMakeSafe($rid);
-	$sql .= ' GROUP BY u.name, p.score ORDER BY total DESC;';
+	$sql .= ' GROUP BY u.uid, u.name, p.score ORDER BY total DESC;';
 } else {
-	$sql .= 'SELECT u.name AS name, 0 AS pscore, 0 AS rscore, 0 AS total';
+	$sql .= 'SELECT u.uid, u.name AS name, 0 AS pscore, 0 AS rscore, 0 AS total';
 	$sql .= ' FROM participant u JOIN registration reg USING (uid) WHERE cid = '.dbMakeSafe($cid).' ORDER BY u.name;';
 }
 $result = dbQuery($sql);
@@ -38,9 +38,9 @@ while($row = dbFetchRow($result)) {
 			<td class="user_name"><?php echo $row['name'];?></td>
 <?php
 	$resultround = dbQuery('SELECT score FROM round_score WHERE cid = '.dbMakeSafe($cid).' AND
-				 rid <= '.dbMakeSafe($rid).' AND uid = '.dbMakeSafe($uid).' ORDER BY rid DESC;');
+				 rid <= '.dbMakeSafe($rid).' AND uid = '.dbMakeSafe($row['uid']).' ORDER BY rid DESC;');
 	while ($rscore = dbFetchRow($resultround)) {
-?>			<td><?php echo $rscore['score'];?></td>				
+?>			<td><?php echo $rscore['score'];?></td>
 <?php
 	}
 ?>			<td><?php echo $row['rscore'];?></td><td><?php echo $row['pscore'];?></td><td><?php echo $row['total'];?></td>
