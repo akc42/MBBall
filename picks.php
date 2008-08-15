@@ -25,7 +25,7 @@ while ($moreMatchesToCome) {
 			.' AND  m.open IS TRUE ORDER BY t.confid, t.divid, hid LIMIT 8 OFFSET '.$startMatch.';');
 ?><table>
 	<thead>
-		<tr><th rowspan="<?php echo ($ouRound)?4:3 ;?>" class="match_data">Match Data</th>
+		<tr><th rowspan="<?php echo ($ouRound)?4:3 ;?>" class="match_data">Match Data<br/><?php echo $rounddata['name'];?></th>
 <?php
 
 	if(($nom = dbNumRows($result)) > 0) {
@@ -201,7 +201,7 @@ while ($moreMatchesToCome) {
 if(!$totalHasBeenOutput) {
 ?><table>
 	<thead>
-		<tr><th rowspan="<?php echo ($isAQuestion)?3:1 ;?>" class="match_data">Round Data</th>
+		<tr><th rowspan="<?php echo ($isAQuestion)?3:1 ;?>" class="match_data">Round Data<br/><?php echo $rounddata['name'];?></th>
 <?php		
 	if($isAQuestion) {
 	//We need to find all the options so we can display them later, but for now we need to know how many for the colspan
