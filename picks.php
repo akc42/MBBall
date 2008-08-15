@@ -25,7 +25,9 @@ while ($moreMatchesToCome) {
 			.' AND  m.open IS TRUE ORDER BY t.confid, t.divid, hid LIMIT 8 OFFSET '.$startMatch.';');
 ?><table>
 	<thead>
-		<tr><th rowspan="<?php echo ($ouRound)?4:3 ;?>" class="match_data">Match Data<br/><?php echo $rounddata['name'];?></th>
+		<tr>
+			<th rowspan="<?php echo ($ouRound)?4:3 ;?>" class="match_data">Match Data<br/><?php echo $rounddata['name'];?></th>
+			<th rowspan="2">Points for<br/>Correct Pick</th>
 <?php
 
 	if(($nom = dbNumRows($result)) > 0) {
@@ -54,7 +56,7 @@ while ($moreMatchesToCome) {
 <?php
 		}
 
-?>			<th rowspan="2">Points for<br/>Correct Pick</th>
+?>			
 <?php
 
 		// if we have less than eight matches left and there is noly the overall total to output we should do it rather than create a new table
@@ -74,6 +76,7 @@ while ($moreMatchesToCome) {
 		}
 ?>		</tr>
 		<tr>
+			<th rowspan="<?php echo ($ouRound)?2:1 ;?>"><?php echo $rounddata['value'];?></th>
 <?php
 		dbRestartQuery($result);  //put the results back to the start so we can interate over them again
 		while($row = dbFetchRow($result)) {
@@ -81,8 +84,7 @@ while ($moreMatchesToCome) {
 			<th><?php if(!is_null($row['ascore'])) echo $row['ascore'];?></th>
 <?php
 		}
-?>			<th><?php echo $rounddata['value'];?></th>
-		</tr>
+?>		</tr>
 <?php
 		if($ouRound) {
 ?>		<tr>
@@ -111,7 +113,7 @@ while ($moreMatchesToCome) {
 <?php
 		while ($userdata = dbFetchRow($resultuser)) {
 ?>			<tr>
-				<td rowspan="2"><?php echo $userdata['name'];?></td>
+				<td rowspan="2" colspan="2"><?php echo $userdata['name'];?></td>
 <?php
 			dbRestartQuery($result);
 			while ($row=dbFetchRow($result)) {
