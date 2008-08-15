@@ -177,6 +177,8 @@ table.layout table td.in_po {background-color:#99FF99;}
 span.in_po {font-size:0.6em;}
 td p.no_team {background-color:#CCFFFF;}
 
+#bonus_pick,#instructions {vertical-align:top;}
+
 /* mainly administration stuff below here */
 div.del {
 	background: url(images/cross.gif);
@@ -279,8 +281,8 @@ table.layout table td {
 	border:1px solid #CCCCFF;
 }
 
-table.layout table.form td, table.layout td {background-color:#FFFFCC;}
-table.layout table.form th, table.layout th, table.layout td.conference {background-color:#4A7DB5;color:#EFEFEF}
+table.layout table.form td, table.layout td, table.layout table.layout td {background-color:#FFFFCC;}
+table.layout table.form th, table.layout th, table.layout td.conference , table.layout table.layout td.conference {background-color:#4A7DB5;color:#EFEFEF}
 table.layout td.conference , th {font-size:x-small;font-weight:normal;}
 td, div {padding:2px;}
 
