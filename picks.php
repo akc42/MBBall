@@ -19,6 +19,7 @@ $moreMatchesToCome = true;
 $startMatch = 0;
 ?><h1>Details of this rounds pick</h1>
 <?php
+/* GROUPS OF 8 MATCHES ----------------------------------------------------------------------------*/
 while ($moreMatchesToCome) {
 	$result = dbQuery('SELECT * FROM match m JOIN team t ON m.hid = t.tid WHERE m.cid = '
 			.dbMakeSafe($cid).' AND m.rid = '.dbMakeSafe($rid)
@@ -29,7 +30,7 @@ while ($moreMatchesToCome) {
 			<th rowspan="<?php echo ($ouRound)?4:3 ;?>" class="match_data">Match Data<br/><?php echo $rounddata['name'];?></th>
 			<th rowspan="2" class="score">Points for<br/>Correct Pick</th>
 <?php
-
+/* TEAM NAMES IN HEADER ---------------------------------------------------------------*/
 	if(($nom = dbNumRows($result)) > 0) {
 		while($row = dbFetchRow($result)) {
 			if(!(is_null($row['hscore']) || is_null($row['ascore']) || $row['hscore'] < $row['ascore'])) {
@@ -62,16 +63,19 @@ while ($moreMatchesToCome) {
 ?>		</tr>
 		<tr>
 <?php
+/*  MATCH TIME ROW IN HEADER --------------------------------------------------------------------------*/
 				//first three rows first column covered by rowspan
 		dbRestartQuery($result);  //put the results back to the start so we can interate over them again
 		while($row = dbFetchRow($result)) {
 ?>			<th colspan="2"><span class="time"><?php echo $row['match_time'];?></span></th>
 <?php
 		}
+/* THE VALUE OF A CORRECT PICK ----------------------*/
 ?>		</tr>
 		<tr>
 			<th class="score" rowspan="<?php echo ($ouRound)?2:1 ;?>"><?php echo $rounddata['value'];?></th>
 <?php
+/* THE SCORES IN HEADER ------------------------------------------------------------------------------*/
 		dbRestartQuery($result);  //put the results back to the start so we can interate over them again
 		while($row = dbFetchRow($result)) {
 ?>			<th class="score" ><?php if(!is_null($row['hscore'])) echo $row['hscore'];?></th>
@@ -83,6 +87,7 @@ while ($moreMatchesToCome) {
 		if($ouRound) {
 ?>		<tr>
 <?php
+/* COMBINED SCORE AND OVER UNDER RESULT --------------------------------------------------------------*/
 			dbRestartQuery($result);  //put the results back to the start so we can interate over them again
 			while($row = dbFetchRow($result)) {
 			//This is an over or under guessing round, so we need to also show the over/under results
@@ -104,14 +109,17 @@ while ($moreMatchesToCome) {
 ?>	</thead>
 	<tbody>
 <?php
+/* FOR EACH USER WE DISPLAY THEIR PICKS FOR THE MATCHES -----------------------------------------------*/
 		while ($userdata = dbFetchRow($resultuser)) {
 ?>			<tr>
 				<td rowspan="2" colspan="2"><?php echo $userdata['name'];?></td>
 <?php
+/* MATCH WINNER PICK ------------------------------------------------------------------------------*/
 			dbRestartQuery($result);
 			while ($row=dbFetchRow($result)) {
-				$pick = dbQuery('SELECT * FROM pick WHERE cid = '.dbMakeSafe($cid)
-							.' AND rid = '.dbMakeSafe($rid).' AND hid = \''.$row['hid'].'\' AND uid = '.$userdata['uid'].';');
+				$pick = dbQuery('SELECT p.pid, p.over, p.comment FROM pick p JOIN match m JOIN team t ON m.hid = t.tid USING (cid, rid, hid) WHERE cid = '.dbMakeSafe($cid)
+							.' AND rid = '.dbMakeSafe($rid).' AND hid = \''.$row['hid'].'\' AND uid = '.$userdata['uid']
+							.' AND m.open IS TRUE ORDER BY t.confid, t.divid, hid LIMIT 8 OFFSET '.$startMatch.';');
 				if($pickdata = dbFetchRow($pick)) {
 					if(!is_null($row['hscore']) && !is_null($row['ascore'])) {
 						if ((($row['hscore']>$row['ascore'])?$row['hid']:$row['aid']) == $pickdata['pid']) {
@@ -125,6 +133,7 @@ while ($moreMatchesToCome) {
 						}
 ?>				</td>
 <?php
+/* OVER UNDER PICK --------------------------------------------------------------------------------*/
 						if($ouRound) {
 							if ($row['hscore']+$row['ascore'] > $row['combined_score']+0.5) {
 								if($pickdata['over'] == 't') {
@@ -156,6 +165,7 @@ while ($moreMatchesToCome) {
 <?php
 				}							
 			}
+/* TOTAL SCORE (if we are doing it here) -------------------------------------------------------------*/
 			if($totalHasBeenOutput) {
 ?>				<td class="score" rowspan="2"><?php echo $userdata['score'];?></td>
 <?php
@@ -163,6 +173,7 @@ while ($moreMatchesToCome) {
 ?>			</tr>
 			<tr>
 <?php
+/* PICK COMMENT --------------------------------------------------------------------------------------*/
 			dbRestartQuery($result);
 			while ($row=dbFetchRow($result)) {
 				$pick = dbQuery('SELECT * FROM pick WHERE cid = '.dbMakeSafe($cid)
@@ -194,7 +205,9 @@ while ($moreMatchesToCome) {
 		$moreMatchesToCome = false;
 	}
 }
-// Now we have done the matches, we may need to do a special table for the bonus question
+
+
+/* BONUS QUESTION --------------------------------------------------------------------------------------*/
 
 if(!$totalHasBeenOutput) {
 ?><table>
@@ -211,6 +224,7 @@ if(!$totalHasBeenOutput) {
 			<th class="score" rowspan="3">Pick Score</th>
 <?php
 	}
+/* THE QUESTION IN HEADER -----------------------------------------------------------------------------*/
 ?>			<th class="score" rowspan="<?php echo ($isAQuestion)?3:1 ;?>">Total<br/>Round Score</th>
 		</tr>
 <?php
@@ -220,6 +234,7 @@ if(!$totalHasBeenOutput) {
 		</tr>
 		<tr>
 <?php
+/* QUESTION OPTIONS IN HEADER --------------------------------------------------------------------------*/
 		if($bqopts > 0) {
 			// this is a multichoice question, so get results and output them
 			while ($optdata = dbFetchRow($resultbq)) {
@@ -240,8 +255,9 @@ if(!$totalHasBeenOutput) {
 ?>	</thead>
 	<tbody>
 <?php
+	// User data was restarted further up (in case it was part of another group of matches)
 	while ($userdata = dbFetchRow($resultuser)) {
-
+/*  BONUS QUESTION ANSWERS ----------------------------------------------------------------------------------------*/
 ?>		<tr>
 			<td><?php echo $userdata['name'];?></td>
 <?php
@@ -277,7 +293,8 @@ if(!$totalHasBeenOutput) {
 ?>			<td><?php echo $userdata['opid'];?></td>
 <?php
 				}
-			}	
+			}
+/* BONUS, MATCH PICK and TOTAL SCORES --------------------------------------------------------------------------------*/
 ?>			<td><?php echo $userdata['bscore'];?></td><td><?php echo $userdata['mscore'];?></td>
 <?php
 		}	

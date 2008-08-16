@@ -31,18 +31,19 @@ MBB = function() {
 	    this.request = new Request.HTML({
             url: url,
 	    onSuccess: function(html) {
-	        div.empty();
+	        div.removeClass('loading');
 	        div.adopt(html);
 	        iSP(div);
 	    },
 	    onFailure: function(){
 	        var output = message || '<p>Failed to Read Page from '+url+'<p>';
-	        div.empty();
 	        div.adopt(output);
 	    }
 	    });
     },
     loadPage: function(params) {
+		this.div.empty();
+		this.div.addClass('loading');
 	    this.request.get($merge(reqOpts,params || {}));
     }
   }),
@@ -140,7 +141,7 @@ var MBBall = new Class({
 		MBB.setRO({'uid':me.uid,'pass':me.password});
 		var span=$('version');
 		span.set('text',version);
-		MBB.setErrorDiv ($(errordiv));
+		MBB.setErrorDiv (errordiv);
 	}
 });
 
@@ -204,10 +205,15 @@ var MBBUser = new Class({
 						return false; //don't submit
 					}
 				}
+		
 				var pickReq = new MBB.req('createpicks.php', function(response) {
 					window.location.reload(true); //reload page to pick up picks
 				});
 				pickReq.post($('pick'));
+				var content = $('content');
+				content.getElement('table').destroy();
+				var div = new Element('div',{'class':'loading'});
+				div.inject(content);
 			});
 		}
 	}

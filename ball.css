@@ -81,6 +81,12 @@ body, td, th
 .error {background-color:#FF9999;font-weight:bold;}
 [disabled],[readonly] {background-color:#EEEEEE;color:black;}
 .clear {clear:both;float:none;}
+.loading {
+	width:300px;
+	height:100px;
+	background: white url(/static/images/spinner.gif) no-repeat center;
+}
+
 
 /* ================================================================ 
 This copyright notice must be kept untouched in the stylesheet at 
@@ -178,11 +184,11 @@ way to fit your requirements.
 .tid {width:30px;}
 .score{width:40px;}
 .ou{width:40px;}
-.pick_comment {width:85px;word-wrap:break-word;}
+.pick_comment {width:165px;word-wrap:break-word;}
 .question {width:500px;word-wrap:break-word;}
 .bquestion {width:250px;word-wrap:break-word;}
 .opt_ans {word-wrap:break-word;}
-.mcomment,.bcomment {width:80px;height:30px;}
+.mcomment,.bcomment {width:160px;height:30px;}
 .conference{width:300px;}
 .confhead{width:149px;}
 

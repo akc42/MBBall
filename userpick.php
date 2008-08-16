@@ -1,22 +1,24 @@
 <?php
 if (!defined('BALL'))
 	die('Hacking attempt...');
-
+$time_at_top = time();
 // If user is registered and we can do picks then we need to display the  Picks Section
 $sql = 'SELECT m.hid , m.aid , p.pid , m.combined_score AS cs, p.over , p.comment ';
 $sql .= ' FROM match m JOIN team t ON m.hid = t.tid LEFT JOIN pick p ';
 $sql .= 'ON m.cid = p.cid AND m.rid = p.rid AND m.hid = p.hid AND p.uid = '.dbMakeSafe($uid);
-$sql .= ' WHERE m.cid = '.dbMakeSafe($cid).' AND m.rid = '.dbMakeSafe($rid).' AND m.open IS TRUE AND m.match_time > '.dbMakeSafe(time()+$gap);
+$sql .= ' WHERE m.cid = '.dbMakeSafe($cid).' AND m.rid = '.dbMakeSafe($rid).' AND m.open IS TRUE AND m.match_time > '.dbMakeSafe($time_at_top +$gap);
 $sql .= ' ORDER BY t.confid,t.divid, m.hid;';
 $result = dbQuery($sql);
 $nomatches = dbNumRows($result);
-$time_at_top = time();
-if ($nomatches > 0 || $rounddata['valid_question']||($playoff_deadline != 0 and $play_off_deadline > $time_at_top)) {
+
+if ($nomatches > 0 || $rounddata['valid_question']||($playoff_deadline != 0 and $playoff_deadline > $time_at_top)) {
 ?><form id="pick">
 	<input type="hidden" name="uid" value="<?php echo $uid;?>" />
 	<input type="hidden" name="pass" value="<?php echo $password;?>" />
 	<input type="hidden" name="cid" value="<?php echo $cid;?>" />
-	<input type="hidden" name="rid" value="<?php echo $rid;?>" />		
+	<input type="hidden" name="rid" value="<?php echo $rid;?>" />
+	<input type="hidden" name="gap" value="<?php echo $gap;?>" />
+	<input type="hidden" name="ppd" value="<?php echo $playoff_deadline ;?>" />
 	<table class="layout">
 		<tbody>
 			<tr>	
@@ -61,11 +63,12 @@ if ($nomatches > 0 || $rounddata['valid_question']||($playoff_deadline != 0 and 
 											value="U"
 											<?php if ($row['over'] == 'f') echo 'checked';?>/>Under<br/>
 									<input	type="radio"
-											name="<?php echo 'O'.$row['hid'];?>" value="O"
+											name="<?php echo 'O'.$row['hid'];?>"
+											value="O"
 											<?php if ($row['over'] == 't') echo 'checked';?>/>Over<br/></td>
 <?php
 			}
-?>								<td><textarea name"<?php echo 'C'.$row['hid'];?>" class="mcomment" rows="2" cols="20"><?php echo $row['comment'];?></textarea></td>
+?>								<td><textarea name="<?php echo 'C'.$row['hid'];?>" class="mcomment" rows="2" cols="20"><?php echo $row['comment'];?></textarea></td>
 							</tr>
 <?php
 		}
@@ -100,29 +103,29 @@ if ($nomatches > 0 || $rounddata['valid_question']||($playoff_deadline != 0 and 
 								<td><?php echo dbBBcode($rounddata['question']);?></td>
 								<td><input id="answer" type="text" name="answer"
 <?php
-			if(!is_null($row['value'])) {
-				echo 'value="'.$row['value'].'"';
+			if(!is_null($row['opid'])) {
+				echo 'value="'.$optdata['opid'].'"';
 			}
 ?>													/></td>
 <?php
 		} else {
 //Question is multichoice
 			for($i=1; $i<$noopts;$i++) {
-				$row = dbFetchRow($result);
+				$optdata = dbFetchRow($resultop);
 ?>							<tr>
 <?php
 				if($i == 1) {
 ?>								<td class="bquestion" rowspan ="<?php echo $noopts ;?>"><?php echo dbBBcode($rounddata['question']);?></td>
 <?php
 				}
-?>								<td><input type="radio" name="Canswer" value="<?php echo $row['opid'];?>"
-										<?php if(isset($opdata) && $optdata['opid'] == $row['opid']) echo 'checked';?>	/><?php echo $row['label']; ?></td>
+?>								<td><input type="radio" name="answer" value="<?php echo $row['opid'];?>"
+										<?php if(isset($opdata['opid']) && $optdata['opid'] == $row['opid']) echo 'checked';?>	/><?php echo $row['label']; ?></td>
 <?php
 				
 			}
 		}
 ?>								<td>
-<textarea class="bcomment" name="Cbonus"><?php if (isset($optdata) && !is_null($opdata['comment'])) echo $opdata['comment'];?></textarea>
+<textarea class="bcomment" name="Cbonus"><?php if (isset($optdata['comment']) && !is_null($opdata['comment'])) echo $opdata['comment'];?></textarea>
 								</td>
 							</tr>
 						</tbody>
@@ -140,18 +143,17 @@ if ($nomatches > 0 || $rounddata['valid_question']||($playoff_deadline != 0 and 
 ?>			<tr>
 				<td id="playoff_pick" colspan="2">
 <?php
-$result=dbQuery('SELECT tid FROM div_winner_pick WHERE cid = '.dbMakeSafe($cid).' AND uid = '.dbMakeSafe($uid).';');
-		$dw = array();
+$result=dbQuery('SELECT tid,divid,confid FROM div_winner_pick WHERE cid = '.dbMakeSafe($cid).' AND uid = '.dbMakeSafe($uid).';');
+		$dw = array(array());
 		while($row = dbFetchRow($result)) {
-			$dw[$row['tid']] = 1;
+			$dw[$row['confid']][$row['divid']] = $row['tid'];
 		}
 dbFree($result);
-$result=dbQuery('SELECT tid FROM wildcard_pick WHERE cid = '.dbMakeSafe($cid).' AND uid = '.dbMakeSafe($uid).';');
-		$wild = array();
+$result=dbQuery('SELECT tid,opid,confid FROM wildcard_pick WHERE cid = '.dbMakeSafe($cid).' AND uid = '.dbMakeSafe($uid).';');
+		$wild = array(array());
 		while($row = dbFetchRow($result)) {
-			$wild[$row['tid']] = 1;
+			$wild[$row['confid']][$row['opid']] = $row['tid'];
 		}
-		$wild1_shown = false;
 ?>					<table>
 						<caption>Pick divisional winner and wildcard picks for each conference</caption>
 						<thead>
@@ -180,7 +182,8 @@ $result=dbQuery('SELECT tid FROM wildcard_pick WHERE cid = '.dbMakeSafe($cid).' 
 <?php
 		foreach($confs as $confid => $conference) {
 			$no_of_rows = max($sizes[$confid]);
-
+			$w1tid = (isset($wild[$confid][1]))?$wild[$confid][1]:'';
+			$w2tid = (isset($wild[$confid][2]))?$wild[$confid][2]:'';
 ?>							<tr>
 								<td class="conference" colspan="2" rowspan="<?php echo $no_of_rows;?>"><?php echo $conference;?></td>
 <?php
@@ -192,22 +195,23 @@ $result=dbQuery('SELECT tid FROM wildcard_pick WHERE cid = '.dbMakeSafe($cid).' 
 				foreach($divs as $divid => $division) {
 					if(isset($teams[$confid][$divid][$i])) { //only if this entry is set
 						$tid=$teams[$confid][$divid][$i]['tid'];
+						$dwtid = (isset($dw[$confid][$divid]))?$dw[$confid][$divid]:'';;
 ?>								<td class="tid"><?php echo $tid; ?></td>
 								<td class="radio">
 									<input type="radio" class="ppick" 
 											name="<?php echo 'D'.$divid.$confid;?>"
 											value="<?php echo $tid;?>"
-											<?php if (isset($dw[$tid])) echo 'checked';?> /></td>
+											<?php if ($dwtid == $tid) echo 'checked';?> /></td>
 								<td class="radio">
 									<input type="radio" class="ppick" 
 											name="<?php echo 'W1'.$confid;?>"
 											value="<?php echo $tid;?>"
-											<?php if (isset($wild[$tid])) {echo 'checked'; $wild1_shown=true;} ?> /></td>
+											<?php if ($w1tid == $tid) echo 'checked'; ?> /></td>
 								<td class="radio">
 									<input type="radio" class="ppick" 
 											name="<?php echo 'W2'.$confid;?>"
 											value="<?php echo $tid;?>"
-											<?php if ($wild1_shown && isset($wild[$tid])) echo 'checked';?> /></td>
+											<?php if ($w2tid == $tid) echo 'checked';?> /></td>
 <?php
 					} else {
 ?>								<td colspan="4"></td>	

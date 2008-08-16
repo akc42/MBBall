@@ -34,7 +34,7 @@ window.addEvent('domready', function() {
 				password : '<?php echo $password; ?>',
 				admin :<?php if(isset($_GET['global'])) {echo 'true';} else {echo 'false';}?>},
 				<?php if(isset($_GET['cid'])) {echo $_GET['cid'] ;}else{ echo '0';}?>,
-                                'errormessage'
+                                $('errormessage')
                              );
 });	
 

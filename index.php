@@ -182,7 +182,7 @@ window.addEvent('domready', function() {
 				password : '<?php echo sha1("Football".$uid); ?>',
 				registered:<?php echo ($registered)?'true':'false';?>},
 				{cid: <?php echo $cid;?>, rid: <?php echo $rid;?>},
-                             'errormessage'
+                             $('errormessage')
 	);
 	MBB.adjustDates($('content'));
 });	
