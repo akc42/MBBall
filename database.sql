@@ -55,9 +55,9 @@ CREATE TABLE div_winner_pick (
     cid integer NOT NULL,
     confid character(3) NOT NULL,
     divid character(1) NOT NULL,
-    tid character(3),
+    tid character(3) NOT NULL,
     uid integer NOT NULL,
-    submit_time bigint
+    submit_time bigint DEFAULT date_part('epoch'::text, now()) NOT NULL
 );
 
 COMMENT ON TABLE div_winner_pick IS 'User Pick of each division winner';
@@ -119,7 +119,7 @@ CREATE TABLE option_pick (
     cid integer NOT NULL,
     rid integer NOT NULL,
     opid integer,
-    submit_time bigint
+    submit_time bigint DEFAULT date_part('epoch'::text, now()) NOT NULL
 );
 
 COMMENT ON COLUMN option_pick.uid IS 'User ID';
@@ -151,7 +151,7 @@ CREATE TABLE pick (
     hid character(3) NOT NULL,
     pid character(3),
     over boolean,
-    submit_time bigint
+    submit_time bigint DEFAULT date_part('epoch'::text, now()) NOT NULL
 );
 
 COMMENT ON COLUMN pick.uid IS 'User ID';
@@ -225,8 +225,8 @@ CREATE TABLE wildcard_pick (
     cid integer NOT NULL,
     confid character(3) NOT NULL,
     uid integer NOT NULL,
-    tid character(3),
-    submit_time bigint,
+    tid character(3) NOT NULL,
+    submit_time bigint DEFAULT date_part('epoch'::text, now()) NOT NULL,
     opid smallint DEFAULT 1 NOT NULL
 );
 
@@ -245,7 +245,21 @@ COMMENT ON COLUMN wildcard_pick.opid IS 'Either 1 or 2 depending on which wildca
 
 
 CREATE VIEW match_score AS
-    SELECT m.cid, m.rid, m.hid, u.uid, ((CASE WHEN p.uid IS NULL THEN 0 ELSE 1 END + CASE WHEN o.uid IS NULL THEN 0 ELSE 1 END) * r.value) AS score FROM ((((registration u JOIN match m USING (cid)) JOIN round r USING (cid, rid)) LEFT JOIN pick p ON ((((((p.cid = m.cid) AND (p.rid = m.rid)) AND (p.hid = m.hid)) AND (p.uid = u.uid)) AND (((m.hscore >= m.ascore) AND (p.pid = m.hid)) OR ((m.hscore <= m.ascore) AND (p.pid = m.aid)))))) LEFT JOIN pick o ON (((((((o.cid = m.cid) AND (o.rid = m.rid)) AND (o.hid = m.hid)) AND (o.uid = u.uid)) AND (r.ou_round IS TRUE)) AND (((((m.hscore + m.ascore))::numeric > ((m.combined_score)::numeric + 0.5)) AND (o.over IS TRUE)) OR ((((m.hscore + m.ascore))::numeric < ((m.combined_score)::numeric + 0.5)) AND (o.over IS NOT TRUE)))))) WHERE (m.open IS TRUE);
+ SELECT m.cid, m.rid, m.hid, u.uid, 
+        CASE
+            WHEN p.uid IS NULL THEN 0
+            ELSE 1
+        END * r.value AS pscore, 
+        CASE
+            WHEN o.uid IS NULL THEN 0
+            ELSE 1
+        END * r.value AS oscore
+   FROM registration u
+   JOIN match m USING (cid)
+   JOIN round r USING (cid, rid)
+   LEFT JOIN pick p ON p.cid = m.cid AND p.rid = m.rid AND p.hid = m.hid AND p.uid = u.uid AND (m.hscore >= m.ascore AND p.pid = m.hid OR m.hscore <= m.ascore AND p.pid = m.aid)
+   LEFT JOIN pick o ON o.cid = m.cid AND o.rid = m.rid AND o.hid = m.hid AND o.uid = u.uid AND r.ou_round IS TRUE AND ((m.hscore + m.ascore)::numeric > (m.combined_score::numeric + 0.5) AND o.over IS TRUE OR (m.hscore + m.ascore)::numeric < (m.combined_score::numeric + 0.5) AND o.over IS FALSE)
+  WHERE r.open IS TRUE AND m.open IS TRUE;
 
 COMMENT ON VIEW match_score IS 'points user scored in a match from the pick and over/under question (if present)';
 
@@ -267,7 +281,34 @@ CREATE VIEW playoff_score AS
 COMMENT ON VIEW playoff_score IS 'Score user makes in correctly guessing the playoffs';
 
 CREATE VIEW round_score AS
-    SELECT r.cid, r.rid, r.uid, sum(CASE WHEN m.score IS NULL THEN 0 ELSE m.score END) AS mscore, r.score AS bscore, (sum(m.score) + r.score) AS score FROM (match_score m RIGHT JOIN bonus_score r USING (cid, rid, uid)) GROUP BY r.cid, r.rid, r.uid, r.score;
+SELECT r.cid, r.rid, r.uid, sum(
+        CASE
+            WHEN m.pscore IS NULL THEN 0
+            ELSE m.pscore
+        END) AS pscore, sum(
+        CASE
+            WHEN m.oscore IS NULL THEN 0
+            ELSE m.oscore
+        END) AS oscore, sum(
+        CASE
+            WHEN m.pscore IS NULL THEN 0
+            ELSE m.pscore
+        END + 
+        CASE
+            WHEN m.oscore IS NULL THEN 0
+            ELSE m.oscore
+        END) AS mscore, r.score AS bscore, sum(
+        CASE
+            WHEN m.pscore IS NULL THEN 0
+            ELSE m.pscore
+        END + 
+        CASE
+            WHEN m.oscore IS NULL THEN 0
+            ELSE m.oscore
+        END) + r.score AS score
+   FROM match_score m
+   RIGHT JOIN bonus_score r USING (cid, rid, uid)
+  GROUP BY r.cid, r.rid, r.uid, r.score;
 
 COMMENT ON VIEW round_score IS 'Get total score for the round by user';
 
