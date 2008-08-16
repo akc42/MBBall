@@ -2,6 +2,18 @@
  * (c) 2008 Alan Chandler - licenced under the GPL
 */
 MBB = function() {
+	var m_names = new Array("Jan","Feb","Mar","Apr","May","Jun","Jly","Aug","Sep","Oct","Nov","Dec");
+	var formatDate = function(d) {
+		//d is a string with seconds from 1st Jan 1970
+		var myDate = new Date(d.toInt()*1000);
+		var ch = myDate.getHours();
+		var ap = (ch < 12)? 'am':'pm';
+		ch = (ch == 0)?12:(ch > 12)?ch-12:ch;
+		var min = myDate.getMinutes();
+		min = min + "";
+		min = (min.length == 1)?'0'+min:min;
+		return myDate.getDate() + ' ' + m_names[myDate.getMonth()] + ' ' + myDate.getFullYear() + ' ' + ch + ':' + min + ' ' + ap;
+	};
   var reqOpts;
   var errorDiv;
   return {
@@ -69,7 +81,7 @@ MBB = function() {
 					datespan.set('text','');
 					break;
 				}
-				datespan.set('text',new Date(d.toInt()*1000).toLocaleString().substr(0,21));
+				datespan.set('text',formatDate(d));
 				break;
 			case "input":
 				d=datespan.value;
@@ -77,7 +89,7 @@ MBB = function() {
 					datespan.value = '';
 					break;
 				}
-				datespan.value = new Date(d.toInt()*1000).toLocaleString().substr(0,21);
+				datespan.value = formatDate(d);
 				break;
 			default:
 				break;
@@ -147,6 +159,55 @@ var MBBUser = new Class({
 					});
                     regReq.post($('register'));
 				}
+			});
+		}
+		if(me.registered) {
+			this.teams = $H({});
+			this.lastpick = $H({});
+			var picks = $$('.ppick')
+			var that =this;
+			// We make a hash of every checked item - which we can then use when an item changes to
+			// check that the new item isn't already picked, and if so set it back
+			picks.each(function(item) {
+				if(item.checked) {
+					that.teams.set(item.value,item);
+					that.lastpick.set(item.name,item);
+				}
+			});
+			picks.addEvent('change',function(e) {
+				e.stop();
+				var lastValue = that.lastpick.get(this.name);
+				if(that.teams.has(this.value)) {
+					//this team already has a selection, so lets find out what
+					var existingSelection = that.teams.get(this.value);
+					existingSelection.getParent().highlight('#F00');
+					// now change it back
+					this.checked = false;
+					if(lastValue) lastValue.checked = true;
+				} else {
+					// This team did not have a selection before, so now set one
+					// and take out old values;
+					that.teams.set(this.value,this);
+					if(lastValue) that.teams.erase(lastValue.value);
+					that.lastpick.erase(this.name);
+					that.lastpick.set(this.name,this);
+				}
+			});
+			
+			//These items are only there if user has registered
+			$('pick').addEvent('submit', function(e) {
+				e.stop();
+				var answer = $('answer');
+				if(answer) {
+					//only here if answer is defined (no options to select (in which case Answer must be an integer
+					if(!MBB.validateInt(answer)) {
+						return false; //don't submit
+					}
+				}
+				var pickReq = new MBB.req('createpicks.php', function(response) {
+					window.location.reload(true); //reload page to pick up picks
+				});
+				pickReq.post($('pick'));
 			});
 		}
 	}
@@ -253,12 +314,23 @@ var MBBAdmin = new Class({
 					var noopts;
 					
 					var setMatchEvents = function (div) {
+						var ou = $('ou');
+						if (!ou.checked) {
+							div.getElement('input[name=cscore]').readOnly = true;
+						}
 						div.getElements('input').extend(div.getElements('textarea')).addEvent('change', function(e) {
 							var validated = true;
-							var surroundDiv = this.getParent();
-							if(surroundDiv.hasClass('.csscore')
-									|| surroundDiv.hasClass('hscore') 
-									|| surroundDiv.hasClass('ascore')) {
+							if (this.name == 'open' && this.checked) {
+								var aid = div.getElement('input[name=aid]');
+								if (aid.value ==  '' || aid.value == null) {
+									this.checked = false;
+									validated = false;
+									aid.highlight('#F00');
+								}
+							}
+							if(this.name == 'cscore' 
+									|| this.name == 'hscore' 
+									|| this.name == 'ascore') {
 								if(!MBB.intValidate(this)) {
 									validated = false;
 								}
@@ -297,12 +369,17 @@ var MBBAdmin = new Class({
 							e.stop();
 							var aid = div.getElement('input[name=aid]');
 							if(aid.value != null && aid.value != '' ) {
-								var removeaidReq = new MBB.req('removeaid.php',function(response){
-								// remove aid from match
-									aid.value = null;
-									e.target.set('text','---');
-									$('T'+response.aid).removeClass('inmatch');
-								});
+								var open = div.getElement('input[name=open]');
+								if (open.checked) {
+									open.highlight('#F00');
+								} else {
+									var removeaidReq = new MBB.req('removeaid.php',function(response){
+									// remove aid from match
+										aid.value = null;
+										e.target.set('text','---');
+										$('T'+response.aid).removeClass('inmatch');
+									});
+								}
 								removeaidReq.get($merge(params,{'hid':div.getElement('input[name=hid]').value}));
 							}
 						});
@@ -372,8 +449,8 @@ var MBBAdmin = new Class({
 							e.stop();
 							if (this.id == 'ou') {
 								//if ou changes then all the matches combined scores are diabled or not
-								$$('.cscore').each(function(item) {
-									item.input.readOnly = ! e.target.checked;
+								$('matches').getElements('input[name=cscore]').each(function(item) {
+									item.readOnly = ! e.target.checked;
 								});
 							}
 							var validated = true;
@@ -540,7 +617,7 @@ var MBBAdmin = new Class({
 											var match = new Element('div',{'class':'match'});
 											match.inject($('matches'));
 											var matchPage = new MBB.subPage(this,'creatematch.php',match, function(div) {
-												if (!$('ou').checked)  match.getElement('.cscore').readOnly=true;
+												if (!$('ou').checked)  match.getElement('input[name=cscore]').readOnly=true;
 												setMatchEvents(match);
 												team.getParent().addClass('inmatch');
 											});

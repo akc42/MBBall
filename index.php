@@ -179,7 +179,8 @@ var MBBmgr;
 window.addEvent('domready', function() {
 	MBBmgr = new MBBUser('<?php echo $version;?>',
 				{uid: <?php echo $uid;?>, 
-				password : '<?php echo sha1("Football".$uid); ?>'},
+				password : '<?php echo sha1("Football".$uid); ?>',
+				registered:<?php echo ($registered)?'true':'false';?>},
 				{cid: <?php echo $cid;?>, rid: <?php echo $rid;?>},
                              'errormessage'
 	);
@@ -274,6 +275,13 @@ if(in_array(SMF_FOOTBALL,$groups)) {
 if($registered && $rid !=0) {
 ?>			<tr><td colspan="2"><div id="registered"><?php require_once('userpick.php');?></div></td></tr>
 <?php
+} else {
+	if($signedup) {
+?>	<tr><td colspan="2"><div id="registered"><p>Although you have registered, this competition requires that Baby Backups obtain
+		admistrators approval before being allowed to enter this competition.  If you have not already done so please contact the
+		the administrator,  who is: <span><?php echo $admName;?></span> </p></div></td></tr>
+<?php
+	}
 }
 if($registration_allowed) {
 ?>			<tr>

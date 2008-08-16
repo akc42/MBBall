@@ -27,32 +27,26 @@ while ($moreMatchesToCome) {
 	<thead>
 		<tr>
 			<th rowspan="<?php echo ($ouRound)?4:3 ;?>" class="match_data">Match Data<br/><?php echo $rounddata['name'];?></th>
-			<th rowspan="2">Points for<br/>Correct Pick</th>
+			<th rowspan="2" class="score">Points for<br/>Correct Pick</th>
 <?php
 
 	if(($nom = dbNumRows($result)) > 0) {
 		while($row = dbFetchRow($result)) {
 			if(!(is_null($row['hscore']) || is_null($row['ascore']) || $row['hscore'] < $row['ascore'])) {
 			//Home win
-?>			<th class="win">
-<?php
+?>			<th class="win tid"><?php
 			} else {
-?>			<th>
-<?php
+?>			<th class="tid"><?php
 			}
-			echo $row['hid'];
-?>			</th>
+			echo $row['hid']; ?></th>
 <?php
 			if(!(is_null($row['hscore']) || is_null($row['ascore']) || $row['hscore'] > $row['ascore'])) {
 			//Away win
-?>			<th class="win">
-<?php
+?>			<th class="win tid"><?php
 			} else {
-?>			<th>
-<?php
+?>			<th class="tid"><?php
 			}
-			echo $row['aid'];
-?>			</th>
+			echo $row['aid'];?></th>
 <?php
 		}
 
@@ -62,7 +56,7 @@ while ($moreMatchesToCome) {
 		// if we have less than eight matches left and there is noly the overall total to output we should do it rather than create a new table
 		if($nom < 8 && !$isAQuestion) {
 			$totalHasBeenOutput = true;
-?>			<th rowspan="<?php echo ($ouRound)?4:3 ;?>">Round Score</th>
+?>			<th rowspan="<?php echo ($ouRound)?4:3 ;?>" class="score">Round Score</th>
 <?php
 		}
 ?>		</tr>
@@ -76,12 +70,12 @@ while ($moreMatchesToCome) {
 		}
 ?>		</tr>
 		<tr>
-			<th rowspan="<?php echo ($ouRound)?2:1 ;?>"><?php echo $rounddata['value'];?></th>
+			<th class="score" rowspan="<?php echo ($ouRound)?2:1 ;?>"><?php echo $rounddata['value'];?></th>
 <?php
 		dbRestartQuery($result);  //put the results back to the start so we can interate over them again
 		while($row = dbFetchRow($result)) {
-?>			<th><?php if(!is_null($row['hscore'])) echo $row['hscore'];?></th>
-			<th><?php if(!is_null($row['ascore'])) echo $row['ascore'];?></th>
+?>			<th class="score" ><?php if(!is_null($row['hscore'])) echo $row['hscore'];?></th>
+			<th class="score"><?php if(!is_null($row['ascore'])) echo $row['ascore'];?></th>
 <?php
 		}
 ?>		</tr>
@@ -95,16 +89,15 @@ while ($moreMatchesToCome) {
 			$cs = $row['combined_score']+0.5;
 				if(!(is_null($row['hscore']) || is_null($row['ascore']))) {
 					$scores=$row['hscore']+$row['ascore'];
-?>			<th><?php echo $cs;?></th>
-			<th><?php echo ($scores>$cs)?'Over':'Under';?></th>
+?>			<th class="score"><?php echo $cs;?></th>
+			<th class="score"><?php echo ($scores>$cs)?'Over':'Under';?></th>
 <?php
 				} else {
-?>			<th><?php echo $cs;?></th><th></th>
+?>			<th class="score"><?php echo $cs;?></th><th></th>
 <?php
 				}
 			}
-?>			<th></th>
-		</tr>
+?>		</tr>
 <?php
 		}
 	
@@ -122,11 +115,11 @@ while ($moreMatchesToCome) {
 				if($pickdata = dbFetchRow($pick)) {
 					if(!is_null($row['hscore']) && !is_null($row['ascore'])) {
 						if ((($row['hscore']>$row['ascore'])?$row['hid']:$row['aid']) == $pickdata['pid']) {
-?>				<td class="win">
+?>				<td class="win tid">
 <?php
 							echo $pickdata['pid'].'<span class="win"><br/>(Right)</span>';
 						} else {
-?>				<td>
+?>				<td class="tid">
 <?php
 							echo $pickdata['pid'];
 						}
@@ -135,18 +128,18 @@ while ($moreMatchesToCome) {
 						if($ouRound) {
 							if ($row['hscore']+$row['ascore'] > $row['combined_score']+0.5) {
 								if($pickdata['over'] == 't') {
-?>				<td class="win">Over<span class="win"><br/>(Right)</span></td>
+?>				<td class="win ou">Over<span class="win"><br/>(Right)</span></td>
 <?php
 								} else {
-?>				<td>Under</td>
+?>				<td class="ou">Under</td>
 <?php
 								}
 							} else {
 								if ($pickdata['over'] == 't') {
-?>				<td>Over</td>
+?>				<td class="ou">Over</td>
 <?php
 								} else {
-?>				<td class="win">Under<span class="win"><br/>(Right)</span></td>
+?>				<td class="win ou">Under<span class="win"><br/>(Right)</span></td>
 <?php
 								}
 							}
@@ -158,10 +151,13 @@ while ($moreMatchesToCome) {
 ?>				<td colspan="2"></td>
 <?php
 					}
-				}
+				} else {
+?>				<td colspan="2"></td>
+<?php
+				}							
 			}
 			if($totalHasBeenOutput) {
-?>				<td rowspan="2"><?php echo $userdata['score'];?></td>
+?>				<td class="score" rowspan="2"><?php echo $userdata['score'];?></td>
 <?php
 			}
 ?>			</tr>
@@ -172,7 +168,7 @@ while ($moreMatchesToCome) {
 				$pick = dbQuery('SELECT * FROM pick WHERE cid = '.dbMakeSafe($cid)
 					.' AND rid = '.dbMakeSafe($rid).' AND hid = \''.$row['hid'].'\' AND uid = '.$userdata['uid'].';');
 				if($pickdata = dbFetchRow($pick)) {
-?>				<td colspan="2"><?php echo dbBBcode($pickdata['comment']);?></td>
+?>				<td class="pick_comment" colspan="2"><?php echo dbBBcode($pickdata['comment']);?></td>
 <?php
 				} else {
 ?>				<td colspan="2"></td>
@@ -209,25 +205,29 @@ if(!$totalHasBeenOutput) {
 	//We need to find all the options so we can display them later, but for now we need to know how many for the colspan
 		$resultbq=dbQuery('SELECT * FROM option WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' ORDER BY opid;');
 		$bqopts = dbNumRows($resultbq);
+		$width = (int) (500/$bqopts); // to style options
 ?>			<th <?php if($bqopts > 0) echo 'colspan="'.$bqopts.'"';?>>Bonus Question</th>
-			<th rowspan="3">Bonus Score</th>
-			<th rowspan="3">Pick Score</th>
+			<th class="score" rowspan="3">Bonus Score</th>
+			<th class="score" rowspan="3">Pick Score</th>
 <?php
 	}
-?>			<th rowspan="<?php echo ($isAQuestion)?3:1 ;?>">Total<br/>Round Score</th>
+?>			<th class="score" rowspan="<?php echo ($isAQuestion)?3:1 ;?>">Total<br/>Round Score</th>
 		</tr>
 <?php
 	if($isAQuestion) {
 ?>		<tr>
-		<th <?php if($bqopts > 0) echo 'colspan="'.$bqopts.'"';?>><?php echo dbBBcode($rounddata['question']);?></th>
+		<th class="question" <?php if($bqopts > 0) echo 'colspan="'.$bqopts.'"';?>><?php echo dbBBcode($rounddata['question']);?></th>
 		</tr>
 		<tr>
 <?php
 		if($bqopts > 0) {
 			// this is a multichoice question, so get results and output them
 			while ($optdata = dbFetchRow($resultbq)) {
-?>			<th <?php if(!is_null($rounddata['answer']) && $rounddata['answer'] == $optdata['opid']) echo 'class="win"';?>>
-					<?php echo $optdata['label'];?></th>
+?>			<th style="width:<?php echo $width;?>px" <?php if(!is_null($rounddata['answer']) && $rounddata['answer'] == $optdata['opid']) {
+					echo 'class="win opt_ans"';
+				} else {
+					echo 'class="opt_ans"';
+				};?>><?php echo $optdata['label'];?></th>
 <?php
 			}
 		} else {

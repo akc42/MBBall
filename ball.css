@@ -19,7 +19,6 @@ body {
 table
 {
 	empty-cells: show;
-	table-layout: fixed;
 }
 
 /* By default (td, body..) use Tahoma in black. */
@@ -133,9 +132,12 @@ way to fit your requirements.
 	background-color:#4A7DB5;
 	background-image:none;
 	color:#fff;
-	padding:20px;
+	padding:5pxpx;
 	overflow:auto;
 }
+
+#content>table.layout{width:970px;}
+
 #r{
 	width:25em;
 }
@@ -164,21 +166,45 @@ way to fit your requirements.
 	color:black;
 }
 
+#registered>p>span {color:red;}
+
 #agree {
 	padding:1em;
 	text-align:center;
 }
 
+.radio{width:22px;}
 .user_name{width:140px;}
-
+.tid {width:30px;}
+.score{width:40px;}
+.ou{width:40px;}
+.pick_comment {width:85px;word-wrap:break-word;}
+.question {width:500px;word-wrap:break-word;}
+.bquestion {width:250px;word-wrap:break-word;}
+.opt_ans {word-wrap:break-word;}
+.mcomment,.bcomment {width:80px;height:30px;}
+.conference{width:300px;}
+.confhead{width:149px;}
 
 table.layout table td.in_po {background-color:#99FF99;}
 
 span.in_po {font-size:0.6em;}
 td p.no_team {background-color:#CCFFFF;}
+.win {background-color:#66FF00;}
 
 #bonus_pick,#instructions {vertical-align:top;}
 
+input#make_picks {
+	font-size:large;
+	font-weight:bold;
+	margin:10px;
+	float:right;
+	margin-right:100px;
+	background-color:red;
+	color:white;
+	padding:5px;
+}
+/
 /* mainly administration stuff below here */
 div.del {
 	background: url(images/cross.gif);
@@ -192,7 +218,6 @@ div.del {
 
 div.del:hover, div.del:active {background-position:left bottom;}
 .del_head{width:18px;}
-.radio{width:22px;}
 
 #rounds {
 	vertical-align:top;
@@ -205,6 +230,8 @@ div.del:hover, div.del:active {background-position:left bottom;}
 	color:#FFFFCC;
 }
 
+#round{width:400px;}
+
 #matches {
 	width:772px;
 	padding:0px;
@@ -215,7 +242,7 @@ div.del:hover, div.del:active {background-position:left bottom;}
 #tic {
 	background-color:#CCEDFF;
 	cursor:pointer;
-    width:80px;
+    width:60px;
 }
 
 #tnic {
@@ -264,7 +291,7 @@ textarea#condition, textarea#question {
 .comment {background-color:#FFFFCC;}
 .comment textarea {
 	width:160px;
-	min-height:56px;; 
+	min-height:56px; 
 	height:auto;
 }
 /* for Internet Explorer */
@@ -290,9 +317,8 @@ td, div {padding:2px;}
 .user {width:180px;}
 .option1{width:12em;}
 table.layout table.form td.submit{width:8em; text-align:center;background-color:#993300;}
-.time,.datetime {width:160px;}
+.time,.datetime {width:80px;text-align:center;}
 .option2{width:8em;}
-.tid {width:46px;}
 
 
 .selectthis {
