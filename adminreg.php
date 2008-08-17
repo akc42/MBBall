@@ -36,7 +36,7 @@ if ($cid != 0) {
 			<td><?php echo $row['email'];?></td>
 			<td><span class="time"><?php echo $row['last_logon']; ?></span></td>
 			<td><span class="time"><?php echo $row['agree_time']; ?></span></td>
-			<td><input type="checkbox" readonly <?php if($row['is_bb'] == 't') echo 'checked';?> /></td>
+			<td class="radio"><?php if($row['is_bb'] == 't') tick();?></td>
 			<td>
 				<input type="checkbox" name="<?php echo $row['uid'];?>"
 <?php 
@@ -57,7 +57,7 @@ if ($cid != 0) {
 		}
 ?>								 />
 			</td>
-			<td><input type="checkbox" readonly <?php if($row['admin_experience'] == 't') echo 'checked';?> /></td>
+			<td class="radio"><?php if($row['admin_experience'] == 't') tick();?></td>
 			<td><div id="<?php echo 'F'.$uid; ?>" class="del"></div></td>
 		</tr>
 <?php
