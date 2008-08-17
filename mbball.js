@@ -116,7 +116,7 @@ MBB = function() {
 	},
 	intValidate: function(el) {
 		el.removeClass('error');
-		if(el.value == '') return false;
+		if(el.value == '') return true;
 		if (isNaN(el.value.toInt())) {
 			el.addClass('error');
 			return false;
