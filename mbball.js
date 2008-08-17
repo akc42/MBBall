@@ -326,15 +326,8 @@ var MBBAdmin = new Class({
 						}
 						div.getElements('input').extend(div.getElements('textarea')).addEvent('change', function(e) {
 							var validated = true;
-							if (this.name == 'open' && this.checked) {
-								var aid = div.getElement('input[name=aid]');
-								if (aid.value ==  '' || aid.value == null) {
-									this.checked = false;
-									validated = false;
-									aid.highlight('#F00');
-								}
-							}
-							if(this.name == 'cscore' 
+							var matchtime = div.getElement('input[name=mtime]');
+							if(this.name == 'cscore'
 									|| this.name == 'hscore' 
 									|| this.name == 'ascore') {
 								if(!MBB.intValidate(this)) {
@@ -342,8 +335,22 @@ var MBBAdmin = new Class({
 								}
 							}
 							// We need to always validate the date - so it gets converted to the correct serial number
-							if(!MBB.parseDate(div.getElement('input[name=mtime]'))) {
+							if(!MBB.parseDate(matchtime)) {
 								validated = false;
+							}
+							if (this.name == 'open' && this.checked) {
+								var aid = div.getElement('input[name=aid]');
+								if (aid.value ==  '' || aid.value == null) {
+									this.checked = false;
+									validated = false;
+									aid.highlight('#F00');
+								}
+								if ( validated && (matchtime.value == '' || matchtime.value = 0)) {  //As user to confirm if no matchdate is set
+									if (!confirm('Are you sure you want to open this match without a match date set?')) {
+										validated = false;
+									}
+								}
+
 							}
 							if (validated) {
 								var updateReq = new MBB.req('updatematch.php',function(response) {
@@ -460,6 +467,7 @@ var MBBAdmin = new Class({
 								});
 							}
 							var validated = true;
+							
 							if(!MBB.parseDate($('deadline'))) {
 								validated = false;
 							}
@@ -471,6 +479,15 @@ var MBBAdmin = new Class({
 							}
 							if (!MBB.textValidate($('rname'))) {
 								validated = false;
+							}
+							// Ask user to confirm if he wants to open a round with no open matches
+							if ( validated && this.name = 'open') {
+								var openmatches = $('matches').getElements('input[name=open]');
+								if(openmatches.length == 0 | openmatches.every(function (match) {return (!match.open);}) ) {
+									if (! confirm('There are no open matches, are you sure you wish to open the round?')) {
+										validated = false;
+									}
+								}
 							}
 							if(validated) {
 								var updateReq = new MBB.req('updateround.php', function(response) {
