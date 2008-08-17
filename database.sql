@@ -257,8 +257,9 @@ CREATE VIEW match_score AS
    FROM registration u
    JOIN match m USING (cid)
    JOIN round r USING (cid, rid)
-   LEFT JOIN pick p ON p.cid = m.cid AND p.rid = m.rid AND p.hid = m.hid AND p.uid = u.uid AND (m.hscore >= m.ascore AND p.pid = m.hid OR m.hscore <= m.ascore AND p.pid = m.aid)
-   LEFT JOIN pick o ON o.cid = m.cid AND o.rid = m.rid AND o.hid = m.hid AND o.uid = u.uid AND r.ou_round IS TRUE AND ((m.hscore + m.ascore)::numeric > (m.combined_score::numeric + 0.5) AND o.over IS TRUE OR (m.hscore + m.ascore)::numeric < (m.combined_score::numeric + 0.5) AND o.over IS FALSE)
+   LEFT JOIN pick p ON p.cid = m.cid AND p.rid = m.rid AND p.hid = m.hid AND p.uid = u.uid AND (m.hscore >= m.ascore AND p.pid = m.hid) OR (m.hscore <= m.ascore AND p.pid = m.aid)
+   LEFT JOIN pick o ON o.cid = m.cid AND o.rid = m.rid AND o.hid = m.hid AND o.uid = u.uid AND r.ou_round IS TRUE
+ 	AND ((m.hscore + m.ascore)::numeric > (m.combined_score::numeric + 0.5) == o.over) IS TRUE
   WHERE r.open IS TRUE AND m.open IS TRUE;
 
 COMMENT ON VIEW match_score IS 'points user scored in a match from the pick and over/under question (if present)';
