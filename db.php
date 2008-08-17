@@ -60,4 +60,7 @@ header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); // Date in the past
 	function dbFetch($result) {
 		return pg_fetch_all($result);
 	}
+	function tick() {
+		echo '<img src="images/tick.gif" alt="Correct" />';
+	}
 ?>

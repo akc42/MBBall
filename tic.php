@@ -36,9 +36,9 @@ foreach($confs as $confid => $conference) {
 				if(isset($teams[$confid][$divid][$i])) { //only if this entry is set
 					$row=$teams[$confid][$divid][$i];
 					if($row['mp']) {
-?>			<td class="in_po">
+?>			<td class="win">
 <?php
-						echo $row['tid'].'<span class="in_po"><br/>(In PO)</span>';
+						echo $row['tid'];tick();
 					} else {
 ?>			<td>
 <?php						
