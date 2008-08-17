@@ -19,6 +19,7 @@ $moreMatchesToCome = true;
 $startMatch = 0;
 ?><h1>Details of this rounds pick</h1>
 <?php
+if ($rid != 0) {
 /* GROUPS OF 8 MATCHES ----------------------------------------------------------------------------*/
 while ($moreMatchesToCome) {
 	$result = dbQuery('SELECT * FROM match m JOIN team t ON m.hid = t.tid WHERE m.cid = '
@@ -309,5 +310,9 @@ if(!$totalHasBeenOutput) {
 	}
 ?>	</tbody>
 </table>
+<?php
+}
+} else {
+?><p>There are no rounds in this competition to display right now.  Please come back later</p>
 <?php
 }

@@ -1,6 +1,6 @@
 <?php
 
-$version = "v1.0";
+$version = "v1.1";
 
 /* A new version of chat
 	Copyright (c) 2008 Alan Chandler
@@ -276,7 +276,7 @@ if($registered && $rid !=0) {
 ?>			<tr><td colspan="2"><div id="registered"><?php require_once('userpick.php');?></div></td></tr>
 <?php
 } else {
-	if($signedup) {
+	if($signedup  & !$registered) {
 ?>	<tr><td colspan="2"><div id="registered"><p>Although you have registered, this competition requires that Baby Backups obtain
 		admistrators approval before being allowed to enter this competition.  If you have not already done so please contact the
 		the administrator,  who is: <span><?php echo $admName;?></span> </p></div></td></tr>
