@@ -36,7 +36,7 @@ if ($nomatches > 0 || $rounddata['valid_question']||($playoff_deadline != 0 and 
 <?php
 		}
 ?>
-								<th class="comment">Comment</td>
+								<th >Comment</td>
 								</tr>
 						</thead>
 						<tbody>
@@ -68,7 +68,7 @@ if ($nomatches > 0 || $rounddata['valid_question']||($playoff_deadline != 0 and 
 											<?php if ($row['over'] == 't') echo 'checked';?>/>Over<br/></td>
 <?php
 			}
-?>								<td><textarea name="<?php echo 'C'.$row['hid'];?>" class="mcomment" rows="2" cols="20"><?php echo $row['comment'];?></textarea></td>
+?>								<td><textarea name="<?php echo 'C'.$row['hid'];?>" class="comment" rows="2" cols="20"><?php echo $row['comment'];?></textarea></td>
 							</tr>
 <?php
 		}
@@ -90,45 +90,50 @@ if ($nomatches > 0 || $rounddata['valid_question']||($playoff_deadline != 0 and 
 						</thead>
 						<tbody>
 <?php
-		$result=dbQuery('SELECT * FROM option WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).';');
+		$result=dbQuery('SELECT * FROM option WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' ORDER BY opid;');
 		$noopts = dbNumRows($result);  //No of multichoice examples 0= numeric answer required
-		$resultop = dbQuery('SELECT * FROM option_pick WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' AND uid = '.dbMakeSafe($uid).';');
-		if (dbNumRows($resultop) > 0 ) {
-			$opdata = dbFetchRow($resultop);
-		}
-		if ($noopts ==0 ) {
+		$resultop = dbQuery('SELECT * FROM option_pick WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid)
+				.' AND uid = '.dbMakeSafe($uid).'ORDER BY opid;');
+
+
+//Question is multichoice
+		for($i=1; $i<=$noopts;$i++) {
+//We get one loop round anyway if noopts = 0
 			$row = dbFetchRow($result);
-//Question is a numeric type
+			$optdata = dbFetchRow($resultop);
+
+
 ?>							<tr>
-								<td><?php echo dbBBcode($rounddata['question']);?></td>
-								<td><input id="answer" type="text" name="answer"
+<?php
+			if($i == 1) {
+?>								<td class="question" rowspan ="<?php echo $noopts ;?>"><?php echo dbBBcode($rounddata['question']);?></td>
+								
+<?php
+			}
+			if($noopts > 0) {
+?>								<td><input type="radio" name="answer" value="<?php echo $row['opid'];?>"
+										<?php if(isset($optdata['opid']) && $optdata['opid'] == $row['opid']) echo 'checked';?>	/><?php echo $row['label']; ?></td>
+<?php
+			} else {
+?>								<td><input id="answer" type="text" name="answer"
 <?php
 			if(!is_null($row['opid'])) {
 				echo 'value="'.$optdata['opid'].'"';
 			}
 ?>													/></td>
 <?php
-		} else {
-//Question is multichoice
-			for($i=1; $i<$noopts;$i++) {
-				$optdata = dbFetchRow($resultop);
-?>							<tr>
-<?php
-				if($i == 1) {
-?>								<td class="bquestion" rowspan ="<?php echo $noopts ;?>"><?php echo dbBBcode($rounddata['question']);?></td>
-<?php
-				}
-?>								<td><input type="radio" name="answer" value="<?php echo $row['opid'];?>"
-										<?php if(isset($opdata['opid']) && $optdata['opid'] == $row['opid']) echo 'checked';?>	/><?php echo $row['label']; ?></td>
-<?php
-				
 			}
-		}
-?>								<td>
-<textarea class="bcomment" name="Cbonus"><?php if (isset($optdata['comment']) && !is_null($opdata['comment'])) echo $opdata['comment'];?></textarea>
+			if($i == 1) {
+?>								<td rowspan ="<?php echo $noopts ;?>">
+<textarea class="comment" name="Cbonus"><?php if (isset($optdata['comment']) && !is_null($optdata['comment'])) echo $optdata['comment'];?></textarea>
 								</td>
-							</tr>
-						</tbody>
+<?php
+			}
+?>							</tr>
+<?php
+		}
+		
+?>						</tbody>
 					</table>
 <?php
 	} // end valid question check

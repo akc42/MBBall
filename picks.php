@@ -4,7 +4,7 @@ if (!defined('BALL'))
 	die('Hacking attempt...');
 
 // we need to get the users resultant score
-$sql = 'SELECT u.name , u.uid , r.mscore,r.bscore,r.score, p.opid, p.comment';
+$sql = 'SELECT u.name , u.uid , r.pscore, r.oscore, r.mscore,r.bscore,r.score, p.opid, p.comment';
 $sql .= ' FROM round_score r JOIN participant u USING (uid)';
 $sql .= ' LEFT JOIN option_pick p USING (cid,rid,uid)';
 $sql .= ' WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid);
@@ -24,6 +24,7 @@ while ($moreMatchesToCome) {
 	$result = dbQuery('SELECT * FROM match m JOIN team t ON m.hid = t.tid WHERE m.cid = '
 			.dbMakeSafe($cid).' AND m.rid = '.dbMakeSafe($rid)
 			.' AND  m.open IS TRUE ORDER BY t.confid, t.divid, hid LIMIT 8 OFFSET '.$startMatch.';');
+
 ?><table>
 	<thead>
 		<tr>
@@ -95,7 +96,7 @@ while ($moreMatchesToCome) {
 				if(!(is_null($row['hscore']) || is_null($row['ascore']))) {
 					$scores=$row['hscore']+$row['ascore'];
 ?>			<th class="score"><?php echo $cs;?></th>
-			<th class="score"><?php echo ($scores>$cs)?'Over':'Under';?></th>
+			<th class="ou"><?php echo ($scores>$cs)?'Over':'Under';?></th>
 <?php
 				} else {
 ?>			<th class="score"><?php echo $cs;?></th><th></th>
@@ -114,50 +115,39 @@ while ($moreMatchesToCome) {
 ?>			<tr>
 				<td rowspan="2" colspan="2"><?php echo $userdata['name'];?></td>
 <?php
+			$sql = 'SELECT p.hid, p.pid, p.over, p.comment, m.pscore,m.oscore';
+			$sql .= ' FROM match_score m JOIN team t ON m.hid = t.tid LEFT JOIN pick p USING (cid,rid,hid,uid)';
+			$sql .= ' WHERE m.cid = '.dbMakeSafe($cid).' AND m.rid = '.dbMakeSafe($rid).' AND m.uid = '.$userdata['uid'];
+			$sql .= ' ORDER BY t.confid, t.divid, m.hid LIMIT 8 OFFSET '.$startMatch.';';
+			$pick = dbQuery($sql);
+
 /* MATCH WINNER PICK ------------------------------------------------------------------------------*/
 			dbRestartQuery($result);
 			while ($row=dbFetchRow($result)) {
-				$pick = dbQuery('SELECT p.pid, p.over, p.comment FROM pick p JOIN match m JOIN team t ON m.hid = t.tid USING (cid, rid, hid) WHERE cid = '.dbMakeSafe($cid)
-							.' AND rid = '.dbMakeSafe($rid).' AND hid = \''.$row['hid'].'\' AND uid = '.$userdata['uid']
-							.' AND m.open IS TRUE ORDER BY t.confid, t.divid, hid LIMIT 8 OFFSET '.$startMatch.';');
-				if($pickdata = dbFetchRow($pick)) {
-					if(!is_null($row['hscore']) && !is_null($row['ascore'])) {
-						if ((($row['hscore']>$row['ascore'])?$row['hid']:$row['aid']) == $pickdata['pid']) {
+				$pickdata = dbFetchRow($pick);
+				if(!is_null($pickdata['hid'])) {
+					if($pickdata['pscore'] > 0) {
 ?>				<td class="win tid">
 <?php
-							echo $pickdata['pid'].'<span class="win"><br/>(Right)</span>';
-						} else {
+						echo $pickdata['pid'].'<span class="win"><br/>(Right)</span>';
+					} else {
 ?>				<td class="tid">
 <?php
-							echo $pickdata['pid'];
-						}
+						if (!is_null($pickdata['pid'])) echo $pickdata['pid'];
+					}
 ?>				</td>
 <?php
 /* OVER UNDER PICK --------------------------------------------------------------------------------*/
-						if($ouRound) {
-							if ($row['hscore']+$row['ascore'] > $row['combined_score']+0.5) {
-								if($pickdata['over'] == 't') {
-?>				<td class="win ou">Over<span class="win"><br/>(Right)</span></td>
+					if($ouRound && !is_null($pickdata['over'])) {
+						if($pickdata['oscore'] > 0) {
+?>				<td class="win ou"><?php echo ($pickdata['over'] == 't')?'Over':'Under';?><span class="win"><br/>(Right)</span></td>
 <?php
-								} else {
-?>				<td class="ou">Under</td>
-<?php
-								}
-							} else {
-								if ($pickdata['over'] == 't') {
-?>				<td class="ou">Over</td>
-<?php
-								} else {
-?>				<td class="win ou">Under<span class="win"><br/>(Right)</span></td>
-<?php
-								}
-							}
 						} else {
-?>				<td></td>
+?>				<td class="ou"><?php echo ($pickdata['over'] == 't')?'Over':'Under';?></td>
 <?php
 						}
 					} else {
-?>				<td colspan="2"></td>
+?>				<td class="ou"></td>
 <?php
 					}
 				} else {
@@ -175,22 +165,19 @@ while ($moreMatchesToCome) {
 <?php
 /* PICK COMMENT --------------------------------------------------------------------------------------*/
 			dbRestartQuery($result);
+			dbRestartQuery($pick);
 			while ($row=dbFetchRow($result)) {
-				$pick = dbQuery('SELECT * FROM pick WHERE cid = '.dbMakeSafe($cid)
-					.' AND rid = '.dbMakeSafe($rid).' AND hid = \''.$row['hid'].'\' AND uid = '.$userdata['uid'].';');
-				if($pickdata = dbFetchRow($pick)) {
-?>				<td class="pick_comment" colspan="2"><?php echo dbBBcode($pickdata['comment']);?></td>
+				$pickdata = dbFetchRow($pick);
+	
+			
+?>				<td class="comment" colspan="2"><?php if(!( is_null($pickdata ['hid']) || is_null($pickdata['comment']))) echo dbBBcode($pickdata['comment']);?></td>
 <?php
-				} else {
-?>				<td colspan="2"></td>
-<?php
-				}
 			}
 ?>			</tr>
 <?php
+			dbFree($pick);
 		}
 		dbFree($result);
-
 ?>	</tbody>
 </table>
 <?php
@@ -219,12 +206,12 @@ if(!$totalHasBeenOutput) {
 		$resultbq=dbQuery('SELECT * FROM option WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' ORDER BY opid;');
 		$bqopts = dbNumRows($resultbq);
 		$width = (int) (500/$bqopts); // to style options
+/* THE QUESTION IN HEADER -----------------------------------------------------------------------------*/
 ?>			<th <?php if($bqopts > 0) echo 'colspan="'.$bqopts.'"';?>>Bonus Question</th>
 			<th class="score" rowspan="3">Bonus Score</th>
 			<th class="score" rowspan="3">Pick Score</th>
 <?php
 	}
-/* THE QUESTION IN HEADER -----------------------------------------------------------------------------*/
 ?>			<th class="score" rowspan="<?php echo ($isAQuestion)?3:1 ;?>">Total<br/>Round Score</th>
 		</tr>
 <?php
@@ -259,7 +246,7 @@ if(!$totalHasBeenOutput) {
 	while ($userdata = dbFetchRow($resultuser)) {
 /*  BONUS QUESTION ANSWERS ----------------------------------------------------------------------------------------*/
 ?>		<tr>
-			<td><?php echo $userdata['name'];?></td>
+			<td rowspan="2"><?php echo $userdata['name'];?></td>
 <?php
 		if($isAQuestion) {
 			if($bqopts > 0) {
@@ -294,13 +281,19 @@ if(!$totalHasBeenOutput) {
 <?php
 				}
 			}
+		}
 /* BONUS, MATCH PICK and TOTAL SCORES --------------------------------------------------------------------------------*/
-?>			<td><?php echo $userdata['bscore'];?></td><td><?php echo $userdata['mscore'];?></td>
-<?php
-		}	
-?>			<td><?php echo $userdata['score'];?></td>
+?>			<td rowspan="2" class="score"><?php echo $userdata['bscore'];?></td><td rowspan="2" class="score"><?php echo $userdata['mscore'];?></td>
+			<td rowspan="2" class="score"><?php echo $userdata['score'];?></td>
 		</tr>
 <?php
+/*  USER COMMENT TO THE QUESTION -----------------------------------------------------------------------*/
+		if($isAQuestion) {
+?>		<tr>
+			<td class="comment" <?php if($bqopts > 0) echo 'colspan="'.$bqopts.'"';?>><?php echo dbBBcode($userdata['comment']);?></td>
+		</tr>
+<?php
+		}
 	}
 ?>	</tbody>
 </table>
