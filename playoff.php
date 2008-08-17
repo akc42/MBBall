@@ -3,73 +3,70 @@ if (!defined('BALL'))
 	die('Hacking attempt...');
 require_once('team.php');
 
-?>
-<table>
-	<caption>Players Playoff Picks</caption>
-	<thead>
-		<tr><th rowspan="3"></th>
+
+?><h1>Players Playoff Picks</h1>
 <?php
 foreach($confs as $confid => $conference) {
-?>			<th colspan="<?php echo array_sum($sizes[$confid]);?>"><?php echo $confid; ?></td>
+	$sql = 'SELECT u.name, u.uid, p.score FROM registration r JOIN participant u USING (uid)';
+	$sql .= ' LEFT JOIN playoff_score p ON r.cid = p.cid AND r.uid = p.uid AND p.confid = '.dbMakeSafe($confid);
+	$sql .= ' WHERE r.cid = '.dbMakeSafe($cid);
+	$sql .= ' ORDER BY score DESC;';
+	$result = dbQuery($sql);
+
+?><table>
+	<thead>
+		<tr><th rowspan="2"><?php echo $conference;?></th>
 <?php
-}
-?>			<th rowspan="3">Score</th>
+	foreach($divs as $divid => $division){
+?>			<th colspan="<?php echo $sizes[$confid][$divid];?>">
+				<?php echo $division; ?></th>
+<?php
+	}
+
+?>			<th rowspan="2" class="score">Score</td>
 		</tr>
 		<tr>
 <?php
-foreach($confs as $confid => $conference) {
-	foreach($divs as $divid => $division){
-?>			<th colspan="<?php echo $sizes[$confid][$divid];?>">
-				<?php echo $divid; ?></th>
-<?php
-	}
-}
-?>		</tr>
-		<tr>
-<?php
-foreach($confs as $confid => $conference) {
+
 	foreach($divs as $divid => $division) {
 		if(isset($teams[$confid][$divid])) {
 			foreach($teams[$confid][$divid] as $team) {
-?>			<th class="tid"><?php echo $team['tid'];?></th>
+?>			<th class="tid"><?php echo $team['tid'];if($team['mp']) {echo '<br/>'; tick();}?></th>
 <?php
 			}
 		}
 	}
-}
 ?>		</tr>
 	</thead>
 	<tbody>
 <?php
-$sql = 'SELECT u.name AS name, u.uid AS uid, p.score AS score';
-$sql .= ' FROM playoff_score p JOIN participant u USING (uid)';
-$sql .= ' WHERE cid = '.dbMakeSafe($cid);
-$sql .= ' ORDER BY score DESC;';
-$result = dbQuery($sql);
-while($row = dbFetchRow($result)) {
-	$playoff_selections = array();
-	$resultplay = dbQuery('SELECT tid  FROM playoff_picks WHERE cid = '.dbMakeSafe($cid).' AND uid = '.dbMakeSafe($row['uid']).';');
-	while($playdata = dbFetchRow($resultplay)) {
-		$playoff_selections[$playdata['tid']] = 1;
-	}
+	while($row = dbFetchRow($result)) {
+		$playoff_selections = array();
+		$resultplay = dbQuery('SELECT tid  FROM playoff_picks JOIN team t USING (tid) '
+				.' WHERE cid = '.dbMakeSafe($cid).' AND uid = '.dbMakeSafe($row['uid']).' AND t.confid = '.dbMakeSafe($confid).' ;');
+		while($playdata = dbFetchRow($resultplay)) {
+			$playoff_selections[$playdata['tid']] = 1;
+		}
 ?>		<tr>
-			<td><?php echo $row['name']; ?></td>
+			<td class="user_name"><?php echo $row['name']; ?></td>
 <?php
-	foreach($confs as $confid => $conference) {
 		foreach($divs as $divid => $division){
 			foreach($teams[$confid][$divid] as $team) {
-?>				<td <?php if($team['mp'] && isset($playoff_selections[$team['tid']])) echo 'class="win"';?>>
-					<?php if(isset($playoff_selections[$team['tid']])) echo $team['tid'];?></td>
+				$correct = ($team['mp'] && isset($playoff_selections[$team['tid']]));
+?>				<td <?php if($correct) {echo 'class="tid win"';}else{ echo 'class="tid"';}?>>
+					<?php if(isset($playoff_selections[$team['tid']])) echo '<img src="images/sel.gif" alt="'.$team['tid'].' selected"/>';if($correct) tick();?></td>
 <?php
 			}
 		}
-	}
-	dbFree($resultplay);
-	unset($playoff_selections);
-?>			<td><?php echo $row['score'];?></td>
+	
+		dbFree($resultplay);
+		unset($playoff_selections);
+?>			<td class="score"><?php echo $row['score'];?></td>
 		</tr>
 <?php
-}
-dbFree($result);
+	}
+	dbFree($result);
 ?>	</tbody>
 </table>
+<?php
+}

@@ -24,28 +24,29 @@ dbFree($result);
 	<tbody>
 <?php
 if ($rid != 0) {
-	$sql = 'SELECT u.uid, u.name AS name, p.score AS pscore, sum(r.score) AS rscore, p.score+sum(r.score) AS total';
+	$sql = 'SELECT u.uid, u.name AS name, sum(p.score) AS pscore, sum(r.score) AS rscore, sum(p.score)+sum(r.score) AS total';
 	$sql .= ' FROM participant u JOIN registration reg USING (uid) JOIN playoff_score p USING (cid,uid) JOIN round_score r USING (cid,uid)';
 	$sql .= ' WHERE cid = '.dbMakeSafe($cid).' AND rid <= '.dbMakeSafe($rid);
-	$sql .= ' GROUP BY u.uid, u.name, p.score ORDER BY total DESC;';
+	$sql .= ' GROUP BY u.uid, u.name, p.confid ORDER BY total DESC;';
 } else {
 	$sql .= 'SELECT u.uid, u.name AS name, 0 AS pscore, 0 AS rscore, 0 AS total';
 	$sql .= ' FROM participant u JOIN registration reg USING (uid) WHERE cid = '.dbMakeSafe($cid).' ORDER BY u.name;';
 }
 $result = dbQuery($sql);
 while($row = dbFetchRow($result)) {
+	
 ?>		<tr>
-			<td class="user_name"><?php echo $row['name'];?></td>
+			<td <?php if($uid == $row['uid']) {echo 'class="user_name me"';} else {echo 'class="user_name"';}?>><?php echo $row['name'];?></td>
 <?php
 	$resultround = dbQuery('SELECT score FROM round_score WHERE cid = '.dbMakeSafe($cid).' AND
 				 rid <= '.dbMakeSafe($rid).' AND uid = '.dbMakeSafe($row['uid']).' ORDER BY rid DESC;');
 	while ($rscore = dbFetchRow($resultround)) {
-?>			<td class="score"><?php echo $rscore['score'];?></td>
+?>			<td <?php if($uid == $row['uid']) {echo 'class="score me"';} else {echo 'class="score"';}?>><?php echo $rscore['score'];?></td>
 <?php
 	}
-?>			<td class="score"><?php echo $row['rscore'];?></td>
-			<td class="score"><?php echo $row['pscore'];?></td>
-			<td class="score"><?php echo $row['total'];?></td>
+?>			<td <?php if($uid == $row['uid']) {echo 'class="score me"';} else {echo 'class="score"';}?>><?php echo $row['rscore'];?></td>
+			<td <?php if($uid == $row['uid']) {echo 'class="score me"';} else {echo 'class="score"';}?>><?php echo $row['pscore'];?></td>
+			<td <?php if($uid == $row['uid']) {echo 'class="score me"';} else {echo 'class="score"';}?>><?php echo $row['total'];?></td>
 		</tr>
 <?php
 }

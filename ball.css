@@ -195,6 +195,8 @@ table.layout table td.comment{height:40px;width:86px;vertical-align:top;}
 table.layout table th.score{text-align:center;}
 table.layout table td.opt_sel{text-align:center;height:20px;}
 table.layout table.layout td.comment{height:40px;width:86px;vertical-align:top;background-color:#D5F4FF}
+table.layout table td.me {background-color:#D5F4FF;}
+
 span.in_po {font-size:0.6em;}
 td p.no_team {background-color:#CCFFFF;}
 td#instructions td {background-color:white; width:150px; border:2px solid black; font-size:x-small; text-align:left;vertical-align:top;}
@@ -309,7 +311,7 @@ height: 56px;
 }
 /**/
 
-caption,#picks h1 {font-size:small; font-weight:bold;text-align:center;}
+caption,#picks h1, #popicks h1 {font-size:small; font-weight:bold;text-align:center;}
 
 table.layout table td {
 	background-color:white;
