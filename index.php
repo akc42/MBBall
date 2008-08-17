@@ -296,7 +296,7 @@ if($registration_allowed) {
 ?>			<tr><td colspan="2"><div id="picks"><?php require_once('picks.php');?></div></td></tr>
 <?php
 if ($playoff_deadline != 0) {
-?>			<tr><td colspan="2"><div id="popicks"><?php //require('playoff.php');?></div></td></tr>
+?>			<tr><td colspan="2"><div id="popicks"><?php require_once('playoff.php');?></div></td></tr>
 <?php
 }
 ?>			<tr><td colspan="2"><div id="tics"><?php require_once('tic.php');?></div></td></tr>

@@ -9,7 +9,7 @@ $cid = $_GET['cid'];
 if ($cid != 0) {
 	define ('BALL',1);   //defined so we can control access to some of the files.
 	require_once('db.php');
-	$result = dbQuery('SELECT rid,name,ou_round FROM round WHERE cid = '.dbMakeSafe($cid).' ORDER BY rid DESC ;');
+	$result = dbQuery('SELECT rid,name,ou_round,open FROM round WHERE cid = '.dbMakeSafe($cid).' ORDER BY rid DESC ;');
 	
 ?>
 <table>
@@ -28,7 +28,8 @@ if ($cid != 0) {
 ?>		<tr>
 			<td id="<?php echo 'R'.$rid;?>" class="selectthis"><?php echo $rid; ?></td>
 			<td id="<?php echo 'S'.$rid;?>" class="selectthis"><?php echo $row['name'];?>
-			<td><div id="<?php echo 'E'.$rid; ?>" class="del"></div></td>
+			<td><div id="<?php echo 'E'.$rid; ?>" class="del">
+					<input type="hidden" name="open" value="<?php echo ($row['open'] == 't')?$rid:0;?>" /></div></td>
 		</tr>
 <?php
 	}

@@ -3,7 +3,7 @@ if (!defined('BALL'))
 	die('Hacking attempt...');
 $time_at_top = time();
 // If user is registered and we can do picks then we need to display the  Picks Section
-$sql = 'SELECT m.hid , m.aid , p.pid , m.combined_score AS cs, p.over , p.comment ';
+$sql = 'SELECT m.hid , m.aid , p.pid , m.combined_score AS cs, p.over , p.comment AS comment, m.comment AS adm_comment';
 $sql .= ' FROM match m JOIN team t ON m.hid = t.tid LEFT JOIN pick p ';
 $sql .= 'ON m.cid = p.cid AND m.rid = p.rid AND m.hid = p.hid AND p.uid = '.dbMakeSafe($uid);
 $sql .= ' WHERE m.cid = '.dbMakeSafe($cid).' AND m.rid = '.dbMakeSafe($rid).' AND m.open IS TRUE AND m.match_time > '.dbMakeSafe($time_at_top +$gap);
@@ -36,8 +36,9 @@ if ($nomatches > 0 || $rounddata['valid_question']||($playoff_deadline != 0 and 
 <?php
 		}
 ?>
-								<th >Comment</td>
-								</tr>
+								<th class="comment">Administrators Comment</td>
+								<th class="comment">Players Comment</td>
+							</tr>
 						</thead>
 						<tbody>
 <?php
@@ -68,7 +69,8 @@ if ($nomatches > 0 || $rounddata['valid_question']||($playoff_deadline != 0 and 
 											<?php if ($row['over'] == 't') echo 'checked';?>/>Over<br/></td>
 <?php
 			}
-?>								<td><textarea name="<?php echo 'C'.$row['hid'];?>" class="comment" rows="2" cols="20"><?php echo $row['comment'];?></textarea></td>
+?>								<td class="comment"><?php echo dbBBcode($row['adm_comment']);?></td>
+								<td><textarea name="<?php echo 'C'.$row['hid'];?>" class="comment" rows="2" cols="20"><?php echo $row['comment'];?></textarea></td>
 							</tr>
 <?php
 		}
@@ -94,13 +96,13 @@ if ($nomatches > 0 || $rounddata['valid_question']||($playoff_deadline != 0 and 
 		$noopts = dbNumRows($result);  //No of multichoice examples 0= numeric answer required
 		$resultop = dbQuery('SELECT * FROM option_pick WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid)
 				.' AND uid = '.dbMakeSafe($uid).'ORDER BY opid;');
+		$optdata = dbFetchRow($resultop); //even on multichoice there is only going to be one pick
 
 
 //Question is multichoice
 		for($i=1; $i<=$noopts;$i++) {
 //We get one loop round anyway if noopts = 0
 			$row = dbFetchRow($result);
-			$optdata = dbFetchRow($resultop);
 
 
 ?>							<tr>
@@ -111,11 +113,10 @@ if ($nomatches > 0 || $rounddata['valid_question']||($playoff_deadline != 0 and 
 <?php
 			}
 			if($noopts > 0) {
-?>								<td><input type="radio" name="answer" value="<?php echo $row['opid'];?>"
-										<?php if(isset($optdata['opid']) && $optdata['opid'] == $row['opid']) echo 'checked';?>	/><?php echo $row['label']; ?></td>
+?>								<td><input type="radio" name="opid" value="<?php echo $row['opid'];?>" <?php if((int)$optdata['opid'] == (int)$row['opid']) echo 'checked';?>	/><?php echo $row['label'];?></td>
 <?php
 			} else {
-?>								<td><input id="answer" type="text" name="answer"
+?>								<td><input id="answer" type="text" name="opid"
 <?php
 			if(!is_null($row['opid'])) {
 				echo 'value="'.$optdata['opid'].'"';
@@ -125,7 +126,7 @@ if ($nomatches > 0 || $rounddata['valid_question']||($playoff_deadline != 0 and 
 			}
 			if($i == 1) {
 ?>								<td rowspan ="<?php echo $noopts ;?>">
-<textarea class="comment" name="Cbonus"><?php if (isset($optdata['comment']) && !is_null($optdata['comment'])) echo $optdata['comment'];?></textarea>
+<textarea class="comment" name="Cbonus"><?php echo $optdata['comment'];?></textarea>
 								</td>
 <?php
 			}
@@ -230,7 +231,7 @@ $result=dbQuery('SELECT tid,opid,confid FROM wildcard_pick WHERE cid = '.dbMakeS
 ?>						</tbody>
 					</table>
 				</td>
-			<tr>
+			</tr>
 <?php
 	}  //playoffs
 ?>

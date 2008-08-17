@@ -1,7 +1,7 @@
 <?php
 if (!defined('BALL'))
 	die('Hacking attempt...');
-
+require_once('team.php');
 
 ?>
 <table>
@@ -19,7 +19,7 @@ foreach($confs as $confid => $conference) {
 <?php
 foreach($confs as $confid => $conference) {
 	foreach($divs as $divid => $division){
-?>			<th colsspan="<?php echo $sizes[$confid][$divid];?>">
+?>			<th colspan="<?php echo $sizes[$confid][$divid];?>">
 				<?php echo $divid; ?></th>
 <?php
 	}
@@ -31,7 +31,7 @@ foreach($confs as $confid => $conference) {
 	foreach($divs as $divid => $division) {
 		if(isset($teams[$confid][$divid])) {
 			foreach($teams[$confid][$divid] as $team) {
-?>			<th><?php echo $team['tid'];?></th>
+?>			<th class="tid"><?php echo $team['tid'];?></th>
 <?php
 			}
 		}

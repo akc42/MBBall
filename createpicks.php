@@ -21,7 +21,7 @@ dbQuery('DELETE FROM pick WHERE uid = '.dbMakeSafe($uid).' AND cid = '.dbMakeSaf
 $opid = (isset($_POST['opid']))?$_POST['opid']:'';
 $comment = (isset($_POST['Cbonus']))?$_POST['Cbonus']:'';
 dbQuery('INSERT INTO option_pick(uid,cid,rid,opid,comment) VALUES ('
-						.dbMakeSafe($uid).','.dbMakeSafe($cid).','.dbMakeSafe($rid).','.dbPostSafe($opid).','.dbPostSafe($comment).');');
+						.dbMakeSafe($uid).','.dbMakeSafe($cid).','.dbMakeSafe($rid).','.dbMakeSafe($opid).','.dbPostSafe($comment).');');
 $result=dbQuery('SELECT hid FROM match  WHERE open IS TRUE AND match_time > '.dbMakeSafe(time()+$gap).' AND cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).';');
 
 while($row = dbFetchRow($result)) {
@@ -45,12 +45,12 @@ if ($ppd != 0 && $ppd > time()) {
 							.dbMakeSafe($uid).','.dbMakeSafe($cid).','.dbMakeSafe($confid).',1,'.dbMakeSafe($_POST['W1'.$confid]).');');
 		}
 		if(isset($_POST['W2'.$confid])) {
-			dbQuery('INSERT INTO wildcard_pick(uid,cid,confid,opid) VALUES ('
+			dbQuery('INSERT INTO wildcard_pick(uid,cid,confid,opid,tid) VALUES ('
 							.dbMakeSafe($uid).','.dbMakeSafe($cid).','.dbMakeSafe($confid).',2,'.dbMakeSafe($_POST['W2'.$confid]).');');
 		}
 		foreach($divs as $divid => $division) {
 			if (isset($_POST['D'.$divid.$confid])) {
-				dbQuery('INSERT INTO div_winner_pick(uid,cid,confid,opid) VALUES ('
+				dbQuery('INSERT INTO div_winner_pick(uid,cid,confid,divid,tid) VALUES ('
 						.dbMakeSafe($uid).','.dbMakeSafe($cid).','.dbMakeSafe($confid).','.dbMakeSafe($divid).','.dbMakeSafe($_POST['D'.$divid.$confid]).');');
 			}
 		}

@@ -728,6 +728,17 @@ var MBBAdmin = new Class({
 							params.rid=0;
 						}
 						maxround = params.rid;
+						// try and find the highest open round to display
+						if (params.rid != 0) {
+							var highestOpenRound = 0;
+							var roundii = div.getElements('input[name=open]')
+							roundii.each(function(round) {
+								if (round.value != 0) {
+									highestOpenRound = Math.max(highestOpenRound, round.value);
+								}
+							});
+							if (highestOpenRound != 0) params.rid = highestOpenRound;
+						}
 					}
 					this.round.loadPage(params);
 					if (params.rid != 0) {

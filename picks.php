@@ -28,7 +28,7 @@ while ($moreMatchesToCome) {
 ?><table>
 	<thead>
 		<tr>
-			<th rowspan="<?php echo ($ouRound)?4:3 ;?>" class="match_data">Match Data<br/><?php echo $rounddata['name'];?></th>
+			<th rowspan="<?php echo ($ouRound)?5:4 ;?>" class="match_data">Match Data<br/><?php echo $rounddata['name'];?></th>
 			<th rowspan="2" class="score">Points for<br/>Correct Pick</th>
 <?php
 /* TEAM NAMES IN HEADER ---------------------------------------------------------------*/
@@ -58,7 +58,7 @@ while ($moreMatchesToCome) {
 		// if we have less than eight matches left and there is noly the overall total to output we should do it rather than create a new table
 		if($nom < 8 && !$isAQuestion) {
 			$totalHasBeenOutput = true;
-?>			<th rowspan="<?php echo ($ouRound)?4:3 ;?>" class="score">Round Score</th>
+?>			<th rowspan="<?php echo ($ouRound)?5:4 ;?>" class="score">Round Score</th>
 <?php
 		}
 ?>		</tr>
@@ -74,7 +74,7 @@ while ($moreMatchesToCome) {
 /* THE VALUE OF A CORRECT PICK ----------------------*/
 ?>		</tr>
 		<tr>
-			<th class="score" rowspan="<?php echo ($ouRound)?2:1 ;?>"><?php echo $rounddata['value'];?></th>
+			<th class="score" rowspan="<?php echo ($ouRound)?3:2 ;?>"><?php echo $rounddata['value'];?></th>
 <?php
 /* THE SCORES IN HEADER ------------------------------------------------------------------------------*/
 		dbRestartQuery($result);  //put the results back to the start so we can interate over them again
@@ -106,8 +106,16 @@ while ($moreMatchesToCome) {
 ?>		</tr>
 <?php
 		}
-	
-?>	</thead>
+/* ADMINISTRATORS MATCH COMMENT IN HEADER ------------------------------------------------------------*/
+		dbRestartQuery($result);  //put the results back to the start so we can interate over them again
+?>		<tr>
+<?php
+		while($row = dbFetchRow($result)) {
+?>			<th class="comment" colspan="2"><?php echo dbBBcode($row['comment']);?></td>
+<?php
+		}	
+?>		</tr>
+	</thead>
 	<tbody>
 <?php
 /* FOR EACH USER WE DISPLAY THEIR PICKS FOR THE MATCHES -----------------------------------------------*/
