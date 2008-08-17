@@ -1,6 +1,6 @@
 <?php
 
-$version = "v0.11";
+$version = "v0.12";
 
 /* A new version of chat
 	Copyright (c) 2008 Alan Chandler

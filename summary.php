@@ -12,13 +12,13 @@ while($row = dbFetchRow($result)) {
 <?php
 }
 dbFree($result);
-?>			<th>Rounds<br/>Total</th>
+?>			<th class="score">Rounds<br/>Total</th>
 <?php
 	if($playoff_deadline != 0) {
-?>			<th>PlayOffs<br/>Total</th>
+?>			<th class="score">PlayOffs<br/>Total</th>
 <?php
 }
-?>			<th>Grand<br/>Total</th>
+?>			<th class="score">Grand<br/>Total</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -40,10 +40,12 @@ while($row = dbFetchRow($result)) {
 	$resultround = dbQuery('SELECT score FROM round_score WHERE cid = '.dbMakeSafe($cid).' AND
 				 rid <= '.dbMakeSafe($rid).' AND uid = '.dbMakeSafe($row['uid']).' ORDER BY rid DESC;');
 	while ($rscore = dbFetchRow($resultround)) {
-?>			<td><?php echo $rscore['score'];?></td>
+?>			<td class="score"><?php echo $rscore['score'];?></td>
 <?php
 	}
-?>			<td><?php echo $row['rscore'];?></td><td><?php echo $row['pscore'];?></td><td><?php echo $row['total'];?></td>
+?>			<td class="score"><?php echo $row['rscore'];?></td>
+			<td class="score"><?php echo $row['pscore'];?></td>
+			<td class="score"><?php echo $row['total'];?></td>
 		</tr>
 <?php
 }
