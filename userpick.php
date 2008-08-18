@@ -98,42 +98,42 @@ if ($nomatches > 0 || $rounddata['valid_question']||($playoff_deadline != 0 and 
 				.' AND uid = '.dbMakeSafe($uid).'ORDER BY opid;');
 		$optdata = dbFetchRow($resultop); //even on multichoice there is only going to be one pick
 
-
+		if ($noopts > 0) {
 //Question is multichoice
-		for($i=1; $i<=$noopts;$i++) {
+			for($i=1; $i<=$noopts;$i++) {
 //We get one loop round anyway if noopts = 0
-			$row = dbFetchRow($result);
+				$row = dbFetchRow($result);
 
 
 ?>							<tr>
 <?php
-			if($i == 1) {
+				if($i == 1) {
 ?>								<td class="question" rowspan ="<?php echo $noopts ;?>"><?php echo dbBBcode($rounddata['question']);?></td>
 								
 <?php
-			}
-			if($noopts > 0) {
+				}
+
 ?>								<td><input type="radio" name="opid" value="<?php echo $row['opid'];?>" <?php if((int)$optdata['opid'] == (int)$row['opid']) echo 'checked';?>	/><?php echo $row['label'];?></td>
 <?php
-			} else {
-?>								<td><input id="answer" type="text" name="opid"
-<?php
-			if(!is_null($row['opid'])) {
-				echo 'value="'.$optdata['opid'].'"';
-			}
-?>													/></td>
-<?php
-			}
-			if($i == 1) {
+
+				if($i == 1) {
 ?>								<td rowspan ="<?php echo $noopts ;?>">
 <textarea class="comment" name="Cbonus"><?php echo $optdata['comment'];?></textarea>
 								</td>
 <?php
-			}
+				}
 ?>							</tr>
 <?php
+			}
+		} else {
+
+?>								<td class="question" rowspan ="<?php echo $noopts ;?>"><?php echo dbBBcode($rounddata['question']);?></td>
+								<td><input id="answer" type="text" name="opid" value="<?php	echo $optdata['opid'];?>"	/></td>
+								<td rowspan ="<?php echo $noopts ;?>">
+<textarea class="comment" name="Cbonus"><?php echo $optdata['comment'];?></textarea>
+								</td>
+<?php
 		}
-		
 ?>						</tbody>
 					</table>
 <?php

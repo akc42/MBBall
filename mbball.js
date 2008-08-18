@@ -1,7 +1,7 @@
 /* MBB - Melindas Backuos Ball application 
  * (c) 2008 Alan Chandler - licenced under the GPL
 */
-MBBVersion = '1';
+MBBVersion = '2';
 
 MBB = function() {
 	var m_names = new Array("Jan","Feb","Mar","Apr","May","Jun","Jly","Aug","Sep","Oct","Nov","Dec");
@@ -203,7 +203,7 @@ var MBBUser = new Class({
 				var answer = $('answer');
 				if(answer) {
 					//only here if answer is defined (no options to select (in which case Answer must be an integer
-					if(!MBB.validateInt(answer)) {
+					if(!MBB.intValidate(answer)) {
 						return false; //don't submit
 					}
 				}

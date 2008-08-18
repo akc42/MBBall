@@ -196,7 +196,7 @@ table.layout table th.score{text-align:center;}
 table.layout table td.opt_sel{text-align:center;height:20px;}
 table.layout table.layout td.comment{height:40px;width:86px;vertical-align:top;background-color:#D5F4FF}
 table.layout table td.me {background-color:#D5F4FF;}
-
+table.layout table th.single_answer,table.layout table td.single_answer {text-align:right;padding-right:240px;}
 span.in_po {font-size:0.6em;}
 td p.no_team {background-color:#CCFFFF;}
 td#instructions td {background-color:white; width:150px; border:2px solid black; font-size:x-small; text-align:left;vertical-align:top;}
@@ -285,10 +285,11 @@ textarea#condition, textarea#question, textarea.question, textarea.comment {
 	color:#FFFFCC;
 	font-weight:bold;
 	background-color:#339900;
-	border:4px solid #CCCCFF;
+	border:4px outset #CCCCFF;
     width:30px;
 	cursor:pointer;
 }
+#option:hover {border-style:inset;}
 
 .option_input {width:192px;}
 .option_choice {width:200px;}

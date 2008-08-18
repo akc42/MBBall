@@ -223,7 +223,7 @@ if(!$totalHasBeenOutput) {
 	//We need to find all the options so we can display them later, but for now we need to know how many for the colspan
 		$resultbq=dbQuery('SELECT * FROM option WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' ORDER BY opid;');
 		$bqopts = dbNumRows($resultbq);
-		$width = (int) (500/$bqopts); // to style options
+		if ($bqopts > 0) $width = (int) (500/$bqopts); // to style options
 /* THE QUESTION IN HEADER -----------------------------------------------------------------------------*/
 ?>			<th <?php if($bqopts > 0) echo 'colspan="'.$bqopts.'"';?>>Bonus Question</th>
 			<th class="score" rowspan="3">Bonus Score</th>
@@ -251,7 +251,7 @@ if(!$totalHasBeenOutput) {
 <?php
 			}
 		} else {
-?>			<th><?php echo $rounddata['answer'];?></th>
+?>			<th class="single_answer"><?php echo $rounddata['answer'];?></th>
 <?php
 		}
 ?>		</tr>
@@ -287,10 +287,10 @@ if(!$totalHasBeenOutput) {
 				}
 			} else{
 				if($userdata['opid'] == $rounddata['answer']) {
-?>			<td class="win score"><?php echo $userdata['opid'];tick();?></span></td>
+?>			<td class="win"><?php echo $userdata['opid'];tick();?></span></td>
 <?php
 				} else {
-?>			<td class="score"><?php echo $userdata['opid'];?></td>
+?>			<td class="single_answer"><?php echo $userdata['opid'];?></td>
 <?php
 				}
 			}
