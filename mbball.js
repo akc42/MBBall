@@ -135,16 +135,25 @@ MBB = function() {
 	},
  	emoticon: new Class({
 		initialize: function(container,outputDivs) {
-			var currentFocus = outputDivs[0];
+			var that = this;
+			this.currentFocus = outputDivs[0];
 			outputDivs.addEvent('focus',function(e) {
-				currentFocus = this;
+				that.currentFocus = this;
 			});
 			container.getElements('img').addEvent('click', function(e) {
 				e.stop();
 				var key = this.get('alt');
-				currentFocus.value += key;
+				that.currentFocus.value += key;
+				that.currentFocus.focus();
+				that.currentFocus.fireEvent('change',e);
 			});
-		}
+		},
+		addTextareas:function(outputDivs) {
+			var that = this;
+			outputDivs.addEvent('focus',function(e) {
+				that.currentFocus = this;
+			});
+		}	
 	})
   };
 }();
@@ -240,6 +249,7 @@ var MBBAdmin = new Class({
 	initialize: function(version,me,cid,errordiv) {
 		this.parent(version,me,errordiv);
 		var params = {'cid':cid, 'rid':0};
+		var emoticons;
 		this.competitions = new MBB.subPage(this,'competitions.php',$('competitions'),function (div) {
 			var owner = this.owner;
 			$$('input.default').each(function(rb,i) {
@@ -327,6 +337,11 @@ var MBBAdmin = new Class({
 						MBB.adjustDates(div);
 					}
 				});
+				if (emoticons) {
+					emoticons.addTextareas(div.getElements('textarea'));
+				} else {
+					emoticons = new MBB.emoticon($('emoticons'),$('content').getElements('textarea'));
+				}
 			}
 			this.rounds = new MBB.subPage(this,'rounds.php',$('rounds'), function(div) {
 				//Initialise to click on a round to load single round
@@ -585,6 +600,11 @@ var MBBAdmin = new Class({
 								newOptionReq.get($merge(params,{'opid':noopts+1}));
 							}
 						});
+						if (emoticons) {
+							emoticons.addTextareas(div.getElements('textarea'));
+						} else {
+							emoticons = new MBB.emoticon($('emoticons'),$('content').getElements('textarea'));
+						}
 					} else {
 						answer =0;
 					}
@@ -595,6 +615,11 @@ var MBBAdmin = new Class({
 							div.getElements('.match').each(function(match) {
 								setMatchEvents(match);
 							});
+							if (emoticons) {
+								emoticons.addTextareas(div.getElements('textarea'));
+							} else {
+								emoticons = new MBB.emoticon($('emoticons'),$('content').getElements('textarea'));
+							}
 						}
 					});
 					this.options = new MBB.subPage(this,'options.php',$('options'),function(div) {
