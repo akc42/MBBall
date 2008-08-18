@@ -1,6 +1,8 @@
 /* MBB - Melindas Backuos Ball application 
  * (c) 2008 Alan Chandler - licenced under the GPL
 */
+MBBVersion = '1';
+
 MBB = function() {
 	var m_names = new Array("Jan","Feb","Mar","Apr","May","Jun","Jly","Aug","Sep","Oct","Nov","Dec");
 	var formatDate = function(d) {
@@ -140,7 +142,7 @@ var MBBall = new Class({
 		this.me = me;
 		MBB.setRO({'uid':me.uid,'pass':me.password});
 		var span=$('version');
-		span.set('text',version);
+		span.set('text',version+'['+MBBVersion+']');
 		MBB.setErrorDiv (errordiv);
 	}
 });
