@@ -40,4 +40,38 @@ Dates and times (of matches mainly) need to be displayed in the local time of th
 
 where 12345678 is the actual value of the date required in unix time.
 
-The init function of javascript will look for all span  like this and convert to a local time display. In terms of coming the otherway, javascript will need to intercept the  input and parse it using the Date.parse() function.  Due to a bug in the Firefox timezone display, which means it outputs the correct time but the wrong value of GMT or BST (don't know about other timezones) the parsing the otherway does not work unless the last 4 characters of the time and date are left off.
+The init function of javascript will look for all span like this and
+convert to a local time display. In terms of coming the otherway,
+javascript will need to intercept the input and parse it using the
+Date.parse() function.  Due to a bug in the Firefox timezone display,
+which means it outputs the correct time but the wrong value of GMT or
+BST (don't know about other timezones) the parsing the otherway does
+not work unless the last 4 characters of the time and date are left
+off.
+
+EMOTICONS
+
+Created a new class Emoticon
+
+var myEmoticons = new Class(container, outputDivs, [options]);
+
+where 
+      container will hold the emoticon list
+
+      - outputDivs is an array of elements or a single element into
+which the clicked emoticon will be placed.  The focus of each of these
+divis is tracked
+
+options 
+	- url = defaults to emoticon.php
+	- loading - the class to insert in the container whilst the
+	list is loading
+
+
+
+Things I am worrying about here are - is it worth it - the main effort
+is to convert the keys to image tags - but only in the output.
+Couldn't PHP do it better for the football? (would make sense if
+content was created dynamically
+
+I might just leave this branch dangling from the moment.
