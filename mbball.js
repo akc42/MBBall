@@ -1,7 +1,7 @@
 /* MBB - Melindas Backuos Ball application 
  * (c) 2008 Alan Chandler - licenced under the GPL
 */
-MBBVersion = '2';
+MBBVersion = '3';
 
 MBB = function() {
 	var m_names = new Array("Jan","Feb","Mar","Apr","May","Jun","Jly","Aug","Sep","Oct","Nov","Dec");
@@ -132,8 +132,20 @@ MBB = function() {
         return false;
      }      
 	  return true;
-	}
-
+	},
+ 	emoticon: new Class({
+		initialize: function(container,outputDivs) {
+			var currentFocus = outputDivs[0];
+			outputDivs.addEvent('focus',function(e) {
+				currentFocus = this;
+			});
+			container.getElements('img').addEvent('click', function(e) {
+				e.stop();
+				var key = this.get('alt');
+				currentFocus.value += key;
+			});
+		}
+	})
   };
 }();
 
@@ -217,6 +229,7 @@ var MBBUser = new Class({
 				var div = new Element('div',{'class':'loading'});
 				div.inject(content);
 			});
+			this.emoticon = new MBB.emoticon($('emoticons'),$('registered').getElements('textarea'));
 		}
 	}
 });

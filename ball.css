@@ -202,7 +202,7 @@ td p.no_team {background-color:#CCFFFF;}
 td#instructions td {background-color:white; width:150px; border:2px solid black; font-size:x-small; text-align:left;vertical-align:top;}
 
 #bonus_pick,#instructions {vertical-align:top;}
-
+#emoticons {background-color:white;}
 input#make_picks {
 	font-size:large;
 	font-weight:bold;
