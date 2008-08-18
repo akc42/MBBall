@@ -484,7 +484,11 @@ var MBBAdmin = new Class({
 							// Ask user to confirm if he wants to open a round with no open matches
 							if ( validated && this.name == 'open' && this.checked) {
 								var openmatches = $('matches').getElements('input[name=open]');
-								if(openmatches.length == 0 | openmatches.every(function (match) {return (!match.open);}) ) {
+								if(openmatches.length == 0 ||
+										openmatches.every(function (match) {
+											return (!match.checked);
+										})
+									) {
 									if (! confirm('There are no open matches, are you sure you wish to open the round?')) {
 										validated = false;
 										this.checked = false;
