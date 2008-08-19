@@ -53,25 +53,18 @@ EMOTICONS
 
 Created a new class Emoticon
 
-var myEmoticons = new Class(container, outputDivs, [options]);
+var myEmoticons = new MBB.Emoticon(container, outputDivs);
 
 where 
-      container will hold the emoticon list
+      container holds the emoticon list (preprepared via php during
+      page load)
 
       - outputDivs is an array of elements or a single element into
 which the clicked emoticon will be placed.  The focus of each of these
-divis is tracked
+divis is tracked so that when the user clicks on an icon in container,
+the key is output into one of these divs.
 
-options 
-	- url = defaults to emoticon.php
-	- loading - the class to insert in the container whilst the
-	list is loading
+The remainder of the formating is done in php (dbBBCode is updated
+with the same key and <img/> strings as container so on output they
+are output too)
 
-
-
-Things I am worrying about here are - is it worth it - the main effort
-is to convert the keys to image tags - but only in the output.
-Couldn't PHP do it better for the football? (would make sense if
-content was created dynamically
-
-I might just leave this branch dangling from the moment.
