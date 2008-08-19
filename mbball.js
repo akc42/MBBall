@@ -1,7 +1,7 @@
 /* MBB - Melindas Backuos Ball application 
  * (c) 2008 Alan Chandler - licenced under the GPL
 */
-MBBVersion = '3';
+MBBVersion = '4';
 
 MBB = function() {
 	var m_names = new Array("Jan","Feb","Mar","Apr","May","Jun","Jly","Aug","Sep","Oct","Nov","Dec");
@@ -142,10 +142,15 @@ MBB = function() {
 			});
 			container.getElements('img').addEvent('click', function(e) {
 				e.stop();
+				var doBlur = function(e) {
+					e.stop();
+					this.removeEvent('blur',doBlur);
+					this.fireEvent('change',e);
+				};
 				var key = this.get('alt');
 				that.currentFocus.value += key;
 				that.currentFocus.focus();
-				that.currentFocus.fireEvent('change',e);
+				that.currentFocus.addEvent('blur',doBlur);
 			});
 		},
 		addTextareas:function(outputDivs) {
@@ -525,6 +530,13 @@ var MBBAdmin = new Class({
 									}
 								}
 							}
+							if(validated & this.name =='comment') {
+								// with emoticons it is possible for the change event on this element to fire twice
+								// this check prevents a round trip to the server when it is not necessary
+								var oldcontent = this.retrieve('old');
+								this.store('old',this.value);
+								if (oldcontent == this.value) validated = false;
+							}	
 							if(validated) {
 								var updateReq = new MBB.req('updateround.php', function(response) {
 									MBB.adjustDates(div);
