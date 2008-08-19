@@ -2,3 +2,11 @@ All files in this application are
 
 
 Copyright (c) 2008 Alan Chandler, licenced under the GPL (see LICENCE.txt file in this directory)
+
+except where otherwise indicated in the text inside the file.
+
+Files in subdirectoy images are similarly copyright (c) 2008 Alan Chandler where they are of his original design.
+
+Team logos remain the copyright of their respective owners
+
+
