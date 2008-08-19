@@ -1,5 +1,8 @@
 <?php
-// Copyright (c) 2008 Alan Chandler - licenced under the GPL (see COPYING.txt in this directory)
+/* Football Picking Competition
+ *	Copyright (c) 2008 Alan Chandler
+ *	See COPYING.txt in this directory for details of licence terms
+*/
 if (!defined('BALL'))
 	die('Hacking attempt...');
 

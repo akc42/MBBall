@@ -1,4 +1,9 @@
 <?php
+/* Football Picking Competition
+ *	Copyright (c) 2008 Alan Chandler
+ *	See COPYING.txt in this directory for details of licence terms
+*/
+
 //This is a convenient place to force everything we output to not be cached (even 
 header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
 header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); // Date in the past

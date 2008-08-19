@@ -1,5 +1,9 @@
 					<div id="emoticons">
 <?php
+/* Football Picking Competition
+ *	Copyright (c) 2008 Alan Chandler
+ *	See COPYING.txt in this directory for details of licence terms
+*/
 
 // Open a known directory, and proceed to read its contents
 	$dir = '../static/images/emoticons';

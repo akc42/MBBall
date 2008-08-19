@@ -1,4 +1,8 @@
 <?php
+/* Football Picking Competition
+ *	Copyright (c) 2008 Alan Chandler
+ *	See COPYING.txt in this directory for details of licence terms
+*/
 if(!(isset($_GET['uid']) && isset($_GET['pass']) && isset($_GET['cid']) && isset($_GET['rid']) ))
 	die('Hacking attempt - wrong parameters');
 $uid = $_GET['uid'];

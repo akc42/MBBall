@@ -1,7 +1,8 @@
 /* MBB - Melindas Backuos Ball application 
- * (c) 2008 Alan Chandler - licenced under the GPL
+ * (c) 2008 Alan Chandler
+ * See COPYING.txt in this directory for details of licence terms
 */
-MBBVersion = '4';
+MBBVersion = '5';
 
 MBB = function() {
 	var m_names = new Array("Jan","Feb","Mar","Apr","May","Jun","Jly","Aug","Sep","Oct","Nov","Dec");

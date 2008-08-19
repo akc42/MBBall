@@ -2,7 +2,7 @@
 -- Copyright (c) 2008 Alan Chandler - Licenced under the GPL, See COPYING.txt in this directory
 
 --
--- Database version 3 (See copy of data to default_competition below)
+-- Database version 4 (See copy of data to default_competition below)
 --
 
 COMMENT ON DATABASE melindas_ball IS 'Melindas Backups Football Pool Competitions Database';
@@ -276,13 +276,21 @@ COMMENT ON VIEW bonus_score IS 'Points scored in round by user answering the bon
 
 
 CREATE VIEW playoff_picks AS
-    SELECT wildcard_pick.cid, wildcard_pick.tid, wildcard_pick.uid FROM wildcard_pick UNION SELECT div_winner_pick.cid, div_winner_pick.tid, div_winner_pick.uid FROM div_winner_pick;
+	SELECT wildcard_pick.cid, wildcard_pick.tid, wildcard_pick.uid, wildcard_pick.confid
+		FROM wildcard_pick
+	UNION
+	SELECT div_winner_pick.cid, div_winner_pick.tid, div_winner_pick.uid, div_winner_pick.confid
+		FROM div_winner_pick;
 
 COMMENT ON VIEW playoff_picks IS 'used to identify teams a user has picked correctly';
 
 CREATE VIEW playoff_score AS
-    SELECT u.cid, u.uid, count(p.uid) AS score FROM (registration u LEFT JOIN (playoff_picks p JOIN team_in_competition t ON ((((p.cid = t.cid) AND (p.tid = t.tid)) AND (t.made_playoff IS TRUE)))) ON (((p.cid = u.cid) AND (p.uid = u.uid)))) GROUP BY u.cid, u.uid;
-
+	SELECT u.cid, u.uid, count(p.uid) AS score, p.confid
+		FROM registration u
+		LEFT JOIN (playoff_picks p JOIN team_in_competition t ON p.cid = t.cid AND p.tid = t.tid AND t.made_playoff IS TRUE)
+			ON p.cid = u.cid AND p.uid = u.uid
+		GROUP BY u.cid, u.uid, p.confid;
+  
 COMMENT ON VIEW playoff_score IS 'Score user makes in correctly guessing the playoffs';
 
 CREATE VIEW round_score AS
