@@ -331,6 +331,13 @@ var MBBAdmin = new Class({
 					if(!MBB.intValidate($('gap'))) {
 						validated = false;
 					}
+					if(validated & this.name =='condition') {
+						// with emoticons it is possible for the change event on this element to fire twice
+						// this check prevents a round trip to the server when it is not necessary
+						var oldcontent = this.retrieve('old');
+						this.store('old',this.value);
+						if (oldcontent == this.value) validated = false;
+					}
 					if(validated) {
 						var updateReq = new MBB.req('updatecomp.php', function(response) {
 							MBB.adjustDates(div);
@@ -388,6 +395,13 @@ var MBBAdmin = new Class({
 								}
 
 							}
+							if(validated & this.name =='comment') {
+								// with emoticons it is possible for the change event on this element to fire twice
+								// this check prevents a round trip to the server when it is not necessary
+								var oldcontent = this.retrieve('old');
+								this.store('old',this.value);
+								if (oldcontent == this.value) validated = false;
+							}	
 							if (validated) {
 								var updateReq = new MBB.req('updatematch.php',function(response) {
 									MBB.adjustDates(div);
@@ -516,6 +530,13 @@ var MBBAdmin = new Class({
 							if (!MBB.textValidate($('rname'))) {
 								validated = false;
 							}
+							if(validated & this.name =='question') {
+								// with emoticons it is possible for the change event on this element to fire twice
+								// this check prevents a round trip to the server when it is not necessary
+								var oldcontent = this.retrieve('old');
+								this.store('old',this.value);
+								if (oldcontent == this.value) validated = false;
+							}	
 							// Ask user to confirm if he wants to open a round with no open matches
 							if ( validated && this.name == 'open' && this.checked) {
 								var openmatches = $('matches').getElements('input[name=open]');
@@ -530,13 +551,6 @@ var MBBAdmin = new Class({
 									}
 								}
 							}
-							if(validated & this.name =='comment') {
-								// with emoticons it is possible for the change event on this element to fire twice
-								// this check prevents a round trip to the server when it is not necessary
-								var oldcontent = this.retrieve('old');
-								this.store('old',this.value);
-								if (oldcontent == this.value) validated = false;
-							}	
 							if(validated) {
 								var updateReq = new MBB.req('updateround.php', function(response) {
 									MBB.adjustDates(div);
