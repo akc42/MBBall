@@ -1,10 +1,10 @@
 <?php
 
-$version = "v1.7";
+$version = "v1.8";
 
-/* A new version of chat
+/* Football Picking Competition
 	Copyright (c) 2008 Alan Chandler
-	Licenced under the GPL
+	See COPYING.txt in this directory for details of licence terms
 */
 // Link to SMF forum as this is only for logged in members
 // Show all errors:
