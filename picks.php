@@ -39,21 +39,25 @@ while ($moreMatchesToCome) {
 /* TEAM NAMES IN HEADER ---------------------------------------------------------------*/
 	if($nom > 0) {
 		while($row = dbFetchRow($result)) {
+?>			<th colspan="2" class="tid">
+<?php
 			if(!(is_null($row['hscore']) || is_null($row['ascore']) || $row['hscore'] < $row['ascore'])) {
 			//Home win
-?>			<th class="win tid"><?php
+?>				<span class="win hid"><?php tick();
 			} else {
-?>			<th class="tid"><?php
+?>				<span class="hid"><?php
 			}
-			echo $row['hid']; ?></th>
+			echo $row['hid']; ?><span>@
 <?php
 			if(!(is_null($row['hscore']) || is_null($row['ascore']) || $row['hscore'] > $row['ascore'])) {
 			//Away win
-?>			<th class="win tid"><?php
+?>				<span class="win aid"><?php echo $row['aid']; tick()?></span>
+<?php
 			} else {
-?>			<th class="tid"><?php
+?>				<span class="aid"><?php	echo $row['aid'];?></span>
+<?php
 			}
-			echo $row['aid'];?></th>
+?>			</th>
 <?php
 		}
 

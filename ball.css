@@ -192,6 +192,11 @@ way to fit your requirements.
 .conference{width:300px;}
 .confhead{width:70px;}
 
+span.hid {width:25px;text-align:right;}
+span.aid {width:25px;text-align:left;}
+
+table.layout table th.tid {width:60px;}
+
 table.layout table td.in_po {background-color:#99FF99;}
 table.layout table td.win {background-color:#FFCC99;}
 table.layout table td.comment{height:40px;width:86px;vertical-align:top;}
@@ -345,18 +350,22 @@ div.match {width:181px;border:2px solid black; padding:2px;background-color:red;
 div.match div {padding:1px;}
 div.match div.del {margin-left:2px;}
 div.match span {background-color:white; border:1px inset black;vertical-align:center; }
-div.match .open {width:56px; height:22px; float:left;border:1px solid blue;background-color:#ddd;}
+div.match .open {width:58px; height:22px; float:left;border:1px solid blue;background-color:#ddd;}
 div.match .hid, div.match .aid { 
-	width:46px; 
+	width:38px;
 	height:21px; 
 	float:left;
 	border:1px solid blue;
 	background-color:#ddd;
 	text-align:center;
-	padding:2px 1px 1px 1px;}
+	padding:1px 1px 1px 1px;}
 div.match .hid span, div.match .aid span {
 	cursor:pointer;
 }
+div.match .hid span {text-align:right;}
+div.match .aid span {text-align:left;}
+div.match .at{float:left;width:10px;border:none;background:transparent;}
+
 div.match .hscore , div.match .ascore,div.match .cscore {
 	float:left;
 	border:1px solid blue;

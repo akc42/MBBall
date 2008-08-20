@@ -28,7 +28,7 @@ if (dbNumRows($result) == 0) {
      <input type="hidden" name="rid" value="<?php echo $rid;?>"/>
      <input type="hidden" name="hid" value="<?php echo $hid;?>" />
      <input type="hidden" name="aid" />
-     <div class="hid"><span><?php echo $hid ;?></span></div>
+     <div class="hid"><span><?php echo $hid ;?></span></div><div class="at">@</div>
      <div class="aid"><span>---</span></div>
      <div class="open"><label><input type="checkbox" name="open" />Open</label></div>
      <div class="del"></div>
