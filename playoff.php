@@ -35,7 +35,7 @@ foreach($confs as $confid => $conference) {
 	foreach($divs as $divid => $division) {
 		if(isset($teams[$confid][$divid])) {
 			foreach($teams[$confid][$divid] as $team) {
-?>			<th class="tid"><?php echo $team['tid'];if($team['mp']) {echo '<br/>'; tick();}?></th>
+?>			<th class="tid"><?php if($team['mp']) {echo tick();}echo $team['tid'];?></th>
 <?php
 			}
 		}

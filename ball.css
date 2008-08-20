@@ -196,6 +196,7 @@ span.hid {width:25px;text-align:right;}
 span.aid {width:25px;text-align:left;}
 
 table.layout table th.tid {width:60px;}
+table.layout table.layout td.score {text-align:center;}
 
 table.layout table td.in_po {background-color:#99FF99;}
 table.layout table td.win {background-color:#FFCC99;}

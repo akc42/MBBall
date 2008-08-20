@@ -7,7 +7,7 @@ if (!defined('BALL'))
 	die('Hacking attempt...');
 $time_at_top = time();
 // If user is registered and we can do picks then we need to display the  Picks Section
-$sql = 'SELECT m.hid , m.aid , p.pid , m.combined_score AS cs, p.over , p.comment AS comment, m.comment AS adm_comment';
+$sql = 'SELECT m.hid , m.aid , p.pid , m.combined_score AS cs, p.over , p.comment AS comment, m.comment AS adm_comment, m.match_time';
 $sql .= ' FROM match m JOIN team t ON m.hid = t.tid LEFT JOIN pick p ';
 $sql .= 'ON m.cid = p.cid AND m.rid = p.rid AND m.hid = p.hid AND p.uid = '.dbMakeSafe($uid);
 $sql .= ' WHERE m.cid = '.dbMakeSafe($cid).' AND m.rid = '.dbMakeSafe($rid).' AND m.open IS TRUE AND m.match_time > '.dbMakeSafe($time_at_top +$gap);
@@ -36,11 +36,10 @@ if ($nomatches > 0 || $rounddata['valid_question']||($playoff_deadline != 0 and 
 								<th class="team">Team Pick</th>
 <?php
 		if ($rounddata['ou_round'] == 't') {
-?>								<th class="score">Score</th><th class="ou_select">Over/Under</th>
+?>								<th class="score">Combined Score</th>
 <?php
 		}
-?>
-								<th class="comment">Administrators Comment</td>
+?>								<th class="comment">Administrators Comment</td>
 								<th class="comment">Players Comment</td>
 							</tr>
 						</thead>
@@ -49,28 +48,50 @@ if ($nomatches > 0 || $rounddata['valid_question']||($playoff_deadline != 0 and 
 		while($row=dbFetchRow($result)) {
 ?>							<tr>
 								<td>
-									<input	type="radio"
-											name="<?php echo 'M'.$row['hid'];?>"
-											value="<?php echo $row['hid'];?>"
-											<?php if ($row['pid'] == $row['hid']) echo 'checked';?>/>
-										<?php echo $row['hid'];?><br/>
-									<input	type="radio"
-											name="<?php echo 'M'.$row['hid'];?>"
-											value="<?php echo $row['aid'];?>"
-											 <?php if ($row['pid'] == $row['aid']) echo 'checked';?>/>
-										<?php echo $row['aid'];?></td>
+									<table>
+										<tbody>
+											<tr>
+												<td colspan="2">
+													<span class="hid"><?php echo $row['hid'];?></span>@<span class="aid"><?php echo $row['aid'];?></span>
+												</td>
+											</tr>
+											<tr>
+												<td><input	type="radio"
+													name="<?php echo 'M'.$row['hid'];?>"
+													value="<?php echo $row['hid'];?>"
+													<?php if ($row['pid'] == $row['hid']) echo 'checked';?>/></td>
+												<td><input	type="radio"
+													name="<?php echo 'M'.$row['hid'];?>"
+													value="<?php echo $row['aid'];?>"
+											 		<?php if ($row['pid'] == $row['aid']) echo 'checked';?>/></td>
+											</tr>
+										</tbody>
+									</table>
+								</td>
 <?php
 			if ($rounddata['ou_round'] == 't') {
-?>								<td class="ou"><?php echo ($row['cs']+0.5);?></td>
+?>								<td>
+									<table>
+										<tbody>
+											<tr>
+												<td colspan="2" class="score"><?php echo ($row['cs']+0.5);?></td>
+											</tr>
+											<tr>
+												<td class="ou">Under</td><td class="ou">Over</td>
+											</tr>
+											<tr>
+												<td><input	type="radio"
+														name="<?php echo 'O'.$row['hid'];?>"
+														value="U"
+														<?php if ($row['over'] == 'f') echo 'checked';?>/></td>
+												<td><input	type="radio"
+														name="<?php echo 'O'.$row['hid'];?>"
+														value="O"
+														<?php if ($row['over'] == 't') echo 'checked';?>/></td>
+											</tr>
+										</tbody>
+									</table>
 								<td>
-									<input	type="radio"
-											name="<?php echo 'O'.$row['hid'];?>"
-											value="U"
-											<?php if ($row['over'] == 'f') echo 'checked';?>/>Under<br/>
-									<input	type="radio"
-											name="<?php echo 'O'.$row['hid'];?>"
-											value="O"
-											<?php if ($row['over'] == 't') echo 'checked';?>/>Over<br/></td>
 <?php
 			}
 ?>								<td class="comment"><?php echo dbBBcode($row['adm_comment']);?></td>
