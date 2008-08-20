@@ -11,7 +11,7 @@ $sql = 'SELECT m.hid , m.aid , p.pid , m.combined_score AS cs, p.over , p.commen
 $sql .= ' FROM match m LEFT JOIN pick p ';
 $sql .= 'ON m.cid = p.cid AND m.rid = p.rid AND m.hid = p.hid AND p.uid = '.dbMakeSafe($uid);
 $sql .= ' WHERE m.cid = '.dbMakeSafe($cid).' AND m.rid = '.dbMakeSafe($rid).' AND m.open IS TRUE AND m.match_time > '.dbMakeSafe($time_at_top +$gap);
-$sql .= ' ORDER BY m.match_time NULLS LAST, m.hid;';
+$sql .= ' ORDER BY m.match_time, m.hid;';
 $result = dbQuery($sql);
 $nomatches = dbNumRows($result);
 

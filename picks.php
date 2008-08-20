@@ -27,7 +27,7 @@ if ($rid != 0) {
 while ($moreMatchesToCome) {
 	$result = dbQuery('SELECT * FROM match m WHERE m.cid = '
 			.dbMakeSafe($cid).' AND m.rid = '.dbMakeSafe($rid)
-			.' AND  m.open IS TRUE ORDER BY match_time NULLS LAST, hid LIMIT 8 OFFSET '.$startMatch.';');
+			.' AND  m.open IS TRUE ORDER BY match_time, hid LIMIT 8 OFFSET '.$startMatch.';');
 	$nom = dbNumRows($result);
 
 ?><table>
@@ -141,7 +141,7 @@ while ($moreMatchesToCome) {
 			$sql = 'SELECT p.hid, p.pid, p.over, p.comment, m.pscore,m.oscore';
 			$sql .= ' FROM match_score m JOIN match USING (cid,rid,hid) LEFT JOIN pick p USING (cid,rid,hid,uid)';
 			$sql .= ' WHERE m.cid = '.dbMakeSafe($cid).' AND m.rid = '.dbMakeSafe($rid).' AND m.uid = '.$userdata['uid'];
-			$sql .= ' ORDER BY match.match_time NULLS LAST, m.hid LIMIT 8 OFFSET '.$startMatch.';';
+			$sql .= ' ORDER BY match.match_time , m.hid LIMIT 8 OFFSET '.$startMatch.';';
 			$pick = dbQuery($sql);
 
 /* MATCH WINNER PICK ------------------------------------------------------------------------------*/
