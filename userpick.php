@@ -49,8 +49,19 @@ if ($nomatches > 0 || $rounddata['valid_question']||($playoff_deadline != 0 and 
 ?>							<tr>
 								<td>
 									<table>
-										<tbody>
-											<tr>
+<?php
+			if($row['match_time']< $time_at_top +$gap+86400) { //less than a day before pick limit
+			
+?>										<thead>
+		 									<tr>
+												<th colspan="2" class="limited">Less than<br/>a DAY<br>to pick<br/>
+											</th>
+											</tr>
+										</thead>
+<?php
+			}
+?>										<tbody>
+										<tr>
 												<td colspan="2">
 													<span class="hid"><?php echo $row['hid'];?></span>@<span class="aid"><?php echo $row['aid'];?></span>
 												</td>
