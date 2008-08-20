@@ -25,9 +25,9 @@ $startMatch = 0;
 if ($rid != 0) {
 /* GROUPS OF 8 MATCHES ----------------------------------------------------------------------------*/
 while ($moreMatchesToCome) {
-	$result = dbQuery('SELECT * FROM match m JOIN team t ON m.hid = t.tid WHERE m.cid = '
+	$result = dbQuery('SELECT * FROM match m WHERE m.cid = '
 			.dbMakeSafe($cid).' AND m.rid = '.dbMakeSafe($rid)
-			.' AND  m.open IS TRUE ORDER BY t.confid, t.divid, hid LIMIT 8 OFFSET '.$startMatch.';');
+			.' AND  m.open IS TRUE ORDER BY match_time NULLS LAST, hid LIMIT 8 OFFSET '.$startMatch.';');
 	$nom = dbNumRows($result);
 
 ?><table>
@@ -139,9 +139,9 @@ while ($moreMatchesToCome) {
 				<td rowspan="<?php echo ($nom == 0)?1:2 ;?>" colspan="2"><?php echo $userdata['name'];?></td>
 <?php
 			$sql = 'SELECT p.hid, p.pid, p.over, p.comment, m.pscore,m.oscore';
-			$sql .= ' FROM match_score m JOIN team t ON m.hid = t.tid LEFT JOIN pick p USING (cid,rid,hid,uid)';
+			$sql .= ' FROM match_score m JOIN match USING (cid,rid,hid) LEFT JOIN pick p USING (cid,rid,hid,uid)';
 			$sql .= ' WHERE m.cid = '.dbMakeSafe($cid).' AND m.rid = '.dbMakeSafe($rid).' AND m.uid = '.$userdata['uid'];
-			$sql .= ' ORDER BY t.confid, t.divid, m.hid LIMIT 8 OFFSET '.$startMatch.';';
+			$sql .= ' ORDER BY match.match_time NULLS LAST, m.hid LIMIT 8 OFFSET '.$startMatch.';';
 			$pick = dbQuery($sql);
 
 /* MATCH WINNER PICK ------------------------------------------------------------------------------*/

@@ -8,10 +8,10 @@ if (!defined('BALL'))
 $time_at_top = time();
 // If user is registered and we can do picks then we need to display the  Picks Section
 $sql = 'SELECT m.hid , m.aid , p.pid , m.combined_score AS cs, p.over , p.comment AS comment, m.comment AS adm_comment, m.match_time';
-$sql .= ' FROM match m JOIN team t ON m.hid = t.tid LEFT JOIN pick p ';
+$sql .= ' FROM match m LEFT JOIN pick p ';
 $sql .= 'ON m.cid = p.cid AND m.rid = p.rid AND m.hid = p.hid AND p.uid = '.dbMakeSafe($uid);
 $sql .= ' WHERE m.cid = '.dbMakeSafe($cid).' AND m.rid = '.dbMakeSafe($rid).' AND m.open IS TRUE AND m.match_time > '.dbMakeSafe($time_at_top +$gap);
-$sql .= ' ORDER BY t.confid,t.divid, m.hid;';
+$sql .= ' ORDER BY m.match_time NULLS LAST, m.hid;';
 $result = dbQuery($sql);
 $nomatches = dbNumRows($result);
 
@@ -49,23 +49,27 @@ if ($nomatches > 0 || $rounddata['valid_question']||($playoff_deadline != 0 and 
 ?>							<tr>
 								<td>
 									<table>
+										<thead>
+											<tr>
+												<th colspan="2">
+													<span class="hid"><?php echo $row['hid'];?></span>@<span class="aid"><?php echo $row['aid'];?></span>
+												</th>
+											</tr>
+											<tr>
+												<th colspan="2" class="mtime"><span class="time"><?php echo $row['match_time']; ?></span></th>
+											</tr>
+
 <?php
 			if($row['match_time']< $time_at_top +$gap+86400) { //less than a day before pick limit
 			
-?>										<thead>
-		 									<tr>
-												<th colspan="2" class="limited">Less than<br/>a DAY<br>to pick<br/>
-											</th>
+?>		 									<tr>
+												<th colspan="2" class="limited">Less than a DAY to pick</th>
 											</tr>
-										</thead>
+											
 <?php
 			}
-?>										<tbody>
-										<tr>
-												<td colspan="2">
-													<span class="hid"><?php echo $row['hid'];?></span>@<span class="aid"><?php echo $row['aid'];?></span>
-												</td>
-											</tr>
+?>										</thead>
+										<tbody>
 											<tr>
 												<td><input	type="radio"
 													name="<?php echo 'M'.$row['hid'];?>"

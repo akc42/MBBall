@@ -41,7 +41,7 @@ if (dbNumRows($result) != 0) {
 	}else {
 		$sql .= ', combined_score = NULL';
 	}
-	if(isset($_POST['mtime'])) {
+	if(isset($_POST['mtime']) && $_POST['mtime'] != 0) {
 		$sql .= ', match_time = '.dbMakeSafe($_POST['mtime']);
 	}else {
 		$sql .= ', match_time = NULL';
