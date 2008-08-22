@@ -3,9 +3,35 @@
  *	Copyright (c) 2008 Alan Chandler
  *	See COPYING.txt in this directory for details of licence terms
 */
-if (!defined('BALL'))
-	die('Hacking attempt...');
+/* Football Picking Competition
+ *	Copyright (c) 2008 Alan Chandler
+ *	See COPYING.txt in this directory for details of licence terms
+*/
+if(!(isset($_GET['uid']) && isset($_GET['pass']) && isset($_GET['cid']) && isset($_GET['rid'])
+		&& isset($_GET['auid']) && isset($_GET['gap']) && isset($_GET['pod']) && isset($_GET['name']) ))
+	die('Hacking attempt - wrong parameters');
+$uid = $_GET['uid'];
+$password = $_GET['pass'];
+
+if ($password != sha1("Football".$uid))
+	die('Hacking attempt got: '.$password.' expected: '.sha1("Football".$uid));
+$uid = $_GET['auid']; // So we can emulate the other user
+$password = sha1("Football".$uid); //So we can emulate the other user
+$cid = $_GET['cid'];
+$rid = $_GET['rid'];
+$gap = $_GET['gap'];
+$playoff_deadline = $_GET['pod'];
+
+if($rid != 0 && $cid !=0) {
+	define ('BALL',1);   //defined so we can control access to some of the files.
+	require_once('db.php');
 $time_at_top = time();
+$resultround = dbQuery('SELECT * FROM round WHERE open is TRUE AND cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($_GET['rid']).' ;');
+if($rounddata = dbFetchRow($resultround)) {
+				
+
+
+
 // If user is registered and we can do picks then we need to display the  Picks Section
 $sql = 'SELECT m.hid , m.aid , p.pid , m.combined_score AS cs, p.over , p.comment AS comment, m.comment AS adm_comment, m.match_time';
 $sql .= ' FROM match m LEFT JOIN pick p ';
@@ -15,7 +41,7 @@ $sql .= ' ORDER BY m.match_time, m.hid;';
 $result = dbQuery($sql);
 $nomatches = dbNumRows($result);
 
-if ($nomatches > 0 || $rounddata['valid_question']||($playoff_deadline != 0 and $playoff_deadline > $time_at_top)) {
+if ($nomatches > 0 || $_GET['vq']||($_GET['pod'] != 0 && $$_GET['pod'] > $time_at_top)) {
 ?><form id="pick">
 	<input type="hidden" name="uid" value="<?php echo $uid;?>" />
 	<input type="hidden" name="pass" value="<?php echo $password;?>" />
@@ -26,11 +52,11 @@ if ($nomatches > 0 || $rounddata['valid_question']||($playoff_deadline != 0 and 
 	<table class="layout">
 		<tbody>
 			<tr>	
-				<td id="picks" rowspan="3">
+				<td id="picks">
 <?php
 	if($nomatches >0) {
 ?>					<table>
-						<caption>Match Picks for <?php echo $rounddata['name'];?></caption>
+						<caption>Match Picks for <?php echo $rounddata['name'];?><br/>(to be entered on behalf of :<?php echo $_GET['name'];?>)</caption>
 						<thead>
 							<tr>
 								<th class="team">Team Pick</th>
@@ -117,11 +143,9 @@ if ($nomatches > 0 || $rounddata['valid_question']||($playoff_deadline != 0 and 
 ?>						</tbody>
 					</table>
 <?php
-	}	dbFree($result);
+	}
+	dbFree($result);
 ?>				</td>
-				<td id="instructions"><?php require_once('instructions.html');?></td>
-			</tr>
-			<tr>
 				<td id="bonus_pick">
 <?php	
 	if ($rounddata['valid_question']) {
@@ -182,11 +206,8 @@ if ($nomatches > 0 || $rounddata['valid_question']||($playoff_deadline != 0 and 
 	dbFree($resultop);
 ?>				</td>
 			</tr>
-			<tr>
-				<td><?php require_once('emoticons.php'); ?></td>
-			</tr>
 <?php
-	if($playoff_deadline != 0 and $playoff_deadline > $time_at_top) {
+	if($playoff_deadline != 0 && $playoff_deadline > $time_at_top) {
 		require_once('team.php');
 //Playoff selection is part of this competition
 ?>			<tr>
@@ -284,3 +305,7 @@ $result=dbQuery('SELECT tid,opid,confid FROM wildcard_pick WHERE cid = '.dbMakeS
 </form>
 <?php
 }
+}
+dbFree($resultround);
+}
+?>

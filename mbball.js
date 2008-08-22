@@ -860,6 +860,58 @@ var MBBAdmin = new Class({
 				});
 				this.adminreg = new MBB.subPage(this,'adminreg.php',$('registered'),function(div) {
 					var owner = this.owner;
+					this.adminpick = new MBB.subPage(this,'adminpick.php',$('userpick'),function(div) {
+						MBB.adjustDates(div);
+						this.teams = $H({});
+						this.lastpick = $H({});
+						var picks = div.getElements('.ppick');
+						var that =this;
+						// We make a hash of every checked item - which we can then use when an item changes to
+						// check that the new item isn't already picked, and if so set it back
+						picks.each(function(item) {
+							if(item.checked) {
+								that.teams.set(item.value,item);
+								that.lastpick.set(item.name,item);
+							}
+						});
+						picks.addEvent('change',function(e) {
+							e.stop();
+							var lastValue = that.lastpick.get(this.name);
+							if(that.teams.has(this.value)) {
+								//this team already has a selection, so lets find out what
+								var existingSelection = that.teams.get(this.value);
+								existingSelection.getParent().highlight('#F00');
+								// now change it back
+								this.checked = false;
+								if(lastValue) lastValue.checked = true;
+							} else {
+								// This team did not have a selection before, so now set one
+								// and take out old values;
+								that.teams.set(this.value,this);
+								if(lastValue) that.teams.erase(lastValue.value);
+								that.lastpick.erase(this.name);
+								that.lastpick.set(this.name,this);
+							}
+						});
+						
+						//These items are only there if user has registered
+						$('pick').addEvent('submit', function(e) {
+							e.stop();
+							var answer = $('answer');
+							if(answer) {
+								//only here if answer is defined (no options to select (in which case Answer must be an integer
+								if(!MBB.intValidate(answer)) {
+									return false; //don't submit
+								}
+							}
+					
+							var pickReq = new MBB.req('createpicks.php', function(response) {
+								$('userpick').empty();
+							});
+							pickReq.post($('pick'));
+						});
+						
+					});
 					if(params.cid !=0) {
 						MBB.adjustDates(div);
 						$$('#registered input.bbapprove').addEvent('change',function(e) {
@@ -882,6 +934,18 @@ var MBBAdmin = new Class({
 									deleteReq.get({'cid': params.cid,'ruid':comp.id.substr(1).toInt()});
 								}
 							});
+						});
+						var that = this;
+						div.getElements('.user_name').addEvent('click', function(e) {
+							e.stop();
+							var pod = $('playoffdeadline').clone();
+							MBB.parseDate(pod);
+							that.adminpick.loadPage($merge(params,{
+								'auid':this.get('id').substr(1),
+								'name':this.get('text'),
+								'gap':$('gap').value,
+								'pod':pod.value
+							}));
 						});
 					}
 				});

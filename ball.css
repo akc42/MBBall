@@ -176,6 +176,7 @@ way to fit your requirements.
 }
 
 #registered>p>span {color:red;}
+#registered .user_name {cursor:pointer;}
 
 #agree {
 	padding:1em;
@@ -187,8 +188,7 @@ way to fit your requirements.
 .tid {width:30px; text-align:center;}
 .score{width:40px; text-align:right;}
 .ou{width:40px;text-align:center;}
-.question {width:500px;word-wrap:break-word;}
-.opt_ans {word-wrap:break-word;}
+.question {width:500px;}
 .conference{width:300px;}
 .confhead{width:70px;}
 
@@ -351,7 +351,7 @@ table.layout table.form td.submit{width:8em; text-align:center;background-color:
 div.match {width:181px;border:2px solid black; padding:2px;background-color:red; float:left;margin:2px;}
 div.match div {padding:1px;}
 div.match div.del {margin-left:2px;}
-div.match span {background-color:white; border:1px inset black;vertical-align:center; }
+div.match span {background-color:white; border:1px inset black;vertical-align:middle; }
 div.match .open {width:58px; height:22px; float:left;border:1px solid blue;background-color:#ddd;}
 div.match .hid, div.match .aid { 
 	width:38px;

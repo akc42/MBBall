@@ -36,7 +36,7 @@ if ($cid != 0) {
 <?php
 	while($row = dbFetchRow($result)) {
 ?>		<tr>
-			<td class="user_name"><?php echo $row['name'];?></td>
+			<td id="<?php echo 'A'.$row['uid'];?>" class="user_name"><?php echo $row['name'];?></td>
 			<td><?php echo $row['email'];?></td>
 			<td><span class="time"><?php echo $row['last_logon']; ?></span></td>
 			<td><span class="time"><?php echo $row['agree_time']; ?></span></td>

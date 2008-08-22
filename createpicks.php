@@ -22,19 +22,34 @@ dbQuery('DELETE FROM option_pick WHERE 	uid = '.dbMakeSafe($uid).' AND cid = '.d
 dbQuery('DELETE FROM pick WHERE uid = '.dbMakeSafe($uid).' AND cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid)
 		.' AND hid IN (SELECT hid FROM match WHERE  open IS TRUE and match_time > '.dbMakeSafe(time()+$gap)
 		.' AND cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).');');
-$opid = (isset($_POST['opid']))?$_POST['opid']:'';
-$comment = (isset($_POST['Cbonus']))?$_POST['Cbonus']:'';
-dbQuery('INSERT INTO option_pick(uid,cid,rid,opid,comment) VALUES ('
-						.dbMakeSafe($uid).','.dbMakeSafe($cid).','.dbMakeSafe($rid).','.dbMakeSafe($opid).','.dbPostSafe($comment).');');
+if (isset($_POST['opid'])) {
+	if (isset($_POST['Cbonus'])) {
+		dbQuery('INSERT INTO option_pick(uid,cid,rid,opid,comment) VALUES ('
+						.dbMakeSafe($uid).','.dbMakeSafe($cid).','.dbMakeSafe($rid).','
+						.dbMakeSafe($_POST['opid']).','.dbPostSafe($_POST['Cbonus']).');');
+	} else {
+		dbQuery('INSERT INTO option_pick(uid,cid,rid,opid,comment) VALUES ('
+						.dbMakeSafe($uid).','.dbMakeSafe($cid).','.dbMakeSafe($rid).','
+						.dbMakeSafe($_POST['opid']).', NULL );');
+	}
+} else {
+	if (isset($_POST['Cbonus'])) {
+		dbQuery('INSERT INTO option_pick(uid,cid,rid,opid,comment) VALUES ('
+						.dbMakeSafe($uid).','.dbMakeSafe($cid).','.dbMakeSafe($rid).', NULL ,'
+						.dbPostSafe($_POST['Cbonus']).');');
+	}
+}
 $result=dbQuery('SELECT hid FROM match  WHERE open IS TRUE AND match_time > '.dbMakeSafe(time()+$gap).' AND cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).';');
 
 while($row = dbFetchRow($result)) {
-	$pid = (isset($_POST['M'.$row['hid']]))?$_POST['M'.$row['hid']]:'';
+	$pid = (isset($_POST['M'.$row['hid']]))?dbMakeSafe($_POST['M'.$row['hid']]):'NULL';
 	$over = (isset($_POST['O'.$row['hid']]) )?(($_POST['O'.$row['hid']] == 'O')?"TRUE":"FALSE"):"NULL";
-	$comment = (isset($_POST['C'.$row['hid']]))?$_POST['C'.$row['hid']]:'';
-	dbQuery('INSERT INTO pick(uid,cid,rid,hid,pid,over,comment) VALUES ('
+	$comment = (isset($_POST['C'.$row['hid']]))?dbPostSafe($_POST['C'.$row['hid']]):'NULL';
+	if( $comment != 'NULL' || $over != 'NULL' || $comment != 'NULL') {
+		dbQuery('INSERT INTO pick(uid,cid,rid,hid,pid,over,comment) VALUES ('
 				.dbMakeSafe($uid).','.dbMakeSafe($cid).','.dbMakeSafe($rid).','.dbMakeSafe($row['hid']).','
-				.dbPostSafe($pid).','.$over.','.dbPostSafe($comment).');');
+				.$pid.','.$over.','.$comment.');');
+	}
 }
 dbFree($result);
 if ($ppd != 0 && $ppd > time()) {

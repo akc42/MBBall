@@ -78,6 +78,7 @@ window.addEvent('domready', function() {
 		<tr><td colspan="3"><?php require_once('emoticons.php');?></td>
 		<tr><td colspan="2" id="matches"></td><td><div id="teams"></div></td></tr>
 		<tr><td colspan="3"><div id="registered"></div></td></tr>
+		<tr><td colspan="3"><div id="userpick"></div></td></tr>
 	</tbody>
 </table>
 
