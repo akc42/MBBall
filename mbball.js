@@ -2,10 +2,11 @@
  * (c) 2008 Alan Chandler
  * See COPYING.txt in this directory for details of licence terms
 */
-MBBVersion = '5';
+MBBVersion = '6';
 
 MBB = function() {
-	var m_names = new Array("Jan","Feb","Mar","Apr","May","Jun","Jly","Aug","Sep","Oct","Nov","Dec");
+	var m_names = ["Jan","Feb","Mar","Apr","May","Jun","Jly","Aug","Sep","Oct","Nov","Dec"];
+	var d_names = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
 	var formatDate = function(d) {
 		//d is a string with seconds from 1st Jan 1970
 		var myDate = new Date(d.toInt()*1000);
@@ -15,7 +16,8 @@ MBB = function() {
 		var min = myDate.getMinutes();
 		min = min + "";
 		min = (min.length == 1)?'0'+min:min;
-		return myDate.getDate() + ' ' + m_names[myDate.getMonth()] + ' ' + myDate.getFullYear() + ' ' + ch + ':' + min + ' ' + ap;
+		return	myDate.getDate() + ' ' + m_names[myDate.getMonth()] + ' ' + myDate.getFullYear() +
+				' '+ ch + ':' + min + ' ' + ap + ' ('+d_names[myDate.getDay()] +')';
 	};
   var reqOpts;
   var errorDiv;

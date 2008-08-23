@@ -57,18 +57,8 @@ if ($nomatches > 0 || $rounddata['valid_question']||($playoff_deadline != 0 and 
 											</tr>
 											<tr>
 												<th colspan="2" class="mtime"><span class="time"><?php echo $row['match_time']; ?></span></th>
-											</tr>
-
-<?php
-			if($row['match_time']< $time_at_top +$gap+86400) { //less than a day before pick limit
-			
-?>		 									<tr>
-												<th colspan="2" class="limited">Less than a DAY to pick</th>
-											</tr>
-											
-<?php
-			}
-?>										</thead>
+											</tr>											
+										</thead>
 										<tbody>
 											<tr>
 												<td><input	type="radio"
@@ -79,6 +69,16 @@ if ($nomatches > 0 || $rounddata['valid_question']||($playoff_deadline != 0 and 
 													name="<?php echo 'M'.$row['hid'];?>"
 													value="<?php echo $row['aid'];?>"
 											 		<?php if ($row['pid'] == $row['aid']) echo 'checked';?>/></td>
+											</tr>
+		 									<tr>
+												<td colspan="2" <?php if (($row['match_time'] - $gap)< ($time_at_top+86400)) echo 'class="limited"' ;?> >
+													<span class="time"><?php echo $row['match_time'] - $gap;?></span>
+				<?php
+			if (($row['match_time'] - $gap)< ($time_at_top+86400)) {
+?>													<span>Less than a DAY to pick</span>
+<?php
+			 }
+?>												</td>
 											</tr>
 										</tbody>
 									</table>
