@@ -508,7 +508,7 @@ ALTER TABLE ONLY team_in_competition
     ADD CONSTRAINT team_in_competition_tid_fkey FOREIGN KEY (tid) REFERENCES team(tid) ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE ONLY wildcard_pick
-    ADD CONSTRAINT wildcard_pick_cid_fkey FOREIGN KEY (cid, uid) REFERENCES registration(cid, uid) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT wildcard_pick_cid_fkey FOREIGN KEY (cid, uid) REFERENCES participant (uid) ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE ONLY wildcard_pick
     ADD CONSTRAINT wildcard_pick_cid_fkey1 FOREIGN KEY (cid, tid) REFERENCES team_in_competition(cid, tid) ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE ONLY wildcard_pick
