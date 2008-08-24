@@ -29,7 +29,8 @@ while ($moreMatchesToCome) {
 			.dbMakeSafe($cid).' AND m.rid = '.dbMakeSafe($rid)
 			.' AND  m.open IS TRUE ORDER BY match_time, hid LIMIT 8 OFFSET '.$startMatch.';');
 	$nom = dbNumRows($result);
-
+	if($nom > 0) {
+	
 ?><table>
 	<thead>
 		<tr>
@@ -37,7 +38,6 @@ while ($moreMatchesToCome) {
 			<th rowspan="<?php echo ($nom == 0)?1:2 ;?>" class="score">Points for<br/>Correct Pick</th>
 <?php
 /* TEAM NAMES IN HEADER ---------------------------------------------------------------*/
-	if($nom > 0) {
 		while($row = dbFetchRow($result)) {
 ?>			<th colspan="2" class="tid">
 <?php
@@ -63,16 +63,16 @@ while ($moreMatchesToCome) {
 
 ?>			
 <?php
-	}
+	
 		// if we have less than eight matches left and there is noly the overall total to output we should do it rather than create a new table
-	if($nom < 8 && !$isAQuestion) {
-		$totalHasBeenOutput = true;
+		if($nom < 8 && !$isAQuestion) {
+			$totalHasBeenOutput = true;
 ?>			<th rowspan="<?php echo ($nom==0)?2:(($ouRound)?5:4) ;?>" class="score">Round Score</th>
 <?php
-	}
+		}
 ?>		</tr>
 <?php
-	if ($nom > 0) {	
+	
 ?>		<tr>
 <?php
 /*  MATCH TIME ROW IN HEADER --------------------------------------------------------------------------*/
@@ -82,14 +82,14 @@ while ($moreMatchesToCome) {
 ?>			<th colspan="2"><span class="time"><?php echo $row['match_time'];?></span></th>
 <?php
 		}
-	}
+	
 /* THE VALUE OF A CORRECT PICK ----------------------*/
 ?>		</tr>
 		<tr>
 			<th class="score" rowspan="<?php echo ($nom==0)?1:(($ouRound)?3:2) ;?>"><?php echo $rounddata['value'];?></th>
 <?php
 /* THE SCORES IN HEADER ------------------------------------------------------------------------------*/
-	if ($nom > 0) {
+	
 		dbRestartQuery($result);  //put the results back to the start so we can interate over them again
 		while($row = dbFetchRow($result)) {
 ?>			<th class="score" ><?php if(!is_null($row['hscore'])) echo $row['hscore'];?></th>
@@ -129,12 +129,12 @@ while ($moreMatchesToCome) {
 		}
 ?>		</tr>
 <?php
-	}
+	
 ?>	</thead>
 	<tbody>
 <?php
 /* FOR EACH USER WE DISPLAY THEIR PICKS FOR THE MATCHES -----------------------------------------------*/
-	while ($userdata = dbFetchRow($resultuser)) {
+		while ($userdata = dbFetchRow($resultuser)) {
 ?>			<tr>
 				<td rowspan="<?php echo ($nom == 0)?1:2 ;?>" colspan="2"><?php echo $userdata['name'];?></td>
 <?php
@@ -145,7 +145,7 @@ while ($moreMatchesToCome) {
 			$pick = dbQuery($sql);
 
 /* MATCH WINNER PICK ------------------------------------------------------------------------------*/
-		if ($nom > 0) {
+		
 			dbRestartQuery($result);
 			while ($row=dbFetchRow($result)) {
 				$pickdata = dbFetchRow($pick);
@@ -179,7 +179,7 @@ while ($moreMatchesToCome) {
 <?php
 				}							
 			}
-		}
+		
 /* TOTAL SCORE (if we are doing it here) -------------------------------------------------------------*/
 			if($totalHasBeenOutput) {
 ?>				<td class="score" rowspan="<?php echo ($nom == 0)?1:2 ;?>"><?php echo $userdata['score'];?></td>
@@ -187,7 +187,7 @@ while ($moreMatchesToCome) {
 			}
 ?>			</tr>
 <?php
-		if ($nom > 0) {
+
 ?>			<tr>
 <?php
 /* PICK COMMENT --------------------------------------------------------------------------------------*/
@@ -204,17 +204,20 @@ while ($moreMatchesToCome) {
 <?php
 			dbFree($pick);
 		}
-	}
-	dbFree($result);
+	
+		dbFree($result);
 ?>	</tbody>
 </table>
 <?php
-	dbRestartQuery($resultuser);
-	if($nom < 8) {
-		$moreMatchesToCome = false;
-	} else {
+		dbRestartQuery($resultuser);
+		if($nom < 8) {
+			$moreMatchesToCome = false;
+		} else {
 		$startMatch += 8;
 		dbRestartQuery($resultuser);
+		}
+	} else {
+		$moreMatchesToCome = false;
 	}
 }
 
@@ -271,7 +274,7 @@ if(!$totalHasBeenOutput) {
 	while ($userdata = dbFetchRow($resultuser)) {
 /*  BONUS QUESTION ANSWERS ----------------------------------------------------------------------------------------*/
 ?>		<tr>
-			<td rowspan="2"><?php echo $userdata['name'];?></td>
+			<td rowspan="<?php echo ($isAQuestion)?2:1 ;?>"><?php echo $userdata['name'];?></td>
 <?php
 		if($isAQuestion) {
 			if($bqopts > 0) {
@@ -301,10 +304,11 @@ if(!$totalHasBeenOutput) {
 <?php
 				}
 			}
+?>			<td rowspan="2" class="score"><?php echo $userdata['bscore'];?></td><td rowspan="2" class="score"><?php echo $userdata['mscore'];?></td>
+<?php
 		}
 /* BONUS, MATCH PICK and TOTAL SCORES --------------------------------------------------------------------------------*/
-?>			<td rowspan="2" class="score"><?php echo $userdata['bscore'];?></td><td rowspan="2" class="score"><?php echo $userdata['mscore'];?></td>
-			<td rowspan="2" class="score"><?php echo $userdata['score'];?></td>
+?>			<td rowspan="<?php echo ($isAQuestion)?2:1 ;?>" class="score"><?php echo $userdata['score'];?></td>
 		</tr>
 <?php
 /*  USER COMMENT TO THE QUESTION -----------------------------------------------------------------------*/
