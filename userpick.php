@@ -122,6 +122,9 @@ if ($nomatches > 0 || $rounddata['valid_question']||($playoff_deadline != 0 and 
 				<td id="instructions"><?php require_once('instructions.html');?></td>
 			</tr>
 			<tr>
+				<td id="emoticon_cell"><?php require_once('emoticons.php'); ?></td>
+			</tr>
+			<tr>
 				<td id="bonus_pick">
 <?php	
 	if ($rounddata['valid_question']) {
@@ -181,9 +184,6 @@ if ($nomatches > 0 || $rounddata['valid_question']||($playoff_deadline != 0 and 
 	dbFree($result);
 	dbFree($resultop);
 ?>				</td>
-			</tr>
-			<tr>
-				<td><?php require_once('emoticons.php'); ?></td>
 			</tr>
 <?php
 	if($playoff_deadline != 0 and $playoff_deadline > $time_at_top) {
@@ -280,7 +280,7 @@ $result=dbQuery('SELECT tid,opid,confid FROM wildcard_pick WHERE cid = '.dbMakeS
 ?>
 		</tbody>
 	</table>
-	<input id="make_picks" type="submit" value="Make Picks" />
+	<button id="make_picks">Make Your Picks</div>
 </form>
 <?php
 }

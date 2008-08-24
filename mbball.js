@@ -2,7 +2,7 @@
  * (c) 2008 Alan Chandler
  * See COPYING.txt in this directory for details of licence terms
 */
-MBBVersion = '7';
+MBBVersion = '8';
 
 MBB = function() {
 	var m_names = ["Jan","Feb","Mar","Apr","May","Jun","Jly","Aug","Sep","Oct","Nov","Dec"];
@@ -227,7 +227,7 @@ var MBBUser = new Class({
 			});
 			
 			//These items are only there if user has registered
-			$('pick').addEvent('submit', function(e) {
+			$('make_picks').addEvent('click', function(e) {
 				e.stop();
 				var validated = true;
 				var answer = $('answer');

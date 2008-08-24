@@ -261,7 +261,7 @@ if(!$totalHasBeenOutput) {
 <?php
 			}
 		} else {
-?>			<th class="single_answer"><?php echo $rounddata['answer'];?></th>
+?>			<th class="single_answer"><?php echo (is_null($rounddata['answer']))?'<i>No Answer Available Yet</i>':$rounddata['answer'];?></th>
 <?php
 		}
 ?>		</tr>
@@ -296,7 +296,7 @@ if(!$totalHasBeenOutput) {
 					}
 				}
 			} else{
-				if($userdata['opid'] == $rounddata['answer']) {
+				if(!is_null($rounddata['answer']) && $userdata['opid'] == $rounddata['answer']) {
 ?>			<td class="win"><?php echo $userdata['opid'];tick();?></span></td>
 <?php
 				} else {

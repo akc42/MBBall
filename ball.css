@@ -214,8 +214,24 @@ td p.no_team {background-color:#CCFFFF;}
 td#instructions td {background-color:white; width:150px; border:2px solid black; font-size:x-small; text-align:left;vertical-align:top;}
 
 #bonus_pick,#instructions {vertical-align:top;}
-#emoticons {background-color:white;}
-input#make_picks {
+table.layout table.layout td#instructions {width:450px;height:1200px;}
+table.layout table.layout td#instructions p {text-align:left;}
+table.layout table.layout td#instructions ul {text-align:left;margin-left:2px;padding-left:1px;}
+table.layout table.layout td#instructions ul ul {text-align:left;margin-left:4px;padding-left:1px;}
+table.layout table.layout td#instructions li {list-style-position:inside;list-style-type:disc;}
+table.layout table.layout td#instructions li li {list-style-position:inside;list-style-type:square;}
+table.layout table.layout td#instructions h1,
+ table.layout table.layout td#instructions h2,
+ table.layout table.layout td#instructions h3 {text-align:left;font-size:small;}
+table.layout table.layout td#instructions h2,
+ table.layout table.layout td#instructions h3{ font-style:italic;}
+table.layout table.layout td#instructions h3{font-weight:normal;}
+ 
+
+#emoticons {background-color:white;border:1px solid black; }
+table.layout table.layout td#emoticon_cell{width:450px;height:160px;}
+
+#make_picks {
 	font-size:large;
 	font-weight:bold;
 	margin:10px;
@@ -224,7 +240,11 @@ input#make_picks {
 	background-color:red;
 	color:white;
 	padding:5px;
+	border:3px outset;
+	cursor:pointer;
 }
+
+#make_picks:hover, #make_picks:active {border-style:inset;}
 
 /* mainly administration stuff below here */
 div.del {
