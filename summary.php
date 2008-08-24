@@ -17,12 +17,8 @@ while($row = dbFetchRow($result)) {
 }
 dbFree($result);
 ?>			<th class="score">Rounds<br/>Total</th>
-<?php
-	if($playoff_deadline != 0) {
-?>			<th class="score">PlayOffs<br/>Total</th>
-<?php
-}
-?>			<th class="score">Grand<br/>Total</th>
+			<th class="score">PlayOffs<br/>Total</th>
+			<th class="score">Grand<br/>Total</th>
 		</tr>
 	</thead>
 	<tbody>
