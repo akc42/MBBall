@@ -2,7 +2,7 @@
  * (c) 2008 Alan Chandler
  * See COPYING.txt in this directory for details of licence terms
 */
-MBBVersion = '6';
+MBBVersion = '7';
 
 MBB = function() {
 	var m_names = ["Jan","Feb","Mar","Apr","May","Jun","Jly","Aug","Sep","Oct","Nov","Dec"];
@@ -229,22 +229,30 @@ var MBBUser = new Class({
 			//These items are only there if user has registered
 			$('pick').addEvent('submit', function(e) {
 				e.stop();
+				var validated = true;
 				var answer = $('answer');
 				if(answer) {
 					//only here if answer is defined (no options to select (in which case Answer must be an integer
 					if(!MBB.intValidate(answer)) {
-						return false; //don't submit
+						validated = false; //don't submit
+						answer.value = '';
 					}
 				}
 		
 				var pickReq = new MBB.req('createpicks.php', function(response) {
-					window.location.reload(true); //reload page to pick up picks
+					if (validated) {
+						window.location.reload(true); //reload page to pick up picks
+					} else {
+						$('bonus_pick').getElement('textarea').value="ERROR - your picks were made, but the bonus question was NOT answered.  It needs to be a whole number (integer)"
+					}
 				});
 				pickReq.post($('pick'));
-				var content = $('content');
-				content.getElement('table').destroy();
-				var div = new Element('div',{'class':'loading'});
-				div.inject(content);
+				if(validated) {
+					var content = $('content');
+					content.getElement('table').destroy();
+					var div = new Element('div',{'class':'loading'});
+					div.inject(content);
+				}
 			});
 			this.emoticon = new MBB.emoticon($('emoticons'),$('registered').getElements('textarea'));
 		}
