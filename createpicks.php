@@ -45,7 +45,7 @@ while($row = dbFetchRow($result)) {
 	$pid = (isset($_POST['M'.$row['hid']]))?dbMakeSafe($_POST['M'.$row['hid']]):'NULL';
 	$over = (isset($_POST['O'.$row['hid']]) )?(($_POST['O'.$row['hid']] == 'O')?"TRUE":"FALSE"):"NULL";
 	$comment = (isset($_POST['C'.$row['hid']]))?dbPostSafe($_POST['C'.$row['hid']]):'NULL';
-	if( $comment != 'NULL' || $over != 'NULL' || $comment != 'NULL') {
+	if( $pid != 'NULL' || $over != 'NULL' || $comment != 'NULL') {
 		dbQuery('INSERT INTO pick(uid,cid,rid,hid,pid,over,comment) VALUES ('
 				.dbMakeSafe($uid).','.dbMakeSafe($cid).','.dbMakeSafe($rid).','.dbMakeSafe($row['hid']).','
 				.$pid.','.$over.','.$comment.');');
