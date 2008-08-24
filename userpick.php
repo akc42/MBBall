@@ -40,7 +40,7 @@ if ($nomatches > 0 || $rounddata['valid_question']||($playoff_deadline != 0 and 
 <?php
 		}
 ?>								<th class="comment">Administrators Comment</td>
-								<th class="comment">Players Comment</td>
+								<th class="comment">Pickers Comment</td>
 							</tr>
 						</thead>
 						<tbody>
