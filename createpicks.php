@@ -18,27 +18,29 @@ $rid=$_POST['rid'];
 dbQuery('BEGIN ;');
 $gap = $_POST['gap'];
 $ppd = $_POST['ppd'];
-dbQuery('DELETE FROM option_pick WHERE 	uid = '.dbMakeSafe($uid).' AND cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).';');
+if (isset($_POST['bqdeadline']) && $_POST['bqdeadline'] > time()) {
+	dbQuery('DELETE FROM option_pick WHERE 	uid = '.dbMakeSafe($uid).' AND cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).';');
+	if (isset($_POST['opid'])) {
+		if (isset($_POST['Cbonus'])) {
+			dbQuery('INSERT INTO option_pick(uid,cid,rid,opid,comment) VALUES ('
+							.dbMakeSafe($uid).','.dbMakeSafe($cid).','.dbMakeSafe($rid).','
+							.dbMakeSafe($_POST['opid']).','.dbPostSafe($_POST['Cbonus']).');');
+		} else {
+			dbQuery('INSERT INTO option_pick(uid,cid,rid,opid,comment) VALUES ('
+							.dbMakeSafe($uid).','.dbMakeSafe($cid).','.dbMakeSafe($rid).','
+							.dbMakeSafe($_POST['opid']).', NULL );');
+		}
+	} else {
+		if (isset($_POST['Cbonus'])) {
+			dbQuery('INSERT INTO option_pick(uid,cid,rid,opid,comment) VALUES ('
+							.dbMakeSafe($uid).','.dbMakeSafe($cid).','.dbMakeSafe($rid).', NULL ,'
+							.dbPostSafe($_POST['Cbonus']).');');
+		}
+	}
+}
 dbQuery('DELETE FROM pick WHERE uid = '.dbMakeSafe($uid).' AND cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid)
 		.' AND hid IN (SELECT hid FROM match WHERE  open IS TRUE and match_time > '.dbMakeSafe(time()+$gap)
 		.' AND cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).');');
-if (isset($_POST['opid'])) {
-	if (isset($_POST['Cbonus'])) {
-		dbQuery('INSERT INTO option_pick(uid,cid,rid,opid,comment) VALUES ('
-						.dbMakeSafe($uid).','.dbMakeSafe($cid).','.dbMakeSafe($rid).','
-						.dbMakeSafe($_POST['opid']).','.dbPostSafe($_POST['Cbonus']).');');
-	} else {
-		dbQuery('INSERT INTO option_pick(uid,cid,rid,opid,comment) VALUES ('
-						.dbMakeSafe($uid).','.dbMakeSafe($cid).','.dbMakeSafe($rid).','
-						.dbMakeSafe($_POST['opid']).', NULL );');
-	}
-} else {
-	if (isset($_POST['Cbonus'])) {
-		dbQuery('INSERT INTO option_pick(uid,cid,rid,opid,comment) VALUES ('
-						.dbMakeSafe($uid).','.dbMakeSafe($cid).','.dbMakeSafe($rid).', NULL ,'
-						.dbPostSafe($_POST['Cbonus']).');');
-	}
-}
 $result=dbQuery('SELECT hid FROM match  WHERE open IS TRUE AND match_time > '.dbMakeSafe(time()+$gap).' AND cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).';');
 
 while($row = dbFetchRow($result)) {

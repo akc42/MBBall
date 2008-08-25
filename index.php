@@ -1,6 +1,6 @@
 <?php
 
-$version = "v1.19";
+$version = "v1.20";
 
 /* Football Picking Competition
  *	Copyright (c) 2008 Alan Chandler

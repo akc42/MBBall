@@ -15,7 +15,7 @@ $sql .= ' ORDER BY m.match_time, m.hid;';
 $result = dbQuery($sql);
 $nomatches = dbNumRows($result);
 
-if ($nomatches > 0 || $rounddata['valid_question']||($playoff_deadline != 0 and $playoff_deadline > $time_at_top)) {
+if ($nomatches > 0 || ($rounddata['valid_question'] && $rounddata['deadline'] > $time_at_top) ||($playoff_deadline != 0 && $playoff_deadline > $time_at_top)) {
 ?><form id="pick">
 	<input type="hidden" name="uid" value="<?php echo $uid;?>" />
 	<input type="hidden" name="pass" value="<?php echo $password;?>" />
@@ -23,6 +23,7 @@ if ($nomatches > 0 || $rounddata['valid_question']||($playoff_deadline != 0 and 
 	<input type="hidden" name="rid" value="<?php echo $rid;?>" />
 	<input type="hidden" name="gap" value="<?php echo $gap;?>" />
 	<input type="hidden" name="ppd" value="<?php echo $playoff_deadline ;?>" />
+	<input type="hidden" name="bqdeadline" value="<?php echo $rounddata['deadline'];?>" />
 	<table class="layout">
 		<tbody>
 			<tr>	
@@ -127,9 +128,16 @@ if ($nomatches > 0 || $rounddata['valid_question']||($playoff_deadline != 0 and 
 			<tr>
 				<td id="bonus_pick">
 <?php	
-	if ($rounddata['valid_question']) {
-?>					<table>
-						<caption>Bonus Question</caption>
+	if ($rounddata['valid_question'] && $rounddata['deadline'] > $time_at_top) {
+?><h1>Bonus Question</h1>
+<h2>(Deadline: <span class="time"><?php echo $rounddata['deadline'];?></span>)</h2>
+<?php
+		if ($rounddata['deadline'] < ($time_at_top+86400)) {
+?><h2 class="limited">Less than a DAY to answer</h2>
+<?php
+		 }
+?>
+					<table>
 						<thead>
 							<tr><th class="bq">Question</th><th class="ba">Answer</th><th class="comment">Comment</th></tr>
 						</thead>
@@ -180,13 +188,13 @@ if ($nomatches > 0 || $rounddata['valid_question']||($playoff_deadline != 0 and 
 ?>						</tbody>
 					</table>
 <?php
+		dbFree($resultop);
+		dbFree($result);
 	} // end valid question check
-	dbFree($result);
-	dbFree($resultop);
 ?>				</td>
 			</tr>
 <?php
-	if($playoff_deadline != 0 and $playoff_deadline > $time_at_top) {
+	if($playoff_deadline != 0 && $playoff_deadline > $time_at_top) {
 		require_once('team.php');
 //Playoff selection is part of this competition
 ?>			<tr>
