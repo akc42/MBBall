@@ -344,8 +344,8 @@ height: 56px;
 }
 /**/
 
-caption,#picks h1, #popicks h1 {font-size:small; font-weight:bold;text-align:center;}
-
+caption,#picks h1, #popicks h1 ,#playoff_pick h1 {font-size:small; font-weight:bold;text-align:center;}
+#playoff_pick h2 {font-size:small; font-weight:normal;text-align:center;}
 table.layout table td {
 	background-color:white;
 	border:1px solid #CCCCFF;

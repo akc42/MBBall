@@ -203,38 +203,47 @@ $result=dbQuery('SELECT tid,opid,confid FROM wildcard_pick WHERE cid = '.dbMakeS
 		while($row = dbFetchRow($result)) {
 			$wild[$row['confid']][$row['opid']] = $row['tid'];
 		}
-?>					<table>
-						<caption>Pick divisional winner and wildcard picks for each conference</caption>
-						<thead>
-							<tr>
-								<th class="confhead">\</th><th class="confhead">Division</th>
-<?php
-		foreach($divs as $division) {
-			// for each division we are building a team id, name and logo columns
-?>								<th class="t_dn" colspan="4"><?php echo $division;?></th>
-<?php
-		}
-?>							</tr>		
-							<tr>
-								<th class="confhead">Conference</th><th class="confhead">\</th>
-<?php
-		foreach($divs as $division) {
-?>								<th class="tid">Team</th>
-								<th class="radio">D Win</th>
-								<th class="radio">Wild1</th>
-								<th class="radio">Wild2</th>
-<?php
-		}
-?>							</tr>	
-						</thead>
-						<tbody>
+?><h1>Pick divisional winner and wildcard picks for each conference</h1>
+<h2>Deadline : <span class="time"><?php echo $playoff_deadline;?></span><?php
+		if ($playoff_deadline< ($time_at_top+86400)) {
+?><span>Less than a DAY to pick</span><?php
+		 }
+?></h2>
 <?php
 		foreach($confs as $confid => $conference) {
 			$no_of_rows = max($sizes[$confid]);
 			$w1tid = (isset($wild[$confid][1]))?$wild[$confid][1]:'';
 			$w2tid = (isset($wild[$confid][2]))?$wild[$confid][2]:'';
-?>							<tr>
-								<td class="conference" colspan="2" rowspan="<?php echo $no_of_rows;?>"><?php echo $conference;?></td>
+?><table>
+	<thead>
+		<tr>
+			<th class="confhead">\</th><th class="confhead">Division</th>
+
+<?php
+			foreach($divs as $divid => $division){
+?>			<th colspan="4">
+				<?php echo $division; ?></th>
+<?php
+			}
+
+?>
+		</tr>
+		<tr>
+			<th class="confhead">Conference</th><th class="confhead">\</th>
+<?php
+			foreach($divs as $division) {
+?>			<th class="tid">Team</th>
+			<th class="radio">D Win</th>
+			<th class="radio">Wild1</th>
+			<th class="radio">Wild2</th>
+<?php
+			}
+?>							</tr>	
+
+	</thead>
+	<tbody>
+		<tr>
+			<td class="conference" colspan="2" rowspan="<?php echo $no_of_rows;?>"><?php echo $conference;?></td>
 <?php
 			for ($i = 0; $i < $no_of_rows;$i++) {
 				if( $i != 0) {
@@ -270,10 +279,11 @@ $result=dbQuery('SELECT tid,opid,confid FROM wildcard_pick WHERE cid = '.dbMakeS
 ?>							</tr>
 <?php
 			}
-		}
 ?>						</tbody>
 					</table>
-				</td>
+<?php
+		}
+?>				</td>
 			</tr>
 <?php
 	}  //playoffs
