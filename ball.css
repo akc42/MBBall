@@ -388,7 +388,7 @@ div.match .hid span, div.match .aid span {
 }
 div.match .hid span {text-align:right;}
 div.match .aid span {text-align:left;}
-div.match .at{float:left;width:10px;border:none;background:transparent;}
+div.match .at {float:left;width:10px;border:none;background:transparent;}
 
 div.match .hscore , div.match .ascore,div.match .cscore {
 	float:left;

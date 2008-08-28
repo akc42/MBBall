@@ -35,7 +35,7 @@ if (dbNumRows($result) == 0) {
      <div class="hscore"><input type="text" name="hscore"/></div>
   <div class="ascore"><input type="text" name="ascore"/></div>
   <div class="cscore"><input type="text" name="cscore" /></div>
-  <div class="mtime"><input type="text" name="mtime" class="time" /></div>
+  <div class="mtime"><input type="hidden" name="mtime"  /></div>
   <div class="comment"><textarea name="comment"></textarea></div>
 </form> 
 <div class="clear"></div>

@@ -374,19 +374,20 @@ var MBBAdmin = new Class({
 						if (!ou.checked) {
 							div.getElement('input[name=cscore]').readOnly = true;
 						}
+						var matchtime = div.getElement('input[name=mtime]');
+						var matchcal = new Calendar.Single(matchtime,{format:'D j M g:ia',width:'172px',start:null,onHideStart:function(){
+							matchtime.fireEvent('change');
+							return true;
+						}});
+
 						div.getElements('input').extend(div.getElements('textarea')).addEvent('change', function(e) {
 							var validated = true;
-							var matchtime = div.getElement('input[name=mtime]');
 							if(this.name == 'cscore'
 									|| this.name == 'hscore' 
 									|| this.name == 'ascore') {
 								if(!MBB.intValidate(this)) {
 									validated = false;
 								}
-							}
-							// We need to always validate the date - so it gets converted to the correct serial number
-							if(!MBB.parseDate(matchtime)) {
-								validated = false;
 							}
 							if (this.name == 'open' && this.checked) {
 								var aid = div.getElement('input[name=aid]');
@@ -395,7 +396,7 @@ var MBBAdmin = new Class({
 									validated = false;
 									aid.highlight('#F00');
 								}
-								if ( validated && (matchtime.value == '' || matchtime.value == 0)) {  //As user to confirm if no matchdate is set
+								if ( validated && (matchtime.value == '' || matchtime.value == 0)) {  //Ask user to confirm if no matchdate is set
 									if (!confirm('Are you sure you want to open this match without a match date set?')) {
 										validated = false;
 										this.checked = false;
@@ -412,13 +413,9 @@ var MBBAdmin = new Class({
 							}	
 							if (validated) {
 								var updateReq = new MBB.req('updatematch.php',function(response) {
-									MBB.adjustDates(div);
 									//Should not be necessary to update page
 								});
 								updateReq.post(div.getElement('form'));
-							} else {
-								//If we failed to validate we need to adjust dates back
-								MBB.adjustDates(div);
 							}
 						});
 						div.getElement('.hid').addEvent('click',function(e) {
