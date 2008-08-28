@@ -324,21 +324,21 @@ var MBBAdmin = new Class({
 			var maxround;
 			var owner = this.owner;
 			if(params.cid != 0) {
+				var pod = new Calendar.Single($('playoffdeadline'),{format:'j M Y g:i a (D)',width:'235px',start:null,onHideStart:function(){
+					var el = $('playoffdeadline')
+					el.fireEvent('change');
+					return true;
+				}});
 				//We only want to do this if there is a competition to get
-				MBB.adjustDates(div);
 				// Validate competition Details and Change Dates to seconds since 1970
 				//if anything in the form changes then submit automatically
 				div.getElements('input').extend(div.getElements('select')).extend(div.getElements('textarea')).addEvent('change', function(e) {
-					e.stop();
 					if(this.id =='bbapproval') {
 						$$('#registered input.bbapprove').each(function (item) {
 							item.readOnly = !e.target.checked;
 						});
 					}
 					var validated = true;
-					if(!MBB.parseDate($('playoffdeadline'))) {
-						validated = false;
-					}
 					if(!MBB.intValidate($('gap'))) {
 						validated = false;
 					}
@@ -351,13 +351,10 @@ var MBBAdmin = new Class({
 					}
 					if(validated) {
 						var updateReq = new MBB.req('updatecomp.php', function(response) {
-							MBB.adjustDates(div);
 							//Shouldn't need to load page as its all there (but we might have updated the summary)
 							owner.competitions.loadPage(params);
 						});
 						updateReq.post($('compform'));
-					} else {
-						MBB.adjustDates(div);
 					}
 				});
 				if (emoticons) {

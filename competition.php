@@ -72,7 +72,7 @@ if ($cid != 0) {
 			<tr>
 				<td colspan="3">
 		<label>Playoff Selection Deadline<br/>(leave blank for no playoff selection)<br/>
-		<input id ="playoffdeadline" name="playoffdeadline" class="time" value="<?php echo $comp['pp_deadline'];?>" />
+		<input id ="playoffdeadline" type="hidden" name="playoffdeadline" value="<?php echo $comp['pp_deadline'];?>" /></label>
 				</td>
 			</tr>
 			<tr>
