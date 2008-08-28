@@ -1,6 +1,6 @@
 <?php
 
-$version = "v1.21";
+$version = "v1.22";
 
 /* Football Picking Competition
  *	Copyright (c) 2008 Alan Chandler
@@ -161,7 +161,7 @@ if ($rounddata = dbFetchRow($result)) {
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<title>Melinda's Backups Football Pool</title>
-	<link rel="stylesheet" type="text/css" href="ball.css" title="mbstyle"/>
+	<link rel="stylesheet" type="text/css" href="ball.css"/>
 	<!--[if lt IE 7]>
 		<link rel="stylesheet" type="text/css" href="ball-ie.css"/>
 	<![endif]-->

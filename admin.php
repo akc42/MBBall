@@ -20,11 +20,8 @@ require_once('db.php');
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<title>Melinda's Backups Football Pool Administration</title>
-	<link rel="stylesheet" type="text/css" href="/static/scripts/calendar/calendar.css" title="calendar"/>
-<!--[if lte IE 7]>
-	<link rel="stylesheet" type="text/css" href="/static/scripts/calendar/calendar-ie.css"/>
-<![endif]-->
-	<link rel="stylesheet" type="text/css" href="ball.css" title="mbstyle"/>
+	<link rel="stylesheet" type="text/css" href="/static/scripts/calendar/calendar.css"/>
+	<link rel="stylesheet" type="text/css" href="ball.css"/>
 	<!--[if lt IE 7]>
 		<link rel="stylesheet" type="text/css" href="ball-ie.css"/>
 	<![endif]-->
