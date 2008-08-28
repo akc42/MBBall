@@ -11,7 +11,7 @@ $sql = 'SELECT u.name , u.uid , r.pscore, r.oscore, r.mscore,r.bscore,r.score, p
 $sql .= ' FROM round_score r JOIN participant u USING (uid)';
 $sql .= ' LEFT JOIN option_pick p USING (cid,rid,uid)';
 $sql .= ' WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid);
-$sql .= ' ORDER BY score DESC;';
+$sql .= ' ORDER BY score DESC,u.name;';
 $resultuser = dbQuery($sql);
 
 
