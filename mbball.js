@@ -516,8 +516,12 @@ var MBBAdmin = new Class({
 						} else {
 							answer = elAns.value.toInt();
 						}
+						var dead = new Calendar.Single($('deadline'),{format:'j M Y g:i a (D)',width:'235px',start:null,onHideStart:function(){
+							var el = $('deadline')
+							el.fireEvent('change');
+							return true;
+						}});
 						div.getElements('input').extend(div.getElements('textarea')).addEvent('change', function(e) {
-							e.stop();
 							if (this.id == 'ou') {
 								//if ou changes then all the matches combined scores are diabled or not
 								$('matches').getElements('input[name=cscore]').each(function(item) {
@@ -526,9 +530,6 @@ var MBBAdmin = new Class({
 							}
 							var validated = true;
 							
-							if(!MBB.parseDate($('deadline'))) {
-								validated = false;
-							}
 							if (!MBB.intValidate($('value'))) {
 								validated = false;
 							}
@@ -561,13 +562,9 @@ var MBBAdmin = new Class({
 							}
 							if(validated) {
 								var updateReq = new MBB.req('updateround.php', function(response) {
-									MBB.adjustDates(div);
 									//Should not be necessary to update page
 								});
 								updateReq.post($('roundform'));
-							} else {
-								//If we failed to validate we need to adjust dates back
-								MBB.adjustDates(div);
 							}
 						});
 						// if user clicks on create option area we need to create an option

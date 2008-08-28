@@ -66,7 +66,7 @@ if($rid != 0 && $cid !=0) {
 			<tr>
 				<td colspan="2">
 		<label>Deadline for answering question<br/>
-			<input id="deadline" name="deadline" type="text" class="time" value="<?php echo $row['deadline'];;?>"/>
+			<input id="deadline" name="deadline" type="hidden" value="<?php echo $row['deadline'];;?>"/>
 		</label>
 				</td>
 				<td>
