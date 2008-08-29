@@ -363,6 +363,8 @@ table.layout table.form td.submit{width:8em; text-align:center;background-color:
 .time,.datetime {width:160px;text-align:center;}
 .option2{width:8em;}
 
+#competition div.calendar,#round div.calendar {background-color:#ddd;}
+#competition div.calendar span, #round div.calendar span {background-color:white;}
 
 .selectthis {
 	cursor:pointer;
@@ -402,4 +404,5 @@ div.match .cscore input {width:52px;}
 
 div.match .comment, div.match .mtime {width:176px;float:left;border:1px solid blue;background-color:#ddd;}
 div.match .comment textarea, div.match .mtime input {width:172px;}
+div.match .mtime {height:24px;}
 

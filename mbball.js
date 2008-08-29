@@ -2,7 +2,7 @@
  * (c) 2008 Alan Chandler
  * See COPYING.txt in this directory for details of licence terms
 */
-MBBVersion = '8';
+MBBVersion = '9';
 
 MBB = function() {
 	var m_names = ["Jan","Feb","Mar","Apr","May","Jun","Jly","Aug","Sep","Oct","Nov","Dec"];
@@ -324,9 +324,17 @@ var MBBAdmin = new Class({
 			var maxround;
 			var owner = this.owner;
 			if(params.cid != 0) {
-				var pod = new Calendar.Single($('playoffdeadline'),{format:'j M Y g:i a (D)',width:'235px',start:null,onHideStart:function(){
-					var el = $('playoffdeadline')
-					el.fireEvent('change');
+				
+				var el = $('playoffdeadline');
+				var oldtime = el.value;
+				var pod = new Calendar.Single(el,{format:'j M Y g:i a (D)',width:'235px',onHideStart:function(){
+					if(new Date(el.value *1000) > new Date() || confirm('Do you mean to set the deadline before now')){
+						oldtime = el.value;
+						el.fireEvent('change');
+					} else {
+						el.value = oldtime;
+						pod.resetVal();
+					}
 					return true;
 				}});
 				//We only want to do this if there is a competition to get
@@ -375,8 +383,15 @@ var MBBAdmin = new Class({
 							div.getElement('input[name=cscore]').readOnly = true;
 						}
 						var matchtime = div.getElement('input[name=mtime]');
-						var matchcal = new Calendar.Single(matchtime,{format:'D j M g:ia',width:'172px',start:null,onHideStart:function(){
-							matchtime.fireEvent('change');
+						var oldtime = matchtime.value;
+						var matchcal = new Calendar.Single(matchtime,{format:'D j M g:ia',width:'172px',onHideStart:function(){
+							if(new Date(matchtime.value *1000) > new Date() || confirm('Do you mean to set the matchtime before now')){
+								oldtime = matchtime.value;
+								matchtime.fireEvent('change');
+							} else {
+									matchtime.value = oldtime;
+									matchcal.resetVal();
+							}
 							return true;
 						}});
 
@@ -513,9 +528,16 @@ var MBBAdmin = new Class({
 						} else {
 							answer = elAns.value.toInt();
 						}
-						var dead = new Calendar.Single($('deadline'),{format:'j M Y g:i a (D)',width:'235px',start:null,onHideStart:function(){
-							var el = $('deadline')
-							el.fireEvent('change');
+						var dead = $('deadline');
+						var oldtime = dead.value;
+						var deadcal = new Calendar.Single(dead,{format:'j M Y g:i a (D)',width:'235px',onHideStart:function(){
+							if(new Date(dead.value *1000) > new Date() || confirm('Do you mean to set the question deadline before now')){
+								oldtime = dead.value;
+								dead.fireEvent('change');
+							} else {
+								dead.value = oldtime;
+								deadcal.resetVal();
+							}
 							return true;
 						}});
 						div.getElements('input').extend(div.getElements('textarea')).addEvent('change', function(e) {
