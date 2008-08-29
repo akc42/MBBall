@@ -80,44 +80,13 @@ MBB = function() {
 			var d;
 			datespan.removeClass('time');
 			datespan.addClass('datetime');
-			switch (datespan.get('tag')) {
-			case "span":
-				d = datespan.get('text');
-				if(d == '' || d=='0') {
-					datespan.set('text','');
-					break;
-				}
+			d = datespan.get('text');
+			if(d == '' || d=='0') {
+				datespan.set('text','');
+			} else {
 				datespan.set('text',formatDate(d));
-				break;
-			case "input":
-				d=datespan.value;
-				if(d == '' || d=='0') {
-					datespan.value = '';
-					break;
-				}
-				datespan.value = formatDate(d);
-				break;
-			default:
-				break;
 			}
 		});
-	},
-	parseDate: function(el) {
-		var secs
-		el.removeClass('error');
-		if (el.value == '' || el.value == '0') {
-			secs = 0;
-		} else {
-			secs = Date.parse(el.value)/1000;
-			if(isNaN(secs)) {
-				el.addClass('error');
-				return false;
-			}
-		}
-		el.value = secs;
-		el.removeClass('datetime');
-		el.addClass('time');
-		return true;
 	},
 	intValidate: function(el) {
 		el.removeClass('error');
