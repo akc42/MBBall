@@ -2,7 +2,6 @@
  * (c) 2008 Alan Chandler
  * See COPYING.txt in this directory for details of licence terms
 */
-MBBVersion = '9';
 
 MBB = function() {
 	var m_names = ["Jan","Feb","Mar","Apr","May","Jun","Jly","Aug","Sep","Oct","Nov","Dec"];
@@ -136,11 +135,9 @@ MBB = function() {
 }();
 
 var MBBall = new Class({
-	initialize: function(version,me,errordiv) {
+	initialize: function(me,errordiv) {
 		this.me = me;
 		MBB.setRO({'uid':me.uid,'pass':me.password});
-		var span=$('version');
-		span.set('text',version+'['+MBBVersion+']');
 		MBB.setErrorDiv (errordiv);
 	}
 });
@@ -148,8 +145,8 @@ var MBBall = new Class({
 
 var MBBUser = new Class({
 	Extends: MBBall,
-	initialize: function(version,me,params,errordiv) {
-		this.parent(version,me,errordiv);
+	initialize: function(me,params,errordiv) {
+		this.parent(me,errordiv);
 		var regdiv = $('registration');
 		if(regdiv) { //exists means registration is open
 			regdiv.getElementById('register').addEvent('submit', function(e) {
@@ -231,8 +228,8 @@ var MBBUser = new Class({
 
 var MBBAdmin = new Class({
 	Extends: MBBall,
-	initialize: function(version,me,cid,errordiv) {
-		this.parent(version,me,errordiv);
+	initialize: function(me,cid,errordiv) {
+		this.parent(me,errordiv);
 		var params = {'cid':cid, 'rid':0};
 		var emoticons;
 		this.competitions = new MBB.subPage(this,'competitions.php',$('competitions'),function (div) {

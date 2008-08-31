@@ -3,7 +3,7 @@
  *	Copyright (c) 2008 Alan Chandler
  *	See COPYING.txt in this directory for details of licence terms
 */
-if(!(isset($_GET['uid']) && isset($_GET['pass']) && isset($_GET['v'])))
+if(!(isset($_GET['uid']) && isset($_GET['pass']) ))
 	die('Hacking attempt - wrong parameters');
 $uid = $_GET['uid'];
 $password = $_GET['pass'];
@@ -36,7 +36,7 @@ require_once('db.php');
 
 var MBBmgr;
 window.addEvent('domready', function() {
-	MBBmgr = new MBBAdmin('<?php echo $_GET['v'];?>',{uid: '<?php echo $uid;?>', 
+	MBBmgr = new MBBAdmin({uid: '<?php echo $uid;?>',
 				password : '<?php echo $password; ?>',
 				admin :<?php if(isset($_GET['global'])) {echo 'true';} else {echo 'false';}?>},
 				<?php if(isset($_GET['cid'])) {echo $_GET['cid'] ;}else{ echo '0';}?>,
@@ -84,7 +84,7 @@ window.addEvent('domready', function() {
 	</tbody>
 </table>
 
-<div id="copyright"><hr/>MBball <span id="version"></span> &copy; 2008 Alan Chandler.  Licenced under the GPL</div>
+<div id="copyright"><hr/>MBball <span><?php include('version.php');?></span> &copy; 2008 Alan Chandler.  Licenced under the GPL</div>
 </div>
 </body>
 

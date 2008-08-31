@@ -1,7 +1,5 @@
 <?php
 
-$version = "v1.22";
-
 /* Football Picking Competition
  *	Copyright (c) 2008 Alan Chandler
  *	See COPYING.txt in this directory for details of licence terms
@@ -52,7 +50,6 @@ if(dbNumRows($result) != 1 ) {
 	die("<p>Database is <b>corrupt</b> - default_competition should have a single row.<br/>Please contact webmaster@melindasbackup.com</p>");
 }
 $row=dbFetchRow($result);
-$version .= '('.$row['version'].')';
 
 if(isset($_GET['cid'])) {
 	$cid = $_GET['cid'];
@@ -61,7 +58,7 @@ if(isset($_GET['cid'])) {
 		$cid = $row['cid'];
 	} else {
 		if(in_array(SMF_FOOTBALL,$groups)) {
-			header( 'Location: admin.php?uid='.$uid.'&pass='.$password.'&v='.$version.'&global=true' ) ; 
+			header( 'Location: admin.php?uid='.$uid.'&pass='.$password.'&global=true' ) ;
 		} else {
 			header( 'Location: nostart.html' ) ;
 		};
@@ -74,7 +71,7 @@ $result = dbQuery('SELECT * FROM Competition c JOIN participant u ON c.administr
 if (dbNumRows($result) == 0) {
 	//This competition doesn't exist yet
 	if(in_array(SMF_FOOTBALL,$groups)) {
-		header( 'Location: admin.php?uid='.$uid.'&pass='.$password.'&v='.$version.'&global=true&cid='.$cid ) ;
+		header( 'Location: admin.php?uid='.$uid.'&pass='.$password.'&global=true&cid='.$cid ) ;
 	} else {
 		header( 'Location: nostart.html' ) ;
 	};
@@ -177,8 +174,7 @@ if ($rounddata = dbFetchRow($result)) {
 
 var MBBmgr;
 window.addEvent('domready', function() {
-	MBBmgr = new MBBUser('<?php echo $version;?>',
-				{uid: <?php echo $uid;?>, 
+	MBBmgr = new MBBUser({uid: <?php echo $uid;?>,
 				password : '<?php echo sha1("Football".$uid); ?>',
 				registered:<?php echo ($registered)?'true':'false';?>},
 				{cid: <?php echo $cid;?>, rid: <?php echo $rid;?>},
@@ -256,13 +252,13 @@ if (dbNumRows($result) > 0) {
 dbFree($result);
 if(in_array(SMF_FOOTBALL,$groups)) {
 // Am Global Administrator - let me also do Admin thinks
-?>	<li><a href="admin.php?<?php echo 'uid='.$uid.'&pass='.$password.'&v='.$version.'&global=true&cid='.$cid;?>"><span>Global Admin</span></a></li>
+?>	<li><a href="admin.php?<?php echo 'uid='.$uid.'&pass='.$password.'&global=true&cid='.$cid;?>"><span>Global Admin</span></a></li>
 
 <?php
 } else {
 	if($admin) {
 // Am Administrator of this competition - let me also do Admin thinks
-?>	<li><a href="admin.php?<?php echo 'uid='.$uid.'&pass='.$password.'&v='.$version.'&cid='.$cid;?>"><span>Administration</span></a></li>
+?>	<li><a href="admin.php?<?php echo 'uid='.$uid.'&pass='.$password.'&cid='.$cid;?>"><span>Administration</span></a></li>
 <?php 
 	}
 }
@@ -302,7 +298,7 @@ if ($playoff_deadline != 0) {
 ?>			<tr><td colspan="2"><div id="tics"><?php require_once('tic.php');?></div></td></tr>
 		</tbody>
 	</table>	
-	<div id="copyright"><hr />MBball <span id="version"></span> &copy; 2008 Alan Chandler.  Licenced under the GPL</div>
+	<div id="copyright"><hr />MBball <span><?php include('version.php');?></span> &copy; 2008 Alan Chandler.  Licenced under the GPL</div>
 </div>
 </body>
 
