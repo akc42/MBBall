@@ -77,7 +77,7 @@ if ($cid != 0) {
 			</tr>
 			<tr>
 				<td colspan="3"><label>Pick Deadline (minutes before match time)<br/>
-					<input id="gap" name="gap" value="<?php echo intval($comp['gap']/60);?>" /></label>
+					<input id="gap" name="gap" value="<?php echo intval($comp['gap']/60);?>" /></label></td>
 			</tr>
 		</tbody>
 	</table>
