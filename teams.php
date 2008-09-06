@@ -42,7 +42,6 @@ if( $cid !=0) {
 	$result = dbQuery($sql);
 	while($row = dbFetchRow($result)) {
 		$row['tid'] = trim($row['tid']);
-		$row['hid'] = trim($row['hid']);
 ?>	<div id="<?php echo 'T'.$row['tid'];?>" <?php if(!is_null($row['hid']))echo 'class="inmatch"';?>>
 		<input type="checkbox" name="<?php echo $row['tid'];?>" <?php
 if($row['mp'] == 't') echo 'checked="checked"';?> />
