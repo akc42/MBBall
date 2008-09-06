@@ -18,6 +18,7 @@ while($row = dbFetchRow($result)) {
 	$divs[$row['divid']] = $row['name'];
 }
 dbFree($result);
+?>
 
 
 

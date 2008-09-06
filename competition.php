@@ -62,11 +62,11 @@ if ($cid != 0) {
 			<tr>
 				<td class="option2">	
 		<label><input id="open" name="open" type="checkbox" 
-			<?php if ($comp['open'] == 't') echo 'checked' ;?>/>Can Register</label>
+			<?php if ($comp['open'] == 't') echo 'checked="checked"' ;?>/>Can Register</label>
 				</td>
 				<td class="option1" colspan="2">
 		<label><input id="bbapproval" name="bbapproval" type="checkbox"
-			<?php if ($comp['bb_approval'] == 't') echo 'checked' ;?>/>BB's need Approval</label>
+			<?php if ($comp['bb_approval'] == 't') echo 'checked="checked"' ;?>/>BB's need Approval</label>
 				</td>
 			</tr>
 			<tr>
@@ -90,3 +90,4 @@ if ($cid != 0) {
 ?><p>There is no Competition to display right now</p>
 <?php
 }
+?>

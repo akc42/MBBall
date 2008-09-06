@@ -74,3 +74,4 @@ foreach($confs as $confid => $conference) {
 </table>
 <?php
 }
+?>

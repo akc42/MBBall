@@ -30,4 +30,4 @@ if ($row=dbFetchRow($result)) {
   dbQuery('ROLLBACK ;');
 }
 dbFree($result);
-
+?>

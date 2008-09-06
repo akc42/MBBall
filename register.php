@@ -35,3 +35,4 @@ if ($row && is_null($row['ruid'])) {
 	echo 'Error Registering. Please tell webmaster@melindasbackups.com';
 }
 dbFree($result);
+?>

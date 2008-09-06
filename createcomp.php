@@ -38,3 +38,4 @@ if(isset($_POST['setdefault'])) {
 dbQuery('COMMIT ;');
 
 echo '{"cid":'.$lastval.'}';
+?>

@@ -31,4 +31,4 @@ if ($row && !is_null($row['aid'])) {
 	dbQuery('ROLLBACK ;');
 }
 dbFree($result);
-
+?>

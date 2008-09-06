@@ -15,3 +15,4 @@ require_once('db.php');
 dbQuery('UPDATE default_competition SET cid = '.dbMakeSafe($_POST['defcomps']).' ;');
 
 echo '{"cid":'.$_POST['defcomps'].'}';
+?>

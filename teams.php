@@ -79,3 +79,4 @@ if($row['mp'] == 't') echo 'checked';?> />
 ?><p>No Team information available right now</p>
 <?php
 }
+?>

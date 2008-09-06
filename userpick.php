@@ -305,3 +305,4 @@ $result=dbQuery('SELECT tid,opid,confid FROM wildcard_pick WHERE cid = '.dbMakeS
 </form>
 <?php
 }
+?>

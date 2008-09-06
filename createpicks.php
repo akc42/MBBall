@@ -81,3 +81,4 @@ if ($ppd != 0 && $ppd > time()) {
 dbQuery('COMMIT ;');
 
 echo '{"uid":'.$uid.',"cid":'.$cid.',"rid":'.$rid.'}';
+?>

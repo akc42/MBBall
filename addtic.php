@@ -17,3 +17,4 @@ dbQuery('INSERT INTO team_in_competition(cid,tid) VALUES('.dbMakeSafe($cid).','.
 
 
 echo '{"cid":'.$cid.',"tid":"'.$tid.'"}';
+?>

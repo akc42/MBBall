@@ -31,3 +31,5 @@ dbFree($result);
 dbQuery('COMMIT;');
 
 echo ']}';
+?>
+		

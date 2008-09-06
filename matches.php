@@ -34,7 +34,7 @@ if($rid != 0 && $cid !=0) {
 					<div class="hid"><span><?php echo $row['hid'];?></span></div><div class="at">@</div>
 					<div class="aid"><span><?php echo (is_null($row['aid'])? '---':$row['aid']);?></span></div>
 					<div class="open">
-		<label><input type="checkbox" name="open" <?php if($row['open'] == 't') echo 'checked';?>/>Open</label>
+		<label><input type="checkbox" name="open" <?php if($row['open'] == 't') echo 'checked="checked"';?>/>Open</label>
 					</div>
 					<div class="del"></div>
 					<div class="hscore">
@@ -63,3 +63,4 @@ if($rid != 0 && $cid !=0) {
 ?><p>No Match information available right now</p>
 <?php
 }
+?>

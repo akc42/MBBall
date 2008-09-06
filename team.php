@@ -20,6 +20,7 @@ $sql .= ' WHERE t.cid = '.dbMakeSafe($cid).' ORDER BY confid,divid,tid;';
 $result = dbQuery($sql);
 if(dbNumRows($result) > 0 ) {
 	while ($row=dbFetchRow($result)) {
+		$row['tid'] = trim($row['tid']);
 		$pick = array();
 		$pick['tid']=$row['tid'];
 		$pick['name']=$row['name'];
@@ -31,5 +32,4 @@ if(dbNumRows($result) > 0 ) {
 	}
 }
 dbFree($result);
-
-
+?>

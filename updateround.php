@@ -46,3 +46,4 @@ $sql .= ' WHERE cid = '.dbMakeSafe($_POST['cid']).' AND rid = '.dbMakeSafe($_POS
 dbQuery($sql);
 
 echo '{"cid":'.$_POST['cid'].',"rid":'.$_POST['rid'].'}';
+?>
