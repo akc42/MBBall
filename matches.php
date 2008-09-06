@@ -20,6 +20,8 @@ if($rid != 0 && $cid !=0) {
 
 	$result = dbQuery('SELECT * FROM match WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' ORDER BY match_time, hid ;');
 	while($row = dbFetchRow($result)) {
+		$row['hid']=trim($row['hid']);
+		$row['aid']=trim($row['aid']);
 
 ?><div class="match">
      <form  action="#" >

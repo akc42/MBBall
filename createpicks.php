@@ -44,6 +44,7 @@ dbQuery('DELETE FROM pick WHERE uid = '.dbMakeSafe($uid).' AND cid = '.dbMakeSaf
 $result=dbQuery('SELECT hid FROM match  WHERE open IS TRUE AND match_time > '.dbMakeSafe(time()+$gap).' AND cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).';');
 
 while($row = dbFetchRow($result)) {
+	$row['hid'] = trim($row['hid']);
 	$pid = (isset($_POST['M'.$row['hid']]))?dbMakeSafe($_POST['M'.$row['hid']]):'NULL';
 	$over = (isset($_POST['O'.$row['hid']]) )?(($_POST['O'.$row['hid']] == 'O')?"TRUE":"FALSE"):"NULL";
 	$comment = (isset($_POST['C'.$row['hid']]))?dbPostSafe($_POST['C'.$row['hid']]):'NULL';

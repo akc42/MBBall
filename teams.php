@@ -41,6 +41,8 @@ if( $cid !=0) {
 	$sql .= ' ORDER BY tid;';
 	$result = dbQuery($sql);
 	while($row = dbFetchRow($result)) {
+		$row['tid'] = trim($row['tid']);
+		$row['hid'] = trim($row['hid']);
 ?>	<div id="<?php echo 'T'.$row['tid'];?>" <?php if(!is_null($row['hid']))echo 'class="inmatch"';?>>
 		<input type="checkbox" name="<?php echo $row['tid'];?>" <?php
 if($row['mp'] == 't') echo 'checked';?> />
@@ -56,7 +58,9 @@ if($row['mp'] == 't') echo 'checked';?> />
 	$sql .= dbMakeSafe($cid).' ORDER BY tid;';
 	$result = dbQuery($sql);
 	while($row = dbFetchRow($result)) {
-?>	<div id="<?php echo 'S'.$row['hid'];?>"><span class="tid"><?php echo $row['tid'];?></span></div>
+		$row['tid'] = trim($row['tid']);
+		
+?>	<div id="<?php echo 'S'.$row['tid'];?>"><span class="tid"><?php echo $row['tid'];?></span></div>
 <?php
 	}
 	dbFree($result);

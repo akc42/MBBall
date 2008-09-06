@@ -47,6 +47,9 @@ if ($nomatches > 0 || ($rounddata['valid_question'] && $rounddata['deadline'] > 
 						<tbody>
 <?php
 		while($row=dbFetchRow($result)) {
+			$row['hid'] = trim($row['hid']);
+			$row['aid'] = trim($row['aid']);
+			$row['pid'] = trim($row['pid']);
 ?>							<tr>
 								<td>
 									<table>
