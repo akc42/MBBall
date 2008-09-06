@@ -45,7 +45,7 @@ if( $cid !=0) {
 		$row['hid'] = trim($row['hid']);
 ?>	<div id="<?php echo 'T'.$row['tid'];?>" <?php if(!is_null($row['hid']))echo 'class="inmatch"';?>>
 		<input type="checkbox" name="<?php echo $row['tid'];?>" <?php
-if($row['mp'] == 't') echo 'checked';?> />
+if($row['mp'] == 't') echo 'checked="checked"';?> />
 		<span class="tid"><?php echo $row['tid'];?></span>
 	</div>
 <?php
@@ -68,7 +68,7 @@ if($row['mp'] == 't') echo 'checked';?> />
 		</tr>
 		<tr>
 			<td>
-				<label id="lock_cell"><input id="lock" type="checkbox" <?php if($ticexists) echo 'checked';?> />Lock</label>
+				<label id="lock_cell"><input id="lock" type="checkbox" <?php if($ticexists) echo 'checked="checked"';?> />Lock</label>
 			</td>
 			<td><div id="addall"></div></td>
 		</tr>
