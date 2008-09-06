@@ -29,7 +29,7 @@ if ($cid != 0) {
 			<th>Is a BB</th>
 			<th>BB Approved</th>
 			<th>Been Admin</th>
-			<th>DEL</td>
+			<th>DEL</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -48,15 +48,15 @@ if ($cid != 0) {
 ?>					class="bbapprove"
 <?php
 			 if($_GET['bbar'] == 'false') {
-?>					readonly
+?>					readonly="readonly"
 <?php
 			}
 		} else {
-?>					readonly
+?>					readonly="readonly"
 <?php
 		}		 
 		if($row['bb_approved'] == 't') {
-?>					checked
+?>					checked="checked"
 <?php
 		}
 ?>								 />
