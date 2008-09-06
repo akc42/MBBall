@@ -44,7 +44,7 @@ if($rid != 0 && $cid !=0) {
 		<input type="text" name="ascore" value="<?php echo $row['ascore'];?>"/>
 					</div>
 					<div class="cscore">
-		<input type="text" name="cscore" value="<?php echo $row['combined_score'];?>" <?php if($_GET['ou'] != 'true') echo 'readOnly';?> />
+		<input type="text" name="cscore" value="<?php echo $row['combined_score'];?>" <?php if($_GET['ou'] != 'true') echo 'readonly="readonly"';?> />
 					</div>
 					<div class="mtime">
 		<input type="hidden" name="mtime" value="<?php echo $row['match_time'];?>" />
