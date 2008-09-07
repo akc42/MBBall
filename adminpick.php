@@ -67,8 +67,8 @@ if($rid != 0 && $cid !=0) {
 ?>								<th class="score">Combined Score</th>
 <?php
 				}
-?>								<th class="comment">Administrators Comment</td>
-								<th class="comment">Players Comment</td>
+?>								<th class="comment">Administrators Comment</th>
+								<th class="comment">Players Comment</th>
 							</tr>
 						</thead>
 						<tbody>
