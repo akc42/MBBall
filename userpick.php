@@ -206,13 +206,13 @@ if ($nomatches > 0 || ($rounddata['valid_question'] && $rounddata['deadline'] > 
 $result=dbQuery('SELECT tid,divid,confid FROM div_winner_pick WHERE cid = '.dbMakeSafe($cid).' AND uid = '.dbMakeSafe($uid).';');
 		$dw = array(array());
 		while($row = dbFetchRow($result)) {
-			$dw[$row['confid']][$row['divid']] = $row['tid'];
+			$dw[$row['confid']][$row['divid']] = trim($row['tid']);
 		}
 dbFree($result);
 $result=dbQuery('SELECT tid,opid,confid FROM wildcard_pick WHERE cid = '.dbMakeSafe($cid).' AND uid = '.dbMakeSafe($uid).';');
 		$wild = array(array());
 		while($row = dbFetchRow($result)) {
-			$wild[$row['confid']][$row['opid']] = $row['tid'];
+			$wild[$row['confid']][$row['opid']] = trim($row['tid']);
 		}
 ?><h1>Pick divisional winner and wildcard picks for each conference</h1>
 <h2>Deadline : <span class="time"><?php echo $playoff_deadline;?></span><?php

@@ -49,7 +49,7 @@ foreach($confs as $confid => $conference) {
 		$resultplay = dbQuery('SELECT tid  FROM playoff_picks JOIN team t USING (tid) '
 				.' WHERE cid = '.dbMakeSafe($cid).' AND uid = '.dbMakeSafe($row['uid']).' AND t.confid = '.dbMakeSafe($confid).' ;');
 		while($playdata = dbFetchRow($resultplay)) {
-			$playoff_selections[$playdata['tid']] = 1;
+			$playoff_selections[trim($playdata['tid'])] = 1;
 		}
 ?>		<tr>
 			<td class="user_name"><?php echo $row['name']; ?></td>
