@@ -65,7 +65,10 @@ header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); // Date in the past
 		return $result;
 	}
 	function dbMakeSafe($value) {
-		return "'".pg_escape_string($value)."'" ;
+		if (!get_magic_quotes_gpc()) {
+			$value=pg_escape_string($value);
+		}
+		return "'".$value."'" ;
 	}
 	function dbPostSafe($text) {
 	  if ($text == '') return 'NULL';
