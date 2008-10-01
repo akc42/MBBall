@@ -410,7 +410,26 @@ KC 	Kansas City Chiefs	KC_logo-50x50.gif		AFC	W
 \.
 
 -- END OF DATA ----------------------------------------------------------
+-- INDEXES --------------------------------------------------------------
 
+CREATE INDEX div_win_pick_uid_idx ON "div_winner_pick" USING btree (uid);
+CREATE INDEX div_win_pick_cid_idx ON "div_winner_pick" USING btree (cid);
+CREATE INDEX match_time_idx ON "match" USING btree (match_time);
+CREATE INDEX match_cid_rid_idx ON "match" USING btree (cid, rid);
+CREATE INDEX match_open_idx ON "match" USING btree (open);
+CREATE INDEX option_cid_rid_idx ON "option" USING btree (cid, rid);
+CREATE INDEX answer_cid_rid_idx ON "option_pick" USING btree (cid, rid);
+CREATE INDEX answer_uid_idx ON "option_pick" USING btree (uid);
+CREATE INDEX pick_cid_rid_idx ON "pick" USING btree (cid, rid);
+CREATE INDEX pick_uid_idx ON "pick" USING btree (uid);
+CREATE INDEX registrations_cid_idx ON "registration" USING btree (cid);
+CREATE INDEX round_open_idx ON "round" USING btree (open);
+CREATE INDEX tic_cid_idx ON "team_in_competition" USING btree (cid);
+CREATE INDEX tic_mp_idx ON "team_in_competition" USING btree (made_playoff);
+CREATE INDEX wild_cid_idx ON "wildcard_pick" USING btree (cid);
+CREATE INDEX wild_uid_idx ON "wildcard_pick" USING btree (uid);
+
+-- END OF INDEXES -------------------------------------------------------
 -- PRIMARY KEY CONTRAINTS -----------------------------------------------
 
 ALTER TABLE ONLY competition
