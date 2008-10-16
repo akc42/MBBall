@@ -23,6 +23,7 @@ define('SMF_FOOTBALL',		21);  //Group that can administer
 define('SMF_BABY',		10);  //Baby backup
 define('MBBALL_ICON_PATH',	"/football/images/"); //URL where football Icons may be found
 define('MBBALL_FORUM_PATH',	"/forum"); //URL to reach forum
+define('MBBALL_ROUND_LIMIT',	13); //Limit to rounds that can be displayed in the summary
 
 $groups =& $user_info['groups'];
 $uid = $ID_MEMBER;
