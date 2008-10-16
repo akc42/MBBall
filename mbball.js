@@ -193,34 +193,37 @@ var MBBUser = new Class({
 			});
 			
 			//These items are only there if user has registered
-			$('make_picks').addEvent('click', function(e) {
-				e.stop();
-				var validated = true;
-				var answer = $('answer');
-				if(answer) {
-					//only here if answer is defined (no options to select (in which case Answer must be an integer
-					if(!MBB.intValidate(answer)) {
-						validated = false; //don't submit
-						answer.value = '';
+			var make_picks = $('make_picks');
+			if (make_picks) {
+				make_picks.addEvent('click', function(e) {
+					e.stop();
+					var validated = true;
+					var answer = $('answer');
+					if(answer) {
+						//only here if answer is defined (no options to select (in which case Answer must be an integer
+						if(!MBB.intValidate(answer)) {
+							validated = false; //don't submit
+							answer.value = '';
+						}
 					}
-				}
-		
-				var pickReq = new MBB.req('createpicks.php', function(response) {
-					if (validated) {
-						window.location.reload(true); //reload page to pick up picks
-					} else {
-						$('bonus_pick').getElement('textarea').value="ERROR - your picks were made, but the bonus question was NOT answered.  It needs to be a whole number (integer)"
+			
+					var pickReq = new MBB.req('createpicks.php', function(response) {
+						if (validated) {
+							window.location.reload(true); //reload page to pick up picks
+						} else {
+							$('bonus_pick').getElement('textarea').value="ERROR - your picks were made, but the bonus question was NOT answered.  It needs to be a whole number (integer)"
+						}
+					});
+					pickReq.post($('pick'));
+					if(validated) {
+						var content = $('content');
+						content.getElement('table').destroy();
+						var div = new Element('div',{'class':'loading'});
+						div.inject(content);
 					}
 				});
-				pickReq.post($('pick'));
-				if(validated) {
-					var content = $('content');
-					content.getElement('table').destroy();
-					var div = new Element('div',{'class':'loading'});
-					div.inject(content);
-				}
-			});
-			this.emoticon = new MBB.emoticon($('emoticons'),$('registered').getElements('textarea'));
+				this.emoticon = new MBB.emoticon($('emoticons'),$('registered').getElements('textarea'));
+			}
 		}
 	}
 });
