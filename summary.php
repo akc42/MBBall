@@ -24,10 +24,12 @@ dbFree($result);
 	<tbody>
 <?php
 if ($rid != 0) {
-	$sql = 'SELECT u.uid, u.name AS name, sum(p.score) AS pscore, sum(r.score) AS rscore, sum(p.score)+sum(r.score) AS total';
-	$sql .= ' FROM participant u JOIN registration reg USING (uid) JOIN playoff_score p USING (cid,uid) JOIN round_score r USING (cid,uid)';
+	$sql = 'SELECT u.uid, u.name AS name, p.pscore, sum(r.score) AS rscore, p.pscore+sum(r.score) AS total';
+	$sql .= ' FROM participant u JOIN registration reg USING (uid) JOIN';
+	$sql .= ' (SELECT cid,uid, sum(score) AS pscore FROM playoff_score GROUP BY cid,uid) AS p';
+	$sql .= ' USING (cid,uid) JOIN round_score r USING (cid,uid)';
 	$sql .= ' WHERE cid = '.dbMakeSafe($cid).' AND rid <= '.dbMakeSafe($rid);
-	$sql .= ' GROUP BY u.uid, u.name, p.confid ORDER BY total DESC,u.name;';
+	$sql .= ' GROUP BY u.uid, u.name,p.pscore  ORDER BY total DESC,u.name;';
 } else {
 	$sql .= 'SELECT u.uid, u.name AS name, 0 AS pscore, 0 AS rscore, 0 AS total';
 	$sql .= ' FROM participant u JOIN registration reg USING (uid) WHERE cid = '.dbMakeSafe($cid).' ORDER BY u.name;';
