@@ -10,7 +10,7 @@ if (!defined('BALL'))
 	<thead>
 		<tr><th class="user_name">Name</th>
 <?php
-$result = dbQuery('SELECT name FROM round WHERE open IS TRUE AND cid = '.dbMakeSafe($cid).' AND rid <= '.dbMakeSafe($rid).' ORDER BY rid DESC;');
+$result = dbQuery('SELECT name FROM round WHERE open IS TRUE AND cid = '.dbMakeSafe($cid).' AND rid <= '.dbMakeSafe($rid).' ORDER BY rid DESC LIMIT '.MBBALL_MAX_ROUND_DISPLAY.' ;');
 while($row = dbFetchRow($result)) {
 ?>			<th><?php echo $row['name']; ?></th>
 <?php
@@ -41,7 +41,7 @@ while($row = dbFetchRow($result)) {
 			<td <?php if($uid == $row['uid']) {echo 'class="user_name me"';} else {echo 'class="user_name"';}?>><?php echo $row['name'];?></td>
 <?php
 	$resultround = dbQuery('SELECT score FROM round_score WHERE cid = '.dbMakeSafe($cid).' AND
-				 rid <= '.dbMakeSafe($rid).' AND uid = '.dbMakeSafe($row['uid']).' ORDER BY rid DESC;');
+				 rid <= '.dbMakeSafe($rid).' AND uid = '.dbMakeSafe($row['uid']).' ORDER BY rid DESC LIMIT '.MBBALL_MAX_ROUND_DISPLAY.' ;');
 	while ($rscore = dbFetchRow($resultround)) {
 ?>			<td <?php if($uid == $row['uid']) {echo 'class="score me"';} else {echo 'class="score"';}?>><?php echo $rscore['score'];?></td>
 <?php
