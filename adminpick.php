@@ -38,7 +38,7 @@ if($rid != 0 && $cid !=0) {
 		$result = dbQuery($sql);
 		$nomatches = dbNumRows($result);
 	}
-	if(($playoff_deadline != 0 && $playoff_deadline > $time_at_top) || $rounddata && ($nomatches > 0 || ( $rounddata['valid_question'] == 't'  && $rounddata['deadline'] > $time_at_top) || )) {
+	if(($playoff_deadline != 0 && $playoff_deadline > $time_at_top) || $rounddata && ($nomatches > 0 || ( $rounddata['valid_question'] == 't'  && $rounddata['deadline'] > $time_at_top))) {
 ?><form id="pick">
 	<input type="hidden" name="uid" value="<?php echo $uid;?>" />
 	<input type="hidden" name="pass" value="<?php echo $password;?>" />
