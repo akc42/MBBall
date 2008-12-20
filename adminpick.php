@@ -41,7 +41,8 @@ $sql .= ' ORDER BY m.match_time, m.hid;';
 $result = dbQuery($sql);
 $nomatches = dbNumRows($result);
 
-if ($nomatches > 0 || $_GET['vq']||($_GET['pod'] != 0 && $$_GET['pod'] > $time_at_top)) {
+if ($nomatches > 0 || (	<input type="hidden" name="bqdeadline" value="<?php echo $rounddata['deadline'];?>" />
+$_GET['vq']&& $rounddata['deadline'] > $time_at_top) ||($_GET['pod'] != 0 && $$_GET['pod'] > $time_at_top)) {
 ?><form id="pick">
 	<input type="hidden" name="uid" value="<?php echo $uid;?>" />
 	<input type="hidden" name="pass" value="<?php echo $password;?>" />
