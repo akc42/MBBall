@@ -15,3 +15,4 @@ require_once('db.php');
 dbQuery('DELETE FROM competition WHERE cid = '.dbMakeSafe($_GET['cid']).';');
 
 echo '{"cid":'.$_GET['cid'].'}';
+?>

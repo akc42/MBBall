@@ -19,3 +19,4 @@ dbQuery('UPDATE team_in_competition SET made_playoff = '.$mp.' WHERE cid ='.dbMa
 
 
 echo '{"cid":'.$cid.',"tid":'.$tid.',"state":'.$mp.'}';
+?>

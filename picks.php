@@ -327,3 +327,4 @@ if(!$totalHasBeenOutput) {
 ?><p>There are no rounds in this competition to display right now.  Please come back later</p>
 <?php
 }
+?>

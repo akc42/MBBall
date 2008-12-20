@@ -31,7 +31,7 @@ if ($cid != 0) {
 		$rid = $row['rid'];
 ?>		<tr>
 			<td id="<?php echo 'R'.$rid;?>" class="selectthis"><?php echo $rid; ?></td>
-			<td id="<?php echo 'S'.$rid;?>" class="selectthis"><?php echo $row['name'];?>
+			<td id="<?php echo 'S'.$rid;?>" class="selectthis"><?php echo $row['name'];?></td>
 			<td><div id="<?php echo 'E'.$rid; ?>" class="del">
 					<input type="hidden" name="open" value="<?php echo ($row['open'] == 't')?$rid:0;?>" /></div></td>
 		</tr>
@@ -46,3 +46,4 @@ if ($cid != 0) {
 ?><p>No Round Data</p>
 <?php
 }
+?>

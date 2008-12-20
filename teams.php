@@ -41,9 +41,10 @@ if( $cid !=0) {
 	$sql .= ' ORDER BY tid;';
 	$result = dbQuery($sql);
 	while($row = dbFetchRow($result)) {
+		$row['tid'] = trim($row['tid']);
 ?>	<div id="<?php echo 'T'.$row['tid'];?>" <?php if(!is_null($row['hid']))echo 'class="inmatch"';?>>
 		<input type="checkbox" name="<?php echo $row['tid'];?>" <?php
-if($row['mp'] == 't') echo 'checked';?> />
+if($row['mp'] == 't') echo 'checked="checked"';?> />
 		<span class="tid"><?php echo $row['tid'];?></span>
 	</div>
 <?php
@@ -56,7 +57,9 @@ if($row['mp'] == 't') echo 'checked';?> />
 	$sql .= dbMakeSafe($cid).' ORDER BY tid;';
 	$result = dbQuery($sql);
 	while($row = dbFetchRow($result)) {
-?>	<div id="<?php echo 'S'.$row['hid'];?>"><span class="tid"><?php echo $row['tid'];?></span></div>
+		$row['tid'] = trim($row['tid']);
+		
+?>	<div id="<?php echo 'S'.$row['tid'];?>"><span class="tid"><?php echo $row['tid'];?></span></div>
 <?php
 	}
 	dbFree($result);
@@ -64,7 +67,7 @@ if($row['mp'] == 't') echo 'checked';?> />
 		</tr>
 		<tr>
 			<td>
-				<label id="lock_cell"><input id="lock" type="checkbox" <?php if($ticexists) echo 'checked';?> />Lock</label>
+				<label id="lock_cell"><input id="lock" type="checkbox" <?php if($ticexists) echo 'checked="checked"';?> />Lock</label>
 			</td>
 			<td><div id="addall"></div></td>
 		</tr>
@@ -75,3 +78,4 @@ if($row['mp'] == 't') echo 'checked';?> />
 ?><p>No Team information available right now</p>
 <?php
 }
+?>

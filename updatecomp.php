@@ -39,3 +39,4 @@ $sql .= ' WHERE cid = '.dbMakeSafe($_POST['cid']).' ;';
 dbQuery($sql);
 dbQuery('COMMIT ;');
 echo '{"cid":'.$_POST['cid'].'}';
+?>

@@ -47,6 +47,9 @@ if ($nomatches > 0 || ($rounddata['valid_question'] && $rounddata['deadline'] > 
 						<tbody>
 <?php
 		while($row=dbFetchRow($result)) {
+			$row['hid'] = trim($row['hid']);
+			$row['aid'] = trim($row['aid']);
+			$row['pid'] = trim($row['pid']);
 ?>							<tr>
 								<td>
 									<table>
@@ -65,11 +68,11 @@ if ($nomatches > 0 || ($rounddata['valid_question'] && $rounddata['deadline'] > 
 												<td><input	type="radio"
 													name="<?php echo 'M'.$row['hid'];?>"
 													value="<?php echo $row['hid'];?>"
-													<?php if ($row['pid'] == $row['hid']) echo 'checked';?>/></td>
+													<?php if ($row['pid'] == $row['hid']) echo 'checked="checked"';?>/></td>
 												<td><input	type="radio"
 													name="<?php echo 'M'.$row['hid'];?>"
 													value="<?php echo $row['aid'];?>"
-											 		<?php if ($row['pid'] == $row['aid']) echo 'checked';?>/></td>
+											 		<?php if ($row['pid'] == $row['aid']) echo 'checked="checked"';?>/></td>
 											</tr>
 		 									<tr>
 												<td colspan="2" <?php if (($row['match_time'] - $gap)< ($time_at_top+86400)) echo 'class="limited"' ;?> >
@@ -99,11 +102,11 @@ if ($nomatches > 0 || ($rounddata['valid_question'] && $rounddata['deadline'] > 
 												<td><input	type="radio"
 														name="<?php echo 'O'.$row['hid'];?>"
 														value="U"
-														<?php if ($row['over'] == 'f') echo 'checked';?>/></td>
+														<?php if ($row['over'] == 'f') echo 'checked="checked"';?>/></td>
 												<td><input	type="radio"
 														name="<?php echo 'O'.$row['hid'];?>"
 														value="O"
-														<?php if ($row['over'] == 't') echo 'checked';?>/></td>
+														<?php if ($row['over'] == 't') echo 'checked="checked"';?>/></td>
 											</tr>
 										</tbody>
 									</table>
@@ -164,7 +167,7 @@ if ($nomatches > 0 || ($rounddata['valid_question'] && $rounddata['deadline'] > 
 <?php
 				}
 
-?>								<td><input type="radio" name="opid" value="<?php echo $row['opid'];?>" <?php if((int)$optdata['opid'] == (int)$row['opid']) echo 'checked';?>	/><?php echo $row['label'];?></td>
+?>								<td><input type="radio" name="opid" value="<?php echo $row['opid'];?>" <?php if((int)$optdata['opid'] == (int)$row['opid']) echo 'checked="checked"';?>	/><?php echo $row['label'];?></td>
 <?php
 
 				if($i == 1) {
@@ -203,13 +206,13 @@ if ($nomatches > 0 || ($rounddata['valid_question'] && $rounddata['deadline'] > 
 $result=dbQuery('SELECT tid,divid,confid FROM div_winner_pick WHERE cid = '.dbMakeSafe($cid).' AND uid = '.dbMakeSafe($uid).';');
 		$dw = array(array());
 		while($row = dbFetchRow($result)) {
-			$dw[$row['confid']][$row['divid']] = $row['tid'];
+			$dw[$row['confid']][$row['divid']] = trim($row['tid']);
 		}
 dbFree($result);
 $result=dbQuery('SELECT tid,opid,confid FROM wildcard_pick WHERE cid = '.dbMakeSafe($cid).' AND uid = '.dbMakeSafe($uid).';');
 		$wild = array(array());
 		while($row = dbFetchRow($result)) {
-			$wild[$row['confid']][$row['opid']] = $row['tid'];
+			$wild[$row['confid']][$row['opid']] = trim($row['tid']);
 		}
 ?><h1>Pick divisional winner and wildcard picks for each conference</h1>
 <h2>Deadline : <span class="time"><?php echo $playoff_deadline;?></span><?php
@@ -267,17 +270,17 @@ $result=dbQuery('SELECT tid,opid,confid FROM wildcard_pick WHERE cid = '.dbMakeS
 									<input type="radio" class="ppick" 
 											name="<?php echo 'D'.$divid.$confid;?>"
 											value="<?php echo $tid;?>"
-											<?php if ($dwtid == $tid) echo 'checked';?> /></td>
+											<?php if ($dwtid == $tid) echo 'checked="checked"';?> /></td>
 								<td class="radio">
 									<input type="radio" class="ppick" 
 											name="<?php echo 'W1'.$confid;?>"
 											value="<?php echo $tid;?>"
-											<?php if ($w1tid == $tid) echo 'checked'; ?> /></td>
+											<?php if ($w1tid == $tid) echo 'checked="checked"'; ?> /></td>
 								<td class="radio">
 									<input type="radio" class="ppick" 
 											name="<?php echo 'W2'.$confid;?>"
 											value="<?php echo $tid;?>"
-											<?php if ($w2tid == $tid) echo 'checked';?> /></td>
+											<?php if ($w2tid == $tid) echo 'checked="checked"';?> /></td>
 <?php
 					} else {
 ?>								<td colspan="4"></td>	
@@ -302,3 +305,4 @@ $result=dbQuery('SELECT tid,opid,confid FROM wildcard_pick WHERE cid = '.dbMakeS
 </form>
 <?php
 }
+?>

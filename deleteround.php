@@ -19,3 +19,4 @@ dbQuery('UPDATE round SET rid = rid - 1 WHERE cid = '.dbMakeSafe($cid).' AND rid
 dbQuery('COMMIT;');
 
 echo '{"cid":'.$cid.', "rid":'.$rid.'}';
+?>

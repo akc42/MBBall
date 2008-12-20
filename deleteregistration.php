@@ -16,4 +16,4 @@ $ruid = $_GET['ruid'];
 dbQuery('DELETE FROM registration WHERE   cid = '.dbMakeSafe($cid).' AND uid = '.dbMakeSafe($ruid).';');
 
 echo '{"cid":'.$cid.',"ruid":"'.$ruid.'"}';
-
+?>

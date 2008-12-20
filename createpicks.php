@@ -38,19 +38,28 @@ if (isset($_POST['bqdeadline']) && $_POST['bqdeadline'] > time()) {
 		}
 	}
 }
-dbQuery('DELETE FROM pick WHERE uid = '.dbMakeSafe($uid).' AND cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid)
-		.' AND hid IN (SELECT hid FROM match WHERE  open IS TRUE and match_time > '.dbMakeSafe(time()+$gap)
-		.' AND cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).');');
+//dbQuery('DELETE FROM pick WHERE uid = '.dbMakeSafe($uid).' AND cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid)
+//		.' AND hid IN (SELECT hid FROM match WHERE  open IS TRUE and match_time > '.dbMakeSafe(time()+$gap)
+//		.' AND cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).');');
 $result=dbQuery('SELECT hid FROM match  WHERE open IS TRUE AND match_time > '.dbMakeSafe(time()+$gap).' AND cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).';');
 
 while($row = dbFetchRow($result)) {
+	$row['hid'] = trim($row['hid']);
 	$pid = (isset($_POST['M'.$row['hid']]))?dbMakeSafe($_POST['M'.$row['hid']]):'NULL';
 	$over = (isset($_POST['O'.$row['hid']]) )?(($_POST['O'.$row['hid']] == 'O')?"TRUE":"FALSE"):"NULL";
 	$comment = (isset($_POST['C'.$row['hid']]))?dbPostSafe($_POST['C'.$row['hid']]):'NULL';
 	if( $pid != 'NULL' || $over != 'NULL' || $comment != 'NULL') {
-		dbQuery('INSERT INTO pick(uid,cid,rid,hid,pid,over,comment) VALUES ('
+		$pickresult = dbQuery('SELECT * FROM pick WHERE uid = '.dbMakeSafe($uid).' AND cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid)
+								.' AND hid = '.dbMakeSafe($row['hid']).';');
+		if (dbNumRows($pickresult) > 0) {
+			dbQuery('UPDATE pick SET pid = '.$pid.', over = '.$over.', comment = '.$comment
+				.' WHERE uid = '.dbMakeSafe($uid).' AND cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' AND hid = '.dbMakeSafe($row['hid']).';');
+		} else {
+			dbQuery('INSERT INTO pick(uid,cid,rid,hid,pid,over,comment) VALUES ('
 				.dbMakeSafe($uid).','.dbMakeSafe($cid).','.dbMakeSafe($rid).','.dbMakeSafe($row['hid']).','
 				.$pid.','.$over.','.$comment.');');
+		}
+		dbFree($pickresult);
 	}
 }
 dbFree($result);
@@ -80,3 +89,4 @@ if ($ppd != 0 && $ppd > time()) {
 dbQuery('COMMIT ;');
 
 echo '{"uid":'.$uid.',"cid":'.$cid.',"rid":'.$rid.'}';
+?>

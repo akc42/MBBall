@@ -20,6 +20,8 @@ if($rid != 0 && $cid !=0) {
 
 	$result = dbQuery('SELECT * FROM match WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' ORDER BY match_time, hid ;');
 	while($row = dbFetchRow($result)) {
+		$row['hid']=trim($row['hid']);
+		$row['aid']=trim($row['aid']);
 
 ?><div class="match">
      <form  action="#" >
@@ -32,7 +34,7 @@ if($rid != 0 && $cid !=0) {
 					<div class="hid"><span><?php echo $row['hid'];?></span></div><div class="at">@</div>
 					<div class="aid"><span><?php echo (is_null($row['aid'])? '---':$row['aid']);?></span></div>
 					<div class="open">
-		<label><input type="checkbox" name="open" <?php if($row['open'] == 't') echo 'checked';?>/>Open</label>
+		<label><input type="checkbox" name="open" <?php if($row['open'] == 't') echo 'checked="checked"';?>/>Open</label>
 					</div>
 					<div class="del"></div>
 					<div class="hscore">
@@ -42,7 +44,7 @@ if($rid != 0 && $cid !=0) {
 		<input type="text" name="ascore" value="<?php echo $row['ascore'];?>"/>
 					</div>
 					<div class="cscore">
-		<input type="text" name="cscore" value="<?php echo $row['combined_score'];?>" <?php if($_GET['ou'] != 'true') echo 'readOnly';?> />
+		<input type="text" name="cscore" value="<?php echo $row['combined_score'];?>" <?php if($_GET['ou'] != 'true') echo 'readonly="readonly"';?> />
 					</div>
 					<div class="mtime">
 		<input type="hidden" name="mtime" value="<?php echo $row['match_time'];?>" />
@@ -61,3 +63,4 @@ if($rid != 0 && $cid !=0) {
 ?><p>No Match information available right now</p>
 <?php
 }
+?>

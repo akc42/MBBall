@@ -16,3 +16,4 @@ dbQuery('UPDATE registration SET bb_approved = '.dbMakeSafe($_GET['approval']).'
 
 
 echo '{"cid":'.$_GET['cid'].', "uid":'.$_GET['bbuid'].',"approve":'.$_GET['approval'].'}';
+?>

@@ -17,3 +17,4 @@ dbQuery('DELETE FROM team_in_competition WHERE cid='.dbMakeSafe($cid).' AND tid 
 
 
 echo '{"cid":'.$cid.',"tid":"'.$tid.'"}';
+?>

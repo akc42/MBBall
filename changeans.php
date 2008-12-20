@@ -28,4 +28,5 @@ if (dbNumRows($result) != 0) {
   dbQuery('ROLLBACK ;');
 }
 dbFree($result);
+?>
 
