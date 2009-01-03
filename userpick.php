@@ -14,7 +14,6 @@ $sql .= ' WHERE m.cid = '.dbMakeSafe($cid).' AND m.rid = '.dbMakeSafe($rid).' AN
 $sql .= ' ORDER BY m.match_time, m.hid;';
 $result = dbQuery($sql);
 $nomatches = dbNumRows($result);
-
 if ($nomatches > 0 || ($rounddata['valid_question'] && $rounddata['deadline'] > $time_at_top) ||($playoff_deadline != 0 && $playoff_deadline > $time_at_top)) {
 ?><form id="pick">
 	<input type="hidden" name="uid" value="<?php echo $uid;?>" />

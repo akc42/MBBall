@@ -119,6 +119,7 @@ MBB = function() {
 					this.fireEvent('change',e);
 				};
 				var key = this.get('alt');
+				pageTracker._trackPageview('/football/event/emoticon-click/'+key.substr(1));
 				that.currentFocus.value += key;
 				that.currentFocus.focus();
 				that.currentFocus.addEvent('blur',doBlur);
@@ -151,8 +152,11 @@ var MBBUser = new Class({
 		if(regdiv) { //exists means registration is open
 			regdiv.getElementById('register').addEvent('submit', function(e) {
 				e.stop();
+				pageTracker._trackPageview('/football/register/submit');
 				if(confirm("Click OK to register for the competition and agree to the condition")) {
+					pageTracker._trackPageview('/football/register/agree');
 					var regReq = new MBB.req('register.php', function(response) {
+						pageTracker._trackPageview('/football/register/registered');
 						window.location.reload(true); //reload the page to pick up self
 					});
                     regReq.post($('register'));
@@ -209,8 +213,10 @@ var MBBUser = new Class({
 			
 					var pickReq = new MBB.req('createpicks.php', function(response) {
 						if (validated) {
+							pageTracker._trackPageview('/football/picks/made');
 							window.location.reload(true); //reload page to pick up picks
 						} else {
+							pageTracker._trackPageview('/football/picks/error-bonus');
 							$('bonus_pick').getElement('textarea').value="ERROR - your picks were made, but the bonus question was NOT answered.  It needs to be a whole number (integer)"
 						}
 					});

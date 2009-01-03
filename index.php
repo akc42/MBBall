@@ -280,11 +280,32 @@ if(in_array(SMF_FOOTBALL,$groups)) {
 		<tbody>
 <?php
 if($registered && $rid !=0) {
-?>			<tr><td colspan="2"><div id="registered"><?php require_once('userpick.php');?></div></td></tr>
+?>
+<script type="text/javascript">
+pageTracker._trackPageview('/football/user/registered');
+</script>
+			<tr><td colspan="2"><div id="registered"><?php require_once('userpick.php');?></div></td></tr>
 <?php
 } else {
+	if ($registered) {
+?>
+<script type="text/javascript">
+pageTracker._trackPageview('/football/user/registered');
+</script>
+<?php
+	} else {
+?>
+<script type="text/javascript">
+pageTracker._trackPageview('/football/user/unregistered');
+</script>
+<?php
+	}
 	if($signedup  & !$registered) {
-?>	<tr><td colspan="2"><div id="registered"><p>Although you have registered, this competition requires that Baby Backups obtain
+?>
+<script type="text/javascript">
+pageTracker._trackPageview('/football/user/bb-awaiting-approval');
+</script>
+	<tr><td colspan="2"><div id="registered"><p>Although you have registered, this competition requires that Baby Backups obtain
 		admistrators approval before being allowed to enter this competition.  If you have not already done so please contact the
 		the administrator,  who is: <span><?php echo $admName;?></span> </p></div></td></tr>
 <?php
