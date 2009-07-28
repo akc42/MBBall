@@ -52,10 +52,10 @@ while($row = dbFetchRow($result)) {
 		$pickresult = dbQuery('SELECT * FROM pick WHERE uid = '.dbMakeSafe($uid).' AND cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid)
 								.' AND hid = '.dbMakeSafe($row['hid']).';');
 		if (dbNumRows($pickresult) > 0) {
-			dbQuery('UPDATE pick SET pid = '.$pid.', over = '.$over.', comment = '.$comment
+			dbQuery('UPDATE pick SET pid = '.$pid.', over_selected = '.$over.', comment = '.$comment
 				.' WHERE uid = '.dbMakeSafe($uid).' AND cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' AND hid = '.dbMakeSafe($row['hid']).';');
 		} else {
-			dbQuery('INSERT INTO pick(uid,cid,rid,hid,pid,over,comment) VALUES ('
+			dbQuery('INSERT INTO pick(uid,cid,rid,hid,pid,over_selected,comment) VALUES ('
 				.dbMakeSafe($uid).','.dbMakeSafe($cid).','.dbMakeSafe($rid).','.dbMakeSafe($row['hid']).','
 				.$pid.','.$over.','.$comment.');');
 		}

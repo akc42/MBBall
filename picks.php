@@ -138,7 +138,7 @@ while ($moreMatchesToCome) {
 ?>			<tr>
 				<td rowspan="<?php echo ($nom == 0)?1:2 ;?>" colspan="2"><?php echo $userdata['name'];?></td>
 <?php
-			$sql = 'SELECT p.hid, p.pid, p.over, p.comment, m.pscore,m.oscore';
+			$sql = 'SELECT p.hid, p.pid, p.over_selected, p.comment, m.pscore,m.oscore';
 			$sql .= ' FROM match_score m JOIN match USING (cid,rid,hid) LEFT JOIN pick p USING (cid,rid,hid,uid)';
 			$sql .= ' WHERE m.cid = '.dbMakeSafe($cid).' AND m.rid = '.dbMakeSafe($rid).' AND m.uid = '.$userdata['uid'];
 			$sql .= ' ORDER BY match.match_time , m.hid LIMIT 8 OFFSET '.$startMatch.';';
@@ -162,12 +162,12 @@ while ($moreMatchesToCome) {
 ?>				</td>
 <?php
 /* OVER UNDER PICK --------------------------------------------------------------------------------*/
-					if($ouRound && !is_null($pickdata['over'])) {
+					if($ouRound && !is_null($pickdata['over_selected'])) {
 						if($pickdata['oscore'] > 0) {
-?>				<td class="win ou"><?php echo ($pickdata['over'] == 't')?'Over':'Under';tick();?></td>
+?>				<td class="win ou"><?php echo ($pickdata['over_selected'] == 't')?'Over':'Under';tick();?></td>
 <?php
 						} else {
-?>				<td class="ou"><?php echo ($pickdata['over'] == 't')?'Over':'Under';?></td>
+?>				<td class="ou"><?php echo ($pickdata['over_selected'] == 't')?'Over':'Under';?></td>
 <?php
 						}
 					} else {

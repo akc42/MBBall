@@ -150,7 +150,7 @@ CREATE TABLE pick (
     rid integer NOT NULL,
     hid character(3) NOT NULL,
     pid character(3),
-    over boolean,
+    over_selected boolean,
     submit_time bigint DEFAULT date_part('epoch'::text, now()) NOT NULL
 );
 
@@ -160,7 +160,7 @@ COMMENT ON COLUMN pick.cid IS 'Competition ID';
 COMMENT ON COLUMN pick.rid IS 'Round ID';
 COMMENT ON COLUMN pick.hid IS 'Home Team ID';
 COMMENT ON COLUMN pick.pid IS 'ID of Team Picked to Win (NULL for Draw)';
-COMMENT ON COLUMN pick.over IS 'true if over score is selected';
+COMMENT ON COLUMN pick.over_selected IS 'true if over score is selected';
 COMMENT ON COLUMN pick.submit_time IS 'Time of submission';
 
 CREATE TABLE registration (
@@ -260,7 +260,7 @@ CREATE VIEW match_score AS
    LEFT JOIN pick p ON p.cid = m.cid AND p.rid = m.rid AND p.hid = m.hid AND p.uid = u.uid
 	AND ((m.hscore >= m.ascore AND p.pid = m.hid) OR (m.hscore <= m.ascore AND p.pid = m.aid))
    LEFT JOIN pick o ON o.cid = m.cid AND o.rid = m.rid AND o.hid = m.hid AND o.uid = u.uid AND r.ou_round IS TRUE
- 	AND ((m.hscore + m.ascore)::numeric > (m.combined_score::numeric + 0.5) == o.over) IS TRUE
+ 	AND ((m.hscore + m.ascore)::numeric > (m.combined_score::numeric + 0.5) == o.over_selected) IS TRUE
   WHERE r.open IS TRUE AND m.open IS TRUE;
 
 COMMENT ON VIEW match_score IS 'points user scored in a match from the pick and over/under question (if present)';
