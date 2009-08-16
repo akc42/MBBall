@@ -38,7 +38,10 @@ foreach($confs as $confid => $conference) {
 ?>			<th class="tid"><?php if($team['mp']) {echo tick();}echo $team['tid'];?></th>
 <?php
 			}
-		}
+		} else {
+?><th class="tid">&nbsp;</th>
+<?php
+        }
 	}
 ?>		</tr>
 	</thead>
@@ -55,14 +58,18 @@ foreach($confs as $confid => $conference) {
 			<td class="user_name"><?php echo $row['name']; ?></td>
 <?php
 		foreach($divs as $divid => $division){
-			foreach($teams[$confid][$divid] as $team) {
-				$correct = ($team['mp'] && isset($playoff_selections[$team['tid']]));
-?>				<td <?php if($correct) {echo 'class="tid win"';}else{ echo 'class="tid"';}?>>
-					<?php if(isset($playoff_selections[$team['tid']])) echo '<img src="images/sel.gif" alt="'.$team['tid'].' selected"/>';if($correct) tick();?></td>
+    		if(isset($teams[$confid][$divid])) {
+			    foreach($teams[$confid][$divid] as $team) {
+				    $correct = ($team['mp'] && isset($playoff_selections[$team['tid']]));
+    ?>				<td <?php if($correct) {echo 'class="tid win"';}else{ echo 'class="tid"';}?>>
+					    <?php if(isset($playoff_selections[$team['tid']])) echo '<img src="images/sel.gif" alt="'.$team['tid'].' selected"/>';if($correct) tick();?></td>
+    <?php
+			    }
+    		} else {
+?><td class="tid">&nbsp;</td>
 <?php
-			}
-		}
-	
+    		}
+        }
 		dbFree($resultplay);
 		unset($playoff_selections);
 ?>			<td class="score"><?php echo $row['score'];?></td>
