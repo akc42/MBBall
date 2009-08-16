@@ -279,7 +279,7 @@ if(in_array(SMF_FOOTBALL,$groups)) {
 	<table class="layout">
 		<tbody>
 <?php
-if($registered && $rid !=0) {
+if($registered) {
 ?>
 <script type="text/javascript">
 pageTracker._trackPageview('/football/user/registered');
@@ -287,20 +287,13 @@ pageTracker._trackPageview('/football/user/registered');
 			<tr><td colspan="2"><div id="registered"><?php require_once('userpick.php');?></div></td></tr>
 <?php
 } else {
-	if ($registered) {
-?>
-<script type="text/javascript">
-pageTracker._trackPageview('/football/user/registered');
-</script>
-<?php
-	} else {
 ?>
 <script type="text/javascript">
 pageTracker._trackPageview('/football/user/unregistered');
 </script>
 <?php
-	}
-	if($signedup  & !$registered) {
+
+	if($signedup) {
 ?>
 <script type="text/javascript">
 pageTracker._trackPageview('/football/user/bb-awaiting-approval');

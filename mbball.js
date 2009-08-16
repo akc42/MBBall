@@ -18,121 +18,121 @@ MBB = function() {
 		return	myDate.getDate() + ' ' + m_names[myDate.getMonth()] + ' ' + myDate.getFullYear() +
 				' '+ ch + ':' + min + ' ' + ap + ' ('+d_names[myDate.getDay()] +')';
 	};
-  var reqOpts;
-  var errorDiv;
-  return {
-    setErrorDiv: function(div) {
-      errorDiv = div;
-    },
-    setRO : function(ro) {
-      reqOpts = ro;
-    },
-   subPage : new Class({
-      initialize:function(owner,url,div,initializeSubPage,message) {
-	    this.owner = owner;
-	    this.div = div;
-	    var iSP = initializeSubPage.bind(this);
-	    this.request = new Request.HTML({
-            url: url,
-	    onSuccess: function(html) {
-	        div.removeClass('loading');
-	        div.adopt(html);
-	        iSP(div);
-	    },
-	    onFailure: function(){
-	        var output = message || '<p>Failed to Read Page from '+url+'<p>';
-	        div.adopt(output);
-	    }
-	    });
-    },
-    loadPage: function(params) {
-		this.div.empty();
-		this.div.addClass('loading');
-	    this.request.get($merge(reqOpts,params || {}));
-    }
-  }),
-  req: new Class({
-      initialize: function (url,success) {
-        this.req = new Request.JSON({
-          url:url,
-          onComplete: function(response,html) {
-            if(response) {
-	      success(response);
-	    } else {
-	      errorDiv.empty();
-	      errorDiv.adopt(html);
-	    }
-	  }
-	});
-      },
-      get:function(params) {
-	 this.req.get($merge(reqOpts,params));
-      },
-      post: function (params) {
-	this.req.post(params);
-      }
-    }),
-    adjustDates: function (el) {
+    var reqOpts;
+    var errorDiv;
+    return {
+        setErrorDiv: function(div) {
+            errorDiv = div;
+        },
+        setRO : function(ro) {
+            reqOpts = ro;
+        },
+        subPage : new Class({
+            initialize:function(owner,url,div,initializeSubPage,message) {
+	           this.owner = owner;
+	           this.div = div;
+	           var iSP = initializeSubPage.bind(this);
+	           this.request = new Request.HTML({
+                    url: url,
+	                onSuccess: function(html) {
+	                    div.removeClass('loading');
+	                    div.adopt(html);
+	                    iSP(div);
+	               },
+	               onFailure: function(){
+                       var output = message || '<p>Failed to Read Page from '+url+'<p>';
+        	           div.adopt(output);
+              	   }
+	           });
+            },
+            loadPage: function(params) {
+		        this.div.empty();
+		        this.div.addClass('loading');
+	            this.request.get($merge(reqOpts,params || {}));
+            }
+        }),
+        req: new Class({
+            initialize: function (url,success) {
+                this.req = new Request.JSON({
+                    url:url,
+                    onComplete: function(response,html) {
+                        if(response) {
+	                        success(response);
+	                    } else {
+	                        errorDiv.empty();
+	                        errorDiv.adopt(html);
+	                    }
+	                }
+            	});
+            },
+            get:function(params) {
+	            this.req.get($merge(reqOpts,params));
+            },
+            post: function (params) {
+	            this.req.post(params);
+            }
+        }),
+        adjustDates: function (el) {
 	//sets up all date time fields under the supplied element
-		var datespans = el.getElements('.time');
-		datespans.each(function(datespan,i) {
-			var d;
-			datespan.removeClass('time');
-			datespan.addClass('datetime');
-			d = datespan.get('text');
-			if(d == '' || d=='0') {
-				datespan.set('text','');
-			} else {
-				datespan.set('text',formatDate(d));
-			}
-		});
-	},
-	intValidate: function(el) {
-		el.removeClass('error');
-		if(el.value == '') return true;
-		if (isNaN(el.value.toInt())) {
-			el.addClass('error');
-			return false;
-		}
-		return true;
-	},
-	textValidate: function(el) {
-	  el.removeClass('error');
-	  if(el.value == '') {
-	  	el.addClass('error');
-        return false;
-     }      
-	  return true;
-	},
- 	emoticon: new Class({
-		initialize: function(container,outputDivs) {
-			var that = this;
-			this.currentFocus = outputDivs[0];
-			outputDivs.addEvent('focus',function(e) {
-				that.currentFocus = this;
-			});
-			container.getElements('img').addEvent('click', function(e) {
-				e.stop();
-				var doBlur = function(e) {
-					e.stop();
-					this.removeEvent('blur',doBlur);
-					this.fireEvent('change',e);
-				};
-				var key = this.get('alt');
-				pageTracker._trackPageview('/football/event/emoticon-click/'+key.substr(1));
-				that.currentFocus.value += key;
-				that.currentFocus.focus();
-				that.currentFocus.addEvent('blur',doBlur);
-			});
-		},
-		addTextareas:function(outputDivs) {
-			var that = this;
-			outputDivs.addEvent('focus',function(e) {
-				that.currentFocus = this;
-			});
-		}	
-	})
-  };
+		    var datespans = el.getElements('.time');
+		    datespans.each(function(datespan,i) {
+		    	var d;
+		    	datespan.removeClass('time');
+		    	datespan.addClass('datetime');
+		    	d = datespan.get('text');
+		    	if(d == '' || d=='0') {
+		    		datespan.set('text','');
+		    	} else {
+		    		datespan.set('text',formatDate(d));
+		    	}
+		    });
+	    },
+	    intValidate: function(el) {
+		    el.removeClass('error');
+		    if(el.value == '') return true;
+		    if (isNaN(el.value.toInt())) {
+		    	el.addClass('error');
+		    	return false;
+		    }
+		    return true;
+	    },
+	    textValidate: function(el) {
+	        el.removeClass('error');
+	        if(el.value == '') {
+	  	        el.addClass('error');
+                return false;
+            }      
+	        return true;
+	    },
+ 	    emoticon: new Class({
+		    initialize: function(container,outputDivs) {
+		    	var that = this;
+		    	this.currentFocus = outputDivs[0];
+		    	outputDivs.addEvent('focus',function(e) {
+		    		that.currentFocus = this;
+		    	});
+		    	container.getElements('img').addEvent('click', function(e) {
+		    		e.stop();
+		    		var doBlur = function(e) {
+		    			e.stop();
+		    			this.removeEvent('blur',doBlur);
+		    			this.fireEvent('change',e);
+		    		};
+		    		var key = this.get('alt');
+		    		pageTracker._trackPageview('/football/event/emoticon-click/'+key.substr(1));
+		    		that.currentFocus.value += key;
+		    		that.currentFocus.focus();
+		    		that.currentFocus.addEvent('blur',doBlur);
+		    	});
+		    },
+		    addTextareas:function(outputDivs) {
+		    	var that = this;
+		    	outputDivs.addEvent('focus',function(e) {
+		    		that.currentFocus = this;
+		    	});
+		    }	
+	    })
+    };
 }();
 
 var MBBall = new Class({
@@ -228,7 +228,7 @@ var MBBUser = new Class({
 						div.inject(content);
 					}
 				});
-				this.emoticon = new MBB.emoticon($('emoticons'),$('registered').getElements('textarea'));
+				if($('emoticons')) this.emoticon = new MBB.emoticon($('emoticons'),$('registered').getElements('textarea'));
 			}
 		}
 	}
