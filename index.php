@@ -243,7 +243,7 @@ dbFree($result);
 // where there is at least one open rouund or it is taking registrations and we are not yet registered
 $sql = 'SELECT c.cid AS cid, c.description AS name FROM competition c LEFT JOIN registration u ON c.cid = u.cid AND u.uid  = '.dbMakeSafe($uid);
 $sql .= ' LEFT JOIN round r ON c.cid = r.cid  WHERE c.cid <> '.dbMakeSafe($cid);
-$sql .= ' AND ((u.uid IS NULL AND c.open IS TRUE ) OR r.open IS TRUE) GROUP BY c.cid, c.description ORDER BY c.cid DESC ; ';
+$sql .= ' AND (c.open IS TRUE OR r.open IS TRUE) GROUP BY c.cid, c.description ORDER BY c.cid DESC ; ';
 $result = dbQuery($sql);
 
 if (dbNumRows($result) > 0) {
