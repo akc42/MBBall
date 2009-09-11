@@ -254,10 +254,11 @@ if(!$totalHasBeenOutput) {
 			// this is a multichoice question, so get results and output them
 			while ($optdata = dbFetchRow($resultbq)) {
 ?>			<th style="width:<?php echo $width;?>px" <?php if(!is_null($rounddata['answer']) && $rounddata['answer'] == $optdata['opid']) {
-					echo 'class="win opt_ans"';
+					echo 'class="win opt_ans">'.$optdata['label']; tick();
 				} else {
-					echo 'class="opt_ans"';
-				};?>><?php echo $optdata['label'];?></th>
+					echo 'class="opt_ans">'.$optdata['label'];
+				}
+?>          </th>
 <?php
 			}
 		} else {
