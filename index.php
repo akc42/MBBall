@@ -1,8 +1,22 @@
 <?php
+/*
+ 	Copyright (c) 2008,2009 Alan Chandler
+    This file is part of MBBall, an American Football Results Picking
+    Competition Management software suite.
 
-/* Football Picking Competition
- *	Copyright (c) 2008 Alan Chandler
- *	See COPYING.txt in this directory for details of licence terms
+    MBBall is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    MBBall is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with MBBall (file COPYING.txt).  If not, see <http://www.gnu.org/licenses/>.
+
 */
 // Link to SMF forum as this is only for logged in members
 // Show all errors:
@@ -323,7 +337,7 @@ if ($playoff_deadline != 0) {
 ?>			<tr><td colspan="2"><div id="tics"><?php require_once('tic.php');?></div></td></tr>
 		</tbody>
 	</table>	
-	<div id="copyright"><hr />MBball <span><?php include('version.php');?></span> &copy; 2008 Alan Chandler.  Licenced under the GPL</div>
+	<div id="copyright"><hr />MBball <span><?php include('version.php');?></span> &copy; 2008,2009 Alan Chandler.  Licenced under the GPL</div>
 </div>
 </body>
 
