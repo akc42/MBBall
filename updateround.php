@@ -18,7 +18,7 @@
     along with MBBall (file COPYING.txt).  If not, see <http://www.gnu.org/licenses/>.
 
 */
-f(!(isset($_POST['uid']) && isset($_POST['pass'])  && isset($_POST['cid']) && isset($_POST['rid']) && isset($_POST['rname'])
+if(!(isset($_POST['uid']) && isset($_POST['pass'])  && isset($_POST['cid']) && isset($_POST['rid']) && isset($_POST['rname'])
 	&& isset($_POST['deadline']) && isset($_POST['value']) ))
 	die('Hacking attempt - wrong parameters');
 $uid = $_POST['uid'];
