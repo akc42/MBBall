@@ -180,6 +180,7 @@ if ($rounddata = dbFetchRow($result)) {
 	<script src="/static/scripts/mootools-1.2-core-nc.js" type="text/javascript" charset="UTF-8"></script>
 	<script src="mbball.js" type="text/javascript" charset="UTF-8"></script>
 </head>
+<?php flush(); ?>
 <body>
 <script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
@@ -293,6 +294,7 @@ if(in_array(SMF_FOOTBALL,$groups)) {
 	<table class="layout">
 		<tbody>
 <?php
+
 if($registered) {
 ?>
 <script type="text/javascript">
