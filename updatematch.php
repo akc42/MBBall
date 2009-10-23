@@ -42,22 +42,22 @@ if (dbNumRows($result) != 0) {
 		$sql .= ' open = FALSE';
 	}
 	if(isset($_POST['hscore'])) {
-		$sql .= ', hscore = '.dbMakeSafe($_POST['hscore']);
+		$sql .= ', hscore = '.dbPostSafe($_POST['hscore']);
 	}else {
 		$sql .= ', hscore = NULL';
 	}
 	if(isset($_POST['ascore'])) {
-		$sql .= ', ascore = '.dbMakeSafe($_POST['ascore']);
+		$sql .= ', ascore = '.dbPostSafe($_POST['ascore']);
 	}else {
 		$sql .= ', ascore = NULL';
 	}
 	if(isset($_POST['cscore'])) {
-		$sql .= ', combined_score = '.dbMakeSafe($_POST['cscore']);
+		$sql .= ', combined_score = '.dbPostSafe($_POST['cscore']);
 	}else {
 		$sql .= ', combined_score = NULL';
 	}
 	if(isset($_POST['mtime']) && $_POST['mtime'] != 0) {
-		$sql .= ', match_time = '.dbMakeSafe($_POST['mtime']);
+		$sql .= ', match_time = '.dbPostSafe($_POST['mtime']);
 	}else {
 		$sql .= ', match_time = NULL';
 	}

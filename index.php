@@ -177,7 +177,7 @@ if ($rounddata = dbFetchRow($result)) {
 	<!--[if lt IE 7]>
 		<link rel="stylesheet" type="text/css" href="ball-ie.css"/>
 	<![endif]-->
-	<script src="/static/scripts/mootools-1.2-core-nc.js" type="text/javascript" charset="UTF-8"></script>
+	<script src="/static/scripts/mootools-1.2.4-core-yc.js" type="text/javascript" charset="UTF-8"></script>
 	<script src="mbball.js" type="text/javascript" charset="UTF-8"></script>
 </head>
 <?php flush(); ?>

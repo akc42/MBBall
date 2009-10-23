@@ -44,7 +44,7 @@ if (isset($_POST['ou'])) {
 if (isset($_POST['validquestion'])) {
 	$sql .= ', valid_question = TRUE';
 	if(isset($_POST['answer'])) {
-		$sql .= ', answer ='.dbMakeSafe($_POST['answer']);
+		$sql .= ', answer ='.dbPostSafe($_POST['answer']);
 	} else {
 		$sql .= ', answer = NULL';
 	}
