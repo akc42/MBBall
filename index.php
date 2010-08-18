@@ -1,6 +1,6 @@
 <?php
 /*
- 	Copyright (c) 2008,2009,2010 Alan Chandler
+    Copyright (c) 2008,2009,2010 Alan Chandler
     This file is part of MBBall, an American Football Results Picking
     Competition Management software suite.
 
