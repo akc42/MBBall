@@ -1,6 +1,6 @@
 <?php
 /*
- 	Copyright (c) 2008,2009 Alan Chandler
+ 	Copyright (c) 2008,2009,2010 Alan Chandler
     This file is part of MBBall, an American Football Results Picking
     Competition Management software suite.
 
@@ -74,7 +74,7 @@ window.addEvent('domready', function() {
 	<td align="center" width="300" class="topbg_r" valign="middle">
 	    <a href="http://melindadoolittle.com" alt="Main Site Home Page" style="text-decoration:none;margin-top:5px;">
 	    <span >MelindaDoolittle.com</span>
-	    <img style="margin-top:5px;" src="/static/images/banner_small.jpg" alt="Melinda Doolittle" border="0" />
+	    <img style="margin-top:5px;" src="/static/images/small_banners/rotate.php" alt="Melinda Doolittle" border="0" />
 	    </a>
 	</td>	
 	<td align="right" width="400" class="topbg" valign="top">
@@ -107,7 +107,7 @@ window.addEvent('domready', function() {
 	</tbody>
 </table>
 
-<div id="copyright"><hr/>MBBall <span><?php include('version.php');?></span> &copy; 2008,2009 Alan Chandler.  Licenced under the GPL</div>
+<div id="copyright"><hr/>MBBall <span><?php include('version.php');?></span> &copy; 2008 -2010 Alan Chandler.  Licenced under the GPL</div>
 </div>
 </body>
 

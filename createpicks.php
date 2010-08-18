@@ -1,6 +1,6 @@
 <?php
 /*
- 	Copyright (c) 2008,2009 Alan Chandler
+ 	Copyright (c) 2008,2009,2010 Alan Chandler
     This file is part of MBBall, an American Football Results Picking
     Competition Management software suite.
 
@@ -35,8 +35,8 @@ $gap = $_POST['gap'];
 $ppd = $_POST['ppd'];
 if (isset($_POST['bqdeadline']) && $_POST['bqdeadline'] > time()) {
 	dbQuery('DELETE FROM option_pick WHERE 	uid = '.dbMakeSafe($uid).' AND cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).';');
-	if (isset($_POST['opid'])) {
-		if (isset($_POST['Cbonus'])) {
+	if (isset($_POST['opid']) && $_POST['opid'] != '') {
+		if (isset($_POST['Cbonus']) && $_POST['Cbonus'] != '') {
 			dbQuery('INSERT INTO option_pick(uid,cid,rid,opid,comment) VALUES ('
 							.dbMakeSafe($uid).','.dbMakeSafe($cid).','.dbMakeSafe($rid).','
 							.dbMakeSafe($_POST['opid']).','.dbPostSafe($_POST['Cbonus']).');');
@@ -46,7 +46,7 @@ if (isset($_POST['bqdeadline']) && $_POST['bqdeadline'] > time()) {
 							.dbMakeSafe($_POST['opid']).', NULL );');
 		}
 	} else {
-		if (isset($_POST['Cbonus'])) {
+		if (isset($_POST['Cbonus']) && $_POST['Cbonus'] != '') {
 			dbQuery('INSERT INTO option_pick(uid,cid,rid,opid,comment) VALUES ('
 							.dbMakeSafe($uid).','.dbMakeSafe($cid).','.dbMakeSafe($rid).', NULL ,'
 							.dbPostSafe($_POST['Cbonus']).');');

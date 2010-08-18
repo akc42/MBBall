@@ -1,6 +1,6 @@
 <?php
 /*
- 	Copyright (c) 2008,2009 Alan Chandler
+ 	Copyright (c) 2008,2009,2010 Alan Chandler
     This file is part of MBBall, an American Football Results Picking
     Competition Management software suite.
 
@@ -40,7 +40,7 @@ define('MBBALL_FORUM_PATH',	"/forum"); //URL to reach forum
 define('MBBALL_MAX_ROUND_DISPLAY',18); //Maximum rounds to display in summary before dropping off earliest round
 
 $groups =& $user_info['groups'];
-$uid = $ID_MEMBER;
+$uid =& $user_info['id'];
 $name =& $user_info['name'];
 $email =& $user_info['email'];
 $password = sha1("Football".$uid);
@@ -222,7 +222,7 @@ window.addEvent('domready', function() {
 	<td align="center" width="300" class="topbg_r" valign="middle">
 	    <a href="http://melindadoolittle.com" alt="Main Site Home Page" style="text-decoration:none;margin-top:5px;">
 	    <span >MelindaDoolittle.com</span>
-	    <img style="margin-top:5px;" src="/static/images/banner_small.jpg" alt="Melinda Doolittle" border="0" />
+	    <img style="margin-top:5px;" src="/static/images/small_banners/rotate.php" alt="Melinda Doolittle" border="0" />
 	    </a>
 	</td>	
 	<td align="right" width="400" class="topbg" valign="top">
@@ -345,7 +345,7 @@ if ($playoff_deadline != 0) {
 ?>			<tr><td colspan="2"><div id="tics"><?php require_once('tic.php');?></div></td></tr>
 		</tbody>
 	</table>	
-	<div id="copyright"><hr />MBball <span><?php include('version.php');?></span> &copy; 2008,2009 Alan Chandler.  Licenced under the GPL</div>
+	<div id="copyright"><hr />MBball <span><?php include('version.php');?></span> &copy; 2008-2010 Alan Chandler.  Licenced under the GPL</div>
 </div>
 </body>
 
