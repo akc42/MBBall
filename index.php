@@ -40,7 +40,11 @@ define('MBBALL_FORUM_PATH',	"/forum"); //URL to reach forum
 define('MBBALL_MAX_ROUND_DISPLAY',18); //Maximum rounds to display in summary before dropping off earliest round
 
 $groups =& $user_info['groups'];
-$uid =& $user_info['id'];
+if(isset($user_info['id'])) { //check if this is SMFv2
+    $uid =& $user_info['id'];
+} else {
+    $uid = $ID_MEMBER;
+}
 $name =& $user_info['name'];
 $email =& $user_info['email'];
 $password = sha1("Football".$uid);
