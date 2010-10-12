@@ -49,6 +49,8 @@ $name =& $user_info['name'];
 $email =& $user_info['email'];
 $password = sha1("Football".$uid);
 
+$time_head = microtime(true);
+
 define ('BALL',1);   //defined so we can control access to some of the files.
 require_once('db.php');
 if(in_array(SMF_FOOTBALL,$groups)) {
@@ -350,6 +352,10 @@ if ($playoff_deadline != 0) {
 		</tbody>
 	</table>	
 	<div id="copyright"><hr />MBball <span><?php include('version.php');?></span> &copy; 2008-2010 Alan Chandler.  Licenced under the GPL</div>
+	<div id="timing"><?php
+$time_display = microtime(true) - $time_head;
+echo "Time to display page is $time_display secs";
+	?></div>
 </div>
 </body>
 
