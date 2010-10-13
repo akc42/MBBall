@@ -23,6 +23,7 @@
 error_reporting(E_ALL);
 // Path to the Ball directory:
 define('MBBALL_PATH', dirname($_SERVER['SCRIPT_FILENAME']).'/');
+$time_head = microtime(true);
 
 
 require_once(MBBALL_PATH.'../forum/SSI.php');
@@ -49,7 +50,7 @@ $name =& $user_info['name'];
 $email =& $user_info['email'];
 $password = sha1("Football".$uid);
 
-$time_head = microtime(true);
+$time_db = microtime(true);
 
 define ('BALL',1);   //defined so we can control access to some of the files.
 require_once('db.php');
@@ -352,10 +353,7 @@ if ($playoff_deadline != 0) {
 		</tbody>
 	</table>	
 	<div id="copyright"><hr />MBball <span><?php include('version.php');?></span> &copy; 2008-2010 Alan Chandler.  Licenced under the GPL</div>
-	<div id="timing"><?php
-$time_display = microtime(true) - $time_head;
-echo "Time to display page is $time_display secs";
-	?></div>
+	<div id="timing"><?php $time_now = microtime(true); printf("Page displayed in %.3f secs of which %.3f secs was in forum checks",$time_now - $time_head,$time_db-$time_head);?></div>
 </div>
 </body>
 
