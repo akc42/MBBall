@@ -43,10 +43,11 @@ $result->closeCursor();
 if ($rid != 0) {
 	$result = $db->prepare("
 		SELECT u.uid, u.name AS name, p.pscore, sum(r.score) AS rscore, p.pscore+sum(r.score) AS total
-		FROM participant u JOIN registration reg USING (uid) JOIN
+		FROM participant u JOIN
 		(SELECT uid, sum(score) AS pscore FROM playoff_score GROUP BY uid) AS p USING (uid) JOIN round_score r USING (uid)
 		WHERE rid <= ? GROUP BY u.uid, u.name,p.pscore  ORDER BY total DESC,u.name;
 	");
+	
 	$result->bindValue(1,$rid,PDO::PARAM_INT);
 } else {
 	$result->prepare("

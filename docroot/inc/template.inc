@@ -38,14 +38,20 @@ $time_start = microtime(true);
 	<script src="/js/mootools-1.2.4-core-yc.js" type="text/javascript" charset="UTF-8"></script>
 <?php
 head_content();
-?></head>
-<body>
-<script type="text/javascript">
+?><script type="text/javascript">
   var _gaq = _gaq || [];
   _gaq.push(['_setAccount', 'UA-6767755-1']);
   _gaq.push(['_trackPageview']);
-</script>        
 
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</head>
+<body>
 <!-- these two spans help the menu load faster-->
 <span class="preload1"></span>
 <span class="preload2"></span>
@@ -73,15 +79,6 @@ content();
 	<div class="copyright"><?php copyright();?></div>
 	<div class="timing"><?php printf("Page created in %.3f seconds",microtime(true)-$time_start); ?></div>
 </div>
-<!-- Google Analytics Tracking Code -->
-  <script type="text/javascript">
-    (function() {
-      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
-    })();
-  </script>
-
 </body>
 </html>
 

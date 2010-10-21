@@ -24,6 +24,14 @@ CREATE TABLE config (
 	dversion integer DEFAULT 0 NOT NULL --database version to use when creating a database
 );
 
+-- used to hold the relationship between the filename and the cid
+CREATE TABLE cache (
+	cid text PRIMARY KEY, --unique key for a competition
+	filename text NOT NULL, -- last known filename for this cid
+	creation_date bigint NOT NULL, --creation date of competition (so we can sort the menu)
+	description text --description for menu items
+); 
+
 INSERT INTO config VALUES('','',18,'',1);  -- single record which will hold the data
 
 COMMIT;

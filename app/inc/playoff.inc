@@ -25,14 +25,15 @@ require_once('./inc/team.inc');
 <?php
 
 $result = $db->prepare("
-		SELECT u.name, u.uid, p.score FROM registration r JOIN participant u USING (uid);
-		LEFT JOIN playoff_score p ON r.uid = p.uid AND p.confid = ?
-		ORDER BY score DESC, u.name
+		SELECT name, u.uid AS uid, score FROM participant u 
+		LEFT JOIN playoff_score p ON u.uid = p.uid AND p.confid = ?
+		ORDER BY score DESC, name
 	");
+$e=$db->errorInfo(); echo "Error $e[2]<br/>\n";
 $resultplay = $db->prepare("SELECT tid  FROM playoff_picks JOIN team t USING (tid) WHERE uid = ? AND t.confid = ? ");
 
 foreach($confs as $confid => $conference) {
-	$result->bindValue(1,$confid,PDO::PARAM_INT);
+	$result->bindValue(1,$confid);
 	$result->execute();
 
 ?><table>
@@ -65,7 +66,7 @@ foreach($confs as $confid => $conference) {
 	</thead>
 	<tbody>
 <?php
-	$resultplay->bindValue(2,$confid,PDO::PARAM_INT);
+	$resultplay->bindValue(2,$confid);
 	while($row = $result->fetch(PDO::FETCH_ASSOC)) {
 		$playoff_selections = array();
 		$resultplay->bindValue(1,$row['uid'],PDO::PARAM_INT);

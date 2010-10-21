@@ -235,7 +235,7 @@ INSERT INTO division (divid, name)  VALUES ('E','East');
 INSERT INTO division (divid, name)  VALUES ('S','South');
 INSERT INTO division (divid, name)  VALUES ('W','West');
 
-INSERT INTO team (tid, name, logo,  confid, divid) VALUES('NE','New England Patriots','NE_logo-50x50.gif','AFC','E');
+INSERT INTO team (tid, name, logo,  confid, divid) VALUES('NE ','New England Patriots','NE_logo-50x50.gif','AFC','E');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('NYG','New York Giants','NYG_logo-50x50.gif','NFC','E');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('TEN','Tennessee Titans','TEN_logo-50x50.gif','AFC','S');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('IND','Indianapolis Colts','IND_logo-50x50.gif','AFC','S');
@@ -246,27 +246,27 @@ INSERT INTO team (tid, name, logo,  confid, divid) VALUES('ATL','Atlanta Falcons
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('CIN','Cincinnati Bengals','CIN_logo-50x50.gif','AFC','N');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('MIA','Miami Dolphins','MIA_logo-50x50.gif','AFC','E');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('CAR','Carolina Panthers','CAR_logo-50x50.gif','NFC','S');
-INSERT INTO team (tid, name, logo,  confid, divid) VALUES('TB','Tampa Bay Buccaneers','TB_logo-50x50.gif','NFC','S');
+INSERT INTO team (tid, name, logo,  confid, divid) VALUES('TB ','Tampa Bay Buccaneers','TB_logo-50x50.gif','NFC','S');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('BUF','Buffalo Bills','BUF_logo-50x50.gif','AFC','E');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('PHI','Philadelphia Eagles','PHI_logo-50x50.gif','NFC','E');
-INSERT INTO team (tid, name, logo,  confid, divid) VALUES('NO','New Orleans Saints','NO_logo-50x50.gif','NFC','S');
+INSERT INTO team (tid, name, logo,  confid, divid) VALUES('NO ','New Orleans Saints','NO_logo-50x50.gif','NFC','S');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('CHI','Chicago','CHI_logo-50x50.gif','NFC','N');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('JAC','Jacksonville Jaguars','JAC_logo-50x50.gif','AFC','S');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('HOU','Houston Texans','HOU_logo-50x50.gif','AFC','S');
-INSERT INTO team (tid, name, logo,  confid, divid) VALUES('SF','San Francisco 49ers','SF_logo-50x50.gif','NFC','W');
+INSERT INTO team (tid, name, logo,  confid, divid) VALUES('SF ','San Francisco 49ers','SF_logo-50x50.gif','NFC','W');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('CLE','Cleveland Browns','CLE_logo-50x50.gif','AFC','N');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('PIT','Pittsburgh Steelers','PIT_logo-50x50.gif','AFC','N');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('BAL','Baltimore Ravens','BAL_logo-50x50.gif','AFC','N');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('DET','Detroit Lions','DET_logo-50x50.gif','NFC','N');
-INSERT INTO team (tid, name, logo,  confid, divid) VALUES('GB','Green Bay Packers','GB_logo-50x50.gif','NFC','N');
-INSERT INTO team (tid, name, logo,  confid, divid) VALUES('SD','San Diego Chargers','SD_logo-50x50.gif','AFC','W');
-INSERT INTO team (tid, name, logo,  confid, divid) VALUES('AK','Oakland Raiders','OAK_logo-50x50.gif','AFC','W');
+INSERT INTO team (tid, name, logo,  confid, divid) VALUES('GB ','Green Bay Packers','GB_logo-50x50.gif','NFC','N');
+INSERT INTO team (tid, name, logo,  confid, divid) VALUES('SD ','San Diego Chargers','SD_logo-50x50.gif','AFC','W');
+INSERT INTO team (tid, name, logo,  confid, divid) VALUES('OAK','Oakland Raiders','OAK_logo-50x50.gif','AFC','W');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('MIN','Minnesota Vikings','MIN_logo-50x50.gif','NFC','N');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('DEN','Denver Broncos','DEN_logo-50x50.gif','AFC','W');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('STL','St. Louis Rams','STL_logo-50x50.gif','NFC','W');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('NYJ','New York Jets','NYJ_logo-50x50.gif','AFC','E');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('ARI','Arizona Cardinals','ARI_logo-50x50.gif','NFC','W');
-INSERT INTO team (tid, name, logo,  confid, divid) VALUES('KC','Kansas City Chiefs','KC_logo-50x50.gif','AFC','W');
+INSERT INTO team (tid, name, logo,  confid, divid) VALUES('KC ','Kansas City Chiefs','KC_logo-50x50.gif','AFC','W');
 
 -- END OF DATA ----------------------------------------------------------
 -- INDEXES --------------------------------------------------------------

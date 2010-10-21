@@ -25,7 +25,7 @@ foreach($db->query("SELECT * FROM conference ORDER BY confid;") as $row) {
 	$confs[$row['confid']] = $row['name'];
 }
 
-foreach($db->query("SELECT * FROM conference ORDER BY confid;") as $row) {
+foreach($db->query("SELECT * FROM division ORDER BY divid;") as $row) {
 	$divs[$row['divid']] = $row['name'];
 }
 ?>

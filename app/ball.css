@@ -163,7 +163,7 @@ way to fit your requirements.
 #r{
 	min-width:25em;
 }
-#reg_submit {
+#registration {
 	background-color:white;
 	padding:2em;
 	border:3px solid red;
@@ -353,7 +353,7 @@ height: 56px;
 /**/
 
 caption,#picks h1, #popicks h1 ,#playoff_pick h1, #bonus_pick h1 {font-size:small; font-weight:bold;text-align:center;}
-#playoff_pick h2, #bonus_pick h2,#registration h1 {
+#playoff_pick h2, #bonus_pick h2 {
 	font-size:small;
 	font-weight:normal;
 	text-align:center;

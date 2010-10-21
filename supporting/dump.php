@@ -138,8 +138,8 @@ while($row = dbFetchRow($result)) {
 			");
 		while($r2=dbFetchRow($table)) {
 			$m->bindValue(1,$r2['rid'],PDO::PARAM_INT);
-			$m->bindValue(2,$r2['hid'],PDO::PARAM_INT);
-			$m->bindValue(3,$r2['aid'],PDO::PARAM_INT);
+			$m->bindValue(2,$r2['hid']);
+			$m->bindValue(3,$r2['aid']);
 			$m->bindValue(4,$r2['comment']);
 			$m->bindValue(5,$r2['ascore'],PDO::PARAM_INT);
 			$m->bindValue(6,$r2['hscore'],PDO::PARAM_INT);
@@ -171,9 +171,9 @@ while($row = dbFetchRow($result)) {
 		$table=dbQuery("SELECT t.*,made_playoff FROM team t LEFT JOIN team_in_competition USING (tid) WHERE team_in_competition.cid = ".$row['cid']);
 		$t=$db->prepare("UPDATE team SET in_competition = ? , made_playoff = ? WHERE tid = ?");
 		while($r2=dbFetchRow($table)) {
-			$t->bindValue(1,(is_null($row['made_playoff']))?0:1,PDO::PARAM_INT);
+			$t->bindValue(1,(is_null($r2['made_playoff']))?0:1,PDO::PARAM_INT);
 			$t->bindValue(2,($r2['made_playoff'] == 't')?1:0,PDO::PARAM_INT);
-			$t->bindValue(3,$r2['tid'],PDO::PARAM_INT);
+			$t->bindValue(3,$r2['tid']);
 			$t->execute();
 			$t->closeCursor();
 		}
@@ -187,9 +187,9 @@ while($row = dbFetchRow($result)) {
 		while($r2=dbFetchRow($table)) {
 			$p->bindValue(1,$r2['uid'],PDO::PARAM_INT);
 			$p->bindValue(2,$r2['rid'],PDO::PARAM_INT);
-			$p->bindValue(3,$r2['hid'],PDO::PARAM_INT);
+			$p->bindValue(3,$r2['hid']);
 			$p->bindValue(4,$r2['comment']);
-			$p->bindValue(5,$r2['pid'],PDO::PARAM_INT);
+			$p->bindValue(5,$r2['pid']);
 			$p->bindValue(6,($r2['over_selected'] == 't')?1:0,PDO::PARAM_INT);
 			$p->bindValue(7,$r2['submit_time'],PDO::PARAM_INT);
 			$p->execute();
@@ -203,9 +203,9 @@ while($row = dbFetchRow($result)) {
 		$p=$db->prepare("INSERT INTO div_winner_pick(uid,confid,divid,tid,submit_time) VALUES (?,?,?,?,?)");
 		while($r2=dbFetchRow($table)) {
 			$p->bindValue(1,$r2['uid'],PDO::PARAM_INT);
-			$p->bindValue(2,$r2['confid'],PDO::PARAM_INT);
-			$p->bindValue(3,$r2['divid'],PDO::PARAM_INT);
-			$p->bindValue(4,$r2['tid'],PDO::PARAM_INT);
+			$p->bindValue(2,$r2['confid']);
+			$p->bindValue(3,$r2['divid']);
+			$p->bindValue(4,$r2['tid']);
 			$p->bindValue(5,$r2['submit_time'],PDO::PARAM_INT);
 			$p->execute();
 			$p->closeCursor();
@@ -218,9 +218,9 @@ while($row = dbFetchRow($result)) {
 		$p=$db->prepare("INSERT INTO wildcard_pick(uid,confid,opid,tid,submit_time) VALUES (?,?,?,?,?)");
 		while($r2=dbFetchRow($table)) {
 			$p->bindValue(1,$r2['uid'],PDO::PARAM_INT);
-			$p->bindValue(2,$r2['confid'],PDO::PARAM_INT);
+			$p->bindValue(2,$r2['confid']);
 			$p->bindValue(3,$r2['opid'],PDO::PARAM_INT);
-			$p->bindValue(4,$r2['tid'],PDO::PARAM_INT);
+			$p->bindValue(4,$r2['tid']);
 			$p->bindValue(5,$r2['submit_time'],PDO::PARAM_INT);
 			$p->execute();
 			$p->closeCursor();

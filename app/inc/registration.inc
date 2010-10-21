@@ -35,14 +35,12 @@ if($extn_auth) {
 ?>	<input type="hidden" name="bb" value="true" />
 	<table>
 		<tr><th>Username</th><th>e-mail (optional)</th></tr>
-		<tr><td><input type="text" name="uid" value=""/></td><input type="email" name="email" value=""/></td></tr>
+		<tr><td><input type="text" name="uid" value=""/></td><td><input type="email" name="email" value=""/></td></tr>
 		<tr><th>Password</th><th>Confirm</th></tr>
 		<tr><td><input type="password" name="password" value=""/></td><td><input type="password" name="confirm" value=""/></td></tr>	
 	</table>
 <?php
 }
-?>	<div id="reg_submit">
-<?php 
 if($condition == '') {
 ?>		<input type="submit" value="Register" />
 <?php
@@ -60,5 +58,5 @@ if ($approval_required && (!$extn_auth || $cook['u']['guest'])) {
 }
 ?>
 		<div id="regerror"></div>
-	</div>
+
 </form>

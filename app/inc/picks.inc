@@ -27,7 +27,7 @@ if ($rid != 0) {
 		SELECT u.name , u.uid , r.pscore, r.oscore, r.mscore,r.bscore,r.score, p.opid, p.comment
 		FROM round_score r JOIN participant u USING (uid)
 		LEFT JOIN option_pick p USING (uid,rid)
-		WHERE rid = ?
+		WHERE r.rid = ?
 		ORDER BY score DESC,u.name
 	");
 	$ustmt->bindValue(1,$rid,PDO::PARAM_INT);
@@ -36,8 +36,8 @@ if ($rid != 0) {
 	$mstmt=$db->prepare("SELECT * FROM match m WHERE m.rid = ? AND  m.open == 1 ORDER BY match_time, hid LIMIT 8 OFFSET ?");
 	$mstmt->bindValue(1,$rid,PDO::PARAM_INT);
 	$pstmt=$db->prepare("
-		SELECT p.hid, p.pid, p.over_selected, p.comment, m.pscore,m.oscore
-		FROM match_score m JOIN match USING (rid,hid) LEFT JOIN pick p USING (uid,rid,hid)';
+		SELECT p.hid AS hid, p.pid AS pid, p.over_selected AS over_selected,p.comment AS comment, m.pscore AS pscore,m.oscore AS oscore
+		FROM match_score m JOIN match USING (rid,hid) LEFT JOIN pick p USING (uid,rid,hid)
 		WHERE  m.rid = ? AND m.uid = ?
 		ORDER BY match.match_time , m.hid LIMIT 8 OFFSET ?
 	");
@@ -114,8 +114,9 @@ if ($rid != 0) {
 <?php
 /* THE SCORES IN HEADER ------------------------------------------------------------------------------*/
 	
-			dbRestartQuery($result);  //put the results back to the start so we can interate over them again
-			while($row = dbFetchRow($result)) {
+			$mstmt->closeCursor();
+			$mstmt->execute();//put the results back to the start so we can interate over them again
+			while($row = $mstmt->fetch(PDO::FETCH_ASSOC)) {
 ?>			<th class="score" ><?php if(!is_null($row['hscore'])) echo $row['hscore'];?></th>
 			<th class="score"><?php if(!is_null($row['ascore'])) echo $row['ascore'];?></th>
 <?php
@@ -158,18 +159,18 @@ if ($rid != 0) {
 	<tbody>
 <?php
 /* FOR EACH USER WE DISPLAY THEIR PICKS FOR THE MATCHES -----------------------------------------------*/
-			$ustmt->query();
+			$ustmt->execute();
 			while ($userdata = $ustmt->fetch(PDO::FETCH_ASSOC)) {
 ?>			<tr>
 				<td rowspan="2" colspan="2"><?php echo $userdata['name'];?></td>
 <?php
-				$pick = dbQuery($sql);
 				$pstmt->bindValue(2,$userdata['uid'],PDO::PARAM_INT);
 /* MATCH WINNER PICK ------------------------------------------------------------------------------*/
 				$mstmt->closeCursor();
 				$mstmt->execute();//put the results back to the start so we can interate over them again
+				$pstmt->execute();
 				while ($row=$mstmt->fetch(PDO::FETCH_ASSOC)) {
-					$pickdata = $pick->fetch(PDO::FETCH_ASSOC);
+					$pickdata = $pstmt->fetch(PDO::FETCH_ASSOC);
 					if(!is_null($pickdata['hid'])) {
 						if($pickdata['pscore'] > 0) {
 ?>				<td class="win tid">
@@ -215,8 +216,9 @@ if ($rid != 0) {
 				$pstmt->closeCursor();
 				$pstmt->execute();//put the results back to the start so we can interate over them again
 				while ($row=$mstmt->fetch(PDO::FETCH_ASSOC)) {
-					$pickdata = $pick->fetch(PDO::FETCH_ASSOC);
-?>				<td class="comment" colspan="2"><?php if(!( is_null($pickdata ['hid']) || is_null($pickdata['comment']))) echo dbBBcode($pickdata['comment']);?></td>
+					$pickdata = $pstmt->fetch(PDO::FETCH_ASSOC);
+
+?>				<td class="comment" colspan="2"><?php if(!( is_null($pickdata['hid']) || is_null($pickdata['comment']))) echo dbBBcode($pickdata['comment']);?></td>
 <?php
 				}
 ?>			</tr>
