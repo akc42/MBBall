@@ -27,13 +27,13 @@ body
 #header
 {
 	background: url(main_block.png) #fefefe no-repeat 0 0;
-	padding-left: 40px;
+	padding: 0 0 0 40px ;
 }
 #header div.frame
 {
 	background: url(main_block.png) no-repeat 100% 0px;
 	display: block;
-	padding-right:40px;
+	padding:0 40px 0 0;
 }
 #header div.frame:after 
 {
