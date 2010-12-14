@@ -29,7 +29,7 @@ foreach($confs as $confid => $conference) {
 	$sql = 'SELECT u.name, u.uid, p.score FROM registration r JOIN participant u USING (uid)';
 	$sql .= ' LEFT JOIN playoff_score p ON r.cid = p.cid AND r.uid = p.uid AND p.confid = '.dbMakeSafe($confid);
 	$sql .= ' WHERE r.cid = '.dbMakeSafe($cid);
-	$sql .= ' ORDER BY score DESC, u.name;';
+	$sql .= ' ORDER BY COALESCE(score,0) DESC, u.name;';
 	$result = dbQuery($sql);
 
 ?><table>
