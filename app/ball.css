@@ -22,11 +22,9 @@ html {
 }
 
 body {
-	padding:0px;
-	margin:0px;
-	background-color: #efefef;
-	width:100%;
-	height:100%;
+	background: #E9EEF2 url(images/backdrop.png) repeat-x;
+	margin: 0 auto;
+	padding: 15px 1%;
 }
 
 /* Tables should show empty cells. */
@@ -42,43 +40,65 @@ body, td, th
 	font-size: small;
 	font-family: tahoma, sans-serif;
 }
-
-.topbg
+/* the framing graphics */
+#header
 {
-	color: #737373;
-	font-size: 22px;
-	padding-top: 28px;
-	padding-bottom: 7px;
-	padding-right:25px;
-	background-color: #efefef;
-	background-image: url(/static/images/topbg_r.gif);
+	background: url(images/main_block.png) #fefefe no-repeat 0 0;
+	padding-left: 20px;
+}
+#header div.frame
+{
+	background: url(images/main_block.png) no-repeat 100% 0;
+	display: block;
+	padding: 5px 20px 0 0;
+}
+/* the content section */
+#wrapper
+{
+	background: #FFFFFF url(images/frame_repeat.png) repeat-y top left;
+	padding-left: 20px;
+}
+#wrapper div.frame
+{
+	background: url(images/frame_repeat.png) repeat-y top right;
+	display: block;
+	padding: 0 20px 0 0;
+}
+#top_section
+{
+	min-height: 65px;
+	overflow: hidden;
+	margin:15px 0 3px 0;
 }
 
-.topbg_r
+h1.logo
 {
-	color: white;
-	background-color: #efefef;
-	background-image: url(/static/images/topbg.gif);
+	line-height: 45px;
+	font-size: 1.8em;
+	margin: 0;
+	padding: 0;
+	float: left;
+}
+#md_banner
+{
+    margin-left:70px;
+    width:300px;
+    text-align:center;
+    float:left;
 }
 
-.topbg_r2
+#siteslogan
 {
-	color: white;
-	background-color: #efefef;
-	background-image: url(/static/images/topbg_r2.gif);
+    color:#737373;
+    font-size:1.5em;
+	margin: 0;
+	padding: 0;
+	float: right;
 }
 
-.topbg_l
-{
-	color: white;
-	background-color: #efefef;
-	background-image: url(/static/images/topbg_l.gif);
-}
 
 #competitionNameContainer {
-	position:absolute;
-	top:100px;
-	left:350px;
+	margin:0 auto;
 	width:40em;
 	text-align:left;
 }
@@ -86,8 +106,21 @@ body, td, th
 	font-size:1.5em;
 	font-family: tahoma, sans-serif;
 	font-weight: normal;
-	color:#737373;
-	margin-left:auto;
+	color:#ffffff;
+}
+/* The footer with copyright links etc. */
+#footer_section
+{
+	text-align: center;
+	background: url(images/main_block.png) no-repeat 0 -550px;
+	padding-left: 20px;
+	font-size: 0.8em;
+}
+#footer div.frame
+{
+	background: url(images/main_block.png) no-repeat 100% -550px;
+	display: block;
+	padding: 60px 0 0 0;
 }
 
 
@@ -149,7 +182,6 @@ way to fit your requirements.
 
 
 #content {
-	font-family:Verdana, Arial, Helvetica, sans-serif;
 	font-size:0.8em;
 	background-color:#4A7DB5;
 	background-image:none;

@@ -1,0 +1,12 @@
+The files in this directory are copied from files orginally
+copyrighted by Aeron Glemann <http://electricprism.com/aeron>, MIT
+Style License.
+
+These include the calander.js (at RC4 and then modified by Davorin
+Šego), and the files calendar.css, calendar-icon.gif,
+calendar-next.gif, calendar-previous.gif (these latter 4 files renamed
+from their dashboard* equivalents).
+ 
+Subsequent modifications to calendar.js and calendar.css are all
+Copyright (c) 2008 Alan Chandler and licenced under the GPL - a copy
+of which is found in LICENCE.txt in this directory

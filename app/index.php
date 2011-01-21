@@ -29,7 +29,7 @@ $time_head = microtime(true);
 require_once(MBBALL_PATH.'../forum/SSI.php');
 //If not logged in to the forum, not allowed any further so redirect to page to say so
 if($user_info['is_guest']) {
-	header( 'Location: /static/Football.htm' ) ;
+	header( 'Location: football.html' ) ;
 	exit;
 };
 
@@ -175,8 +175,8 @@ if ($rounddata = dbFetchRow($result)) {
 }
 
 
-?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+?><!DOCTYPE html >
+<html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<title>Melinda's Backups Football Pool</title>
@@ -184,7 +184,7 @@ if ($rounddata = dbFetchRow($result)) {
 	<!--[if lt IE 7]>
 		<link rel="stylesheet" type="text/css" href="ball-ie.css"/>
 	<![endif]-->
-	<script src="/static/scripts/mootools-1.2.4-core-yc.js" type="text/javascript" charset="UTF-8"></script>
+	<script src="mootools-1.2.4-core-yc.js" type="text/javascript" charset="UTF-8"></script>
 	<script src="mbball.js" type="text/javascript" charset="UTF-8"></script>
 </head>
 <?php flush(); ?>
@@ -218,51 +218,45 @@ window.addEvent('domready', function() {
 
 	// -->
 </script>
-
-<table id="header" align="center" border="0" cellpadding="0" cellspacing="0" width="100%" >
-<tbody>
-	<tr>
-	<td align="left" width="30" class="topbg_l" height="70">&nbsp;</td>
-	<td align="left" colspan="2" class="topbg_r" valign="top"><a href="/" alt="Main Site Home Page">
-		<img  style="margin-top: 24px;" src="/static/images/mb-logo-community.gif" alt="Melinda's Backups Community" border="0" /></a>	
-	</td>
-	<td align="center" width="300" class="topbg_r" valign="middle">
-	    <a href="http://melindadoolittle.com" alt="Main Site Home Page" style="text-decoration:none;margin-top:5px;">
-	    <span >MelindaDoolittle.com</span>
-	    <img style="margin-top:5px;" src="/static/images/small_banners/rotate.php" alt="Melinda Doolittle" border="0" />
-	    </a>
-	</td>	
-	<td align="right" width="400" class="topbg" valign="top">
-	<span style="font-family: tahoma, sans-serif; margin-left: 5px;">Melinda's Backups Community</span>
-	</td>
-		<td align="right" width="25" class="topbg_r2" valign="top">
-		<div id="competitionNameContainer">
-			<h1><?php echo $competitiontitle ?></h1>
-		</div>
-		<!-- blank -->
-		</td>
-	</tr>  </tbody>
-</table>
-
-<ul id="menu">
-	<li><a href="<?php echo MBBALL_FORUM_PATH?>"><span>Return to the Forum</span></a></li>
+<div id="header"><div class="frame">
+	<div id="top_section">
+		<h1 class="logo">
+			<!-- replace this section with your own logo -->
+			<a href="/forum/index.php">
+				<img src="src="/static/images/mb-logo-community.gif" alt="Melinda's Backups Community" border="0" />
+			</a>
+		</h1>
+		<!-- Only for mb.com -->
+		<div id="md_banner">
+		    <a href="http://melindadoolittle.com" alt="Main Site Home Page" style="text-decoration:none;margin-top:5px;">
+                <span >MelindaDoolittle.com</span><br/>
+                <img style="margin-top:5px;" src="/static/images/small_banners/rotate.php" alt="Melinda Doolittle" border="0" />
+            </a>
+        </div>
+		<div id="siteslogan">Melinda's Backups Community</div>
+	</div>
+	<div id="competitionNameContainer">
+		<h1><?php echo $competitiontitle ?></h1>
+	</div>
+	<ul id="menu">
+		<li><a href="<?php echo MBBALL_FORUM_PATH?>"><span>Return to the Forum</span></a></li>
 <?php
 if (dbNumRows($result) >1 ) {
 	dbRestartQuery($result);
 		// more than one round, so we need to have a menu for the others
-?>	<li><a href="#"><span class="down">Rounds</span><!--[if gte IE 7]><!--></a><!--<![endif]-->
+?>		<li><a href="#"><span class="down">Rounds</span><!--[if gte IE 7]><!--></a><!--<![endif]-->
 		<!--[if lte IE 6]><table><tr><td><![endif]-->
-		<ul>
+			<ul>
 <?php 
 	while ($row = dbFetchRow($result)) {
 		if ($row['rid'] != $rid) {
-?>			<li><a href="index.php?<?php echo 'cid='.$cid.'&rid='.$row['rid']; ?>"><?php echo $row['name'] ;?></a></li>
+?>				<li><a href="index.php?<?php echo 'cid='.$cid.'&rid='.$row['rid']; ?>"><?php echo $row['name'] ;?></a></li>
 <?php
 		}
 	} ;
-?>		</ul>
+?>			</ul>
 		<!--[if lte IE 6]></td></tr></table></a><![endif]-->
-	</li>
+		</li>
 <?php
 }
 dbFree($result);
@@ -275,33 +269,35 @@ $sql .= ' AND (c.open IS TRUE OR r.open IS TRUE) GROUP BY c.cid, c.description O
 $result = dbQuery($sql);
 
 if (dbNumRows($result) > 0) {
-?>	<li><a href="#"><span class="down">Competitions</span><!--[if gte IE 7]><!--></a><!--<![endif]-->
+?>		<li><a href="#"><span class="down">Competitions</span><!--[if gte IE 7]><!--></a><!--<![endif]-->
 		<!--[if lte IE 6]><table><tr><td><![endif]-->
-		<ul>
+			<ul>
 <?php 
 	while ($row = dbFetchRow($result)) {
-?>			<li><a href="index.php?<?php echo 'cid='.$row['cid'] ; ?>"><?php echo $row['name'] ;?></a></li>
+?>				<li><a href="index.php?<?php echo 'cid='.$row['cid'] ; ?>"><?php echo $row['name'] ;?></a></li>
 <?php	}
-?>		</ul>
+?>			</ul>
 		<!--[if lte IE 6]></td></tr></table></a><![endif]-->
 
-	</li>
+		</li>
 <?php
 }
 dbFree($result);
 if(in_array(SMF_FOOTBALL,$groups)) {
 // Am Global Administrator - let me also do Admin thinks
-?>	<li><a href="admin.php?<?php echo 'uid='.$uid.'&pass='.$password.'&global=true&cid='.$cid;?>"><span>Global Admin</span></a></li>
+?>		<li><a href="admin.php?<?php echo 'uid='.$uid.'&pass='.$password.'&global=true&cid='.$cid;?>"><span>Global Admin</span></a></li>
 
 <?php
 } else {
 	if($admin) {
 // Am Administrator of this competition - let me also do Admin thinks
-?>	<li><a href="admin.php?<?php echo 'uid='.$uid.'&pass='.$password.'&cid='.$cid;?>"><span>Administration</span></a></li>
+?>		<li><a href="admin.php?<?php echo 'uid='.$uid.'&pass='.$password.'&cid='.$cid;?>"><span>Administration</span></a></li>
 <?php 
 	}
 }
-?></ul>
+?>	</ul>
+</div></div> <!-- #header .frame -->
+<div id="wrapper"><div class="frame">
 <div id="content">
  <div id="errormessage"></div>
 	<table class="layout">
@@ -352,9 +348,12 @@ if ($playoff_deadline != 0) {
 ?>			<tr><td colspan="2"><div id="tics"><?php require_once('tic.php');?></div></td></tr>
 		</tbody>
 	</table>	
-	<div id="copyright"><hr />MBball <span><?php include('version.php');?></span> &copy; 2008-2010 Alan Chandler.  Licenced under the GPL</div>
-	<div id="timing"><?php $time_now = microtime(true); printf("Page displayed in %.3f secs of which %.3f secs was in forum checks",$time_now - $time_head,$time_db-$time_head);?></div>
 </div>
+</div></div> <!-- #wrapper .frame -->
+<div id="footer"><div class="frame">
+	<div id="copyright"><hr />MBball <span><?php include('version.php');?></span> &copy; 2008-2011 Alan Chandler.  Licenced under the GPL</div>
+	<div id="timing"><?php $time_now = microtime(true); printf("Page displayed in %.3f secs of which %.3f secs was in forum checks",$time_now - $time_head,$time_db-$time_head);?></div>
+</div></div><!-- #footer .frame -->
 </body>
 
 </html>

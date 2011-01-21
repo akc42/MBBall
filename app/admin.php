@@ -30,8 +30,8 @@ define ('BALL',1);   //defined so we can control access to some of the files.
 require_once('db.php');
 
 
-?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+?><!DOCTYPE html>
+<html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<title>Melinda's Backups Football Pool Administration</title>
@@ -40,9 +40,9 @@ require_once('db.php');
 	<!--[if lt IE 7]>
 		<link rel="stylesheet" type="text/css" href="ball-ie.css"/>
 	<![endif]-->
-	<script src="/static/scripts/mootools-1.2.4-core-yc.js" type="text/javascript" charset="UTF-8"></script>
+	<script src="mootools-1.2.4-core-yc.js" type="text/javascript" charset="UTF-8"></script>
 	<script src="mootools-1.2.4.1-drag_move.js" type="text/javascript" charset="UTF-8"></script>
-	<script src="/static/scripts/calendar/calendar.js" type="text/javascript" charset="UTF-8"></script>
+	<script src="calendar/calendar.js" type="text/javascript" charset="UTF-8"></script>
 	<script src="mbball.js" type="text/javascript" charset="UTF-8"></script>
 </head>
 <body>
@@ -64,34 +64,32 @@ window.addEvent('domready', function() {
 	// -->
 </script>
 
-<table id="header" align="center" border="0" cellpadding="0" cellspacing="0" width="100%" >
-<tbody>
-	<tr>
-	<td align="left" width="30" class="topbg_l" height="70">&nbsp;</td>
-	<td align="left" colspan="2" class="topbg_r" valign="top"><a href="/" alt="Main Site Home Page">
-		<img  style="margin-top: 24px;" src="/static/images/mb-logo-community.gif" alt="Melinda's Backups Community" border="0" /></a>	
-		</td>
-	<td align="center" width="300" class="topbg_r" valign="middle">
-	    <a href="http://melindadoolittle.com" alt="Main Site Home Page" style="text-decoration:none;margin-top:5px;">
-	    <span >MelindaDoolittle.com</span>
-	    <img style="margin-top:5px;" src="/static/images/small_banners/rotate.php" alt="Melinda Doolittle" border="0" />
-	    </a>
-	</td>	
-	<td align="right" width="400" class="topbg" valign="top">
-	<span style="font-family: tahoma, sans-serif; margin-left: 5px;">Melinda's Backups Community</span>
-	</td>
-		<td align="right" width="25" class="topbg_r2" valign="top">
-		<div id="competitionNameContainer">
-			<h1>Administration Page</h1>
-		</div>
-		<!-- blank -->
-		</td>
-	</tr>  </tbody>
-</table>
-<ul id="menu">
-	<li><a href="/forum"><span>Return to the Forum</span></a></li>
-	<li><a href="/football"><span>Return the User Page</span></a></li>
-</ul>
+<div id="header"><div class="frame">
+	<div id="top_section">
+		<h1 class="logo">
+			<!-- replace this section with your own logo -->
+			<a href="/forum/index.php">
+				<img src="src="/static/images/mb-logo-community.gif" alt="Melinda's Backups Community" border="0" />
+			</a>
+		</h1>
+		<!-- Only for mb.com -->
+		<div id="md_banner">
+		    <a href="http://melindadoolittle.com" alt="Main Site Home Page" style="text-decoration:none;margin-top:5px;">
+                <span >MelindaDoolittle.com</span><br/>
+                <img style="margin-top:5px;" src="/static/images/small_banners/rotate.php" alt="Melinda Doolittle" border="0" />
+            </a>
+        </div>
+		<div id="siteslogan">Melinda's Backups Community</div>
+	</div>
+	<div id="competitionNameContainer">
+		<h1>Administration Page</h1>
+	</div>
+	<ul id="menu">
+		<li><a href="/forum"><span>Return to the Forum</span></a></li>
+		<li><a href="/football"><span>Return the User Page</span></a></li>
+	</ul>
+</div></div> <!-- #header .frame -->
+<div id="wrapper"><div class="frame">
 <div id="content">
 <div id="errormessage"></div>
 <table class="layout">
@@ -107,8 +105,11 @@ window.addEvent('domready', function() {
 	</tbody>
 </table>
 
-<div id="copyright"><hr/>MBBall <span><?php include('version.php');?></span> &copy; 2008 -2010 Alan Chandler.  Licenced under the GPL</div>
 </div>
+</div></div> <!-- #wrapper .frame -->
+<div id="footer"><div class="frame">
+	<div id="copyright"><hr />MBball <span><?php include('version.php');?></span> &copy; 2008-2011 Alan Chandler.  Licenced under the GPL</div>
+</div></div><!-- #footer .frame -->
 </body>
 
 </html>
