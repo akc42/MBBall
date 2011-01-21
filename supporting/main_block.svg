@@ -26,11 +26,11 @@
       <stop
          id="stop2903"
          offset="0"
-         style="stop-color:#4a7db5;stop-opacity:1;" />
+         style="stop-color:#324d6f;stop-opacity:1;" />
       <stop
          id="stop2899"
          offset="0.08"
-         style="stop-color:#88a9ce;stop-opacity:1;" />
+         style="stop-color:#4a73b5;stop-opacity:1;" />
       <stop
          id="stop2897"
          offset="0.12"
@@ -325,8 +325,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1"
-     inkscape:cx="252.70122"
-     inkscape:cy="489.33495"
+     inkscape:cx="195.42683"
+     inkscape:cy="591.13835"
      inkscape:document-units="px"
      inkscape:current-layer="layer2"
      showgrid="false"
@@ -352,6 +352,13 @@
      id="layer2"
      inkscape:label="Main"
      transform="translate(1.3900223e-8,-2.2760997e-6)">
+    <rect
+       style="fill:#e9eef2;fill-opacity:1;fill-rule:evenodd;stroke:none"
+       id="rect2872"
+       width="2300"
+       height="23"
+       x="-1.3900223e-08"
+       y="601" />
     <rect
        style="fill:#385b79;fill-opacity:1;stroke:none"
        id="rect3884"
