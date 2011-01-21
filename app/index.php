@@ -223,7 +223,7 @@ window.addEvent('domready', function() {
 		<h1 class="logo">
 			<!-- replace this section with your own logo -->
 			<a href="/forum/index.php">
-				<img src="src="/static/images/mb-logo-community.gif" alt="Melinda's Backups Community" border="0" />
+				<img src="/static/images/mb-logo-community.gif" alt="Melinda's Backups Community" border="0" />
 			</a>
 		</h1>
 		<!-- Only for mb.com -->
@@ -351,7 +351,7 @@ if ($playoff_deadline != 0) {
 </div>
 </div></div> <!-- #wrapper .frame -->
 <div id="footer"><div class="frame">
-	<div id="copyright"><hr />MBball <span><?php include('version.php');?></span> &copy; 2008-2011 Alan Chandler.  Licenced under the GPL</div>
+	<div id="copyright">MBball <span><?php include('version.php');?></span> &copy; 2008-2011 Alan Chandler.  Licenced under the GPL</div>
 	<div id="timing"><?php $time_now = microtime(true); printf("Page displayed in %.3f secs of which %.3f secs was in forum checks",$time_now - $time_head,$time_db-$time_head);?></div>
 </div></div><!-- #footer .frame -->
 </body>

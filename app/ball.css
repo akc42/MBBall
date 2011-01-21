@@ -44,7 +44,7 @@ body, td, th
 #header
 {
 	background: url(images/main_block.png) #fefefe no-repeat 0 0;
-	padding-left: 20px;
+	padding:0 0 0 20px;
 }
 #header div.frame
 {
@@ -56,7 +56,7 @@ body, td, th
 #wrapper
 {
 	background: #FFFFFF url(images/frame_repeat.png) repeat-y top left;
-	padding-left: 20px;
+	padding:0 0 0 20px;
 }
 #wrapper div.frame
 {
@@ -100,27 +100,28 @@ h1.logo
 #competitionNameContainer {
 	margin:0 auto;
 	width:40em;
-	text-align:left;
+	text-align:center;
 }
 #competitionNameContainer h1 {
 	font-size:1.5em;
 	font-family: tahoma, sans-serif;
 	font-weight: normal;
-	color:#ffffff;
+	color:#606060;
+	margin:0 0 20px 0;
 }
 /* The footer with copyright links etc. */
-#footer_section
+#footer
 {
 	text-align: center;
 	background: url(images/main_block.png) no-repeat 0 -550px;
-	padding-left: 20px;
+	padding:0 0 0 20px;
 	font-size: 0.8em;
 }
 #footer div.frame
 {
 	background: url(images/main_block.png) no-repeat 100% -550px;
 	display: block;
-	padding: 60px 0 0 0;
+	padding: 80px 0 0 0;
 }
 
 
@@ -148,7 +149,7 @@ way to fit your requirements.
 .preload1 {background: url(images/blank_over.gif);}
 .preload2 {background: url(images/blank_overa.gif);}
 
-#menu {padding:0 0 0 32px; margin:0; list-style:none; height:36px; background:#fff; position:relative; z-index:500; font-family:arial, verdana, sans-serif;}
+#menu {padding:0 0 0 32px; margin:5px 0 0 5px; list-style:none; height:36px; background:#fff; position:relative; z-index:500; font-family:arial, verdana, sans-serif;}
 #menu>li {display:block; float:left;}
 #menu>li>a {display:block; float:left; height:36px; line-height:27px; color:#ccc; text-decoration:none; font-size:11px; font-weight:bold; padding:0 0 0 12px; cursor:pointer;background: url(images/blank.gif);}
 #menu>li>a span {float:left; display:block; padding:0 24px 0 12px; height:36px;background:url(images/blank.gif) right top;}

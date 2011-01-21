@@ -69,7 +69,7 @@ window.addEvent('domready', function() {
 		<h1 class="logo">
 			<!-- replace this section with your own logo -->
 			<a href="/forum/index.php">
-				<img src="src="/static/images/mb-logo-community.gif" alt="Melinda's Backups Community" border="0" />
+				<img src="/static/images/mb-logo-community.gif" alt="Melinda's Backups Community" border="0" />
 			</a>
 		</h1>
 		<!-- Only for mb.com -->
@@ -108,7 +108,7 @@ window.addEvent('domready', function() {
 </div>
 </div></div> <!-- #wrapper .frame -->
 <div id="footer"><div class="frame">
-	<div id="copyright"><hr />MBball <span><?php include('version.php');?></span> &copy; 2008-2011 Alan Chandler.  Licenced under the GPL</div>
+	<div id="copyright">MBball <span><?php include('version.php');?></span> &copy; 2008-2011 Alan Chandler.  Licenced under the GPL</div>
 </div></div><!-- #footer .frame -->
 </body>
 
