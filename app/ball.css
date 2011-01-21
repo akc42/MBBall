@@ -452,3 +452,10 @@ div.match .comment, div.match .mtime {width:176px;float:left;border:1px solid bl
 div.match .comment textarea, div.match .mtime input {width:172px;}
 div.match .mtime {height:24px;}
 
+#notice {
+	margin:30px;
+	padding:20px;
+	font-size:1.2em;
+	background-color:#FFFFCC;
+	color:#000000;
+}
