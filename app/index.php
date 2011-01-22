@@ -352,7 +352,7 @@ if ($playoff_deadline != 0) {
 </div></div> <!-- #wrapper .frame -->
 <div id="footer"><div class="frame">
 	<div id="copyright">MBball <span><?php include('version.php');?></span> &copy; 2008-2011 Alan Chandler.  Licenced under the GPL</div>
-	<div id="timing"><?php $time_now = microtime(true); printf("Page displayed in %.3f secs of which %.3f secs was in forum checks",$time_now - $time_head,$time_db-$time_head);?></div>
+	<div id="timing"><?php $time_now = microtime(true); printf("With %d queries, page displayed in %.3f secs of which %.3f secs was in forum checks",$querycounter,$time_now - $time_head,$time_db-$time_head);?></div>
 </div></div><!-- #footer .frame -->
 </body>
 
