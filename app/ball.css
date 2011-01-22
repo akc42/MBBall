@@ -59,12 +59,14 @@ body, td, th
 {
 	background: #FFFFFF url(images/frame_repeat.png) repeat-y top left;
 	padding:0 0 0 20px;
+	width:980px;
 }
 #wrapper div.frame
 {
 	background: url(images/frame_repeat.png) repeat-y top right;
 	display: block;
 	padding: 0 20px 0 0;
+	width:980px;
 }
 #top_section
 {
