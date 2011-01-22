@@ -45,12 +45,14 @@ body, td, th
 {
 	background: url(images/main_block.png) #fefefe no-repeat 0 0;
 	padding:0 0 0 20px;
+	width:980px;
 }
 #header div.frame
 {
 	background: url(images/main_block.png) no-repeat 100% 0;
 	display: block;
 	padding: 5px 20px 0 0;
+	width:980px;
 }
 /* the content section */
 #wrapper
@@ -116,12 +118,14 @@ h1.logo
 	background: url(images/main_block.png) no-repeat 0 -550px;
 	padding:0 0 0 20px;
 	font-size: 0.8em;
+	width:1000px;
 }
 #footer div.frame
 {
 	background: url(images/main_block.png) no-repeat 100% -550px;
 	display: block;
 	padding: 80px 0 0 0;
+	width:1000px;
 }
 
 
@@ -188,7 +192,7 @@ way to fit your requirements.
 	background-image:none;
 	color:#fff;
 	padding:5px;
-	overflow:auto;
+	width:970px;
 }
 
 #content>table.layout{width:970px;}
