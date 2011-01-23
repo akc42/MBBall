@@ -101,7 +101,7 @@ h1.logo
 
 #competitionNameContainer {
 	margin:-10px auto 0 auto;
-	padding:0;
+	padding:0 0 20px 0;
 	width:40em;
 	text-align:center;
 }
