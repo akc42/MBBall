@@ -6,8 +6,7 @@ $password = $_GET['pass'];
 if ($password != sha1("Football".$uid))
 	die('Hacking attempt got: '.$password.' expected: '.sha1("Football".$uid));
 
-define ('BALL',1);   //defined so we can control access to some of the files.
-require_once('db.php');
+require_once('./db.inc');
 
 $resultusers = dbQuery('SELECT uid,name FROM participant WHERE last_logon > extract(epoch from now()) - 31536000 AND is_bb IS NOT TRUE
 				ORDER BY admin_experience DESC, name;');

@@ -26,8 +26,7 @@ if ($password != sha1("Football".$uid))
 	die('Hacking attempt got: '.$password.' expected: '.sha1("Football".$uid));
 $cid = $_GET['cid'];
 if ($cid != 0) {
-	define ('BALL',1);   //defined so we can control access to some of the files.
-	require_once('db.php');
+	require_once('./db.inc');
 	$result = dbQuery('SELECT rid,name,ou_round,open FROM round WHERE cid = '.dbMakeSafe($cid).' ORDER BY rid DESC ;');
 	
 ?>

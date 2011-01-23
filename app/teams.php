@@ -29,8 +29,7 @@ if ($password != sha1("Football".$uid))
 	die('Hacking attempt got: '.$password.' expected: '.sha1("Football".$uid));
 if( $cid !=0) {
 
-	define ('BALL',1);   //defined so we can control access to some of the files.
-	require_once('db.php');
+	require_once('./db.inc');
 	$result = dbQuery('SELECT count(*) from team_in_competition WHERE cid = '.dbMakeSafe($cid).';');
 	$row = dbFetchRow($result);
 	if($row['count'] > 0) {

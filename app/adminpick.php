@@ -34,8 +34,7 @@ $gap = $_GET['gap'];
 $playoff_deadline = $_GET['pod'];
 
 if($rid != 0 && $cid !=0) {
-	define ('BALL',1);   //defined so we can control access to some of the files.
-	require_once('db.php');
+	require_once('./db.inc');
 	$time_at_top = time();
 	$resultround = dbQuery('SELECT * FROM round WHERE open is TRUE AND cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($_GET['rid']).' ;');
 	$rounddata = dbFetchRow($resultround);
@@ -220,7 +219,7 @@ if($rid != 0 && $cid !=0) {
 <?php
 		}
 		if($playoff_deadline != 0 && $playoff_deadline > $time_at_top) {
-			require_once('team.php');
+			require_once('./team.inc');
 		//Playoff selection is part of this competition
 ?>			<tr>
 				<td id="playoff_pick" colspan="2">

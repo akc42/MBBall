@@ -18,9 +18,7 @@
     along with MBBall (file COPYING.txt).  If not, see <http://www.gnu.org/licenses/>.
 
 */
-if (!defined('BALL'))
-	die('Hacking attempt...');
-require_once('team.php');
+require_once('./team.inc');
 
 ?><table>
 	<caption>List of teams in competition</caption>

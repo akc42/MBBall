@@ -26,8 +26,7 @@ if ($_GET['pass'] != sha1("Football".$uid))
 
 $txt = 'MBball version: '.$_GET['mbchat'].', Mootools Version : '.$_GET['version'].' build '.$_GET['build'] ;
 $txt .=' Browser : '.$_GET['browser'].' on Platform : '.$_GET['platform'];
-define ('BALL',1);   //defined so we can control access to some of the files.
-require_once('db.php');
+require_once('./db.inc');
 // Do something here maybe
 echo '{"Logout" : '.$txt.'}' ;
 ?> 

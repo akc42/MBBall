@@ -18,8 +18,6 @@
     along with MBBall (file COPYING.txt).  If not, see <http://www.gnu.org/licenses/>.
 
 */
-if (!defined('BALL'))
-	die('Hacking attempt...');
 ?><table>
 	<caption>Overall Results</caption>
 	<thead>

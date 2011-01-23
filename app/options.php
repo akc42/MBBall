@@ -30,8 +30,7 @@ $rid = $_GET['rid'];
 if($rid != 0 && $cid !=0) {
 	if(!isset($_GET['answer']))
 		die('Hacking attempt - wrong parameters');
-	define ('BALL',1);   //defined so we can control access to some of the files.
-	require_once('db.php');
+	require_once('./db.inc');
 	
 	$optionresult = dbQuery('SELECT * FROM option WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' ORDER BY opid;');
 	$noopts = dbNumRows($optionresult);

@@ -30,8 +30,7 @@ if($cid !=0) {
 
 	$rid = $_GET['mr'];
 	
-	define ('BALL',1);   //defined so we can control access to some of the files.
-	require_once('db.php');
+	require_once('./db.inc');
 ?>
 <form id="createroundform" action="createround.php">
 	<input type="hidden" name="uid" value="<?php echo $uid; ?>" />

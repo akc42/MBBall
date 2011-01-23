@@ -30,8 +30,7 @@ $rid = $_GET['rid'];
 if($rid != 0 && $cid !=0) {
 	if (!isset($_GET['ou']))
 		die('Hacking attempt - wrong parameters');
-	define ('BALL',1);   //defined so we can control access to some of the files.
-	require_once('db.php');
+	require_once('./db.inc');
 
 	$result = dbQuery('SELECT * FROM match WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' ORDER BY match_time, hid ;');
 	while($row = dbFetchRow($result)) {

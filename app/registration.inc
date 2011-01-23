@@ -18,8 +18,6 @@
     along with MBBall (file COPYING.txt).  If not, see <http://www.gnu.org/licenses/>.
 
 */
-if (!defined('BALL'))
-	die('Hacking attempt...');
 ?><form id="register" action="register.php">
 	<input type="hidden" name="uid" value="<?php echo $uid;?>" />
 	<input type="hidden" name="pass" value="<?php echo $password;?>" />

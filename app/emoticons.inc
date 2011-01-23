@@ -1,5 +1,6 @@
+<?php
 /*
- 	Copyright (c) 2008,2009 Alan Chandler
+ 	Copyright (c) 2008-2011 Alan Chandler
     This file is part of MBBall, an American Football Results Picking
     Competition Management software suite.
 
@@ -14,22 +15,23 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with MBBall (file COPYING.txt).  If not, see <http://www.gnu.org/licenses/>.
+    along with MBBall (file supporting/COPYING.txt).  If not, 
+    see <http://www.gnu.org/licenses/>.
 
 */
+?><div id="emoticons">
+<?php
+// Open a known directory, and proceed to read its contents
+	$dir = $_SERVER['DOCUMENT_ROOT'].'/static/images/emoticons';
+	$fns = scandir($dir);
+	foreach ($fns as $filename) {
 
-
-/*
- * Positioning adjustments for IE versions < 7
- */
-
-
-
-<!--[if lte IE 7]>
-<style type="text/css">
-/* not validating css */
-
-</style>
-<![endif]-->
-
-
+		if(filetype($dir.'/'.$filename) == 'file') {
+			$split = splitFIlename($filename);
+			if($split[1] == 'gif') {
+				echo '<img src="/static/images/emoticons/'.$filename.'" alt=":'.$split[0].'" title="'.$split[0].'" />';
+				echo "\n";
+			}
+		}
+	}
+?></div>

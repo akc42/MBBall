@@ -18,9 +18,6 @@
     along with MBBall (file COPYING.txt).  If not, see <http://www.gnu.org/licenses/>.
 
 */
-if (!defined('BALL'))
-	die('Hacking attempt...');
-
 $time_at_top = time();
 $roundpicks = false;
 $playpicks = false;
@@ -143,10 +140,10 @@ if ($rid != 0) {
     	}	
     	dbFree($result);
 ?>				</td>
-				<td id="instructions"><?php require_once('instructions.html');?></td>
+				<td id="instructions"><?php require_once('./instructions.html');?></td>
 			</tr>
 			<tr>
-				<td id="emoticon_cell"><?php require_once('emoticons.php'); ?></td>
+				<td id="emoticon_cell"><?php require_once('./emoticons.inc'); ?></td>
 			</tr>
 			<tr>
 				<td id="bonus_pick">
@@ -232,7 +229,7 @@ if($playoff_deadline != 0 && $playoff_deadline > $time_at_top) {
 		<tbody>
 <?php
     }
-	require_once('team.php');
+	require_once('./team.inc');
     //Playoff selection is part of this competition
 ?>			<tr>
 				<td id="playoff_pick" colspan="2">

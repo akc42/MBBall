@@ -1,4 +1,3 @@
-					<div id="emoticons">
 <?php
 /*
  	Copyright (c) 2008,2009 Alan Chandler
@@ -19,18 +18,20 @@
     along with MBBall (file COPYING.txt).  If not, see <http://www.gnu.org/licenses/>.
 
 */
+//Lets get the conference and div lists as this is data useful throughout this page
+$confs = array();
+$divs = array(); 
+$result = dbQuery('SELECT * FROM conference ORDER BY confid;');
+while($row = dbFetchRow($result)) {
+	$confs[$row['confid']] = $row['name'];
+}
+dbFree($result);
+$result = dbQuery('SELECT * FROM division ORDER BY divid;');
+while($row = dbFetchRow($result)) {
+	$divs[$row['divid']] = $row['name'];
+}
+dbFree($result);
+?>
 
-// Open a known directory, and proceed to read its contents
-	$dir = '../static/images/emoticons';
-	$fns = scandir($dir);
-	foreach ($fns as $filename) {
 
-		if(filetype($dir.'/'.$filename) == 'file') {
-			$split = splitFIlename($filename);
-			if($split[1] == 'gif') {
-				echo '<img src="/static/images/emoticons/'.$filename.'" alt=":'.$split[0].'" title="'.$split[0].'" />';
-				echo "\n";
-			}
-		}
-	}
-?>					</div>
+

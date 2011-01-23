@@ -22,14 +22,14 @@
 // Show all errors:
 error_reporting(E_ALL);
 // Path to the Ball directory:
-define('MBBALL_PATH', dirname($_SERVER['SCRIPT_FILENAME']).'/');
+
 $time_head = microtime(true);
 
 
-require_once(MBBALL_PATH.'../forum/SSI.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/forum/SSI.php');
 //If not logged in to the forum, not allowed any further so redirect to page to say so
 if($user_info['is_guest']) {
-	header( 'Location: football.html' ) ;
+	header( 'Location: football.php' ) ;
 	exit;
 };
 
@@ -52,8 +52,7 @@ $password = sha1("Football".$uid);
 
 $time_db = microtime(true);
 
-define ('BALL',1);   //defined so we can control access to some of the files.
-require_once('db.php');
+require_once('./db.inc');
 if(in_array(SMF_FOOTBALL,$groups)) {
 	//Global administrator - so check that participant record is up to date
 	dbQuery('BEGIN;');
@@ -82,7 +81,7 @@ if(isset($_GET['cid'])) {
 		if(in_array(SMF_FOOTBALL,$groups)) {
 			header( 'Location: admin.php?uid='.$uid.'&pass='.$password.'&global=true' ) ;
 		} else {
-			header( 'Location: nostart.html' ) ;
+			header( 'Location: nostart.php' ) ;
 		};
 		exit;
 	}
@@ -95,7 +94,7 @@ if (dbNumRows($result) == 0) {
 	if(in_array(SMF_FOOTBALL,$groups)) {
 		header( 'Location: admin.php?uid='.$uid.'&pass='.$password.'&global=true&cid='.$cid ) ;
 	} else {
-		header( 'Location: nostart.html' ) ;
+		header( 'Location: nostart.php' ) ;
 	};
 	exit;
 }	
@@ -174,35 +173,12 @@ if ($rounddata = dbFetchRow($result)) {
 	$rid=0;
 }
 
-
-?><!DOCTYPE html >
-<html>
-<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<title>Melinda's Backups Football Pool</title>
+function head_content() {
+	global $uid, $registered, $cid, $rid
+?>	<title>Melinda's Backups Football Pool</title>
 	<link rel="stylesheet" type="text/css" href="ball.css"/>
-	<!--[if lt IE 7]>
-		<link rel="stylesheet" type="text/css" href="ball-ie.css"/>
-	<![endif]-->
-	<script src="mootools-1.2.4-core-yc.js" type="text/javascript" charset="UTF-8"></script>
 	<script src="mbball.js" type="text/javascript" charset="UTF-8"></script>
-</head>
-<?php flush(); ?>
-<body>
-<script type="text/javascript">
-var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-</script>
-<script type="text/javascript">
-try {
-var pageTracker = _gat._getTracker("UA-xxxxxxx-1");
-pageTracker._trackPageview();
-} catch(err) {}</script>
-
-<!-- these two spans seem to help the menu -->
-<span class="preload1"></span>
-<span class="preload2"></span>
-<script type="text/javascript">
+	<script type="text/javascript">
 	<!--
 
 var MBBmgr;
@@ -217,143 +193,129 @@ window.addEvent('domready', function() {
 });	
 
 	// -->
-</script>
-<div id="header"><div class="frame">
-	<div id="top_section">
-		<h1 class="logo">
-			<!-- replace this section with your own logo -->
-			<a href="/forum/index.php">
-				<img src="/static/images/mb-logo-community.gif" alt="Melinda's Backups Community" border="0" />
-			</a>
-		</h1>
-		<!-- Only for mb.com -->
-		<div id="md_banner">
-		    <a href="http://melindadoolittle.com" alt="Main Site Home Page" style="text-decoration:none;margin-top:5px;">
-                <span >MelindaDoolittle.com</span><br/>
-                <img style="margin-top:5px;" src="/static/images/small_banners/rotate.php" alt="Melinda Doolittle" border="0" />
-            </a>
-        </div>
-		<div id="siteslogan">Melinda's Backups Community</div>
-	</div>
-	<div id="competitionNameContainer">
-		<h1><?php echo $competitiontitle ?></h1>
-	</div>
-	<ul id="menu">
-		<li><a href="<?php echo MBBALL_FORUM_PATH?>"><span>Return to the Forum</span></a></li>
+	</script>
 <?php
-if (dbNumRows($result) >1 ) {
-	dbRestartQuery($result);
+}
+function content_title() {
+	global $competitiontitle;
+	echo $competitiontitle;
+}
+function menu_items () {
+	global $result,$cid,$rid,$uid,$password,$groups;
+?>		<li><a href="/forum"><span>Return to the Forum</span></a></li>
+<?php
+	if (dbNumRows($result) >1 ) {
+		dbRestartQuery($result);
 		// more than one round, so we need to have a menu for the others
 ?>		<li><a href="#"><span class="down">Rounds</span><!--[if gte IE 7]><!--></a><!--<![endif]-->
 		<!--[if lte IE 6]><table><tr><td><![endif]-->
 			<ul>
 <?php 
-	while ($row = dbFetchRow($result)) {
-		if ($row['rid'] != $rid) {
+		while ($row = dbFetchRow($result)) {
+			if ($row['rid'] != $rid) {
 ?>				<li><a href="index.php?<?php echo 'cid='.$cid.'&rid='.$row['rid']; ?>"><?php echo $row['name'] ;?></a></li>
 <?php
+			}
 		}
-	} ;
 ?>			</ul>
 		<!--[if lte IE 6]></td></tr></table></a><![endif]-->
 		</li>
 <?php
-}
-dbFree($result);
+	}
+	dbFree($result);
 
-// The following select should select the cid and name of all competitions that are in a state
-// where there is at least one open rouund or it is taking registrations and we are not yet registered
-$sql = 'SELECT c.cid AS cid, c.description AS name FROM competition c LEFT JOIN registration u ON c.cid = u.cid AND u.uid  = '.dbMakeSafe($uid);
-$sql .= ' LEFT JOIN round r ON c.cid = r.cid  WHERE c.cid <> '.dbMakeSafe($cid);
-$sql .= ' AND (c.open IS TRUE OR r.open IS TRUE) GROUP BY c.cid, c.description ORDER BY c.cid DESC ; ';
-$result = dbQuery($sql);
+	// The following select should select the cid and name of all competitions that are in a state
+	// where there is at least one open rouund or it is taking registrations and we are not yet registered
+	$sql = 'SELECT c.cid AS cid, c.description AS name FROM competition c LEFT JOIN registration u ON c.cid = u.cid AND u.uid  = '.dbMakeSafe($uid);
+	$sql .= ' LEFT JOIN round r ON c.cid = r.cid  WHERE c.cid <> '.dbMakeSafe($cid);
+	$sql .= ' AND (c.open IS TRUE OR r.open IS TRUE) GROUP BY c.cid, c.description ORDER BY c.cid DESC ; ';
+	$result = dbQuery($sql);
 
-if (dbNumRows($result) > 0) {
+	if (dbNumRows($result) > 0) {
 ?>		<li><a href="#"><span class="down">Competitions</span><!--[if gte IE 7]><!--></a><!--<![endif]-->
 		<!--[if lte IE 6]><table><tr><td><![endif]-->
 			<ul>
 <?php 
-	while ($row = dbFetchRow($result)) {
+		while ($row = dbFetchRow($result)) {
 ?>				<li><a href="index.php?<?php echo 'cid='.$row['cid'] ; ?>"><?php echo $row['name'] ;?></a></li>
-<?php	}
+<?php	
+		}
 ?>			</ul>
 		<!--[if lte IE 6]></td></tr></table></a><![endif]-->
 
 		</li>
 <?php
-}
-dbFree($result);
-if(in_array(SMF_FOOTBALL,$groups)) {
-// Am Global Administrator - let me also do Admin thinks
+	}
+	dbFree($result);
+	if(in_array(SMF_FOOTBALL,$groups)) {
+	// Am Global Administrator - let me also do Admin thinks
 ?>		<li><a href="admin.php?<?php echo 'uid='.$uid.'&pass='.$password.'&global=true&cid='.$cid;?>"><span>Global Admin</span></a></li>
 
 <?php
-} else {
-	if($admin) {
-// Am Administrator of this competition - let me also do Admin thinks
+	} else {
+		if($admin) {
+	// Am Administrator of this competition - let me also do Admin thinks
 ?>		<li><a href="admin.php?<?php echo 'uid='.$uid.'&pass='.$password.'&cid='.$cid;?>"><span>Administration</span></a></li>
 <?php 
+		}
 	}
 }
-?>	</ul>
-</div></div> <!-- #header .frame -->
-<div id="wrapper"><div class="frame">
-<div id="content">
- <div id="errormessage"></div>
+
+function content() {
+	global $cid,$rid,$uid,$registered,$signedup,$admName,$registration_allowed,$rounddata,$gap,$playoff_deadline,$approval_required,$email,$groups,$name,$condition;
+?><div id="errormessage"></div>
 	<table class="layout">
 		<tbody>
 <?php
 
-if($registered) {
-?>
-<script type="text/javascript">
-pageTracker._trackPageview('/football/user/registered');
+	if($registered) {
+?><script type="text/javascript">
+	_gaq.push(['_trackPageview','/football/user/registered']);
 </script>
-			<tr><td colspan="2"><div id="registered"><?php require_once('userpick.php');?></div></td></tr>
+			<tr><td colspan="2"><div id="registered"><?php require_once('./userpick.inc');?></div></td></tr>
 <?php
-} else {
-?>
-<script type="text/javascript">
-pageTracker._trackPageview('/football/user/unregistered');
+	} else {
+?><script type="text/javascript">
+	_gaq.push(['_trackPageview','/football/user/unregistered']);
 </script>
 <?php
-
-	if($signedup) {
-?>
-<script type="text/javascript">
-pageTracker._trackPageview('/football/user/bb-awaiting-approval');
+		if($signedup) {
+?><script type="text/javascript">
+	_gaq.push(['_trackPageview','/football/user/bb-awaiting-approval']);
 </script>
 	<tr><td colspan="2"><div id="registered"><p>Although you have registered, this competition requires that Baby Backups obtain
 		admistrators approval before being allowed to enter this competition.  If you have not already done so please contact the
 		the administrator,  who is: <span><?php echo $admName;?></span> </p></div></td></tr>
 <?php
+		}
 	}
-}
-if($registration_allowed) {
+	if($registration_allowed) {
 ?>			<tr>
-				<td><div id="summary"><?php require_once ('summary.php');?></div></td>
-				<td id="r"><div id="registration"><?php require_once ('registration.php');?></div></td>
+				<td><div id="summary"><?php require_once ('./summary.inc');?></div></td>
+				<td id="r"><div id="registration"><?php require_once ('./registration.inc');?></div></td>
 			</tr>
 <?php
 } else {
-?>			<tr><td colspan="2"><div id="summary"><?php require_once ('summary.php');?></div></td></tr>
+?>			<tr><td colspan="2"><div id="summary"><?php require_once ('./summary.inc');?></div></td></tr>
 <?php
 }
-?>			<tr><td colspan="2"><div id="picks"><?php require_once('picks.php');?></div></td></tr>
+?>			<tr><td colspan="2"><div id="picks"><?php require_once('./picks.inc');?></div></td></tr>
 <?php
 if ($playoff_deadline != 0) {
-?>			<tr><td colspan="2"><div id="popicks"><?php require_once('playoff.php');?></div></td></tr>
+?>			<tr><td colspan="2"><div id="popicks"><?php require_once('./playoff.inc');?></div></td></tr>
 <?php
 }
-?>			<tr><td colspan="2"><div id="tics"><?php require_once('tic.php');?></div></td></tr>
+?>			<tr><td colspan="2"><div id="tics"><?php require_once('./tic.inc');?></div></td></tr>
 		</tbody>
-	</table>	
-</div>
-</div></div> <!-- #wrapper .frame -->
-<div id="footer"><div class="frame">
-	<div id="copyright">MBball <span><?php include('version.php');?></span> &copy; 2008-2011 Alan Chandler.  Licenced under the GPL</div>
+	</table>
+<?php
+}	
+function foot_content() {
+	global $querycounter,$time_head,$time_db;
+?>	<div id="copyright">MBball <span><?php include('./version.inc');?></span> &copy; 2008-2011 Alan Chandler.  Licenced under the GPL</div>
 	<div id="timing"><?php $time_now = microtime(true); printf("With %d queries, page displayed in %.3f secs of which %.3f secs was in forum checks",$querycounter,$time_now - $time_head,$time_db-$time_head);?></div>
-</div></div><!-- #footer .frame -->
-</body>
+<?php
+}
+require_once($_SERVER['DOCUMENT_ROOT'].'/inc/template.inc'); 
+?>
 
-</html>
