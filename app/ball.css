@@ -70,14 +70,12 @@ body, td, th
 }
 #top_section
 {
-	min-height: 65px;
 	overflow: hidden;
 	margin:15px 0 3px 0;
 }
 
 h1.logo
 {
-	line-height: 45px;
 	font-size: 1.8em;
 	margin: 0;
 	padding: 0;
@@ -102,7 +100,8 @@ h1.logo
 
 
 #competitionNameContainer {
-	margin:0 auto;
+	margin:-10px auto 0 auto;
+	padding:0;
 	width:40em;
 	text-align:center;
 }
