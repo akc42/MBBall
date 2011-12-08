@@ -60,7 +60,7 @@ if($rid != 0 && $cid !=0) {
 		<caption>Entering Picks on behalf of :<?php echo $_GET['name'];?></caption>
 		<tbody>
 <?php	
-
+		require_once('./bbcode.inc');
 		if ($rounddata && ($nomatches > 0 || $rounddata['valid_question'] == 't' )) {
 ?>			<tr>
 				<td id="picks">

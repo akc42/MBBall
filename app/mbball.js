@@ -63,7 +63,7 @@ MBB = function() {
             loadPage: function(params) {
 		        this.div.empty();
 		        this.div.addClass('loading');
-	            this.request.get($merge(reqOpts,params || {}));
+	            this.request.get(Object.merge(reqOpts,params || {}));
             }
         }),
         req: new Class({
@@ -81,7 +81,7 @@ MBB = function() {
             	});
             },
             get:function(params) {
-	            this.req.get($merge(reqOpts,params));
+	            this.req.get(Object.merge(reqOpts,params));
             },
             post: function (params) {
 	            this.req.post(params);
@@ -179,24 +179,24 @@ var MBBUser = new Class({
 			});
 		}
 		if(me.registered) {
-			this.teams = $H({});
-			this.lastpick = $H({});
+			this.teams = new Object({});
+			this.lastpick = new Object({});
 			var picks = $$('.ppick')
 			var that =this;
 			// We make a hash of every checked item - which we can then use when an item changes to
 			// check that the new item isn't already picked, and if so set it back
 			picks.each(function(item) {
 				if(item.checked) {
-					that.teams.set(item.value,item);
-					that.lastpick.set(item.name,item);
+					that.teams[item.value] = item;
+					that.lastpick[item.name] = item;
 				}
 			});
 			picks.addEvent('change',function(e) {
 				e.stop();
-				var lastValue = that.lastpick.get(this.name);
-				if(that.teams.has(this.value)) {
+				var lastValue = that.lastpick[this.name];
+				if(that.teams[this.value] != undefined ) {
 					//this team already has a selection, so lets find out what
-					var existingSelection = that.teams.get(this.value);
+					var existingSelection = that.teams[this.value];
 					existingSelection.getParent().highlight('#F00');
 					// now change it back
 					this.checked = false;
@@ -204,10 +204,10 @@ var MBBUser = new Class({
 				} else {
 					// This team did not have a selection before, so now set one
 					// and take out old values;
-					that.teams.set(this.value,this);
-					if(lastValue) that.teams.erase(lastValue.value);
-					that.lastpick.erase(this.name);
-					that.lastpick.set(this.name,this);
+					that.teams[this.value] = this;
+					if(lastValue) delete that.teams[lastValue.value];
+					delete that.lastpick[this.name];
+					that.lastpick[this.name] = this;
 				}
 			});
 			
@@ -330,7 +330,7 @@ var MBBAdmin = new Class({
 				//We only want to do this if there is a competition to get
 				// Validate competition Details and Change Dates to seconds since 1970
 				//if anything in the form changes then submit automatically
-				div.getElements('input').extend(div.getElements('select')).extend(div.getElements('textarea')).addEvent('change', function(e) {
+				div.getElements('input').append(div.getElements('select')).append(div.getElements('textarea')).addEvent('change', function(e) {
 					if(this.id =='bbapproval') {
 						$$('#registered input.bbapprove').each(function (item) {
 							item.readOnly = !e.target.checked;
@@ -387,7 +387,7 @@ var MBBAdmin = new Class({
 							return true;
 						}});
 
-						div.getElements('input').extend(div.getElements('textarea')).addEvent('change', function(e) {
+						div.getElements('input').append(div.getElements('textarea')).addEvent('change', function(e) {
 							var validated = true;
 							if(this.name == 'cscore'
 									|| this.name == 'hscore' 
@@ -440,7 +440,7 @@ var MBBAdmin = new Class({
 									div.getElement('.aid').getFirst().set('text',response.aid);
 									$('userpick').empty();
 								});
-								switchReq.get($merge(params,{'hid':this.getElement('span').get('text')}));
+								switchReq.get(Object.merge(params,{'hid':this.getElement('span').get('text')}));
 							}
 						});
 						div.getElement('.aid').addEvent('click',function(e) {
@@ -459,7 +459,7 @@ var MBBAdmin = new Class({
 										$('userpick').empty();
 									});
 								}
-								removeaidReq.get($merge(params,{'hid':div.getElement('input[name=hid]').value}));
+								removeaidReq.get(Object.merge(params,{'hid':div.getElement('input[name=hid]').value}));
 							}
 						});
 						div.getElement('.del').addEvent('click',function(e) {
@@ -472,7 +472,7 @@ var MBBAdmin = new Class({
 									if(aid) aid.removeClass('inmatch'); //only if not null
 									$('userpick').empty();
 								});
-								deleteReq.get($merge(params,{'hid':div.getElement('input[name=hid]').value}));
+								deleteReq.get(Object.merge(params,{'hid':div.getElement('input[name=hid]').value}));
 							}
 						});
 					};
@@ -484,7 +484,7 @@ var MBBAdmin = new Class({
 								answer = response.opid;
 								$('answer').value = answer;
 							});
-					    	changeAnsReq.get($merge(params,{'opid':this.value}));
+					    	changeAnsReq.get(Object.merge(params,{'opid':this.value}));
 						}
 					};
 					var changeAnswer = function(e) {
@@ -493,7 +493,7 @@ var MBBAdmin = new Class({
 					  		var changeAnsReq = new MBB.req('changeans.php', function(response) {
 								//Nothing to do here?
 							});
-							changeAnsReq.get($merge(params,{'opid':this.name,'label':this.value}));
+							changeAnsReq.get(Object.merge(params,{'opid':this.name,'label':this.value}));
 						}
 					};
 					var deleteAnswer = function(e) {
@@ -516,7 +516,7 @@ var MBBAdmin = new Class({
 							}
 							$('userpick').empty();
 						});
-						deleteAnsReq.get($merge(params,{'opid':this.get('id').substr(1).toInt()}));
+						deleteAnsReq.get(Object.merge(params,{'opid':this.get('id').substr(1).toInt()}));
 					};
 					if(params.rid != 0) {
 						MBB.adjustDates(div);
@@ -538,7 +538,7 @@ var MBBAdmin = new Class({
 							}
 							return true;
 						}});
-						div.getElements('input').extend(div.getElements('textarea')).addEvent('change', function(e) {
+						div.getElements('input').append(div.getElements('textarea')).addEvent('change', function(e) {
 							if (this.id == 'ou') {
 								//if ou changes then all the matches combined scores are diabled or not
 								$('matches').getElements('input[name=cscore]').each(function(item) {
@@ -647,7 +647,7 @@ var MBBAdmin = new Class({
 									noopts = response.opid; //should be one more than before (no need to update hidden input - its ignored
 									$('userpick').empty();
 								});
-								newOptionReq.get($merge(params,{'opid':noopts+1}));
+								newOptionReq.get(Object.merge(params,{'opid':noopts+1}));
 							}
 						});
 						if (emoticons) {
@@ -727,7 +727,7 @@ var MBBAdmin = new Class({
 													match.getElement('div.aid').getFirst().set('text',teamName);
 													team.getParent().addClass('inmatch');
 												});
-												addaidReq.get($merge(params,{
+												addaidReq.get(Object.merge(params,{
 													'hid':match.getElement('input[name=hid]').value,
 													'aid':teamName}));
 												return false;
@@ -742,7 +742,7 @@ var MBBAdmin = new Class({
 												setMatchEvents(match);
 												team.getParent().addClass('inmatch');
 											});
-											matchPage.loadPage($merge(params,{'hid':teamName}));
+											matchPage.loadPage(Object.merge(params,{'hid':teamName}));
 										}
 									}
 								}
@@ -764,7 +764,7 @@ var MBBAdmin = new Class({
 								}).inject(div);
 								return div;
 							};
-							var tnicClicked = function(e) {
+							tnicClicked = function(e) {
 								e.stop();
 								if(!lock.checked) {
 									var team=this;
@@ -808,8 +808,8 @@ var MBBAdmin = new Class({
 						}
 					});
 					if (params.rid != 0){
-						this.matches.loadPage($merge(params,{'ou':$('ou').checked }));
-						this.options.loadPage($merge(params,{'answer':answer}));
+						this.matches.loadPage(Object.merge(params,{'ou':$('ou').checked }));
+						this.options.loadPage(Object.merge(params,{'answer':answer}));
 					} else {
 						this.matches.loadPage(params);
 						this.options.loadPage(params);
@@ -887,25 +887,25 @@ var MBBAdmin = new Class({
 					var owner = this.owner;
 					this.adminpick = new MBB.subPage(this,'adminpick.php',$('userpick'),function(div) {
 						if ($('pick')) { //We loaded the page and there is something there
+							this.teams = new Object({});
+							this.lastpick = new Object({});
 							MBB.adjustDates(div);
-							this.teams = $H({});
-							this.lastpick = $H({});
 							var picks = div.getElements('.ppick');
 							var that =this;
 							// We make a hash of every checked item - which we can then use when an item changes to
 							// check that the new item isn't already picked, and if so set it back
 							picks.each(function(item) {
 								if(item.checked) {
-									that.teams.set(item.value,item);
-									that.lastpick.set(item.name,item);
+									that.teams[item.value] = item;
+									that.lastpick[item.name] = item;
 								}
 							});
 							picks.addEvent('change',function(e) {
 								e.stop();
-								var lastValue = that.lastpick.get(this.name);
-								if(that.teams.has(this.value)) {
+								var lastValue = that.lastpick[this.name];
+								if(that.teams[this.value] != undefined) {
 									//this team already has a selection, so lets find out what
-									var existingSelection = that.teams.get(this.value);
+									var existingSelection = that.teams[this.value];
 									existingSelection.getParent().highlight('#F00');
 									// now change it back
 									this.checked = false;
@@ -913,10 +913,10 @@ var MBBAdmin = new Class({
 								} else {
 									// This team did not have a selection before, so now set one
 									// and take out old values;
-									that.teams.set(this.value,this);
-									if(lastValue) that.teams.erase(lastValue.value);
-									that.lastpick.erase(this.name);
-									that.lastpick.set(this.name,this);
+									that.teams[this.value] = this;
+									if(lastValue) delete that.teams[lastValue.value];
+									delete that.lastpick[this.name];
+									that.lastpick[this.name] = this;
 								}
 							});
 							
@@ -945,7 +945,7 @@ var MBBAdmin = new Class({
 							if(confirm('You are changing the approval status of a Baby Backup for this Competition. Are you sure you want to do this?')) {
 								var updateBBa = new MBB.req('bbapprove.php',function(response) {
 								});
-								updateBBa.get($merge(params,{'bbuid':this.name,'approval':this.checked}));
+								updateBBa.get(Object.merge(params,{'bbuid':this.name,'approval':this.checked}));
 							} else {
 								this.checked = !this.checked;
 							}
@@ -955,7 +955,7 @@ var MBBAdmin = new Class({
 								e.stop();
 								if(confirm('This will Un-Register this User from this Competition. Do you wish to Proceed?')) {
 									var deleteReq = new MBB.req('deleteregistration.php',function (response) {
-										owner.adminreg.loadPage($merge(params,{'bbar':$('bbapproval').checked}));
+										owner.adminreg.loadPage(Object.merge(params,{'bbar':$('bbapproval').checked}));
 									});
 									deleteReq.get({'cid': params.cid,'ruid':comp.id.substr(1).toInt()});
 								}
@@ -964,7 +964,7 @@ var MBBAdmin = new Class({
 						var that = this;
 						div.getElements('.user_name').addEvent('click', function(e) {
 							e.stop();
-							that.adminpick.loadPage($merge(params,{
+							that.adminpick.loadPage(Object.merge(params,{
 								'auid':this.get('id').substr(1),
 								'name':this.get('text'),
 								'gap':$('gap').value,
@@ -973,13 +973,13 @@ var MBBAdmin = new Class({
 						});
 					}
 				});
-				this.newround.loadPage($merge(params,{'mr':maxround+1}));
-				this.adminreg.loadPage($merge(params,{'bbar':$('bbapproval').checked}));
+				this.newround.loadPage(Object.merge(params,{'mr':maxround+1}));
+				this.adminreg.loadPage(Object.merge(params,{'bbar':$('bbapproval').checked}));
 			});
 			this.rounds.loadPage(params);	
 		});
 		if (this.me.admin) {
-			$extend(params,{'global':true});
+			Object.append(params,{'global':true});
 		}
 		this.competitions.loadPage(params);
 		this.competition.loadPage(params);

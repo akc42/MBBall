@@ -32,6 +32,8 @@ if ($rid != 0) {
     $nomatches = dbNumRows($result);
     if ($nomatches > 0 || ($rounddata['valid_question'] && $rounddata['deadline'] > $time_at_top) ||($playoff_deadline != 0 && $playoff_deadline > $time_at_top)) {
         $roundpicks = true;
+	require_once('./bbcode.inc');
+
 ?><form id="pick">
 	<input type="hidden" name="uid" value="<?php echo $uid;?>" />
 	<input type="hidden" name="pass" value="<?php echo $password;?>" />

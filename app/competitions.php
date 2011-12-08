@@ -75,7 +75,7 @@ dbFree($result);
 				<tr>
 					<td>
 			<label>Competition Title<br/>
-			<input id="desc" name="desc" type="text" class="ctitle" value="<?php echo $comp['description'];?>" /></label>
+			<input id="desc" name="desc" type="text" class="ctitle" value="" /></label>
 					</td>
 					<td>
 			<label>Administrator<br/>

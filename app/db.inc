@@ -26,37 +26,6 @@ header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); // Date in the past
 
 $querycounter = 0;
 
-function splitFilename($filename) {
-	$pos = strrpos($filename, '.');
-	if ($pos === false) { // dot is not found in the filename
-		return array($filename, ''); // no extension
-	} else {
-		$basename = substr($filename, 0, $pos);
-		$extension = substr($filename, $pos+1);
-		return array($basename, $extension);
-	} 
-}
-//  These are the patterns that we will use to search for some simple bbcode sequences
-$search[0]='/\[b\](.*?)\[\/b\]/';
-$search[1]='/\[s\](.*?)\[\/s\]/';
-$replace[0]='<b>$1</b>';
-$replace[1]='<del>$1</del>';
-$dir = '../static/images/emoticons';
-$fns = scandir($dir);
-foreach ($fns as $filename) {
-
-	if(filetype($dir.'/'.$filename) == 'file') {
-		$split = splitFIlename($filename);
-		if($split[1] == 'gif') {
-			$search[] = '/:'.$split[0].'/';
-			$replace[] = '<img src="/static/images/emoticons/'.$filename.'" alt=":'.$split[0].'" title="'.$split[0].'" />';
-		}
-	}
-}
-unset($fns);
-
-
-
 $db_server = 'localhost';
 $db_name = 'melindas_ball';
 $db_user = 'melindas_ball';
@@ -91,10 +60,6 @@ function dbMakeSafe($value) {
 function dbPostSafe($text) {
   if ($text == '') return 'NULL';
   return dbMakeSafe(htmlentities($text,ENT_QUOTES,'UTF-8',false));
-}
-function dbBBcode($text) {
-	global $search,$replace;
-	return preg_replace($search,$replace,$text);
 }
 function dbNumRows($result) {
 	return pg_num_rows($result);

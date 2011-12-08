@@ -19,6 +19,8 @@
     see <http://www.gnu.org/licenses/>.
 
 */
+define('DEBUG','yes'); //define debug mode to get uncompressed mootools loaded
+
 if(!(isset($_GET['uid']) && isset($_GET['pass']) ))
 	die('Hacking attempt - wrong parameters');
 $uid = $_GET['uid'];
@@ -29,6 +31,7 @@ if (!isset($_GET['global']) && !isset($_GET['cid']))
 	die('Hacking attempt - need cid or global');
 
 require_once('./db.inc');
+require_once('./bbcode.inc');
 
 function head_content () {
 	global $uid,$password
@@ -36,7 +39,7 @@ function head_content () {
 ?>	<title>Melinda's Backups Football Pool Administration</title>
 	<link rel="stylesheet" type="text/css" href="calendar/calendar.css"/>
 	<link rel="stylesheet" type="text/css" href="ball.css"/>
-	<script src="mootools-1.2.4.1-drag_move.js" type="text/javascript" charset="UTF-8"></script>
+	<script src="mootools-dragmove-1.4.js" type="text/javascript" charset="UTF-8"></script>
 	<script src="calendar/calendar.js" type="text/javascript" charset="UTF-8"></script>
 	<script src="mbball.js" type="text/javascript" charset="UTF-8"></script>
 	<script type="text/javascript">

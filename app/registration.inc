@@ -33,6 +33,7 @@ if($condition == '') {
 ?>		<input type="submit" value="Register" />
 <?php
 } else {
+	require_once('./bbcode.inc');
 ?>	<p><?php echo $name ;?>, In order to enter the competition you must agree to the following condition:-</p>
 	<p class="condition"><?php echo dbBBcode($condition);?></p>
 		<div id="agree"><input type="submit" value="I Agree" /></div>

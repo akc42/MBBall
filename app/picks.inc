@@ -18,6 +18,8 @@
     along with MBBall (file COPYING.txt).  If not, see <http://www.gnu.org/licenses/>.
 
 */
+
+require_once('./bbcode.inc');
 // we need to get the users resultant score
 $sql = 'SELECT u.name , u.uid , r.pscore, r.oscore, r.mscore,r.bscore,r.score, p.opid, p.comment';
 $sql .= ' FROM round_score r JOIN participant u USING (uid)';

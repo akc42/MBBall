@@ -18,6 +18,8 @@
     along with MBBall (file COPYING.txt).  If not, see <http://www.gnu.org/licenses/>.
 
 */
+
+define('DEBUG','yes');  //Define this to get an uncompressed form of the mootools core library
 // Link to SMF forum as this is only for logged in members
 // Show all errors:
 error_reporting(E_ALL);
@@ -262,7 +264,7 @@ function menu_items () {
 }
 
 function content() {
-	global $cid,$rid,$uid,$registered,$signedup,$admName,$registration_allowed,$rounddata,$gap,$playoff_deadline,$approval_required,$email,$groups,$name,$condition;
+	global $cid,$rid,$uid,$registered,$signedup,$admName,$registration_allowed,$rounddata,$gap,$playoff_deadline,$approval_required,$email,$groups,$name,$condition,$search,$replace;
 ?><div id="errormessage"></div>
 	<table class="layout">
 		<tbody>
