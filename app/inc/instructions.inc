@@ -1,5 +1,5 @@
 <!--
- 	Copyright (c) 2008,2009 Alan Chandler
+ 	Copyright (c) 2008-2011 Alan Chandler
     This file is part of MBBall, an American Football Results Picking
     Competition Management software suite.
 
@@ -14,7 +14,8 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with MBBall (file COPYING.txt).  If not, see <http://www.gnu.org/licenses/>.
+    along with MBBall (file supporting/COPYING.txt).  If not, 
+    see <http://www.gnu.org/licenses/>.
 
 -->
 <h1>Instructions</h1>

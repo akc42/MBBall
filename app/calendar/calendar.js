@@ -21,26 +21,31 @@ Calendar = function() {
 	var calcopy = new Element('div');
 	var calqueue = new Chain();
 	var calendar = function(bind,callback) {
+		var calling = callback.bind(bind);
+		function doCallback() {
+			calling(calcopy.clone(true,true));
+		}
 		if (calendarloaded) {
-			var calling = callback.bind(bind);
 			calling(calcopy.clone(true,true));
 			calqueue.callChain();
 			return true;
 		}
 		if(!calrequested) {
-			var req = new Request.HTML({
+			var req = new Request({
 				url:url,
 				onSuccess:function(html) {
-					calcopy.adopt(html);
+					calcopy.set('html',html);
 					calendarloaded = true;
-					var i=0;
 					calqueue.callChain();
+				},
+				onFailure: function(xhr) {
+				    var i = 0;
 				}
 			});
 			req.get();
 			calrequested = true;
 		}
-		calqueue.chain(arguments.callee.bind(this,[bind,callback]));
+		calqueue.chain(doCallback);
 		return false;
 	}
 
@@ -83,7 +88,7 @@ Calendar = function() {
 				var div;
 				this.setOptions(options);
 				//Basic validation
-				if ($type(input) != 'element') return false;
+				if (typeOf(input) != 'element') return false;
 				if (input.get('tag') != 'input') return false;
 				if (input.type != 'hidden') return false;
 				this.input = input;
@@ -129,7 +134,7 @@ Calendar = function() {
 						top: '-1000px',
 						zIndex: 1000
 					}
-				}).addClass(this.options.classes.picker).injectInside(document.body);
+				}).addClass(this.options.classes.picker).inject(document.body);
 
 				// iex 6 needs a transparent iframe underneath the calendar in order to not allow select elements to render through
 				if (window.ie6) {
@@ -148,10 +153,25 @@ Calendar = function() {
 				this.fx = new Fx.Tween(this.picker, {
 					onStart: function() {
 						if (this.picker.getStyle('opacity') == 0) { // show
+							var size;
+							var coord;
+							var x,y;
+							size = window.getScrollSize();
+							coord = this.button.getCoordinates();
+							x = coord.right + this.options.tweak.x;
+							y = coord.top + this.options.tweak.y;
+
+							// make sure the calendar doesn't open off screen
+							if (!this.picker.coord) this.picker.coord = this.picker.getCoordinates();
+
+							if (x + this.picker.coord.width > size.x) x -= (x + this.picker.coord.width - size.x);
+							if (y + this.picker.coord.height > size.y)  y -= (y + this.picker.coord.height - size.y);
+
+							this.picker.setStyles({ left: x + 'px', top: y + 'px',display:'block' });
+
 							if (window.ie6) {
-								this.iframe.setStyle('display', 'block');
+								this.iframe.setStyles({ height: this.picker.coord.height + 'px', left: x + 'px', top: y + 'px', width: this.picker.coord.width + 'px',display:'block' });
 							}
-							this.picker.setStyle('display', 'block');
 							this.fireEvent('showStart', this);
 						} else { // hide
 							this.fireEvent('hideStart', this);
@@ -159,9 +179,9 @@ Calendar = function() {
 					}.bind(this),
 					onComplete: function() {
 						if (this.picker.getStyle('opacity') == 0) { // hidden
-							this.picker.setStyle('display', 'none');
+							this.picker.setStyles({ left: '-1000px', top: '-1000px',display:'none' });
 							if (window.ie6) {
-								this.iframe.setStyle('display', 'none');
+								this.iframe.setStyles({ height: this.picker.coord.height + 'px', left: '-1000px', top: '-1000px', width: this.picker.coord.width + 'px',display:'none' });
 							}
 							this.fireEvent('hideComplete', this);
 						} else { // shown
@@ -195,35 +215,16 @@ Calendar = function() {
 				this.picker.empty();
 
 				calendar(this,function(picker) {
-					var size;
-					var coord;
-					var x,y;
 					var table;
 					var navs;
 					var i;
 					var firsthr,firstmi,secondhr,secondmi;
-					
+					var that = this;
 					picker.inject(this.picker);
 					this.button.addEvent('click',function(e) {
 						e.stop();
-						this.toggle();
-					}.bindWithEvent(this));
-					size = window.getScrollSize();
-					coord = this.button.getCoordinates();
-					x = coord.right + this.options.tweak.x;
-					y = coord.top + this.options.tweak.y;
-
-					// make sure the calendar doesn't open off screen
-					if (!this.picker.coord) this.picker.coord = this.picker.getCoordinates();
-
-					if (x + this.picker.coord.width > size.x) x -= (x + this.picker.coord.width - size.x);
-					if (y + this.picker.coord.height > size.y)  y -= (y + this.picker.coord.height - size.y);
-
-					this.picker.setStyles({ left: x + 'px', top: y + 'px' });
-
-					if (window.ie6) {
-						this.iframe.setStyles({ height: this.picker.coord.height + 'px', left: x + 'px', top: y + 'px', width: this.picker.coord.width + 'px' });
-					}
+						that.toggle();
+					});
 
 
 					// heading of the day columns
@@ -285,25 +286,25 @@ Calendar = function() {
 					}
 
 					picker.getElement('.unset').empty().appendText(this.options.titles.Unset).addEvent('click',function(e) {
-						var offset = ((new Date(this.year, this.month, 1).getDay() - this.options.offset) + 7) % 7; // day of the week (offset)
-						if(this.date >=0) {
-							this.days[this.date+offset-1].removeClass(this.options.classes.active);
-							this.date = -1;
+						var offset = ((new Date(that.year, that.month, 1).getDay() - that.options.offset) + 7) % 7; // day of the week (offset)
+						if(that.date >=0) {
+							that.days[that.date+offset-1].removeClass(that.options.classes.active);
+							that.date = -1;
 						}
-						if (this.hour>=0) {
-							this.hours[this.hour%12].removeClass(this.options.classes.active);
-							this.am.removeClass(this.options.classes.active);
-							this.pm.removeClass(this.options.classes.active);
+						if (that.hour>=0) {
+							that.hours[that.hour%12].removeClass(that.options.classes.active);
+							that.am.removeClass(that.options.classes.active);
+							that.pm.removeClass(that.options.classes.active);
 						}
-						this.hour = -1;
+						that.hour = -1;
 
-						if (this.min>=0) {
-							this.mins[this.min/5].removeClass(this.options.classes.active);
-							this.min = -1;
+						if (that.min>=0) {
+							that.mins[that.min/5].removeClass(that.options.classes.active);
+							that.min = -1;
 						}
-						this.checkVal();
-						this.newDay();
-					}.bindWithEvent(this));
+						that.checkVal();
+						that.newDay();
+					});
 				});
 
 			},
@@ -390,26 +391,26 @@ Calendar = function() {
 			toggle: function() {
 				if (this.visible) {
 					document.removeEvent('mousedown', this.hide); // always remove the current mousedown script first
+					this.drag.detach(); //hoping this will prevent drag holding on 
 					this.fx.start('opacity', 1, 0);
 					this.visible = false;
 				} else {
 					document.removeEvent('mousedown', this.hide); // always remove the current mousedown script first
+					var that = this;
 					this.hide = function(e) {
-						var el;
-
-						el = new Event(e).target; //Need to clone the event so that changing el does not effect the original one
-			
+						var el = e.target;
+						
 						while (el !== document.body && el.nodeType === 1) {
-							if (el === this.picker || el === this.button ) {
+							if (el === that.picker || el === that.button ) {
 								e.stop;
 								return false;
 							}
-							el = el.parentNode;
+							el = el.getParent();
 						}
-						this.toggle();
+						that.toggle();
 						return true;
-					}.bindWithEvent(this);
-
+					};
+					this.drag.attach();
 					document.addEvent('mousedown', this.hide);
 
 					this.newDay();
@@ -425,6 +426,7 @@ Calendar = function() {
 				var dates,datee;
 				var td;
 				var today,d;
+				var that = this;
 				//put the class of the month (allows different months pictures to be done via css
 				this.picker.addClass(this.options.months[this.month].toLowerCase());
 								//Now add the navigation
@@ -436,10 +438,10 @@ Calendar = function() {
 					if(this.year !== this.getStart().getFullYear()) {
 						this.navprevyear.addClass(this.options.classes.prev).addEvent('click',function(e) {
 							e.stop();
-							this.year--;
-							this.setVal();
-							this.newMorY();
-						}.bindWithEvent(this));
+							that.year--;
+							that.setVal();
+							that.newMorY();
+						});
 					}
 				}
 				if(this.navnextyear) {
@@ -447,10 +449,10 @@ Calendar = function() {
 					if(this.year !== this.getEnd().getFullYear()) {
 						this.navnextyear.addClass(this.options.classes.next).addEvent('click',function(e) {
 							e.stop();
-							this.year++;
-							this.setVal();
-							this.newMorY();
-						}.bindWithEvent(this));
+							that.year++;
+							that.setVal();
+							that.newMorY();
+						});
 					}
 				}
 
@@ -458,30 +460,30 @@ Calendar = function() {
 				if (this.year !== this.getStart().getFullYear() || this.month !== this.getStart().getMonth()) {
 					this.navprevmonth.addEvent('click',function(e) {
 						e.stop();
-						this.picker.removeClass(this.options.months[this.month].toLowerCase());
-						this.month--;
-						if(this.month < 0) {
-							this.month=11;
-							this.year--;
+						that.picker.removeClass(that.options.months[that.month].toLowerCase());
+						that.month--;
+						if(that.month < 0) {
+							that.month=11;
+							that.year--;
 						}
-						this.setVal();
-						this.newMorY();
-					}.bindWithEvent(this)).addClass(this.options.classes.prev);
+						that.setVal();
+						that.newMorY();
+					}).addClass(this.options.classes.prev);
 				}
 				
 				this.navnextmonth.removeEvents().removeClass(this.options.classes.next);
 				if (this.year !== this.getEnd().getFullYear() || this.month !== this.getEnd().getMonth()) {
 					this.navnextmonth.addEvent('click',function(e) {
 						e.stop();
-						this.picker.removeClass(this.options.months[this.month].toLowerCase());
-						this.month++
-						if(this.month > 11) {
-							this.month=0;
-							this.year++;
+						that.picker.removeClass(that.options.months[that.month].toLowerCase());
+						that.month++
+						if(that.month > 11) {
+							that.month=0;
+							that.year++;
 						}
-						this.setVal();
-						this.newMorY();
-					}.bindWithEvent(this)).addClass(this.options.classes.next);
+						that.setVal();
+						that.newMorY();
+					}).addClass(this.options.classes.next);
 				}
 
 				offset = ((new Date(this.year, this.month, 1).getDay() - this.options.offset) + 7) % 7; // day of the week (offset)
@@ -510,21 +512,24 @@ Calendar = function() {
 								//CSS should make the most important of these stand out
 								td.addClass(this.options.classes.valid);
 								if (today === i) td.addClass(this.options.classes.today);
+								td.store('i',i);
 								if (this.date === i-offset+1) td.addClass(this.options.classes.active);
-								td.addEvent('click', function(e,i) {
+								td.addEvent('click', function(e) {
+									var i;
 									e.stop();
-									if (this.date>=0)this.days[this.date-1+offset].removeClass(this.options.classes.active);
-									this.date = i-offset+1;
-									this.days[i].addClass(this.options.classes.active);
-									this.checkVal();
-									this.newDay();
-								}.bindWithEvent(this,i));
+									i = this.retrieve('i');
+									if (that.date>=0) that.days[that.date-1+offset].removeClass(that.options.classes.active);
+									that.date = i-offset+1;
+									this.addClass(that.options.classes.active);
+									that.checkVal();
+								});
 							}
 						}
 					}
 				}
 			},
 			newDay: function() {
+				var that = this;
 				this.am.removeEvents()
 						.removeClass(this.options.classes.active)
 						.removeClass(this.options.classes.valid)
@@ -538,13 +543,13 @@ Calendar = function() {
 				if (this.date<0 || this.hour<0 || (datee > this.getStart() && dates < this.getEnd())) {
 					this.am.addEvent('click',function(e) {
 						e.stop();
-						if(this.hour >=12) this.hour -=12;
-						if(this.hour === -2) this.hour = -1;
-						this.pm.removeClass(this.options.classes.active);
-						this.am.addClass(this.options.classes.active);
-						this.checkVal();
-						this.newDay();
-					}.bindWithEvent(this)).addClass(this.options.classes.valid);
+						if(that.hour >=12) that.hour -=12;
+						if(that.hour === -2) that.hour = -1;
+						that.pm.removeClass(that.options.classes.active);
+						that.am.addClass(that.options.classes.active);
+						that.checkVal();
+						that.newDay();
+					}).addClass(this.options.classes.valid);
 					if (this.hour < 12 && this.hour > -2) {
 						this.am.addClass(this.options.classes.active);
 					}
@@ -563,13 +568,13 @@ Calendar = function() {
 				if(this.date<0 ||  this.hour<0 || (datee > this.getStart() && dates < this.getEnd())) {
 					this.pm.addEvent('click',function(e) {
 						e.stop();
-						if (this.hour == -1 ) this.hour = -2;
-						if(this.hour<12 && this.hour >=0 ) this.hour +=12;
-						this.am.removeClass(this.options.classes.active);
-						this.pm.addClass(this.options.classes.active)
-						this.checkVal();
-						this.newDay();
-					}.bindWithEvent(this)).addClass(this.options.classes.valid);
+						if (that.hour == -1 ) that.hour = -2;
+						if(that.hour<12 && that.hour >=0 ) that.hour +=12;
+						that.am.removeClass(that.options.classes.active);
+						that.pm.addClass(this.options.classes.active)
+						that.checkVal();
+						that.newDay();
+					}).addClass(this.options.classes.valid);
 					if(this.hour >=12 || this.hour === -2) {
 						this.pm.addClass(this.options.classes.active);
 					}
@@ -598,26 +603,27 @@ Calendar = function() {
 						}
 					}
 					if(this.date<0 || (datee > this.getStart() && dates < this.getEnd())) {
-						this.hours[i].addClass(this.options.classes.valid).addEvent('click',function(e,i) {
+						this.hours[i].store('i',i).addClass(this.options.classes.valid).addEvent('click',function(e) {
 							e.stop();
-							if(this.hour>=0) {
-								this.hours[this.hour%12].removeClass(this.options.classes.active);
-								if(this.hour >= 12) {
-									this.hour = i+12;
+							var i = this.retrieve('i');
+							if(that.hour>=0) {
+								that.hours[that.hour%12].removeClass(that.options.classes.active);
+								if(that.hour >= 12) {
+									that.hour = i+12;
 								} else {
-									this.hour = i;
+									that.hour = i;
 								}
 							} else {
-								if (this.hour === -1 ) {
-									this.hour = i;
+								if (that.hour === -1 ) {
+									that.hour = i;
 								} else {
-									this.hour = i+12;
+									that.hour = i+12;
 								}
 							}
-							this.hours[i].addClass(this.options.classes.active);
-							this.checkVal();
-							this.newDay();
-						}.bindWithEvent(this,i));
+							this.addClass(that.options.classes.active);
+							that.checkVal();
+							that.newDay();
+						});
 						if(this.hour >= 0 && this.hour%12 === i) this.hours[i].addClass(this.options.classes.active);
 					} else {
 						this.hours[i].addClass(this.options.classes.invalid);
@@ -627,14 +633,15 @@ Calendar = function() {
 						datee.setHours(this.hour,mi,59,999);
 					}
 					if(this.date<0 || this.hour<0 || datee > this.getStart() && dates < this.getEnd()) {
-						this.mins[i].addClass(this.options.classes.valid).addEvent('click',function(e,mi,i) {
+						this.mins[i].store('i',i).addClass(this.options.classes.valid).addEvent('click',function(e) {
+							var i = this.retrieve('i');
 							e.stop();
-							if(this.min >= 0) this.mins[(this.min/5)%12].removeClass(this.options.classes.active);
-							this.min = mi;
-							this.mins[i].addClass(this.options.classes.active);
-							this.checkVal();
+							if(that.min >= 0) that.mins[(that.min/5)%12].removeClass(that.options.classes.active);
+							that.min = i*5;
+							this.addClass(that.options.classes.active);
+							that.checkVal();
 							return false;
-						}.bindWithEvent(this,[mi,i]));
+						});
 						if (this.min === mi ) this.mins[i].addClass(this.options.classes.active);
 					} else {
 						this.mins[i].addClass(this.options.classes.invalid);
@@ -775,9 +782,8 @@ Calendar = function() {
 			initialize: function(input, options) {
 				this.setOptions(options);
 				this.calendars = [];
-				var newOptions = {}
-				$extend(newOptions,options);
-				$extend(newOptions,{onUpdate:this.update.bind(this)});
+				var newOptions = Object.append({},options);
+				newOptions = Object.append(newOptions,{onUpdate:this.update.bind(this)});
 				input.each(function(item, i) {
 					this.calendars.push(new Calendar.Single(item,newOptions));
 				},this);

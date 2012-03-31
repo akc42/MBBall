@@ -19,6 +19,7 @@
 
 */
 
+define('DEBUG','yes');  //Define this to get an uncompressed form of the mootools core library
 // Show all errors:
 error_reporting(E_ALL);
 
@@ -77,7 +78,7 @@ if($extn_auth != '' && !isset($_COOKIE['MBBall'])) {
 	require_once($extn_auth.'SSI.php');	
 	//If not logged in to the forum, not allowed any further so redirect to page to say so
 	if($user_info['is_guest']) {
-		header( 'Location: noforum.php' ) ;
+	header( 'Location: football.php' ) ;
 		exit;
 	};
 	//Since we are using SMF to get info - just get what we need in case we need it
@@ -159,17 +160,13 @@ if(isset($cook['c'][$cid])) {
 	}
 }
 
-
+function head_content() {
 $db->rollBack();
 
 function head_content() {
 	global $cid,$uid,$rid,$registered;
-?>	<title>Chandler's Zen Football Pool</title>
+?>	<title>Melinda's Backups Football Pool</title>
 	<link rel="stylesheet" type="text/css" href="ball.css"/>
-	<!--[if lt IE 7]>
-		<link rel="stylesheet" type="text/css" href="ball-ie.css"/>
-	<![endif]-->
-	
 	<script src="mbball.js" type="text/javascript" charset="UTF-8"></script>
 	<script src="mbbuser.js" type="text/javascript" charset="UTF-8"></script>
 	<script type="text/javascript">
@@ -188,6 +185,7 @@ function head_content() {
 
 		// -->
 	</script>
+
 <?php
 }
 
@@ -217,7 +215,7 @@ function menu_items () {
 		*/
 ?>			<li><a href="index.php?<?php echo 'cid='.$cid.'&rid='.$possrounddata['rid']; ?>"><?php echo $possrounddata['name'] ;?></a></li>
 <?php
-		}
+			}
 	}
 	$result->closeCursor();
     if($rid != 0) { //we had some menu itesm
@@ -339,22 +337,20 @@ function content() {
 		<tbody>
 <?php
 	if($registered) {
-?>
-<script type="text/javascript">
-_gaq.push(['_trackPageview','/football/user/registered']);
+?><script type="text/javascript">
+	_gaq.push(['_trackPageview','/football/user/registered']);
+
 </script>
 			<tr><td colspan="2"><div id="registered"><?php require_once('./inc/userpick.inc');?></div></td></tr>
 <?php
 	} else {
-?>
-<script type="text/javascript">
-_gaq.push(['_trackPageview','/football/user/unregistered']);
+?><script type="text/javascript">
+	_gaq.push(['_trackPageview','/football/user/unregistered']);
 </script>
 <?php
 		if($signedup) {
-?>
-<script type="text/javascript">
-_gaq.push(['_trackPageview','/football/user/bb-awaiting-approval']);
+?><script type="text/javascript">
+	_gaq.push(['_trackPageview','/football/user/bb-awaiting-approval']);
 </script>
 	<tr><td colspan="2"><div id="registered"><p>Although you have registered, this competition requires that Baby Backups obtain
 		admistrators approval before being allowed to enter this competition.  If you have not already done so please contact the
@@ -380,9 +376,16 @@ _gaq.push(['_trackPageview','/football/user/bb-awaiting-approval']);
 	}
 ?>			<tr><td colspan="2"><div id="tics"><?php require_once('./inc/tic.inc');?></div></td></tr>
 		</tbody>
-	</table>	
+	</table>
 <?php
 	$db->rollBack();
+
+}	
+function foot_content() {
+	global $querycounter,$time_head,$time_db;
+?>	<div id="copyright">MBball <span><?php include('./version.inc');?></span> &copy; 2008-2011 Alan Chandler.  Licenced under the GPL</div>
+	<div id="timing"><?php $time_now = microtime(true); printf("With %d queries, page displayed in %.3f secs of which %.3f secs was in forum checks",$querycounter,$time_now - $time_head,$time_db-$time_head);?></div>
+<?php
 }
 require_once('./inc/utils.inc');
 require_once($_SERVER['DOCUMENT_ROOT'].'/inc/template.inc'); 

@@ -63,7 +63,7 @@ MBB = function() {
             loadPage: function(params) {
 		        this.div.empty();
 		        this.div.addClass('loading');
-	            this.request.get($merge(reqOpts,params || {}));
+	            this.request.get(Object.merge(reqOpts,params || {}));
             }
         }),
         req: new Class({
@@ -81,7 +81,7 @@ MBB = function() {
             	});
             },
             get:function(params) {
-	            this.req.get($merge(reqOpts,params));
+	            this.req.get(Object.merge(reqOpts,params));
             },
             post: function (params) {
 	            this.req.post(params);

@@ -37,24 +37,24 @@ var MBBUser = new Class({
 			});
 		}
 		if(me.registered) {
-			this.teams = $H({});
-			this.lastpick = $H({});
+			this.teams = new Object({});
+			this.lastpick = new Object({});
 			var picks = $$('.ppick')
 			var that =this;
 			// We make a hash of every checked item - which we can then use when an item changes to
 			// check that the new item isn't already picked, and if so set it back
 			picks.each(function(item) {
 				if(item.checked) {
-					that.teams.set(item.value,item);
-					that.lastpick.set(item.name,item);
+					that.teams[item.value] = item;
+					that.lastpick[item.name] = item;
 				}
 			});
 			picks.addEvent('change',function(e) {
 				e.stop();
-				var lastValue = that.lastpick.get(this.name);
-				if(that.teams.has(this.value)) {
+				var lastValue = that.lastpick[this.name];
+				if(that.teams[this.value] != undefined ) {
 					//this team already has a selection, so lets find out what
-					var existingSelection = that.teams.get(this.value);
+					var existingSelection = that.teams[this.value];
 					existingSelection.getParent().highlight('#F00');
 					// now change it back
 					this.checked = false;
@@ -62,10 +62,10 @@ var MBBUser = new Class({
 				} else {
 					// This team did not have a selection before, so now set one
 					// and take out old values;
-					that.teams.set(this.value,this);
-					if(lastValue) that.teams.erase(lastValue.value);
-					that.lastpick.erase(this.name);
-					that.lastpick.set(this.name,this);
+					that.teams[this.value] = this;
+					if(lastValue) delete that.teams[lastValue.value];
+					delete that.lastpick[this.name];
+					that.lastpick[this.name] = this;
 				}
 			});
 			

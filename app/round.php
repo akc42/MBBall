@@ -28,8 +28,7 @@ if ($password != sha1("Football".$uid))
 $cid = $_GET['cid'];
 $rid = $_GET['rid'];
 if($rid != 0 && $cid !=0) {
-	define ('BALL',1);   //defined so we can control access to some of the files.
-	require_once('db.php');
+	require_once('./db.inc');
 	$result = dbQuery('SELECT * FROM round WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' ;');
 	$row = dbFetchRow($result);
 	dbFree($result);

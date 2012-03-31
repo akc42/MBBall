@@ -18,17 +18,25 @@
     along with MBBall (file COPYING.txt).  If not, see <http://www.gnu.org/licenses/>.
 
 */
-//Lets get the conference and div lists as this is data useful throughout this page
-$confs = array();
-$divs = array(); 
-foreach($db->query("SELECT * FROM conference ORDER BY confid;") as $row) {
-	$confs[$row['confid']] = $row['name'];
-}
+require_once('./inc/confdiv.inc');
 
-foreach($db->query("SELECT * FROM division ORDER BY divid;") as $row) {
-	$divs[$row['divid']] = $row['name'];
+$teams = array(array());
+$sizes = array(array());
+foreach($confs as $confid => $conference) {
+	foreach($divs as $divid => $division) {
+		$sizes[$confid][$divid] = 0;
+	}
+} 
+// It would be good to have a set of team names. 
+foreach ($db->query("SELECT *  FROM team WHERE in_competition = 1 ORDER BY confid,divid,tid;") as $row) {
+	$row['tid'] = trim($row['tid']);
+	$pick = array();
+	$pick['tid']=$row['tid'];
+	$pick['name']=$row['name'];
+	$pick['logo']=$row['logo'];
+	$pick['url']=$row['url'];
+	$pick['mp'] = ($row['made_playoff'] == 1);
+	$teams[$row['confid']][$row['divid']][] = $pick;
+	$sizes[$row['confid']][$row['divid']]++;
 }
 ?>
-
-
-

@@ -340,8 +340,8 @@
        id="linearGradient2893"
        x1="314"
        y1="128.5"
-       x2="313"
-       y2="589.5"
+       x2="314"
+       y2="589.00177"
        gradientUnits="userSpaceOnUse" />
 >>>>>>> v2.0
   </defs>
@@ -352,9 +352,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-<<<<<<< HEAD
-     inkscape:zoom="1.880904"
-     inkscape:cx="64.768876"
+     inkscape:zoom="1.32"
+     inkscape:cx="565.03962"
+     inkscape:cy="300.16667"
      inkscape:cy="28.992315"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -365,18 +365,14 @@
      inkscape:window-x="0"
      inkscape:window-y="49"
 =======
-     inkscape:zoom="1"
-     inkscape:cx="195.42683"
-     inkscape:cy="591.13835"
      inkscape:document-units="px"
      inkscape:current-layer="layer2"
      showgrid="false"
-     inkscape:window-width="849"
-     inkscape:window-height="879"
-     inkscape:window-x="226"
-     inkscape:window-y="76"
->>>>>>> v2.0
-     inkscape:window-maximized="0" />
+     inkscape:window-width="1280"
+     inkscape:window-height="949"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
+     inkscape:window-maximized="1" />
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -390,36 +386,6 @@
     </rdf:RDF>
   </metadata>
   <g
-<<<<<<< HEAD
-     inkscape:label="Layer 1"
-     inkscape:groupmode="layer"
-     id="layer1"
-     transform="translate(775,-478.07648)">
-    <image
-       y="835.21936"
-       x="-775"
-       id="image2993"
-       height="120"
-       width="2300"
-       xlink:href="file:///home/alan/dev/football/docroot/css/main_block.png" />
-    <image
-       y="461.07648"
-       x="-775"
-       id="image3046"
-       height="477"
-       width="2299.9631"
-       xlink:href="file:///home/alan/dev/football/docroot/css/backdrop.png" />
-    <rect
-       style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#767373;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       id="rect3050"
-       width="2296.4998"
-       height="140.17381"
-       x="1.7216552"
-       y="1.7203901"
-       transform="translate(-775,478.07648)"
-       rx="11.211527"
-       ry="10.96815" />
-=======
      inkscape:groupmode="layer"
      id="layer2"
      inkscape:label="Main"
@@ -452,7 +418,8 @@
        x="8"
        y="129"
        transform="translate(-1.3900223e-8,2.2760997e-6)"
-       ry="12" />
->>>>>>> v2.0
+       ry="12"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
   </g>
 </svg>

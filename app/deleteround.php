@@ -11,8 +11,7 @@ $cid=$_GET['cid'];
 $rid=$_GET['rid'];
 if ($password != sha1("Football".$uid))
 	die('Hacking attempt got: '.$password.' expected: '.sha1("Football".$uid));
-define ('BALL',1);   //defined so we can control access to some of the files.
-require_once('db.php');
+require_once('./db.inc');
 dbQuery('BEGIN;');
 dbQuery('DELETE FROM round WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).';');
 dbQuery('UPDATE round SET rid = rid - 1 WHERE cid = '.dbMakeSafe($cid).' AND rid > '.dbMakeSafe($rid).';');

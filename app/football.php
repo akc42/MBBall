@@ -1,6 +1,6 @@
 <?php
 /*
- 	Copyright (c) 2008,-2012 Alan Chandler
+ 	Copyright (c) 2008,-2011 Alan Chandler
     This file is part of MBBall, an American Football Results Picking
     Competition Management software suite.
 
@@ -21,21 +21,24 @@
 */
 function head_content() {
 ?>
-	<title>Melinda's Backups Football Pool Members No Competition</title>
+	<title>Melinda's Backups Football Pool Guest Page</title>
 	<link rel="stylesheet" type="text/css" href="ball.css"/>
 <?php
 }
 function content_title() {
-	echo 'Competition Not Started Yet';
+	echo 'Guest Page';
 }
+
 function menu_items() {
 ?>		<li><a href="/forum"><span>Return to the Forum</span></a></li>
 <?php
 }
 function content() {
-?><div id="notice">
-<p>Unfortunately there are no football competitions running just yet, please check back later.</p>
-</div>
+?>	<div id="notice"><p>The Football Pool is just one of the exiting facilities available to the members of our community.</p>
+		<p>To use it you have to be logged on to the forum, and at the moment you aren't.  If you are member please 
+		<a href="/forum/index.php?action=login">Login First</a>.  If not, <a href="/forum/index.php?action=register">please
+		consider joining</a>.</p>
+	</div>
 <?php
 }
 function foot_content() {

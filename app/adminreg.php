@@ -28,8 +28,7 @@ $cid = $_GET['cid'];
 
 
 if ($cid != 0) {
-	define ('BALL',1);   //defined so we can control access to some of the files.
-	require_once('db.php');
+	require_once('./db.inc');
 	$result = dbQuery('SELECT * FROM registration r JOIN participant u USING (uid) WHERE r.cid = '.dbMakeSafe($cid).' ORDER BY agree_time ;');
 
 ?>

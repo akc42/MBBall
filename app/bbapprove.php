@@ -24,8 +24,7 @@ $uid = $_GET['uid'];
 $password = $_GET['pass'];
 if ($password != sha1("Football".$uid))
 	die('Hacking attempt got: '.$password.' expected: '.sha1("Football".$uid));
-define ('BALL',1);   //defined so we can control access to some of the files.
-require_once('db.php');
+require_once('./db.inc');
 
 dbQuery('UPDATE registration SET bb_approved = '.dbMakeSafe($_GET['approval']).' WHERE cid = '.dbMakeSafe($_GET['cid']).' AND uid = '.dbMakeSafe($_GET['bbuid']).';');
 
