@@ -22,11 +22,9 @@ html {
 }
 
 body {
-	padding:0px;
-	margin:0px;
-	background-color: #efefef;
-	width:100%;
-	height:100%;
+	background: #E9EEF2 url(images/backdrop.png) repeat-x;
+	margin: 0 auto;
+	padding: 15px 1%;
 }
 
 /* Tables should show empty cells. */
@@ -42,52 +40,88 @@ body, td, th
 	font-size: small;
 	font-family: tahoma, sans-serif;
 }
-
-.topbg
+/* the framing graphics */
+#header
 {
-	color: #737373;
-	font-size: 22px;
-	padding-top: 28px;
-	padding-bottom: 7px;
-	padding-right:25px;
-	background-color: #efefef;
-	background-image: url(/static/images/topbg_r.gif);
+	background: url(images/main_block.png) #fefefe no-repeat 0 0;
+	padding:0 0 0 20px;
+}
+#header div.frame
+{
+	background: url(images/main_block.png) no-repeat 100% 0;
+	display: block;
+	padding: 5px 20px 0 0;
+}
+/* the content section */
+#wrapper
+{
+	background: #FFFFFF url(images/frame_repeat.png) repeat-y top left;
+	padding:0 0 0 20px;
+}
+#wrapper div.frame
+{
+	background: url(images/frame_repeat.png) repeat-y top right;
+	display: block;
+	padding: 0 20px 0 0;
+}
+#top_section
+{
+	min-height: 65px;
+	overflow: hidden;
+	margin:15px 0 3px 0;
 }
 
-.topbg_r
+h1.logo
 {
-	color: white;
-	background-color: #efefef;
-	background-image: url(/static/images/topbg.gif);
+	line-height: 45px;
+	font-size: 1.8em;
+	margin: 0;
+	padding: 0;
+	float: left;
+}
+#md_banner
+{
+    margin-left:70px;
+    width:300px;
+    text-align:center;
+    float:left;
 }
 
-.topbg_r2
+#siteslogan
 {
-	color: white;
-	background-color: #efefef;
-	background-image: url(/static/images/topbg_r2.gif);
+    color:#737373;
+    font-size:1.5em;
+	margin: 0;
+	padding: 0;
+	float: right;
 }
 
-.topbg_l
-{
-	color: white;
-	background-color: #efefef;
-	background-image: url(/static/images/topbg_l.gif);
-}
 
 #competitionNameContainer {
-	position:absolute;
-	top:100px;
-	left:350px;
+	margin:0 auto;
 	width:40em;
-	text-align:left;
+	text-align:center;
 }
 #competitionNameContainer h1 {
 	font-size:1.5em;
 	font-family: tahoma, sans-serif;
 	font-weight: normal;
-	color:#737373;
-	margin-left:auto;
+	color:#606060;
+	margin:0 0 20px 0;
+}
+/* The footer with copyright links etc. */
+#footer
+{
+	text-align: center;
+	background: url(images/main_block.png) no-repeat 0 -550px;
+	padding:0 0 0 20px;
+	font-size: 0.8em;
+}
+#footer div.frame
+{
+	background: url(images/main_block.png) no-repeat 100% -550px;
+	display: block;
+	padding: 80px 0 0 0;
 }
 
 
@@ -115,7 +149,7 @@ way to fit your requirements.
 .preload1 {background: url(images/blank_over.gif);}
 .preload2 {background: url(images/blank_overa.gif);}
 
-#menu {padding:0 0 0 32px; margin:0; list-style:none; height:36px; background:#fff; position:relative; z-index:500; font-family:arial, verdana, sans-serif;}
+#menu {padding:0 0 0 32px; margin:5px 0 0 5px; list-style:none; height:36px; background:#fff; position:relative; z-index:500; font-family:arial, verdana, sans-serif;}
 #menu>li {display:block; float:left;}
 #menu>li>a {display:block; float:left; height:36px; line-height:27px; color:#ccc; text-decoration:none; font-size:11px; font-weight:bold; padding:0 0 0 12px; cursor:pointer;background: url(images/blank.gif);}
 #menu>li>a span {float:left; display:block; padding:0 24px 0 12px; height:36px;background:url(images/blank.gif) right top;}
@@ -149,7 +183,6 @@ way to fit your requirements.
 
 
 #content {
-	font-family:Verdana, Arial, Helvetica, sans-serif;
 	font-size:0.8em;
 	background-color:#4A7DB5;
 	background-image:none;
@@ -418,3 +451,10 @@ div.match .comment, div.match .mtime {width:176px;float:left;border:1px solid bl
 div.match .comment textarea, div.match .mtime input {width:172px;}
 div.match .mtime {height:24px;}
 
+#notice {
+	margin:30px;
+	padding:20px;
+	font-size:1.2em;
+	background-color:#FFFFCC;
+	color:#000000;
+}
