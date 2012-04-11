@@ -23,10 +23,13 @@
 
 	USAGE.
 	
-	1. Place this file in the application directory of the old (Postgres based) version of football
+	1. Place this file in the application directory of an old (Postgres based) version of football
 	2. Create a subdirectory called db and copy database.sql and football.sql from the app/inc directory there
 	3. In a web browser call up dump.php (at the appropriate url).
 	
+	NOTE:
+	   If you wish to do this on the development version of football, then there is already a branch dumppgtosqlite
+	   with this file and the db directory with the two *.sql files in.
 	RESULT
 	
 	This should create football.ini and a set of .db files representing each of the competitions that were contained on the main database
@@ -39,7 +42,7 @@ $db->exec(file_get_contents('./db/football.sql'));  //setup first database
 $db = null;
 
 define ('BALL',1);   //defined so we can control access to some of the files.
-require_once('db.php');
+require_once('db.inc');
 
 dbQuery('BEGIN;');
 $result=dbQuery("SELECT cid FROM default_competition LIMIT 1");
