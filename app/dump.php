@@ -24,7 +24,7 @@
 	USAGE.
 	
 	1. Place this file in the application directory of the old (Postgres based) version of football
-	2. Create a subdirectory called db and copy database.sql and football.sql from the app/inc directory there
+	2. Create a subdirectory called db and copy database.sql from the app/inc directory there
 	3. In a web browser call up dump.php (at the appropriate url).
 	
 	RESULT
@@ -33,7 +33,7 @@
 */
 
 
-
+unlink('./db/football.db');
 $db=new PDO('sqlite:./db/football.db');
 $db->exec(file_get_contents('./db/database.sql'));  //setup database
 
@@ -46,24 +46,25 @@ $row = dbFetchRow($result);
 $cid = $row['cid'];
 
 $db->exec('BEGIN EXCLUSIVE');
-$f=$db->prepare("UPDATE default_competition SET cid = ?");
+$f=$db->prepare("UPDATE config SET cid = ?");
 $f->bindValue(1,$row['cid']);
 $f->execute();
 $f->closeCursor();
 unset($f);
 
 dbFree($result);
+echo "done config <br/>\n";
 
 /*
  * Set up competition table
  */
 
 $result = dbQuery("SELECT *, date_part('epoch',creation_date) AS cd FROM competition");
-while($row = dbFetchRow($result)) {
-		$c=$db->prepare("
+$c=$db->prepare("
 			INSERT INTO competition(cid,description,condition,administrator,open,pp_deadline,gap,bb_approval,creation_date)
 			VALUES (?,?,?,?,?,?,?,?,?)
 			");
+while($row = dbFetchRow($result)) {
 		$c->bindValue(1,$row['cid']);
 		$c->bindValue(2,$row['description']);
 		$c->bindValue(3,$row['condition']);
@@ -75,9 +76,10 @@ while($row = dbFetchRow($result)) {
 		$c->bindValue(9,$row['cd'],PDO::PARAM_INT);
 		$c->execute();
 		$c->closeCursor();
-		unset($c);
 }
 dbFree($result);
+unset($c);
+echo "done competition <br/>\n";
 /*
 	Setup participant table
 */
@@ -98,6 +100,7 @@ while($r2=dbFetchRow($result)) {
 }
 dbFree($result);
 unset($p);
+echo "done participant <br/>\n";
 /*
 	Setup registration table
 */
@@ -110,12 +113,13 @@ while($r2=dbFetchRow($result)) {
 	$r->bindValue(1,$r2['cid'],PDO::PARAM_INT);
 	$r->bindValue(2,$r2['uid'],PDO::PARAM_INT);
 	$r->bindValue(3,$r2['agree_time'],PDO::PARAM_INT);
-	$r->bindValue(4,($r2['approved'] == 't')?1:0,PDO::PARAM_INT);
+	$r->bindValue(4,($r2['bb_approved'] == 't')?1:0,PDO::PARAM_INT);
 	$r->execute();
 	$r->closeCursor();
 }
 dbFree($result);
 unset($r);
+echo "done registration <br/>\n";
 /*
 	Setup Rounds
 */
@@ -140,6 +144,7 @@ while($r2=dbFetchRow($result)) {
 }
 dbFree($result);
 unset($r);
+echo "done round <br/>\n";
 /*
 	Setup Matches
 */
@@ -164,6 +169,7 @@ while($r2=dbFetchRow($result)) {
 }
 dbFree($result);
 unset($m);
+echo "done match <br/>\n";
 /*
 	Setup Option
 */
@@ -179,6 +185,7 @@ while($r2=dbFetchRow($result)) {
 }
 dbFree($result);
 unset($o);
+echo "done option <br/>\n";
 /*
 	Setup Team In Competition (Team already setup)
 */
@@ -193,6 +200,7 @@ while($r2=dbFetchRow($result)) {
 }
 dbFree($result);
 unset($t);
+echo "done tic <br/>\n";
 /*
 	Setup Match Picks
 */
@@ -211,6 +219,8 @@ while($r2=dbFetchRow($result)) {
 	$p->closeCursor();
 }
 dbFree($result);
+unset($p);
+echo "done pick <br/>\n";
 /*
 	Setup Divisional Winner Picks
 */
@@ -227,12 +237,14 @@ while($r2=dbFetchRow($result)) {
 	$p->closeCursor();
 }
 dbFree($result);
+unset($p);
+echo "done div winner pick <br/>\n";
 /*
 	Setup WildCard Picks
 */
 $result=dbQuery("SELECT * FROM wildcard_pick");
 $p=$db->prepare("INSERT INTO wildcard_pick(cid,uid,confid,opid,tid,submit_time) VALUES (?,?,?,?,?,?)");
-while($r2=dbFetchRow($table)) {
+while($r2=dbFetchRow($result)) {
 	$p->bindValue(1,$r2['cid'].PDO::PARAM_INT);
 	$p->bindValue(2,$r2['uid'],PDO::PARAM_INT);
 	$p->bindValue(3,$r2['confid']);
@@ -243,12 +255,14 @@ while($r2=dbFetchRow($table)) {
 	$p->closeCursor();
 }
 dbFree($result);
+unset($p);
+echo "Done wildcardpick <br/>\n";
 /*
 	Setup Option Picks
 */
 $result=dbQuery("SELECT * FROM option_pick");
 $p=$db->prepare("INSERT INTO option_pick(cid,uid,rid,opid,comment,submit_time) VALUES (?,?,?,?,?,?)");
-while($r2=dbFetchRow($table)) {
+while($r2=dbFetchRow($result)) {
 	$p->bindValue(1,$r2['cid'],PDO::PARAM_INT);
 	$p->bindValue(2,$r2['uid'],PDO::PARAM_INT);
 	$p->bindValue(3,$r2['rid'],PDO::PARAM_INT);
@@ -260,7 +274,8 @@ while($r2=dbFetchRow($table)) {
 }
 dbFree($result);
 unset($p);
+echo "Just about to commit (Done option pick) <br/>\n";
 $db->exec("COMMIT");
 $db = null; //closes the database		
-dbQuery('ROLLBACK');
+
 

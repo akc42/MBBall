@@ -20,59 +20,80 @@
 */
 
 define('DEBUG','yes');  //Define this to get an uncompressed form of the mootools core library
-// Link to SMF forum as this is only for logged in members
 // Show all errors:
 error_reporting(E_ALL);
 // Path to the Ball directory:
+define('MBBALL_ICON_PATH',	dirname(__FILE__)."/images/"); //URL where football Icons may be found
+// SMF membergroup IDs for the groups that we have used to define characteristics which control Chat Group
+define('SMF_FOOTBALL',		21);  //Group that can administer
+define('SMF_BABY',		10);  //Baby backup
+
+define('PRIVATE_KEY','Football19Key'); //NOTE - keep this in step with same value in inc/db.inc
+
 
 $time_head = microtime(true);
 
-
-require_once($_SERVER['DOCUMENT_ROOT'].'/forum/SSI.php');
-//If not logged in to the forum, not allowed any further so redirect to page to say so
-if($user_info['is_guest']) {
-	header( 'Location: football.php' ) ;
-	exit;
-};
-
-// SMF membergroup IDs for the groups that we have used to define characteristics which control Chat Group
-define('SMF_FOOTBALL',		21);  //Group that can administer 
-define('SMF_BABY',		10);  //Baby backup
-define('MBBALL_ICON_PATH',	"/football/images/"); //URL where football Icons may be found
-define('MBBALL_FORUM_PATH',	"/forum"); //URL to reach forum
-define('MBBALL_MAX_ROUND_DISPLAY',18); //Maximum rounds to display in summary before dropping off earliest round
-
-$groups =& $user_info['groups'];
-if(isset($user_info['id'])) { //check if this is SMFv2
-    $uid =& $user_info['id'];
-} else {
-    $uid = $ID_MEMBER;
+if(!isset($_COOKIE['MBBall'])) {
+	require_once($_SERVER['DOCUMENT_ROOT'].'/forum/SSI.php');
+	//If not logged in to the forum, not allowed any further so redirect to page to say so
+	if($user_info['is_guest']) {
+		header( 'Location: football.php' ) ;
+		exit;
+	}
+	$user = Array();
+	$user_data = Array();
+	
+	$groups =& $user_info['groups'];
+	if(isset($user_info['id'])) { //check if this is SMFv2
+		$user['id'] =& $user_info['id'];
+	} else {
+		$user['id'] = $ID_MEMBER;
+	}
+	$user_data['name'] =& $user_info['name'];
+	$user_data['email'] =& $user_info['email'];
+	$user_data['admin'] = in_array(SMF_FOOTBALL,$groups); 
+	$user_data['guest'] = in_array(SMF_BABY,$groups);
+	$user['data'] = $user_data;
+	$user['timestamp'] = time();
+    $user['key'] = sha1(PRIVATE_KEY.$user['timestamp'].$user['uid'].serialize($user['data']));
+	setcookie('MBBall',serialize($user),0);  //Cookie only lasts this session, 
+	unset($user);
+	unset($user_data);
+	unset($user_info);
+	unset($groups);
 }
-$name =& $user_info['name'];
-$email =& $user_info['email'];
-$password = sha1("Football".$uid);
+	
+
+
 
 $time_db = microtime(true);
 
 require_once('./db.inc');
-if(in_array(SMF_FOOTBALL,$groups)) {
-	//Global administrator - so check that participant record is up to date
-	dbQuery('BEGIN;');
-	$result=dbQuery('SELECT * FROM participant WHERE uid = '.dbMakeSafe($uid).';');
-	if(dbNumRows($result) > 0) {
-		dbQuery('UPDATE participant SET last_logon = DEFAULT, admin_experience = TRUE, name = '
-				.dbPostSafe($name).', email = '.dbPostSafe($email).' WHERE uid = '.dbMakeSafe($uid).';');
-	} else {
-		dbQuery('INSERT INTO participant (uid,name,email,last_logon, admin_experience) VALUES ('
-				.dbMakeSafe($uid).','.dbPostSafe($name).','.dbPostSafe($email).', DEFAULT,TRUE);');
-	}
-	dbQuery('COMMIT;');
+
+//Update participant record with this user
+if ($user['data']['admin']) {
+	$sql = "REPLACE INTO participant(uid,name,email,is_guest,last_logon,admin_experience) VALUES(?,?,?,?,DEFAULT,TRUE)";
+} else {
+	$sql = "REPLACE INTO participant(uid,name,email,is_guest,last_logon) VALUES (?,?,?,?,DEFAULT)";
 }
-$result = dbQuery('SELECT cid,version FROM default_competition;');
-if(dbNumRows($result) != 1 ) {
-	die("<p>Database is <b>corrupt</b> - default_competition should have a single row.<br/>Please contact webmaster@melindasbackup.com</p>");
+$p = $db->prepare($sql);
+$p->bindInt(1,$user['uid']);
+$p->bindString(2,$user['data']['name']);
+$p->bindString(3,$user['data']['email']);
+$p->bindBool(4,$user['data']['child']);
+$p->exec();
+unset($p);
+
+
+$c = $db->prepare("SELECT * FROM config");
+$c->exec();
+if(!($row = $c->fetch())) {
+	die("<p>Database is <b>corrupt</b> - config should be populated.<br/>Please contact webmaster@melindasbackup.com</p>");
 }
-$row=dbFetchRow($result);
+
+define('MBBALL_MAX_ROUND_DISPLAY',$row['max_round_display']);
+define('MBBALL_FORUM_PATH',$row['home_url']);
+
 
 if(isset($_GET['cid'])) {
 	$cid = $_GET['cid'];
@@ -80,53 +101,48 @@ if(isset($_GET['cid'])) {
 	if (!is_null($row['cid'])) {
 		$cid = $row['cid'];
 	} else {
-		if(in_array(SMF_FOOTBALL,$groups)) {
-			header( 'Location: admin.php?uid='.$uid.'&pass='.$password.'&global=true' ) ;
+		if($user['admin']) {
+			header( 'Location: admin.php?uid='.$uid.'&global=true' ) ;
 		} else {
 			header( 'Location: nostart.php' ) ;
 		};
 		exit;
 	}
 }
-dbFree($result);	
+unset($c);
+unset($user);  //done with it.  Just uid remains.
 
-$result = dbQuery('SELECT * FROM Competition c JOIN participant u ON c.administrator = u.uid WHERE cid = '.dbMakeSafe($cid).';');
-if (dbNumRows($result) == 0) {
+$c = $db->prepare("SELECT * FROM Competition c JOIN participant u ON c.administrator = u.uid WHERE cid = ?");
+$c->bindInt(1,$cid);
+$c->exec();
+if(!$row = $c->fetch()) {
 	//This competition doesn't exist yet
-	if(in_array(SMF_FOOTBALL,$groups)) {
-		header( 'Location: admin.php?uid='.$uid.'&pass='.$password.'&global=true&cid='.$cid ) ;
+	if($user['admin']) {
+		header( 'Location: admin.php?uid='.$uid.'&global=true&cid='.$cid ) ;
 	} else {
 		header( 'Location: nostart.php' ) ;
 	};
 	exit;
 }	
 $admin = false;
-$row = dbFetchRow($result);
 if ($uid == $row['administrator']) {
 	//User is administrator of this competition
 	$admin = true;
-	// check that participant record is up to date, as we are not going to be registered for the competition (maybe)
-	dbQuery('BEGIN;');
-	$result=dbQuery('SELECT * FROM participant WHERE uid = '.dbMakeSafe($uid).';');
-	if(dbNumRows($result) > 0) {
-		dbQuery('UPDATE participant SET last_logon = DEFAULT, admin_experience = TRUE, name = '
-				.dbPostSafe($name).', email = '.dbPostSafe($email).' WHERE uid = '.dbMakeSafe($uid).';');
-	} else {
-		dbQuery('INSERT INTO participant (uid,name,email,last_logon, admin_experience) VALUES ('
-				.dbMakeSafe($uid).','.dbPostSafe($name).','.dbPostSafe($email).', DEFAULT,TRUE);');
-	}
-	dbQuery('COMMIT;');
+	$a = $db->prepare("UPDATE participant SET admin_experience = TRUE WHERE uid = ?");
+	$a->bindInt(1,$uid);
+	$a->exec();	
+	unset($a);
 }
 $gap = $row['gap'];   //difference from match time that picks close
 $playoff_deadline=$row['pp_deadline']; //is set will be the cutoff point for playoff predictions, if 0 there is no playoff quiz
-$registration_open = ($row['open'] == 't'); //is the competition open for registration
-$approval_required = ($row['bb_approval'] == 't'); //BB approval is required
+$registration_open = ($row['open'] == 1); //is the competition open for registration
+$approval_required = ($row['bb_approval'] == 1); //BB approval is required
 $condition = $row['condition'];
 $admName = $row['name'];
 $competitiontitle = $row['description'];
-dbFree($result);
+unset($c);
 
-
+$r = $db->prepare("SELECT ")
 
 
 $result = dbQuery('SELECT * FROM registration 
@@ -138,17 +154,6 @@ if(dbNumRows($result) <> 0) {
 		$registered = false;
 	} else {
 		$registered = true;
-	}
-	if(!(in_array(SMF_FOOTBALL,$groups)  || $admin)) { //update already done if global or ordinary administrator
-			//Don't touch admin experience - might not be admin now, but could have been in past
-            if(in_array(SMF_BABY,$groups)) {
-			dbQuery('UPDATE participant SET last_logon = DEFAULT, is_bb = TRUE, name = '
-				.dbPostSafe($name).', email = '.dbPostSafe($email).' WHERE uid = '.dbMakeSafe($uid).';');
-		} else {
-		
-			dbQuery('UPDATE participant SET last_logon = DEFAULT, is_bb = FALSE, name = '
-				.dbPostSafe($name).', email = '.dbPostSafe($email).' WHERE uid = '.dbMakeSafe($uid).';');
-		}
 	}
 } else {
 	$signedup = false;

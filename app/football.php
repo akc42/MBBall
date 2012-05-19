@@ -42,7 +42,7 @@ function content() {
 <?php
 }
 function foot_content() {
-?>	<div id="copyright">MBball <span><?php include('./version.inc');?></span> &copy; 2008-2011 Alan Chandler.  Licenced under the GPL</div>
+?>	<div id="copyright">MBball <span><?php include('./version.inc');?></span> &copy; 2008-2012 Alan Chandler.  Licenced under the GPL</div>
 <?php
 }
 require_once($_SERVER['DOCUMENT_ROOT'].'/inc/template.inc'); 
