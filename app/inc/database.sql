@@ -30,7 +30,7 @@ CREATE TABLE competition (
     open boolean DEFAULT 0 NOT NULL, --Says whether a user may register for the competion or not
     pp_deadline bigint DEFAULT 0 NOT NULL, --Playoff Selection Deadline 0 if no selection
     gap integer DEFAULT 300 NOT NULL, --Seconds to go before match to make pick deadline
-    bb_approval boolean DEFAULT 0 NOT NULL, --Set if BB''s Need Approval after registering to play
+    guest_approval boolean DEFAULT 0 NOT NULL, --Set if BB''s Need Approval after registering to play
     creation_date bigint DEFAULT (strftime('%s','now')) NOT NULL --Date Competition Created
 );
 

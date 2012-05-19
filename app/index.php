@@ -72,7 +72,7 @@ require_once('./db.inc');
 
 //Update participant record with this user
 if ($user['data']['admin']) {
-	$sql = "REPLACE INTO participant(uid,name,email,is_guest,last_logon,admin_experience) VALUES(?,?,?,?,DEFAULT,TRUE)";
+	$sql = "REPLACE INTO participant(uid,name,email,is_guest,last_logon,admin_experience,is_global_admin) VALUES(?,?,?,?,DEFAULT,1,1)";
 } else {
 	$sql = "REPLACE INTO participant(uid,name,email,is_guest,last_logon) VALUES (?,?,?,?,DEFAULT)";
 }
@@ -136,21 +136,19 @@ if ($uid == $row['administrator']) {
 $gap = $row['gap'];   //difference from match time that picks close
 $playoff_deadline=$row['pp_deadline']; //is set will be the cutoff point for playoff predictions, if 0 there is no playoff quiz
 $registration_open = ($row['open'] == 1); //is the competition open for registration
-$approval_required = ($row['bb_approval'] == 1); //BB approval is required
+$approval_required = ($row['is_guest'] == 1); //BB approval is required
 $condition = $row['condition'];
 $admName = $row['name'];
 $competitiontitle = $row['description'];
 unset($c);
 
-$r = $db->prepare("SELECT ")
-
-
-$result = dbQuery('SELECT * FROM registration 
-			WHERE uid = '.dbMakeSafe($uid).' AND cid = '.dbMakeSafe($cid).';');
-if(dbNumRows($result) <> 0) {
+$r = $db->prepare("SELECT * FROM registration WHERE uid = ? AND cid = ?");
+$r->bindInt(1,$uid);
+$r->bindInt(2,$cid);
+$r->exec();
+if($row = $r->fetch()) {
 	$signedup = true;
-	$row = dbFetchRow($result);
-	if ($approval_required && $row['bb_approved'] != 't' && in_array(SMF_BABY,$groups)) {
+	if ($approval_required && $row['bb_approved'] != 1 && in_array(SMF_BABY,$groups)) {
 		$registered = false;
 	} else {
 		$registered = true;
