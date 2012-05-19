@@ -136,7 +136,7 @@ if ($uid == $row['administrator']) {
 $gap = $row['gap'];   //difference from match time that picks close
 $playoff_deadline=$row['pp_deadline']; //is set will be the cutoff point for playoff predictions, if 0 there is no playoff quiz
 $registration_open = ($row['open'] == 1); //is the competition open for registration
-$approval_required = ($row['is_guest'] == 1); //BB approval is required
+$approval_required = ($row['guest_approval'] == 1); //BB approval is required
 $condition = $row['condition'];
 $admName = $row['name'];
 $competitiontitle = $row['description'];
@@ -148,7 +148,7 @@ $r->bindInt(2,$cid);
 $r->exec();
 if($row = $r->fetch()) {
 	$signedup = true;
-	if ($approval_required && $row['bb_approved'] != 1 && in_array(SMF_BABY,$groups)) {
+	if ($approval_required && $row['bb_approved'] != 1 && $user['data']['is_guest']) {
 		$registered = false;
 	} else {
 		$registered = true;
@@ -158,18 +158,23 @@ if($row = $r->fetch()) {
 	$registered = false;
 }
 $registration_allowed = ($registration_open && !$signedup && !$admin);
-dbFree($result);
-$result = dbQuery('SELECT * FROM round WHERE cid = '.dbMakeSafe($cid).' AND open IS TRUE ORDER BY rid DESC ;');  //find rounds where at least one match is open
-if ($rounddata = dbFetchRow($result)) {
+unset($r);
+$r = $db->prepare("SELECT * FROM round WHERE cid = ? AND open = 1 ORDER BY rid DESC");  //find rounds where at least one match is open
+$r->bindInt(1,$cid);
+$r->exec();
+if ($rounddata = $r->fetch()) {
 	if(isset($_GET['rid'])) {
 		$rid=$rounddata['rid'];
 		if ($rid != $_GET['rid']) {
-			$resultround = dbQuery('SELECT * FROM round WHERE open is TRUE AND cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($_GET['rid']).' ;');
-			if($possrounddata = dbFetchRow($resultround)) {
+			$rd = $db->prepare("SELECT * FROM round WHERE open is TRUE AND cid = ? AND rid = ?");
+			$rd->bindInt(1,$cid);
+			$rd->bindInt(2,$_GET['rid']);
+			$rd->exec();
+			if($possrounddata = $rd->fetch()) {
 				$rounddata = $possrounddata;
 				$rid = $_GET['rid'];
 			}
-			dbFree($resultround);			
+			unset($rd);			
 		}
 	} else {
 		$rid=$rounddata['rid'];  //if not set use the first row (ie highest round)
