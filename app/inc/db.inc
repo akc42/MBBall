@@ -23,6 +23,7 @@
 define('DATA_DIR','/home/alan/dev/football/data/');
 define('GOOGLE_ACCOUNT');
 
+
 function forbidden() {
 	header('HTTP/1.0 403 Forbidden');
 	?><html>
@@ -72,7 +73,7 @@ $user = unserialize($_COOKIE['MBBall']);
 if ($user['key'] != sha1(PRIVATE_KEY.$user['timestamp'].$user['uid'].serialize($user['data']))) forbidden();
 $uid = $user['id']; //This is the one parameter that is important.
 
-//This is a convenient place to force everything we output to not be cached (even 
+//This is a convenient place to force everything we output to not be cached 
 header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
 header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); // Date in the past
 
@@ -80,7 +81,7 @@ class DB extends PDO {
     private static $instance;
     private function __construct()
     {
-    	parent::__construct('sqlite:'.DATA_DIR.'football.db')
+    	parent::__construct('sqlite:'.DATA_DIR.'football.db');
     }
 
     public static function get()
@@ -102,6 +103,9 @@ class DB extends PDO {
     public function prepare($sql) {
     	return new STMT(parent::prepare($sql));
     }
+    public function getCounts() {
+    	return STMT::getCount();
+    }
 }
 
 class STMT {
@@ -111,7 +115,7 @@ class STMT {
 		$this->_s = $s;
 	}
 	public function bindString($i,$string) {
-		$this->_s->bindValue($i,$string)
+		$this->_s->bindValue($i,$string);
 	}
 	public function bindInt($i,$value) {
 		$this->_s->bindValue($i,$value,PDO::PARAM_INT);

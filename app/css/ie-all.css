@@ -1,0 +1,12 @@
+body {
+	overflow: hidden;
+}
+#footer-wrapper {
+	width: 100%;
+	position:relative;
+	padding-bottom: 10px;
+	background: white;         /* Same as body 
+                               background */
+}
+
+ 

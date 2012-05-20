@@ -44,7 +44,7 @@ body, td, th
 .loading {
 	width:300px;
 	height:100px;
-	background: white url(/static/images/spinner.gif) no-repeat center;
+	background: white url(spinner.gif) no-repeat center;
 }
 
 /*#content>table.layout{width:970px;}*/
@@ -150,7 +150,7 @@ table.layout table.layout td#emoticon_cell{width:450px;height:160px;}
 
 /* mainly administration stuff below here */
 div.del {
-	background: url(images/cross.gif);
+	background: url(cross.gif);
 	border: 0;
 	cursor: pointer;
 	float: left;
@@ -194,7 +194,7 @@ div.del:hover, div.del:active {background-position:left bottom;}
 }
 
 #addall {
-	background: url(images/all.gif);
+	background: url(all.gif);
 	border: 0;
 	cursor: pointer;
 	float: left;

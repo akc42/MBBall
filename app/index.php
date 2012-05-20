@@ -68,21 +68,26 @@ if(!isset($_COOKIE['MBBall'])) {
 
 $time_db = microtime(true);
 
-require_once('./db.inc');
-
+require_once('./inc/db.inc');
+$email = $user['data']['email'];
+$guest = $user['data']['is_guest'];
+$name = $user['data']['name'];
 //Update participant record with this user
 if ($user['data']['admin']) {
 	$sql = "REPLACE INTO participant(uid,name,email,is_guest,last_logon,admin_experience,is_global_admin) VALUES(?,?,?,?,DEFAULT,1,1)";
+	$global_admin = true;
 } else {
+	$global_admin = false;
 	$sql = "REPLACE INTO participant(uid,name,email,is_guest,last_logon) VALUES (?,?,?,?,DEFAULT)";
 }
 $p = $db->prepare($sql);
-$p->bindInt(1,$user['uid']);
-$p->bindString(2,$user['data']['name']);
-$p->bindString(3,$user['data']['email']);
-$p->bindBool(4,$user['data']['child']);
+$p->bindInt(1,$uid);
+$p->bindString(2,$name);
+$p->bindString(3,$email);
+$p->bindBool(4,$guest);
 $p->exec();
 unset($p);
+unset($user);  //done with it.
 
 
 $c = $db->prepare("SELECT * FROM config");
@@ -101,7 +106,7 @@ if(isset($_GET['cid'])) {
 	if (!is_null($row['cid'])) {
 		$cid = $row['cid'];
 	} else {
-		if($user['admin']) {
+		if($global_admin) {
 			header( 'Location: admin.php?uid='.$uid.'&global=true' ) ;
 		} else {
 			header( 'Location: nostart.php' ) ;
@@ -110,14 +115,13 @@ if(isset($_GET['cid'])) {
 	}
 }
 unset($c);
-unset($user);  //done with it.  Just uid remains.
 
 $c = $db->prepare("SELECT * FROM Competition c JOIN participant u ON c.administrator = u.uid WHERE cid = ?");
 $c->bindInt(1,$cid);
 $c->exec();
 if(!$row = $c->fetch()) {
 	//This competition doesn't exist yet
-	if($user['admin']) {
+	if($global_admin) {
 		header( 'Location: admin.php?uid='.$uid.'&global=true&cid='.$cid ) ;
 	} else {
 		header( 'Location: nostart.php' ) ;
@@ -148,7 +152,7 @@ $r->bindInt(2,$cid);
 $r->exec();
 if($row = $r->fetch()) {
 	$signedup = true;
-	if ($approval_required && $row['bb_approved'] != 1 && $user['data']['is_guest']) {
+	if ($approval_required && $row['bb_approved'] != 1 && $guest) {
 		$registered = false;
 	} else {
 		$registered = true;
@@ -159,29 +163,20 @@ if($row = $r->fetch()) {
 }
 $registration_allowed = ($registration_open && !$signedup && !$admin);
 unset($r);
-$r = $db->prepare("SELECT * FROM round WHERE cid = ? AND open = 1 ORDER BY rid DESC");  //find rounds where at least one match is open
+if (isset($_GET['rid'])) {
+	$r = $db->prepare("SELECT * FROM round WHERE open = 1 AND cid = ? AND rid = ?");
+	$r->bindInt(2,$_GET['rid']);
+} else {
+	$r = $db->prepare("SELECT * FROM round WHERE cid = ? AND open = 1 ORDER BY rid LIMIT 1 DESC");  //find highest round where at least one match is open
+}
 $r->bindInt(1,$cid);
 $r->exec();
 if ($rounddata = $r->fetch()) {
-	if(isset($_GET['rid'])) {
-		$rid=$rounddata['rid'];
-		if ($rid != $_GET['rid']) {
-			$rd = $db->prepare("SELECT * FROM round WHERE open is TRUE AND cid = ? AND rid = ?");
-			$rd->bindInt(1,$cid);
-			$rd->bindInt(2,$_GET['rid']);
-			$rd->exec();
-			if($possrounddata = $rd->fetch()) {
-				$rounddata = $possrounddata;
-				$rid = $_GET['rid'];
-			}
-			unset($rd);			
-		}
-	} else {
-		$rid=$rounddata['rid'];  //if not set use the first row (ie highest round)
-	}
+	$rid = $rounddata['rid'];
 } else {
 	$rid=0;
 }
+unset($r);
 
 function head_content() {
 	global $uid, $registered, $cid, $rid
@@ -194,7 +189,6 @@ function head_content() {
 var MBBmgr;
 window.addEvent('domready', function() {
 	MBBmgr = new MBBUser({uid: <?php echo $uid;?>,
-				password : '<?php echo sha1("Football".$uid); ?>',
 				registered:<?php echo ($registered)?'true':'false';?>},
 				{cid: <?php echo $cid;?>, rid: <?php echo $rid;?>},
                              $('errormessage')
@@ -211,68 +205,81 @@ function content_title() {
 	echo $competitiontitle;
 }
 function menu_items () {
-	global $result,$cid,$rid,$uid,$password,$groups;
+	global $cid,$rid,$uid,$global_admin,$db;
 ?>		<li><a href="/forum"><span>Return to the Forum</span></a></li>
 <?php
-	if (dbNumRows($result) >1 ) {
-		dbRestartQuery($result);
+	$r = $db->prepare("SELECT rid,name FROM round WHERE open = 1 AND cid = ? and rid <> ? ORDER BY rid DESC");
+	$r->bindInt(1,$cid);
+	$r->bindInt(2,$rid);
+	$r->exec();
+	$do_first = true;
+	while($row = $r->fetch()) {
+		if ($do_first) {
 		// more than one round, so we need to have a menu for the others
 ?>		<li><a href="#"><span class="down">Rounds</span><!--[if gte IE 7]><!--></a><!--<![endif]-->
 		<!--[if lte IE 6]><table><tr><td><![endif]-->
 			<ul>
 <?php 
-		while ($row = dbFetchRow($result)) {
-			if ($row['rid'] != $rid) {
+		}
+		$do_first = false;
 ?>				<li><a href="index.php?<?php echo 'cid='.$cid.'&rid='.$row['rid']; ?>"><?php echo $row['name'] ;?></a></li>
 <?php
-			}
-		}
+	}
+	if(!$do_first) {
 ?>			</ul>
 		<!--[if lte IE 6]></td></tr></table></a><![endif]-->
 		</li>
 <?php
 	}
-	dbFree($result);
+	unset($r);
 
 	// The following select should select the cid and name of all competitions that are in a state
 	// where there is at least one open rouund or it is taking registrations and we are not yet registered
-	$sql = 'SELECT c.cid AS cid, c.description AS name FROM competition c LEFT JOIN registration u ON c.cid = u.cid AND u.uid  = '.dbMakeSafe($uid);
-	$sql .= ' LEFT JOIN round r ON c.cid = r.cid  WHERE c.cid <> '.dbMakeSafe($cid);
-	$sql .= ' AND (c.open IS TRUE OR r.open IS TRUE) GROUP BY c.cid, c.description ORDER BY c.cid DESC ; ';
-	$result = dbQuery($sql);
+	$sql = "SELECT c.cid AS cid, c.description AS name FROM competition c LEFT JOIN registration u ON c.cid = u.cid AND u.uid  = ?";
+	$sql .= " LEFT JOIN round r ON c.cid = r.cid  WHERE c.cid <> ?";
+	$sql .= " AND (c.open = 1 OR r.open = 1) GROUP BY c.cid, c.description ORDER BY c.cid DESC";
 
-	if (dbNumRows($result) > 0) {
+	$c = $db->prepare($sql);
+	$c->bindInt(1,$uid);
+	$c->bindInt(2,$cid);
+	$c->exec();
+	$do_first = true;
+	while($row = $c->fetch()){
+		if($do_first) {
 ?>		<li><a href="#"><span class="down">Competitions</span><!--[if gte IE 7]><!--></a><!--<![endif]-->
 		<!--[if lte IE 6]><table><tr><td><![endif]-->
 			<ul>
 <?php 
-		while ($row = dbFetchRow($result)) {
+		}
+		$do_first = false;
 ?>				<li><a href="index.php?<?php echo 'cid='.$row['cid'] ; ?>"><?php echo $row['name'] ;?></a></li>
 <?php	
-		}
+	}
+	if(!$do_first) {
 ?>			</ul>
 		<!--[if lte IE 6]></td></tr></table></a><![endif]-->
 
 		</li>
 <?php
 	}
-	dbFree($result);
-	if(in_array(SMF_FOOTBALL,$groups)) {
-	// Am Global Administrator - let me also do Admin thinks
-?>		<li><a href="admin.php?<?php echo 'uid='.$uid.'&pass='.$password.'&global=true&cid='.$cid;?>"><span>Global Admin</span></a></li>
+	unset($c);
+	
+	if($admin) {
+		// Am Administrator of this competition - let me also do Admin things
+		?>		<li><a href="admin.php?<?php echo 'uid='.$uid.'&cid='.$cid;?>"><span>Administration</span></a></li>
+	<?php 
+	} else {		
+		if($global_admin) {
+	// Am Global Administrator - let me also do Admin things
+?>		<li><a href="admin.php?<?php echo 'uid='.$uid.'&global=true&cid='.$cid;?>"><span>Global Admin</span></a></li>
 
 <?php
-	} else {
-		if($admin) {
-	// Am Administrator of this competition - let me also do Admin thinks
-?>		<li><a href="admin.php?<?php echo 'uid='.$uid.'&pass='.$password.'&cid='.$cid;?>"><span>Administration</span></a></li>
-<?php 
 		}
 	}
 }
 
 function content() {
-	global $cid,$rid,$uid,$registered,$signedup,$admName,$registration_allowed,$rounddata,$gap,$playoff_deadline,$approval_required,$email,$groups,$name,$condition,$search,$replace;
+	global $db,$cid,$rid,$uid,$registered,$signedup,$admName,$registration_allowed,$rounddata,$gap,$playoff_deadline,$approval_required,$email,$global_admin,$name,$condition;
 ?><div id="errormessage"></div>
 	<table class="layout">
 		<tbody>
@@ -282,7 +289,7 @@ function content() {
 ?><script type="text/javascript">
 	_gaq.push(['_trackPageview','/football/user/registered']);
 </script>
-			<tr><td colspan="2"><div id="registered"><?php require_once('./userpick.inc');?></div></td></tr>
+			<tr><td colspan="2"><div id="registered"><?php require_once('./inc/userpick.inc');?></div></td></tr>
 <?php
 	} else {
 ?><script type="text/javascript">
@@ -301,29 +308,29 @@ function content() {
 	}
 	if($registration_allowed) {
 ?>			<tr>
-				<td><div id="summary"><?php require_once ('./summary.inc');?></div></td>
+				<td><div id="summary"><?php require_once ('./inc/summary.inc');?></div></td>
 				<td id="r"><div id="registration"><?php require_once ('./registration.inc');?></div></td>
 			</tr>
 <?php
 } else {
-?>			<tr><td colspan="2"><div id="summary"><?php require_once ('./summary.inc');?></div></td></tr>
+?>			<tr><td colspan="2"><div id="summary"><?php require_once ('./inc/summary.inc');?></div></td></tr>
 <?php
 }
-?>			<tr><td colspan="2"><div id="picks"><?php require_once('./picks.inc');?></div></td></tr>
+?>			<tr><td colspan="2"><div id="picks"><?php require_once('./inc/picks.inc');?></div></td></tr>
 <?php
 if ($playoff_deadline != 0) {
-?>			<tr><td colspan="2"><div id="popicks"><?php require_once('./playoff.inc');?></div></td></tr>
+?>			<tr><td colspan="2"><div id="popicks"><?php require_once('./inc/playoff.inc');?></div></td></tr>
 <?php
 }
-?>			<tr><td colspan="2"><div id="tics"><?php require_once('./tic.inc');?></div></td></tr>
+?>			<tr><td colspan="2"><div id="tics"><?php require_once('./inc/tic.inc');?></div></td></tr>
 		</tbody>
 	</table>
 <?php
 }	
 function foot_content() {
-	global $querycounter,$time_head,$time_db;
+	global $db,$time_head,$time_db;
 ?>	<div id="copyright">MBball <span><?php include('./version.inc');?></span> &copy; 2008-2011 Alan Chandler.  Licenced under the GPL</div>
-	<div id="timing"><?php $time_now = microtime(true); printf("With %d queries, page displayed in %.3f secs of which %.3f secs was in forum checks",$querycounter,$time_now - $time_head,$time_db-$time_head);?></div>
+	<div id="timing"><?php $time_now = microtime(true); printf("With %d queries, page displayed in %.3f secs of which %.3f secs was in forum checks",$db->getCounts(),$time_now - $time_head,$time_db-$time_head);?></div>
 <?php
 }
 require_once($_SERVER['DOCUMENT_ROOT'].'/inc/template.inc'); 

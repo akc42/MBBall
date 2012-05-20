@@ -20,7 +20,8 @@
 
 */
 
-
+define('EMOTICON_DIR','/home/alan/dev/mb.com/static/images/emoticons');
+define('EMOTICON_URL','/static/images/emoticons/');
 
 function splitFilename($filename) {
 	$pos = strrpos($filename, '.');
@@ -37,19 +38,16 @@ $search[0]='/\[b\](.*?)\[\/b\]/';
 $search[1]='/\[s\](.*?)\[\/s\]/';
 $replace[0]='<b>$1</b>';
 $replace[1]='<del>$1</del>';
-$dir = $_SERVER['DOCUMENT_ROOT'].'/static/images/emoticons';
-$fns = scandir($dir);
+$fns = scandir(EMOTICON_DIR);
 foreach ($fns as $filename) {
-	if(filetype($dir.'/'.$filename) == 'file') {
+	if(filetype(EMOTICON_DIR.'/'.$filename) == 'file') {
 		$split = splitFIlename($filename);
 		if($split[1] == 'gif') {
 			$search[] = '/:'.$split[0].'/';
-			$replace[] = '<img src="/static/images/emoticons/'.$filename.'" alt=":'.$split[0].'" title="'.$split[0].'" />';
+			$replace[] = '<img src="'.EMOTICON_URL.$filename.'" alt=":'.$split[0].'" title="'.$split[0].'" />';
 		}
 	}
 }
-
-unset($dir);
 unset($fns);
 
 
