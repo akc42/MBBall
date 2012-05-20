@@ -27,10 +27,10 @@
 	<link rel="stylesheet" type="text/css" href="css/template.css"/>
 <?php
 if(defined('DEBUG')) {
-?><script src="/jsmootools-core-1.4.5-full-nocompat.js" type="text/javascript" charset="UTF-8"></script>
+?><script src="/js/mootools-core-1.4.5-full-nocompat.js" type="text/javascript" charset="UTF-8"></script>
 <?php
 } else {
-?>	<script src="/static/scripts/mootools-core-1.4.5-full-nocompat-yc.js" type="text/javascript" charset="UTF-8"></script>
+?>	<script src="js/mootools-core-1.4.5-full-nocompat-yc.js" type="text/javascript" charset="UTF-8"></script>
 <?php
 }
 head_content(); ?>
@@ -51,10 +51,10 @@ head_content(); ?>
 	<div id="top_section">
 		<h1 class="logo">
 			<a href="index.php">
-				<img src="images/mbball-logo.jpg" alt="MBBall Results Picking Competition" border="0" />
+				<img src="images/mbball-logo.png" alt="MBBall Football Results Picking Competition" border="0" />
 			</a>
 		</h1>
-		<div id="siteslogan">MBBall Football Results Picking Competition</div>
+		<div id="siteslogan">MBBall - Football Results Picking Competition</div>
 	</div>
 	<div id="competitionNameContainer">
 		<h1><?php content_title(); ?></h1>

@@ -20,21 +20,22 @@
 
 */
 define('DEBUG','yes'); //define debug mode to get uncompressed mootools loaded
-
-if(!(isset($_GET['uid']) && isset($_GET['pass']) ))
-	die('Hacking attempt - wrong parameters');
-$uid = $_GET['uid'];
-$password = $_GET['pass'];
-if ($_GET['pass'] != sha1("Football".$uid))
-	die('Hacking attempt got: '.$_GET['pass'].' expected: '.sha1("Football".$uid));
-if (!isset($_GET['global']) && !isset($_GET['cid']))
+if (!(isset($_GET['global']) || isset($_GET['cid'])))
 	die('Hacking attempt - need cid or global');
 
-require_once('./db.inc');
-require_once('./bbcode.inc');
+require_once('./inc/db.inc'); //This will also validate user
+$c = $db->prepare("SELECT emoticon_dir,emoticon_url FROM config LIMIT 1");
+$c->exec();
+$row = $c->fetch();
+define('MBBALL_EMOTICON_DIR',$row['emoticon_dir']);
+define('MBBALL_EMOTICON_URL',$row['emoticon_url']);
+unset($row);
+unset($c);
+
+require_once('./inc/bbcode.inc');
 
 function head_content () {
-	global $uid,$password
+	global $uid
 
 ?>	<title>Melinda's Backups Football Pool Administration</title>
 	<link rel="stylesheet" type="text/css" href="calendar/calendar.css"/>
@@ -42,13 +43,13 @@ function head_content () {
 	<script src="mootools-dragmove-1.4.js" type="text/javascript" charset="UTF-8"></script>
 	<script src="calendar/calendar.js" type="text/javascript" charset="UTF-8"></script>
 	<script src="mbball.js" type="text/javascript" charset="UTF-8"></script>
+	<script src="mbadmin.js" type="text/javascript" charset="UTF-8"></script>
 	<script type="text/javascript">
 	<!--
 
 var MBBmgr;
 window.addEvent('domready', function() {
 	MBBmgr = new MBBAdmin({uid: '<?php echo $uid;?>',
-				password : '<?php echo $password; ?>',
 				admin :<?php if(isset($_GET['global'])) {echo 'true';} else {echo 'false';}?>},
 				<?php if(isset($_GET['cid'])) {echo $_GET['cid'] ;}else{ echo '0';}?>,
                                 $('errormessage')
@@ -84,7 +85,7 @@ function content() {
 <?php
 }
 function foot_content() {
-?>	<div id="copyright">MBball <span><?php include('./version.inc');?></span> &copy; 2008-2011 Alan Chandler.  Licenced under the GPL</div>
+?>	<div id="copyright">MBball <span><?php include('./version.inc');?></span> &copy; 2008-2012 Alan Chandler.  Licenced under the GPL</div>
 <?php
 }
 require_once($_SERVER['DOCUMENT_ROOT'].'/inc/template.inc'); 

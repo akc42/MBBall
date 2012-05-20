@@ -98,6 +98,9 @@ if(!($row = $c->fetch())) {
 
 define('MBBALL_MAX_ROUND_DISPLAY',$row['max_round_display']);
 define('MBBALL_FORUM_PATH',$row['home_url']);
+define('MBBALL_EMOTICON_DIR',$row['emoticon_dir']);
+define('MBBALL_EMOTICON_URL',$row['emoticon_url']);
+
 
 
 if(isset($_GET['cid'])) {
@@ -183,6 +186,7 @@ function head_content() {
 ?>	<title>Melinda's Backups Football Pool</title>
 	<link rel="stylesheet" type="text/css" href="ball.css"/>
 	<script src="mbball.js" type="text/javascript" charset="UTF-8"></script>
+	<script src="mbuser.js" type="text/javascript" charset="UTF-8"></script>
 	<script type="text/javascript">
 	<!--
 
@@ -279,7 +283,8 @@ function menu_items () {
 }
 
 function content() {
-	global $db,$cid,$rid,$uid,$registered,$signedup,$admName,$registration_allowed,$rounddata,$gap,$playoff_deadline,$approval_required,$email,$global_admin,$name,$condition;
+	global $db,$cid,$rid,$uid,$registered,$signedup,$admName,$registration_allowed,
+		$rounddata,$gap,$playoff_deadline,$approval_required,$email,$global_admin,$name,$condition,$search,$replace;
 ?><div id="errormessage"></div>
 	<table class="layout">
 		<tbody>

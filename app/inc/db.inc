@@ -21,7 +21,7 @@
 */
 
 define('DATA_DIR','/home/alan/dev/football/data/');
-define('GOOGLE_ACCOUNT');
+define('GOOGLE_ACCOUNT','UA-6767755-1');
 
 
 function forbidden() {

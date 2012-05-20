@@ -20,9 +20,6 @@
 
 */
 
-define('EMOTICON_DIR','/home/alan/dev/mb.com/static/images/emoticons');
-define('EMOTICON_URL','/static/images/emoticons/');
-
 function splitFilename($filename) {
 	$pos = strrpos($filename, '.');
 	if ($pos === false) { // dot is not found in the filename
@@ -38,13 +35,13 @@ $search[0]='/\[b\](.*?)\[\/b\]/';
 $search[1]='/\[s\](.*?)\[\/s\]/';
 $replace[0]='<b>$1</b>';
 $replace[1]='<del>$1</del>';
-$fns = scandir(EMOTICON_DIR);
+$fns = scandir(MBBALL_EMOTICON_DIR);
 foreach ($fns as $filename) {
-	if(filetype(EMOTICON_DIR.'/'.$filename) == 'file') {
+	if(filetype(MBBALL_EMOTICON_DIR.'/'.$filename) == 'file') {
 		$split = splitFIlename($filename);
 		if($split[1] == 'gif') {
 			$search[] = '/:'.$split[0].'/';
-			$replace[] = '<img src="'.EMOTICON_URL.$filename.'" alt=":'.$split[0].'" title="'.$split[0].'" />';
+			$replace[] = '<img src="'.MBBALL_EMOTICON_URL.'/'.$filename.'" alt=":'.$split[0].'" title="'.$split[0].'" />';
 		}
 	}
 }
