@@ -140,6 +140,8 @@ CREATE TABLE round (
     ou_round boolean DEFAULT 0 NOT NULL, --set if over underscores are requested for this round
     deadline bigint, --Time Deadline for submitting answers to bonus questions
     open boolean DEFAULT 0 NOT NULL,  --says whether round is availble for display
+    results_cache text, -- php serialized cache of recent result table
+    cache_store_date bigint DEFAULT (strftime('%s','now')),
     PRIMARY KEY (cid,rid)
 );
 
