@@ -44,9 +44,11 @@ CREATE TABLE conference (
 
 CREATE TABLE config (
 	cid integer REFERENCES competition(cid) ON UPDATE CASCADE ON DELETE SET NULL,
-	version integer NOT NULL DEFAULT 0,
-	max_round_display integer NOT NULL DEFAULT 0,
-	home_url character varying(100) NOT NULL DEFAULT '/forum',
+	version integer NOT NULL DEFAULT 12, --version of this configuration
+	max_round_display integer NOT NULL DEFAULT 18, -- max rounds to include in results table
+	home_url character varying(100) NOT NULL DEFAULT '/forum/index.php', --url used for home menu item
+	emoticon_dir text DEFAULT './images/emoticons' NOT NULL, --filesystem location of emoticons
+	emoticon_url text DEFAULT 'images/emoticons' NOT NULL, --web based location of emoticons
 	cache_age integer DEFAULT 0 NOT NULL --cache age before invalid (in seconds), 0 is infinite
 );
 
@@ -258,8 +260,7 @@ SELECT r.cid,r.rid, r.uid, sum(
   GROUP BY r.cid,r.rid, r.uid, r.score;
 
 -- END OF VIEWS ------------------------------------------------------------------
-
-INSERT INTO config(version,max_round_display,home_url) VALUES (12,18,'http://www.melindasbackups.com/forum/index.php');
+-- STANDARD DATA
 
 INSERT INTO conference(confid, name) VALUES ('AFC','American Football Conference');
 INSERT INTO conference(confid, name) VALUES ('NFC','National Football Conference');
@@ -302,7 +303,7 @@ INSERT INTO team (tid, name, logo,  confid, divid) VALUES('NYJ','New York Jets',
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('ARI','Arizona Cardinals','ARI_logo-50x50.gif','NFC','W');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('KC ','Kansas City Chiefs','KC_logo-50x50.gif','AFC','W');
 
--- END OF DATA ----------------------------------------------------------
+-- END OF STANDARD DATA ----------------------------------------------------------
 -- INDEXES --------------------------------------------------------------
 
 CREATE INDEX div_tid_idx ON div_winner_pick (tid);
@@ -334,6 +335,16 @@ CREATE INDEX registration_cid_idx ON registration(cid);
 
 
 -- END OF INDEXES -------------------------------------------------------
+
+-- Configuration file - expect to edit this for each installation
+-- THIS VERSION IS FOR http://www.melindasbackups.com - since we are taking their database
+INSERT INTO config(
+       home_url -- URL that the home menu item points to
+) 
+VALUES (
+       '/forum/index.php' -- using default just to be an example of how to change them
+);
+
 
 COMMIT;
 -- set it all up as Write Ahead Log for max performance and minimum contention with other users.
