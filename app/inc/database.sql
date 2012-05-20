@@ -31,7 +31,9 @@ CREATE TABLE competition (
     pp_deadline bigint DEFAULT 0 NOT NULL, --Playoff Selection Deadline 0 if no selection
     gap integer DEFAULT 300 NOT NULL, --Seconds to go before match to make pick deadline
     guest_approval boolean DEFAULT 0 NOT NULL, --Set if BB''s Need Approval after registering to play
-    creation_date bigint DEFAULT (strftime('%s','now')) NOT NULL --Date Competition Created
+    creation_date bigint DEFAULT (strftime('%s','now')) NOT NULL, --Date Competition Created
+    results_cache text, -- php serialized cache of recent result table
+    cache_store_date bigint DEFAULT (strftime('%s','now'))
 );
 
 
@@ -44,7 +46,8 @@ CREATE TABLE config (
 	cid integer REFERENCES competition(cid) ON UPDATE CASCADE ON DELETE SET NULL,
 	version integer NOT NULL DEFAULT 0,
 	max_round_display integer NOT NULL DEFAULT 0,
-	home_url character varying(100) NOT NULL DEFAULT '/forum'
+	home_url character varying(100) NOT NULL DEFAULT '/forum',
+	cache_age integer DEFAULT 0 NOT NULL --cache age before invalid (in seconds), 0 is infinite
 );
 
 -- User Pick of each division winner
