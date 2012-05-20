@@ -42,16 +42,6 @@ CREATE TABLE conference (
     name character varying(30)
 );
 
-CREATE TABLE config (
-	cid integer REFERENCES competition(cid) ON UPDATE CASCADE ON DELETE SET NULL,
-	version integer NOT NULL DEFAULT 12, --version of this configuration
-	max_round_display integer NOT NULL DEFAULT 18, -- max rounds to include in results table
-	home_url character varying(100) NOT NULL DEFAULT '/forum/index.php', --url used for home menu item
-	emoticon_dir text DEFAULT './images/emoticons' NOT NULL, --filesystem location of emoticons
-	emoticon_url text DEFAULT 'images/emoticons' NOT NULL, --web based location of emoticons
-	cache_age integer DEFAULT 0 NOT NULL --cache age before invalid (in seconds), 0 is infinite
-);
-
 -- User Pick of each division winner
 CREATE TABLE div_winner_pick (
     cid integer NOT NULL REFERENCES competition(cid) ON UPDATE CASCADE ON DELETE CASCADE, -- Competition ID
@@ -151,6 +141,12 @@ CREATE TABLE round (
     deadline bigint, --Time Deadline for submitting answers to bonus questions
     open boolean DEFAULT 0 NOT NULL,  --says whether round is availble for display
     PRIMARY KEY (cid,rid)
+);
+
+-- Settings used to define various aspects of operation
+CREATE TABLE settings (
+    name character varying(20) PRIMARY KEY, -- Setting Name
+    value integer -- although an Int, We can store strings in here
 );
 
 CREATE TABLE team (
@@ -303,6 +299,15 @@ INSERT INTO team (tid, name, logo,  confid, divid) VALUES('NYJ','New York Jets',
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('ARI','Arizona Cardinals','ARI_logo-50x50.gif','NFC','W');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('KC ','Kansas City Chiefs','KC_logo-50x50.gif','AFC','W');
 
+INSERT INTO settings (name,value) VALUES('version',12); --version of this configuration
+INSERT INTO settings (name,value) VALUES('max_round_display',18); -- max rounds to include in results table
+INSERT INTO settings (name,value) VALUES('cache_age',0);--cache age before invalid (in seconds), 0 is infinite
+INSERT INTO settings (name,value) VALUES('home_url','/forum/index.php'); --url used for home menu item
+INSERT INTO settings (name,value) VALUES('emoticon_dir','./images/emoticons');--filesystem location of emoticons
+INSERT INTO settings (name,value) VALUES('emoticon_url','images/emoticons');--web based location of emoticons
+INSERT INTO settings (name,value) VALUES('template','./inc/template.inc'); -- page template location in filesystem
+INSERT INTO settings (name,value) VALUES('default_competition',0); -- cid of default competition 0 means we don't know what it is
+
 -- END OF STANDARD DATA ----------------------------------------------------------
 -- INDEXES --------------------------------------------------------------
 
@@ -336,15 +341,10 @@ CREATE INDEX registration_cid_idx ON registration(cid);
 
 -- END OF INDEXES -------------------------------------------------------
 
--- Configuration file - expect to edit this for each installation
--- THIS VERSION IS FOR http://www.melindasbackups.com - since we are taking their database
-INSERT INTO config(
-       home_url -- URL that the home menu item points to
-) 
-VALUES (
-       '/forum/index.php' -- using default just to be an example of how to change them
-);
+-- Configuration Settings That are non standard - expect to edit this for each installation
+-- THIS VERSION Just shows one example commented out 
 
+-- UPDATE settings SET value = '../static/template/template.inc' WHERE name = 'template' ; -- page template location in filesystem
 
 COMMIT;
 -- set it all up as Write Ahead Log for max performance and minimum contention with other users.

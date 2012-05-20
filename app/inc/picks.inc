@@ -20,60 +20,66 @@
 */
 
 require_once('./bbcode.inc');
+
 // we need to get the users resultant score
 $sql = 'SELECT u.name , u.uid , r.pscore, r.oscore, r.mscore,r.bscore,r.score, p.opid, p.comment';
 $sql .= ' FROM round_score r JOIN participant u USING (uid)';
 $sql .= ' LEFT JOIN option_pick p USING (cid,rid,uid)';
-$sql .= ' WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid);
-$sql .= ' ORDER BY score DESC,u.name;';
-$resultuser = dbQuery($sql);
+$sql .= ' WHERE cid = ? AND rid = ? ORDER BY score DESC,u.name;';
+$u = $db->prepare($sql);
 
 
-$isAQuestion = ($rounddata['valid_question'] == 't');
-$ouRound = ($rounddata['ou_round'] == 't');
+$isAQuestion = ($rounddata['valid_question'] == 1);
+$ouRound = ($rounddata['ou_round'] == 1);
 $totalHasBeenOutput = false;
 $moreMatchesToCome = true;
 $startMatch = 0;
 ?><h1>Details of this rounds pick</h1>
 <?php
 if ($rid != 0) {
+	$u->bindInt(1,$cid);
+	$u->bindInt(2,$rid);
+	$u->exec();
 /* GROUPS OF 8 MATCHES ----------------------------------------------------------------------------*/
 while ($moreMatchesToCome) {
-	$result = dbQuery('SELECT * FROM match m WHERE m.cid = '
-			.dbMakeSafe($cid).' AND m.rid = '.dbMakeSafe($rid)
-			.' AND  m.open IS TRUE ORDER BY match_time, hid LIMIT 8 OFFSET '.$startMatch.';');
-	$nom = dbNumRows($result);
-	if($nom > 0) {
-	
+	$m = $db->prepare("SELECT * FROM match WHERE .cid = ? AND rid = ? AND m.open = 1 ORDER BY match_time, hid, LIMIT 8 OFFSET ?");
+	$m->bindInt(1,$cid);
+	$m->bindInt(2,$rid);
+	$m->bindInt(2,$startMatch);
+	$m->exec();
+	$do_first = true;
+	while($row = $m->fetch()) {
+		if(do_first) {	
 ?><table>
 	<thead>
 		<tr>
-			<th rowspan="<?php echo ($nom == 0)?2:(($ouRound)?5:4) ;?>" class="match_data">Match Data<br/><?php echo $rounddata['name'];?></th>
-			<th rowspan="<?php echo ($nom == 0)?1:2 ;?>" class="score">Points for<br/>Correct Pick</th>
+			<th rowspan="<?php echo (($ouRound)?5:4) ;?>" class="match_data">Match Data<br/><?php echo $rounddata['name'];?></th>
+			<th rowspan="2" class="score">Points for<br/>Correct Pick</th>
 <?php
 /* TEAM NAMES IN HEADER ---------------------------------------------------------------*/
-		while($row = dbFetchRow($result)) {
+		}
+		$do_first = false;
 ?>			<th colspan="2" class="tid">
 <?php
-			if(!(is_null($row['hscore']) || is_null($row['ascore']) || $row['hscore'] < $row['ascore'])) {
+		if(!(is_null($row['hscore']) || is_null($row['ascore']) || $row['hscore'] < $row['ascore'])) {
 			//Home win
 ?>				<span class="win hid"><?php tick();
-			} else {
+		} else {
 ?>				<span class="hid"><?php
-			}
-			echo $row['hid']; ?><span>@
+		}
+		echo $row['hid']; ?><span>@
 <?php
-			if(!(is_null($row['hscore']) || is_null($row['ascore']) || $row['hscore'] > $row['ascore'])) {
+		if(!(is_null($row['hscore']) || is_null($row['ascore']) || $row['hscore'] > $row['ascore'])) {
 			//Away win
 ?>				<span class="win aid"><?php echo $row['aid']; tick()?></span>
 <?php
-			} else {
+		} else {
 ?>				<span class="aid"><?php	echo $row['aid'];?></span>
 <?php
-			}
+		}
 ?>			</th>
 <?php
-		}
+	}
 
 ?>			
 <?php
@@ -148,7 +154,7 @@ while ($moreMatchesToCome) {
 	<tbody>
 <?php
 /* FOR EACH USER WE DISPLAY THEIR PICKS FOR THE MATCHES -----------------------------------------------*/
-		while ($userdata = dbFetchRow($resultuser)) {
+		while ($userdata = $u->fetch()) {
 ?>			<tr>
 				<td rowspan="<?php echo ($nom == 0)?1:2 ;?>" colspan="2"><?php echo $userdata['name'];?></td>
 <?php

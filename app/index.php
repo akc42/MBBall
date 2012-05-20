@@ -1,6 +1,6 @@
 <?php
 /*
-    Copyright (c) 2008,2009,2010 Alan Chandler
+    Copyright (c) 2008-2012 Alan Chandler
     This file is part of MBBall, an American Football Results Picking
     Competition Management software suite.
 
@@ -90,25 +90,19 @@ unset($p);
 unset($user);  //done with it.
 
 
-$c = $db->prepare("SELECT * FROM config");
-$c->exec();
-if(!($row = $c->fetch())) {
-	die("<p>Database is <b>corrupt</b> - config should be populated.<br/>Please contact webmaster@melindasbackup.com</p>");
-}
-
-define('MBBALL_MAX_ROUND_DISPLAY',$row['max_round_display']);
-define('MBBALL_FORUM_PATH',$row['home_url']);
-define('MBBALL_EMOTICON_DIR',$row['emoticon_dir']);
-define('MBBALL_EMOTICON_URL',$row['emoticon_url']);
-
+$s = $db->prepare("SELECT value FROM settings WHERE name = ?");
+define('MBBALL_MAX_ROUND_DISPLAY',$s->fetchValue('max_round_display'));
+define('MBBALL_FORUM_PATH',$s->fetchValue('home_url'));
+define('MBBALL_EMOTICON_DIR',$s->fetchValue('emoticon_dir'));
+define('MBBALL_EMOTICON_URL',$s->fetchValue('emoticon_url'));
+define('MBBALL_TEMPLATE',$s->fetchValue('template'));
 
 
 if(isset($_GET['cid'])) {
 	$cid = $_GET['cid'];
 } else {
-	if (!is_null($row['cid'])) {
-		$cid = $row['cid'];
-	} else {
+	$cid = $s->fetchValue('default_competition');
+	if ($cid == 0) {
 		if($global_admin) {
 			header( 'Location: admin.php?uid='.$uid.'&global=true' ) ;
 		} else {
@@ -117,7 +111,7 @@ if(isset($_GET['cid'])) {
 		exit;
 	}
 }
-unset($c);
+unset($s);
 
 $c = $db->prepare("SELECT * FROM Competition c JOIN participant u ON c.administrator = u.uid WHERE cid = ?");
 $c->bindInt(1,$cid);
@@ -334,10 +328,10 @@ if ($playoff_deadline != 0) {
 }	
 function foot_content() {
 	global $db,$time_head,$time_db;
-?>	<div id="copyright">MBball <span><?php include('./version.inc');?></span> &copy; 2008-2011 Alan Chandler.  Licenced under the GPL</div>
+?>	<div id="copyright">MBball <span><?php include('./version.inc');?></span> &copy; 2008-2012 Alan Chandler.  Licenced under the GPL</div>
 	<div id="timing"><?php $time_now = microtime(true); printf("With %d queries, page displayed in %.3f secs of which %.3f secs was in forum checks",$db->getCounts(),$time_now - $time_head,$time_db-$time_head);?></div>
 <?php
 }
-require_once($_SERVER['DOCUMENT_ROOT'].'/inc/template.inc'); 
+require_once(MBBALL_TEMPLATE); 
 ?>
 

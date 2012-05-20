@@ -22,6 +22,7 @@
 
 define('DATA_DIR','/home/alan/dev/football/data/');
 define('GOOGLE_ACCOUNT','UA-6767755-1');
+if(!defined(PRIVATE_KEY)) define('PRIVATE_KEY','Football19Key'); //NOTE - keep this in step with same value in index.php
 
 
 function forbidden() {
@@ -127,8 +128,12 @@ class STMT {
 	public function fetchRow() {
 		return $this->_s->fetch(PDO::FETCH_ASSOC);
 	}
-	public function fetchValue() {
-		return $this->_s->fetchColumn();
+	public function fetchValue($name) {
+		$this->_s->bindValue(1,$name);
+		$this->_s->exec();
+		$r = $this->_s->fetchColumn();
+		$this->_s->closeCursor();
+		return $r;
 	}
 	public function close() {
 		$this->_s->closeCursor();

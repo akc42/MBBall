@@ -1,6 +1,6 @@
 <?php
 /*
- 	Copyright (c) 2008,-2011 Alan Chandler
+ 	Copyright (c) 2008,-2012 Alan Chandler
     This file is part of MBBall, an American Football Results Picking
     Competition Management software suite.
 
@@ -24,13 +24,12 @@ if (!(isset($_GET['global']) || isset($_GET['cid'])))
 	die('Hacking attempt - need cid or global');
 
 require_once('./inc/db.inc'); //This will also validate user
-$c = $db->prepare("SELECT emoticon_dir,emoticon_url FROM config LIMIT 1");
-$c->exec();
-$row = $c->fetch();
-define('MBBALL_EMOTICON_DIR',$row['emoticon_dir']);
-define('MBBALL_EMOTICON_URL',$row['emoticon_url']);
-unset($row);
-unset($c);
+
+$s = $db->prepare("SELECT value FROM settings WHERE name = ?");
+define('MBBALL_EMOTICON_DIR',$s->fetchValue('emoticon_dir'));
+define('MBBALL_EMOTICON_URL',$s->fetchValue('emoticon_url'));
+define('MBBALL_TEMPLATE',$s->fetchValue('template'));
+unset($s);
 
 require_once('./inc/bbcode.inc');
 
@@ -40,10 +39,17 @@ function head_content () {
 ?>	<title>Melinda's Backups Football Pool Administration</title>
 	<link rel="stylesheet" type="text/css" href="calendar/calendar.css"/>
 	<link rel="stylesheet" type="text/css" href="ball.css"/>
-	<script src="mootools-dragmove-1.4.js" type="text/javascript" charset="UTF-8"></script>
-	<script src="calendar/calendar.js" type="text/javascript" charset="UTF-8"></script>
-	<script src="mbball.js" type="text/javascript" charset="UTF-8"></script>
-	<script src="mbadmin.js" type="text/javascript" charset="UTF-8"></script>
+<?php
+	if(defined(DEBUG) {
+?>	<script src="js/mootools-dragmove-1.4.0.1.js" type="text/javascript" charset="UTF-8"></script>
+<?php
+	} else {
+?>	<script src="js/mootools-dragmove-1.4.0.1-yc.js" type="text/javascript" charset="UTF-8"></script>
+<?php
+	}
+?>	<script src="js/calendar/calendar.js" type="text/javascript" charset="UTF-8"></script>
+	<script src="js/mbball.js" type="text/javascript" charset="UTF-8"></script>
+	<script src="js/mbadmin.js" type="text/javascript" charset="UTF-8"></script>
 	<script type="text/javascript">
 	<!--
 
@@ -76,7 +82,7 @@ function content() {
 		<tr><td colspan="2"><div id="competition"></div></td><td rowspan="3"><div id="rounds"></div></td></tr>
 		<tr><td colspan="2"><div id="newround"></div></td></tr>
 		<tr><td><div id="round"></div></td><td id="options"></td></tr>
-		<tr><td colspan="3"><?php require_once('./emoticons.inc');?></td>
+		<tr><td colspan="3"><?php require_once('./inc/emoticons.inc');?></td>
 		<tr><td colspan="2" id="matches"></td><td><div id="teams"></div></td></tr>
 		<tr><td colspan="3"><div id="registered"></div></td></tr>
 		<tr><td colspan="3"><div id="userpick"></div></td></tr>
@@ -85,8 +91,8 @@ function content() {
 <?php
 }
 function foot_content() {
-?>	<div id="copyright">MBball <span><?php include('./version.inc');?></span> &copy; 2008-2012 Alan Chandler.  Licenced under the GPL</div>
+?>	<div id="copyright">MBball <span><?php include('./inc/version.inc');?></span> &copy; 2008-2012 Alan Chandler.  Licenced under the GPL</div>
 <?php
 }
-require_once($_SERVER['DOCUMENT_ROOT'].'/inc/template.inc'); 
+require_once(MBBALL_TEMPLATE); 
 ?>
