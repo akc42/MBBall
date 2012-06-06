@@ -206,12 +206,14 @@ function menu_items () {
 	global $cid,$rid,$uid,$global_admin,$db;
 ?>		<li><a href="/forum"><span>Return to the Forum</span></a></li>
 <?php
+	$maxrid = $rid;
 	$r = $db->prepare("SELECT rid,name FROM round WHERE open = 1 AND cid = ? and rid <> ? ORDER BY rid DESC");
 	$r->bindInt(1,$cid);
 	$r->bindInt(2,$rid);
 	$r->exec();
 	$do_first = true;
 	while($row = $r->fetch()) {
+		if($row['rid'] > $maxrid) $maxrid = $row['rid'];
 		if ($do_first) {
 		// more than one round, so we need to have a menu for the others
 ?>		<li><a href="#"><span class="down">Rounds</span><!--[if gte IE 7]><!--></a><!--<![endif]-->
@@ -223,6 +225,7 @@ function menu_items () {
 ?>				<li><a href="index.php?<?php echo 'cid='.$cid.'&rid='.$row['rid']; ?>"><?php echo $row['name'] ;?></a></li>
 <?php
 	}
+	define('MBBALL_MAX_RID',$maxrid);
 	if(!$do_first) {
 ?>			</ul>
 		<!--[if lte IE 6]></td></tr></table></a><![endif]-->

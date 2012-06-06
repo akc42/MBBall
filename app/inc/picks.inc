@@ -42,7 +42,7 @@ if ($rid != 0) {
 	$u->exec();
 /* GROUPS OF 8 MATCHES ----------------------------------------------------------------------------*/
 while ($moreMatchesToCome) {
-	$m = $db->prepare("SELECT * FROM match WHERE .cid = ? AND rid = ? AND m.open = 1 ORDER BY match_time, hid, LIMIT 8 OFFSET ?");
+	$m = $db->prepare("SELECT * FROM match WHERE .cid = ? AND rid = ? AND m.open = 1 ORDER BY match_time, hid LIMIT 8 OFFSET ?");
 	$m->bindInt(1,$cid);
 	$m->bindInt(2,$rid);
 	$m->bindInt(2,$startMatch);
