@@ -22,7 +22,7 @@
 
 define('DATA_DIR','/home/alan/dev/football/data/');
 define('GOOGLE_ACCOUNT','UA-6767755-1');
-if(!defined(PRIVATE_KEY)) define('PRIVATE_KEY','Football19Key'); //NOTE - keep this in step with same value in index.php
+
 
 
 function forbidden() {
@@ -71,8 +71,9 @@ function tick() {
 //Check that call is legit
 if(!isset($_COOKIE['MBBall'])) forbidden();
 $user = unserialize($_COOKIE['MBBall']);
-if ($user['key'] != sha1(PRIVATE_KEY.$user['timestamp'].$user['uid'].serialize($user['data']))) forbidden();
-$uid = $user['id']; //This is the one parameter that is important.
+//NOTE - keep sha1 in step with same value in index.php
+if ($user['key'] != sha1('Football19Key'.$user['timestamp'].$user['uid'].serialize($user['data']))) forbidden();
+$uid = $user['uid']; //This is the one parameter that is important.
 
 //This is a convenient place to force everything we output to not be cached 
 header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
@@ -80,7 +81,7 @@ header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); // Date in the past
 
 class DB extends PDO {
     private static $instance;
-    private function __construct()
+    public function __construct()  //DO NOT USE DIRECTLY, call via get()
     {
     	parent::__construct('sqlite:'.DATA_DIR.'football.db');
     }
@@ -95,13 +96,15 @@ class DB extends PDO {
 			} else {
 				self::$instance = new $className;	
 			}
-			self::$instance->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);  // We might as well know about any problems asap (for debugging, drop for production)
+			if(defined('DEBUG')) {
+				self::$instance->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);  // We might as well know about any problems asap (for debugging, drop for production)
+			}
 			self::$instance->setAttribute(PDO::ATTR_TIMEOUT,25);  //set 25 second timeout on obtaining a lock
 			self::$instance->exec("PRAGMA foreign_keys = ON");
         }
         return self::$instance;
     }
-    public function prepare($sql) {
+    public function prepare($sql,$options=NULL) {
     	return new STMT(parent::prepare($sql));
     }
     public function getCounts() {
@@ -112,8 +115,10 @@ class DB extends PDO {
 class STMT {
 	private static $count = 0;
 	private $_s;
+	private $_executed;
 	public function __CONSTRUCT($s) {
 		$this->_s = $s;
+		$this->_executed = false;
 	}
 	public function bindString($i,$string) {
 		$this->_s->bindValue($i,$string);
@@ -121,22 +126,34 @@ class STMT {
 	public function bindInt($i,$value) {
 		$this->_s->bindValue($i,$value,PDO::PARAM_INT);
 	}
+	public function bindBool($i,$value) {
+		$this->_s->bindValue($i,$value,PDO::PARAM_BOOL);
+	}
 	public function exec() {
 		self::$count++;
 		$this->_s->execute();
+		$this->_executed = true;
 	}
 	public function fetchRow() {
+		if(!$this->_executed) $this->exec();
 		return $this->_s->fetch(PDO::FETCH_ASSOC);
 	}
-	public function fetchValue($name) {
+	public function fetchSetting($name) {
 		$this->_s->bindValue(1,$name);
-		$this->_s->exec();
+		return $this->fetchValue();
+	}
+	public function fetchValue() {
+		$this->exec();
 		$r = $this->_s->fetchColumn();
-		$this->_s->closeCursor();
+		$this->close();
 		return $r;
 	}
 	public function close() {
 		$this->_s->closeCursor();
+		$this->_executed = false;
+	}
+	public function effected() {
+		return $this->_s->rowCount();
 	}
 	public function __destruct() {
 		$this->_s->closeCursor();

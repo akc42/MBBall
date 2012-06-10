@@ -27,7 +27,7 @@
 	<link rel="stylesheet" type="text/css" href="css/template.css"/>
 <?php
 if(defined('DEBUG')) {
-?><script src="/js/mootools-core-1.4.5-full-nocompat.js" type="text/javascript" charset="UTF-8"></script>
+?><script src="js/mootools-core-1.4.5-full-nocompat.js" type="text/javascript" charset="UTF-8"></script>
 <?php
 } else {
 ?>	<script src="js/mootools-core-1.4.5-full-nocompat-yc.js" type="text/javascript" charset="UTF-8"></script>

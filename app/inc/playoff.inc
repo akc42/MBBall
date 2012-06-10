@@ -18,80 +18,113 @@
     along with MBBall (file COPYING.txt).  If not, see <http://www.gnu.org/licenses/>.
 
 */
-require_once('./team.inc');
-
+require_once('./inc/team.inc');
 
 ?><h1>Players Playoff Picks</h1>
 <?php
-foreach($confs as $confid => $conference) {
-	$sql = 'SELECT u.name, u.uid, p.score FROM registration r JOIN participant u USING (uid)';
-	$sql .= ' LEFT JOIN playoff_score p ON r.cid = p.cid AND r.uid = p.uid AND p.confid = '.dbMakeSafe($confid);
-	$sql .= ' WHERE r.cid = '.dbMakeSafe($cid);
-	$sql .= ' ORDER BY COALESCE(score,0) DESC, u.name;';
-	$result = dbQuery($sql);
 
+$sql = " SELECT u.uid, u.name, p.tid AS tid, COALESCE(s.score,0) AS score,s.confid AS confid";
+$sql .= " FROM";
+$sql .= "	registration r";
+$sql .= " 	JOIN participant u USING (uid)";
+$sql .= " 	JOIN playoff_score s USING(cid,uid)";
+$sql .= " 	JOIN playoff_picks p USING (cid,uid,confid)";
+$sql .= " WHERE";
+$sql .= " 	r.cid = ? ";
+$sql .= " ORDER BY";
+$sql .= " 	s.confid,";
+$sql .= " 	COALESCE(s.score,0) DESC,";
+$sql .= " 	u.name COLLATE NOCASE";
+
+$u = $db->prepare($sql);
+$u->bindInt(1,$cid);
+
+$lastconfid = "";
+$lastuid = 0;
+
+if($newrow = $u->fetchRow()) {
+	$alldone = false;
+} else {
+	$alldone = true;
+}
+
+while(!$alldone){
+	$row = $newrow;
+	if(!($newrow = $u->fetchRow())) {
+		$alldone = true;
+	}
+	if($lastconfid != $row['confid']) {
+		$confid = $row['confid'];
+		$conference = $confs[$confid];
+		$lastconfid = $confid;
 ?><table>
 	<thead>
 		<tr><th rowspan="2"><?php echo $conference;?></th>
 <?php
-	foreach($divs as $divid => $division){
+		foreach($divs as $divid => $division){
 ?>			<th colspan="<?php echo $sizes[$confid][$divid];?>">
 				<?php echo $division; ?></th>
 <?php
-	}
+		}
 
 ?>			<th rowspan="2" class="score">Score</td>
 		</tr>
 		<tr>
 <?php
-
-	foreach($divs as $divid => $division) {
-		if(isset($teams[$confid][$divid])) {
-			foreach($teams[$confid][$divid] as $team) {
+	
+		foreach($divs as $divid => $division) {
+			if(isset($teams[$confid][$divid])) {
+				foreach($teams[$confid][$divid] as $team) {
 ?>			<th class="tid"><?php if($team['mp']) {echo tick();}echo $team['tid'];?></th>
 <?php
-			}
-		} else {
+				}
+			} else {
 ?><th class="tid">&nbsp;</th>
 <?php
-        }
-	}
+	        }
+		}
 ?>		</tr>
 	</thead>
 	<tbody>
 <?php
-	while($row = dbFetchRow($result)) {
-		$playoff_selections = array();
-		$resultplay = dbQuery('SELECT tid  FROM playoff_picks JOIN team t USING (tid) '
-				.' WHERE cid = '.dbMakeSafe($cid).' AND uid = '.dbMakeSafe($row['uid']).' AND t.confid = '.dbMakeSafe($confid).' ;');
-		while($playdata = dbFetchRow($resultplay)) {
-			$playoff_selections[trim($playdata['tid'])] = 1;
-		}
+		$lastuid = 0;
+	}
+	if($lastuid != $row['uid'])	{
+		//Open a new row
 ?>		<tr>
 			<td class="user_name"><?php echo $row['name']; ?></td>
 <?php
-		foreach($divs as $divid => $division){
+		$playoff_selections = Array();
+		$lastuid = $row['uid'];		
+	}
+	$playoff_selections[trim($row['tid'])] = 1;
+			
+	if( $alldone ||$newrow['uid'] != $lastuid) {
+	//now we have to close the previous role
+		foreach($divs as $divid => $division) {
     		if(isset($teams[$confid][$divid])) {
 			    foreach($teams[$confid][$divid] as $team) {
 				    $correct = ($team['mp'] && isset($playoff_selections[$team['tid']]));
     ?>				<td <?php if($correct) {echo 'class="tid win"';}else{ echo 'class="tid"';}?>>
 					    <?php if(isset($playoff_selections[$team['tid']])) echo '<img src="images/sel.gif" alt="'.$team['tid'].' selected"/>';if($correct) tick();?></td>
-    <?php
+	    <?php
 			    }
     		} else {
 ?><td class="tid">&nbsp;</td>
 <?php
     		}
         }
-		dbFree($resultplay);
-		unset($playoff_selections);
 ?>			<td class="score"><?php echo $row['score'];?></td>
 		</tr>
 <?php
 	}
-	dbFree($result);
+	if($alldone || $newrow['confid'] != $lastconfid) {
 ?>	</tbody>
 </table>
 <?php
+	}
 }
+unset($newrow);
+unset($playoff_selections);
+unset($u);
 ?>

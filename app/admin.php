@@ -26,9 +26,9 @@ if (!(isset($_GET['global']) || isset($_GET['cid'])))
 require_once('./inc/db.inc'); //This will also validate user
 
 $s = $db->prepare("SELECT value FROM settings WHERE name = ?");
-define('MBBALL_EMOTICON_DIR',$s->fetchValue('emoticon_dir'));
-define('MBBALL_EMOTICON_URL',$s->fetchValue('emoticon_url'));
-define('MBBALL_TEMPLATE',$s->fetchValue('template'));
+define('MBBALL_EMOTICON_DIR',$s->fetchSetting('emoticon_dir'));
+define('MBBALL_EMOTICON_URL',$s->fetchSetting('emoticon_url'));
+define('MBBALL_TEMPLATE',$s->fetchSetting('template'));
 unset($s);
 
 require_once('./inc/bbcode.inc');
@@ -40,7 +40,7 @@ function head_content () {
 	<link rel="stylesheet" type="text/css" href="calendar/calendar.css"/>
 	<link rel="stylesheet" type="text/css" href="ball.css"/>
 <?php
-	if(defined(DEBUG) {
+	if(defined(DEBUG)) {
 ?>	<script src="js/mootools-dragmove-1.4.0.1.js" type="text/javascript" charset="UTF-8"></script>
 <?php
 	} else {

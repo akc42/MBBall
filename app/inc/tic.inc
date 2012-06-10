@@ -18,7 +18,7 @@
     along with MBBall (file COPYING.txt).  If not, see <http://www.gnu.org/licenses/>.
 
 */
-require_once('./team.inc');
+require_once('./inc/team.inc');
 
 ?><table>
 	<caption>List of teams in competition</caption>
@@ -74,7 +74,7 @@ foreach($confs as $confid => $conference) {
 			<td>
 <?php 
 					if(!is_null($row['logo'])) {
-						$logopath = MBBALL_ICON_PATH.$row['logo'];
+						$logopath = 'images/'.$row['logo'];
 						if (!is_null($row['url'])) {			
 							echo '<a href="'.$row['url'].'"><img src="'.$logopath.'" alt="team logo" /></a>';
 						} else {

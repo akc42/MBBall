@@ -100,7 +100,7 @@ CREATE TABLE participant (
     name character varying,
     email character varying,
     password character varying, --stores md5 of password to enable login if doing local authentication
-    last_logon bigint DEFAULT 0 NOT NULL, --last time user connected
+    last_logon bigint DEFAULT (strftime('%s','now')) NOT NULL, --last time user connected
     admin_experience boolean DEFAULT 0 NOT NULL,--Set true if user has ever been administrator
     is_global_admin boolean DEFAULT 0 NOT NULL, -- Set true if user is global admin
     is_guest boolean DEFAULT false NOT NULL --user is a guest and requires approving before is registered (baby backup from Melinda's Backups)

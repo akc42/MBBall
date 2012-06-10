@@ -19,6 +19,11 @@
     see <http://www.gnu.org/licenses/>.
 
 */
+
+require_once('./inc/db.inc');
+$s = $db->prepare("SELECT value FROM settings WHERE name = ?");
+define('MBBALL_TEMPLATE',$s->fetchSetting('template'));
+setcookie('MBBall','',time() - 3600);  //Expire the cookie
 function head_content() {
 ?>
 	<title>Melinda's Backups Football Pool Guest Page</title>
@@ -42,8 +47,8 @@ function content() {
 <?php
 }
 function foot_content() {
-?>	<div id="copyright">MBball <span><?php include('./version.inc');?></span> &copy; 2008-2012 Alan Chandler.  Licenced under the GPL</div>
+?>	<div id="copyright">MBball <span><?php include('./inc/version.inc');?></span> &copy; 2008-2012 Alan Chandler.  Licenced under the GPL</div>
 <?php
 }
-require_once($_SERVER['DOCUMENT_ROOT'].'/inc/template.inc'); 
+require_once(MBBALL_TEMPLATE); 
 ?>

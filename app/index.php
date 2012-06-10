@@ -28,26 +28,19 @@ define('MBBALL_ICON_PATH',	dirname(__FILE__)."/images/"); //URL where football I
 define('SMF_FOOTBALL',		21);  //Group that can administer
 define('SMF_BABY',		10);  //Baby backup
 
-define('PRIVATE_KEY','Football19Key'); //NOTE - keep this in step with same value in inc/db.inc
-
-
 $time_head = microtime(true);
 
 if(!isset($_COOKIE['MBBall'])) {
 	require_once($_SERVER['DOCUMENT_ROOT'].'/forum/SSI.php');
 	//If not logged in to the forum, not allowed any further so redirect to page to say so
-	if($user_info['is_guest']) {
-		header( 'Location: football.php' ) ;
-		exit;
-	}
 	$user = Array();
 	$user_data = Array();
 	
 	$groups =& $user_info['groups'];
 	if(isset($user_info['id'])) { //check if this is SMFv2
-		$user['id'] =& $user_info['id'];
+		$user['uid'] =& $user_info['id'];
 	} else {
-		$user['id'] = $ID_MEMBER;
+		$user['uid'] = $ID_MEMBER;
 	}
 	$user_data['name'] =& $user_info['name'];
 	$user_data['email'] =& $user_info['email'];
@@ -55,10 +48,15 @@ if(!isset($_COOKIE['MBBall'])) {
 	$user_data['guest'] = in_array(SMF_BABY,$groups);
 	$user['data'] = $user_data;
 	$user['timestamp'] = time();
-    $user['key'] = sha1(PRIVATE_KEY.$user['timestamp'].$user['uid'].serialize($user['data']));
+    $user['key'] = sha1('Football19Key'.$user['timestamp'].$user['uid'].serialize($user['data']));//NOTE - keep first part of SHA1 same as in inc/db.inc
 	setcookie('MBBall',serialize($user),0);  //Cookie only lasts this session, 
+	$_COOKIE['MBBall'] = serialize($user);  //Make a copy for this access
 	unset($user);
 	unset($user_data);
+	if($user_info['is_guest']) {
+		header( 'Location: football.php' ) ;
+		exit;
+	}
 	unset($user_info);
 	unset($groups);
 }
@@ -69,45 +67,63 @@ if(!isset($_COOKIE['MBBall'])) {
 $time_db = microtime(true);
 
 require_once('./inc/db.inc');
+if($uid == 0) forbidden(); //Extra guard against guests who having gone to football, login again
 $email = $user['data']['email'];
-$guest = $user['data']['is_guest'];
+$guest = $user['data']['guest'];
 $name = $user['data']['name'];
 //Update participant record with this user
+$sql = "UPDATE participant SET name = ?, email = ?, is_guest = ?, last_logon = strftime('%s','now')";
 if ($user['data']['admin']) {
-	$sql = "REPLACE INTO participant(uid,name,email,is_guest,last_logon,admin_experience,is_global_admin) VALUES(?,?,?,?,DEFAULT,1,1)";
+	$sql .= ", admin_experience = 1,is_global_admin = 1 WHERE uid = ?"; 
+	$sql2 = "INSERT INTO participant(uid,name,email,is_guest,last_logon,admin_experience,is_global_admin) VALUES(?,?,?,?,strftime('%s','now'),1,1)";
 	$global_admin = true;
 } else {
 	$global_admin = false;
-	$sql = "REPLACE INTO participant(uid,name,email,is_guest,last_logon) VALUES (?,?,?,?,DEFAULT)";
+	$sql .= " WHERE uid = ?";
+	$sql2 = "INSERT INTO participant(uid,name,email,is_guest,last_logon) VALUES (?,?,?,?,strftime('%s','now'))";
 }
+
+$db->exec("BEGIN TRANSACTION");  //The whole page will run within one transaction - so its faster
+
 $p = $db->prepare($sql);
-$p->bindInt(1,$uid);
-$p->bindString(2,$name);
-$p->bindString(3,$email);
-$p->bindBool(4,$guest);
+$p->bindString(1,$name);
+$p->bindString(2,$email);
+$p->bindBool(3,$guest);
+$p->bindInt(4,$uid);
 $p->exec();
+if($p->effected() == 0) {
+	unset($p);
+	//No update occured so we have to insert
+	$p = $db->prepare($sql2);
+	$p->bindInt(1,$uid);
+	$p->bindString(2,$name);
+	$p->bindString(3,$email);
+	$p->bindBool(4,$guest);
+	$p->exec();
+}
 unset($p);
 unset($user);  //done with it.
 
 
 $s = $db->prepare("SELECT value FROM settings WHERE name = ?");
-define('MBBALL_MAX_ROUND_DISPLAY',$s->fetchValue('max_round_display'));
-define('MBBALL_FORUM_PATH',$s->fetchValue('home_url'));
-define('MBBALL_EMOTICON_DIR',$s->fetchValue('emoticon_dir'));
-define('MBBALL_EMOTICON_URL',$s->fetchValue('emoticon_url'));
-define('MBBALL_TEMPLATE',$s->fetchValue('template'));
+define('MBBALL_MAX_ROUND_DISPLAY',$s->fetchSetting('max_round_display'));
+define('MBBALL_FORUM_PATH',$s->fetchSetting('home_url'));
+define('MBBALL_EMOTICON_DIR',$s->fetchSetting('emoticon_dir'));
+define('MBBALL_EMOTICON_URL',$s->fetchSetting('emoticon_url'));
+define('MBBALL_TEMPLATE',$s->fetchSetting('template'));
 
 
 if(isset($_GET['cid'])) {
 	$cid = $_GET['cid'];
 } else {
-	$cid = $s->fetchValue('default_competition');
+	$cid = $s->fetchSetting('default_competition');
 	if ($cid == 0) {
 		if($global_admin) {
 			header( 'Location: admin.php?uid='.$uid.'&global=true' ) ;
 		} else {
 			header( 'Location: nostart.php' ) ;
 		};
+		$db->exec("ROLLBACK");
 		exit;
 	}
 }
@@ -116,13 +132,14 @@ unset($s);
 $c = $db->prepare("SELECT * FROM Competition c JOIN participant u ON c.administrator = u.uid WHERE cid = ?");
 $c->bindInt(1,$cid);
 $c->exec();
-if(!$row = $c->fetch()) {
+if(!$row = $c->fetchRow()) {
 	//This competition doesn't exist yet
 	if($global_admin) {
 		header( 'Location: admin.php?uid='.$uid.'&global=true&cid='.$cid ) ;
 	} else {
 		header( 'Location: nostart.php' ) ;
 	};
+	$db->exec("ROLLBACK");
 	exit;
 }	
 $admin = false;
@@ -141,15 +158,15 @@ $approval_required = ($row['guest_approval'] == 1); //BB approval is required
 $condition = $row['condition'];
 $admName = $row['name'];
 $competitiontitle = $row['description'];
+$competitionCache = $row['results_cache'];
 unset($c);
 
 $r = $db->prepare("SELECT * FROM registration WHERE uid = ? AND cid = ?");
 $r->bindInt(1,$uid);
 $r->bindInt(2,$cid);
-$r->exec();
-if($row = $r->fetch()) {
+if($row = $r->fetchRow()) {
 	$signedup = true;
-	if ($approval_required && $row['bb_approved'] != 1 && $guest) {
+	if ($approval_required && $row['approved'] != 1 && $guest) {
 		$registered = false;
 	} else {
 		$registered = true;
@@ -164,11 +181,10 @@ if (isset($_GET['rid'])) {
 	$r = $db->prepare("SELECT * FROM round WHERE open = 1 AND cid = ? AND rid = ?");
 	$r->bindInt(2,$_GET['rid']);
 } else {
-	$r = $db->prepare("SELECT * FROM round WHERE cid = ? AND open = 1 ORDER BY rid LIMIT 1 DESC");  //find highest round where at least one match is open
+	$r = $db->prepare("SELECT * FROM round WHERE cid = ? AND open = 1 ORDER BY rid DESC LIMIT 1");  //find highest round where at least one match is open
 }
 $r->bindInt(1,$cid);
-$r->exec();
-if ($rounddata = $r->fetch()) {
+if ($rounddata = $r->fetchRow()) {
 	$rid = $rounddata['rid'];
 } else {
 	$rid=0;
@@ -178,9 +194,9 @@ unset($r);
 function head_content() {
 	global $uid, $registered, $cid, $rid
 ?>	<title>Melinda's Backups Football Pool</title>
-	<link rel="stylesheet" type="text/css" href="ball.css"/>
-	<script src="mbball.js" type="text/javascript" charset="UTF-8"></script>
-	<script src="mbuser.js" type="text/javascript" charset="UTF-8"></script>
+	<link rel="stylesheet" type="text/css" href="css/ball.css"/>
+	<script src="js/mbball.js" type="text/javascript" charset="UTF-8"></script>
+	<script src="js/mbuser.js" type="text/javascript" charset="UTF-8"></script>
 	<script type="text/javascript">
 	<!--
 
@@ -203,16 +219,15 @@ function content_title() {
 	echo $competitiontitle;
 }
 function menu_items () {
-	global $cid,$rid,$uid,$global_admin,$db;
+	global $cid,$rid,$uid,$global_admin,$admin,$db;
 ?>		<li><a href="/forum"><span>Return to the Forum</span></a></li>
 <?php
 	$maxrid = $rid;
 	$r = $db->prepare("SELECT rid,name FROM round WHERE open = 1 AND cid = ? and rid <> ? ORDER BY rid DESC");
 	$r->bindInt(1,$cid);
 	$r->bindInt(2,$rid);
-	$r->exec();
 	$do_first = true;
-	while($row = $r->fetch()) {
+	while($row = $r->fetchRow()) {
 		if($row['rid'] > $maxrid) $maxrid = $row['rid'];
 		if ($do_first) {
 		// more than one round, so we need to have a menu for the others
@@ -243,9 +258,8 @@ function menu_items () {
 	$c = $db->prepare($sql);
 	$c->bindInt(1,$uid);
 	$c->bindInt(2,$cid);
-	$c->exec();
 	$do_first = true;
-	while($row = $c->fetch()){
+	while($row = $c->fetchRow()){
 		if($do_first) {
 ?>		<li><a href="#"><span class="down">Competitions</span><!--[if gte IE 7]><!--></a><!--<![endif]-->
 		<!--[if lte IE 6]><table><tr><td><![endif]-->
@@ -280,8 +294,8 @@ function menu_items () {
 }
 
 function content() {
-	global $db,$cid,$rid,$uid,$registered,$signedup,$admName,$registration_allowed,
-		$rounddata,$gap,$playoff_deadline,$approval_required,$email,$global_admin,$name,$condition,$search,$replace;
+	global $db,$cid,$rid,$uid,$registered,$signedup,$admName,$registration_allowed,$guest,
+		$rounddata,$gap,$playoff_deadline,$approval_required,$email,$global_admin,$name,$condition,$search,$replace,$competitionCache;
 ?><div id="errormessage"></div>
 	<table class="layout">
 		<tbody>
@@ -311,7 +325,7 @@ function content() {
 	if($registration_allowed) {
 ?>			<tr>
 				<td><div id="summary"><?php require_once ('./inc/summary.inc');?></div></td>
-				<td id="r"><div id="registration"><?php require_once ('./registration.inc');?></div></td>
+				<td id="r"><div id="registration"><?php require_once ('./inc/registration.inc');?></div></td>
 			</tr>
 <?php
 } else {
@@ -331,10 +345,11 @@ if ($playoff_deadline != 0) {
 }	
 function foot_content() {
 	global $db,$time_head,$time_db;
-?>	<div id="copyright">MBball <span><?php include('./version.inc');?></span> &copy; 2008-2012 Alan Chandler.  Licenced under the GPL</div>
+?>	<div id="copyright">MBball <span><?php include('./inc/version.inc');?></span> &copy; 2008-2012 Alan Chandler.  Licenced under the GPL</div>
 	<div id="timing"><?php $time_now = microtime(true); printf("With %d queries, page displayed in %.3f secs of which %.3f secs was in forum checks",$db->getCounts(),$time_now - $time_head,$time_db-$time_head);?></div>
 <?php
 }
 require_once(MBBALL_TEMPLATE); 
+$db->exec("COMMIT");  //Time to write back any updates we actually did during the creation of the page
 ?>
 

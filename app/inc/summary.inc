@@ -23,12 +23,16 @@
 	<thead>
 		<tr><th class="user_name">Name</th>
 <?php
-$result = dbQuery('SELECT name FROM round WHERE open IS TRUE AND cid = '.dbMakeSafe($cid).' AND rid <= '.dbMakeSafe($rid).' ORDER BY rid DESC LIMIT '.MBBALL_MAX_ROUND_DISPLAY.' ;');
-while($row = dbFetchRow($result)) {
+$noRounds = 0;
+$r = $db->prepare("SELECT name FROM round WHERE open = 1 AND cid = ? and rid <= ? ORDER BY rid DESC LIMIT ".MBBALL_MAX_ROUND_DISPLAY);
+$r->bindInt(1,$cid);
+$r->bindInt(2,$rid);
+while($row = $r->fetchRow()) {
 ?>			<th><?php echo $row['name']; ?></th>
 <?php
+	$noRounds++; //Keep a count of rounds so we can know when to add the summary
 }
-dbFree($result);
+unset($r);
 ?>			<th class="score">Rounds<br/>Total</th>
 			<th class="score">PlayOffs<br/>Total</th>
 			<th class="score">Grand<br/>Total</th>
@@ -36,34 +40,58 @@ dbFree($result);
 	</thead>
 	<tbody>
 <?php
+
 if ($rid != 0) {
-	$sql = 'SELECT u.uid, u.name AS name, p.pscore, sum(r.score) AS rscore, p.pscore+sum(r.score) AS total';
-	$sql .= ' FROM participant u JOIN registration reg USING (uid) JOIN';
-	$sql .= ' (SELECT cid,uid, sum(score) AS pscore FROM playoff_score GROUP BY cid,uid) AS p';
-	$sql .= ' USING (cid,uid) JOIN round_score r USING (cid,uid)';
-	$sql .= ' WHERE cid = '.dbMakeSafe($cid).' AND rid <= '.dbMakeSafe($rid);
-	$sql .= ' GROUP BY u.uid, u.name,p.pscore  ORDER BY total DESC,u.name;';
+	$sql = "SELECT r.score AS score,t.uid AS uid,t.name AS name,t.rscore AS rscore,t.pscore AS pscore,(t.rscore + t.pscore) AS tscore";
+	$sql .=  " FROM (";
+	$sql .=  "  SELECT r.cid,u.uid,u.name AS name,sum(rs.score) AS rscore,p.pscore";
+	$sql .=  "  FROM participant u JOIN registration r USING (uid)";
+	$sql .=  "   JOIN round_score rs USING (cid,uid)";
+	$sql .=  "   JOIN (";
+	$sql .=  "	   SELECT cid,uid,sum(score) as pscore";
+	$sql .=  "     FROM playoff_score GROUP BY cid,uid";
+	$sql .=  "	 ) p USING (cid,uid)";
+	$sql .=  "  GROUP BY r.cid,u.uid,u.name,p.pscore";
+	$sql .=  " ) t";
+	$sql .=  "  JOIN (";
+	$sql .=  "	  SELECT cid,uid, rounds.rid,score"; 
+	$sql .=  "    FROM round_score rs JOIN (";
+	$sql .=  "      SELECT cid,rid,name FROM round";
+	$sql .=  "      WHERE cid = ? AND open = 1 AND rid <= ?";
+	$sql .=  "      ORDER BY rid DESC LIMIT ".MBBALL_MAX_ROUND_DISPLAY;
+	$sql .=  "  ) AS rounds USING (cid,rid)"; 
+	$sql .=  " ) r USING (cid,uid)";  
+	$sql .=  " ORDER BY (pscore + rscore) DESC, t.name COLLATE NOCASE,rid DESC";
+	$r = $db->prepare($sql);
+	$r->bindInt(1,$cid);
+	$r->bindInt(2,$rid);
 } else {
-	$sql .= 'SELECT u.uid, u.name AS name, 0 AS pscore, 0 AS rscore, 0 AS total';
-	$sql .= ' FROM participant u JOIN registration reg USING (uid) WHERE cid = '.dbMakeSafe($cid).' ORDER BY u.name;';
+	$sql = "SELECT 0 As score,u.uid AS uid, u.name AS name, 0 AS pscore, 0 AS rscore, 0 AS total";
+	$sql .= " FROM participant u JOIN registration r USING (uid) WHERE cid = ? ORDER BY u.name COLLATE NOCASE";
+	$r = $db->prepare($sql);
+	$r->bindInt(1,$cid);
 }
-$result = dbQuery($sql);
-while($row = dbFetchRow($result)) {
-	
+$lastuid = 0;
+while ($row = $r->fetchRow()) {
+	if($row['uid'] <> $lastuid) {
+		$lastuid = $row['uid'];
+		$rowcounter = $noRounds;
 ?>		<tr>
 			<td <?php if($uid == $row['uid']) {echo 'class="user_name me"';} else {echo 'class="user_name"';}?>><?php echo $row['name'];?></td>
 <?php
-	$resultround = dbQuery('SELECT score FROM round_score WHERE cid = '.dbMakeSafe($cid).' AND
-				 rid <= '.dbMakeSafe($rid).' AND uid = '.dbMakeSafe($row['uid']).' ORDER BY rid DESC LIMIT '.MBBALL_MAX_ROUND_DISPLAY.' ;');
-	while ($rscore = dbFetchRow($resultround)) {
-?>			<td <?php if($uid == $row['uid']) {echo 'class="score me"';} else {echo 'class="score"';}?>><?php echo $rscore['score'];?></td>
+	}
+	if($rid != 0) {
+?>			<td <?php if($uid == $row['uid']) {echo 'class="score me"';} else {echo 'class="score"';}?>><?php echo $row['score'];?></td>
 <?php
 	}
+	if(--$rowcounter <= 0) {
 ?>			<td <?php if($uid == $row['uid']) {echo 'class="score me"';} else {echo 'class="score"';}?>><?php echo $row['rscore'];?></td>
 			<td <?php if($uid == $row['uid']) {echo 'class="score me"';} else {echo 'class="score"';}?>><?php echo $row['pscore'];?></td>
-			<td <?php if($uid == $row['uid']) {echo 'class="score me"';} else {echo 'class="score"';}?>><?php echo $row['total'];?></td>
+			<td <?php if($uid == $row['uid']) {echo 'class="score me"';} else {echo 'class="score"';}?>><?php echo $row['tscore'];?></td>
 		</tr>
 <?php
+	}
 }
+unset($r);
 ?>	</tbody>
 </table>
