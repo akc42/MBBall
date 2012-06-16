@@ -1,6 +1,6 @@
 <?php
 /*
- 	Copyright (c) 2008,-2011 Alan Chandler
+ 	Copyright (c) 2008-2012 Alan Chandler
     This file is part of MBBall, an American Football Results Picking
     Competition Management software suite.
 
@@ -15,10 +15,13 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with MBBall (file supporting/COPYING.txt).  If not, 
-    see <http://www.gnu.org/licenses/>.
+    along with MBBall (file COPYING.txt).  If not, see <http://www.gnu.org/licenses/>.
 
 */
+require_once('./inc/db.inc');
+$s = $db->prepare("SELECT value FROM settings WHERE name = ?");
+define('MBBALL_TEMPLATE',$s->fetchSetting('template'));
+unset($s);
 function head_content() {
 ?>
 	<title>Melinda's Backups Football Pool Members No Competition</title>
@@ -39,8 +42,8 @@ function content() {
 <?php
 }
 function foot_content() {
-?>	<div id="copyright">MBball <span><?php include('./version.inc');?></span> &copy; 2008-2011 Alan Chandler.  Licenced under the GPL</div>
+?>	<div id="copyright">MBball <span><?php include('./inc/version.inc');?></span> &copy; 2008-2012 Alan Chandler.  Licenced under the GPL</div>
 <?php
 }
-require_once($_SERVER['DOCUMENT_ROOT'].'/inc/template.inc'); 
+require_once(MBBALL_TEMPLATE); 
 ?>

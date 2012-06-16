@@ -1,6 +1,6 @@
 <?php
 /*
- 	Copyright (c) 2008,2009 Alan Chandler
+ 	Copyright (c) 2008-2012 Alan Chandler
     This file is part of MBBall, an American Football Results Picking
     Competition Management software suite.
 
@@ -18,38 +18,41 @@
     along with MBBall (file COPYING.txt).  If not, see <http://www.gnu.org/licenses/>.
 
 */
-if(!(isset($_POST['uid']) && isset($_POST['pass'])  && isset($_POST['desc']) && isset($_POST['adm'])))
-	die('Hacking attempt - wrong parameters');
-$uid = $_POST['uid'];
-$password = $_POST['pass'];
-if ($password != sha1("Football".$uid))
-	die('Hacking attempt got: '.$password.' expected: '.sha1("Football".$uid));
-require_once('./db.inc');
-$adm=dbMakeSafe($_POST['adm']);
-dbQuery('BEGIN ;');
-$result=dbQuery('SELECT * FROM participant WHERE uid = '.$adm.';');
-if (dbNumRows($result) == 0) {
-	$adm = 'NULL';
-} else {
-	dbQuery('UPDATE participant SET admin_experience = TRUE WHERE uid = '.$adm.';');
-}
-dbFree($result);
+require_once('./inc/db.inc');
 
-dbQuery('INSERT INTO competition (description,administrator) VALUES ('.dbPostSafe($_POST['desc']).','.$adm.');');
-$result=dbQuery('SELECT currval(\'competition_cid_seq\') AS lastval ;');
-$row=dbFetchRow($result);
-$lastval = $row['lastval'];
-dbFree($result);
-if(isset($_POST['setdefault'])) {
+
+if(!(isset($_POST['desc']) && isset($_POST['adm']))) forbidden();
+
+$adm=$_POST['adm'];
+$db->exec("BEGIN TRANSACTION");
+
+$u = $db->prepare("SELECT COUNT(*) FROM participant WHERE uid = ? ");
+$u->bindInt(1,$adm);
+$users = $u->fetchValue();
+unset($u);
+
+$u = $db->prepare("UPDATE participant SET admin_experience = 1 WHERE uid = ?");
+$u->bindInt(1,$adm);
+$u->exec();
+unset($u);
+
+$c= $db->prepare("INSERT INTO competition(description,administrator) VALUES(?,?)");
+$c->bindString(1,$_POST['desc']);
+$c->bindInt(2,$adm);
+$c->exec();
+unset($c);
+$lastVal = $db->lastInsertID();
+
+$c = $db->prepare("SELECT COUNT(*) FROM competition");
+$noComps =  $c->fetchValue();
+unset($c);
+
+$d = $db->prepare("UPDATE settings SET value = ? WHERE name = 'default_competition");
+$d->bindInt(1,$lastval);
+if(isset($_POST['setdefault']) || $noComps <= 1) {
 	dbQuery('UPDATE default_competition SET cid = '.dbMakeSafe($lastval).' ;');
-} else {
-	$result=dbQuery('SELECT count(*) FROM competition;');
-	$row = dbFetchRow($result);
-	if($row['count'] <= 1) {
-		dbQuery('UPDATE default_competition SET cid = '.dbMakeSafe($lastval).' ;');
-	}
 }
-dbQuery('COMMIT ;');
+$db->exec("COMMIT");
 
 echo '{"cid":'.$lastval.'}';
 ?>

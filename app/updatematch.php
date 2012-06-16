@@ -1,6 +1,6 @@
 <?php
 /*
- 	Copyright (c) 2008,2009 Alan Chandler
+ 	Copyright (c) 2008-2012 Alan Chandler
     This file is part of MBBall, an American Football Results Picking
     Competition Management software suite.
 
@@ -18,62 +18,63 @@
     along with MBBall (file COPYING.txt).  If not, see <http://www.gnu.org/licenses/>.
 
 */
-if(!(isset($_POST['uid']) && isset($_POST['pass'])  && isset($_POST['cid']) && isset($_POST['rid']) && isset($_POST['hid']) ))
-	die('Hacking attempt - wrong parameters');
-$uid = $_POST['uid'];
-$password = $_POST['pass'];
-if ($password != sha1("Football".$uid))
-	die('Hacking attempt got: '.$password.' expected: '.sha1("Football".$uid));
-require_once('./db.inc');
+require_once('./inc/db.inc');
+if(!(isset($_POST['cid']) && isset($_POST['rid']) && isset($_POST['hid']) )) forbidden();
+
 $cid=$_POST['cid'];
 $rid=$_POST['rid'];
 $hid=$_POST['hid'];
 
-dbQuery('BEGIN ;');
-
-$result=dbQuery('SELECT * FROM match WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' AND hid = '.dbMakeSafe($hid).';');
-
-if (dbNumRows($result) != 0) {
+$db->exec("BEGIN TRANSACTION");
+$m = $db->prepare("SELECT COUNT(*) FROM match WHERE cid = ? AND rid = ? AND hid = ?");
+$m->bindInt(1,$cid);
+$m->bindInt(2,$rid);
+$m->bindString(3,$hid);
+$noMatch = $m->fetchValue();
+unset($m);
+if ($noMatch != 0) {
+	
+	$sql = "UPDATE match SET open = ?, hscore = ?, ascore = ?,combined_score = ?, match_time = ?, comment = ? ";
+	$sql .= " WHERE cid = ? AND rid = ? AND hid = ?";
 	$sql = 'UPDATE match SET';
-	if(isset($_POST['open'])) {
-		$sql .= ' open = TRUE';
-	} else {
-		$sql .= ' open = FALSE';
-	}
+	$m = $db->prepare($sql);
+	$m->bindInt(1,isset($_POST['open'])?1:0);
 	if(isset($_POST['hscore'])) {
-		$sql .= ', hscore = '.dbPostSafe($_POST['hscore']);
+		$m->bindInt(2,$_POST['hscore']);
 	}else {
-		$sql .= ', hscore = NULL';
+		$m->bindNull(2);
 	}
 	if(isset($_POST['ascore'])) {
-		$sql .= ', ascore = '.dbPostSafe($_POST['ascore']);
+		$m->bindInt(3,$_POST['ascore']);
 	}else {
-		$sql .= ', ascore = NULL';
+		$m->bindNull(3);
 	}
 	if(isset($_POST['cscore'])) {
-		$sql .= ', combined_score = '.dbPostSafe($_POST['cscore']);
+		$m->bindInt(4,$_POST['cscore']);
 	}else {
-		$sql .= ', combined_score = NULL';
+		$m->bindNull(4);
 	}
 	if(isset($_POST['mtime']) && $_POST['mtime'] != 0) {
-		$sql .= ', match_time = '.dbPostSafe($_POST['mtime']);
+		$m->bindInt(5,$_POST['mtime']);
 	}else {
-		$sql .= ', match_time = NULL';
+		$m->bindNull(5);
 	}
 	if(isset($_POST['comment'])) {
-		$sql .= ', comment = '.dbPostSafe($_POST['comment']);
+		$m->bindString(6,$_POST['comment']);
 	}else {
-		$sql .= ', comment = NULL';
+		$m->bindNull(6);
 	}
-	$sql .= ' WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' AND hid = '.dbMakeSafe($hid).';';
-	dbQuery($sql);
-	dbQuery('COMMIT ;');
+	$m->bindInt(7,$cid);
+	$m->bindInt(8,$rid);
+	$m->bindString(9,$hid);
+	$m->exec();
+	unset($m);
+	$db->exec("COMMIT");
 	echo '{"cid":'.$cid.',"rid":'.$rid.',"hid":"'.$hid.'"}';
 
 } else {
 ?><p>Match does not exist</p>
 <?php
-	dbQuery('ROLLBACK;');
+	$db->exec("ROLLBACK");
 }
-dbFree($result);
 ?>

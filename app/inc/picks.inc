@@ -201,10 +201,10 @@ while ($nom > 0) {
 /* OVER UNDER PICK --------------------------------------------------------------------------------*/
 				if($ouRound && !is_null($pickdata['over_selected'])) {
 					if($pickdata['oscore'] > 0) {
-?>				<td class="win ou"><?php echo ($pickdata['over_selected'] == 't')?'Over':'Under';tick();?></td>
+?>				<td class="win ou"><?php echo ($pickdata['over_selected'] == 1)?'Over':'Under';tick();?></td>
 <?php
 					} else {
-?>				<td class="ou"><?php echo ($pickdata['over_selected'] == 't')?'Over':'Under';?></td>
+?>				<td class="ou"><?php echo ($pickdata['over_selected'] == 1)?'Over':'Under';?></td>
 <?php
 					}
 				} else {

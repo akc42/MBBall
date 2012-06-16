@@ -74,7 +74,7 @@ foreach($confs as $confid => $conference) {
 			<td>
 <?php 
 					if(!is_null($row['logo'])) {
-						$logopath = 'images/'.$row['logo'];
+						$logopath = MBBALL_ICON_PATH.$row['logo'];
 						if (!is_null($row['url'])) {			
 							echo '<a href="'.$row['url'].'"><img src="'.$logopath.'" alt="team logo" /></a>';
 						} else {

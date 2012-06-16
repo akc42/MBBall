@@ -1,6 +1,6 @@
 <?php
 /*
- 	Copyright (c) 2008,2009 Alan Chandler
+ 	Copyright (c) 2008-2012 Alan Chandler
     This file is part of MBBall, an American Football Results Picking
     Competition Management software suite.
 
@@ -18,46 +18,34 @@
     along with MBBall (file COPYING.txt).  If not, see <http://www.gnu.org/licenses/>.
 
 */
-if(!(isset($_POST['uid']) && isset($_POST['pass'])  && isset($_POST['cid']) && isset($_POST['rid']) && isset($_POST['rname'])
-	&& isset($_POST['deadline']) && isset($_POST['value']) ))
-	die('Hacking attempt - wrong parameters');
-$uid = $_POST['uid'];
-$password = $_POST['pass'];
-if ($password != sha1("Football".$uid))
-	die('Hacking attempt got: '.$password.' expected: '.sha1("Football".$uid));
-require_once('db.inc');
+require_once('./inc/db.inc');
+if(!(isset($_POST['cid']) && isset($_POST['rid']) && isset($_POST['rname'])
+	&& isset($_POST['deadline']) && isset($_POST['value']) )) forbidden();
 
-
-$sql = 'UPDATE round SET name = '.dbPostSafe($_POST['rname']).', value = '.dbMakeSafe($_POST['value']);
-$sql .= ', deadline = '.dbMakeSafe($_POST['deadline']); 
-if (isset($_POST['open'])) {
-	$sql .= ', open = TRUE';
-} else {
-	$sql .= ', open = FALSE';
-}
-if (isset($_POST['ou'])) {
-	$sql .= ', ou_round = TRUE';
-} else {
-	$sql .= ', ou_round = FALSE';
-}
+$sql = "UPDATE round SET name = ?, value = ?, deadline = ?, open = ?, ou_round = ?, valid_question = ?,answer = ?, ";
+$sql .= "question = ? WHERE cid = ? AND rid = ?";
+$r = $db->prepare($sql);
+$r->bindString(1,$_POST['rname']);
+$r->bindInt(2,$_POST['value']);
+$r->bindInt(3,$_POST['deadline']);
+$r->bindInt(4,isset($_POST['open'])?1:0);
+$r->bindInt(5,isset($_POST['ou'])?1:0);
 if (isset($_POST['validquestion'])) {
-	$sql .= ', valid_question = TRUE';
+	$r->bindInt(7,1);
 	if(isset($_POST['answer'])) {
-		$sql .= ', answer ='.dbPostSafe($_POST['answer']);
+		$r->bindInt(8,$_POST['answer']);
 	} else {
-		$sql .= ', answer = NULL';
+		$r->bindNull(8);
 	}
 } else {
-	$sql .= ', valid_question = FALSE, answer = NULL';
+	$r->bindInt(7,0);
+	$r->bindNull(8);
 }
-if(isset($_POST['question'])) {
-	$sql .= ', question = '.dbPostSafe($_POST['question']);
-} else {
-	$sql .= ', question = \'\'';
-}
-
-$sql .= ' WHERE cid = '.dbMakeSafe($_POST['cid']).' AND rid = '.dbMakeSafe($_POST['rid']).';';
-dbQuery($sql);
+$r->bindString(9,isset($_POST['question'])?$_POST['question']:'');
+$r->bindInt(10,$cid);
+$r->bindInt(11,$rid);
+$r->exec();
+unset($r);
 
 echo '{"cid":'.$_POST['cid'].',"rid":'.$_POST['rid'].'}';
 ?>

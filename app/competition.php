@@ -1,6 +1,6 @@
 <?php
 /*
- 	Copyright (c) 2008,2009 Alan Chandler
+ 	Copyright (c) 2008-2012 Alan Chandler
     This file is part of MBBall, an American Football Results Picking
     Competition Management software suite.
 
@@ -18,22 +18,19 @@
     along with MBBall (file COPYING.txt).  If not, see <http://www.gnu.org/licenses/>.
 
 */
-if(!(isset($_GET['uid']) && isset($_GET['pass']) && isset($_GET['cid'])))
-	die('Hacking attempt - wrong parameters');
-$uid = $_GET['uid'];
-$password = $_GET['pass'];
+
+require_once('./inc/db');
+if (!isset($_GET['cid'])) forbidden();
 $cid = $_GET['cid'];
 
-if ($password != sha1("Football".$uid))
-	die('Hacking attempt got: '.$password.' expected: '.sha1("Football".$uid));
 if ($cid != 0) {
-	require_once('./db.inc');
-	$resultcomp=dbQuery('SELECT * FROM competition WHERE cid = '.dbMakeSafe($cid).';');
-	if($comp = dbFetchRow($resultcomp)) {
+
+	
+	$c = $db->prepare("SELECT description,administrator FROM competition c LEFT JOIN participant u ON u.uid = c.administrator WHERE cid = ?");
+	$c->bindInt(1,$cid);	
+	if($comp = $c->FetchRow()) {
 ?>
 <form id="compform" action="updatecomp.php" >
-	<input type="hidden" name="uid" value="<?php echo $uid;?>" />
-	<input type="hidden" name="pass" value="<?php echo $password;?>" />
 	<input type="hidden" name="cid" value="<?php echo $cid;?>" />
 	<!-- condition is first so it can be floated right -->
 	<table class="form">
@@ -51,21 +48,22 @@ if ($cid != 0) {
 		<label>Administrator<br/>
 		<select id="administrator" name="adm" class="user">
 <?php
-			$resultusers = dbQuery('SELECT uid,name FROM participant WHERE last_logon > extract(epoch from now()) - 31536000 AND
-							 is_bb IS NOT TRUE ORDER BY admin_experience DESC, name;');
-			$userdata = dbFetch($resultusers);
-			dbFree($resultusers);
-			foreach($userdata as $user) {
+			$sql = "SELECT uid,name FROM participant WHERE last_logon > strftime('%s','now') - 31536000";
+			$sql .= "AND is_guest = 0 ORDER BY admin_experience DESC, name COLLATE NOCASE";
+			$u = $db->prepare($sql);
+			while ($user = $u->fetchRow()){
+
 ?>			<option value="<?php echo $user['uid'];?>" 
-				<?php if ($user['uid'] == $comp['administrator']) echo 'selected="selected"' ;?>><?php echo $user['name'] ;?></option>
+				<?php if ($user['uid'] == $row['administrator']) echo 'selected="selected"' ;?>><?php echo $user['name'] ;?></option>
 <?php
 			}
+			unset($u);
+			unset($user);
 ?>		</select></label>
 <?php
 		} else {
-?>	<input type="hidden" name="adm" value="<?php echo $user['uid'];?>" />
-	<?php echo $comp['name'];?>
-<?php
+?>	<input type="hidden" name="adm" value="<?php echo is_null($comp['administrator'])?0:$comp['administrator'];?>" />
+	<?php echo $comp['name'];
 		}
 ?>				</td>
 				<td class="comment" rowspan="4">
@@ -76,11 +74,11 @@ if ($cid != 0) {
 			<tr>
 				<td class="option2">	
 		<label><input id="open" name="open" type="checkbox" 
-			<?php if ($comp['open'] == 't') echo 'checked="checked"' ;?>/>Can Register</label>
+			<?php if ($comp['open'] == 1) echo 'checked="checked"' ;?>/>Can Register</label>
 				</td>
 				<td class="option1" colspan="2">
 		<label><input id="bbapproval" name="bbapproval" type="checkbox"
-			<?php if ($comp['bb_approval'] == 't') echo 'checked="checked"' ;?>/>BB's need Approval</label>
+			<?php if ($comp['guest_approval'] == 1) echo 'checked="checked"' ;?>/>BB's need Approval</label>
 				</td>
 			</tr>
 			<tr>
@@ -99,7 +97,7 @@ if ($cid != 0) {
 
 <?php
 	}
-	dbFree($resultcomp);
+	unset($c);
 } else {
 ?><p>There is no Competition to display right now</p>
 <?php

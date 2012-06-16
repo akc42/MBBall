@@ -1,6 +1,6 @@
 <?php
 /*
- 	Copyright (c) 2008,2009 Alan Chandler
+ 	Copyright (c) 2008-2012 Alan Chandler
     This file is part of MBBall, an American Football Results Picking
     Competition Management software suite.
 
@@ -18,22 +18,19 @@
     along with MBBall (file COPYING.txt).  If not, see <http://www.gnu.org/licenses/>.
 
 */
-if(!(isset($_GET['uid']) && isset($_GET['pass']) && isset($_GET['cid']) && isset($_GET['rid'])))
-	die('Hacking attempt - wrong parameters');
-$uid = $_GET['uid'];
-$password = $_GET['pass'];
+require_once('./inc/db.inc');
+if(!(isset($_GET['cid']) && isset($_GET['rid']))) forbidden();
 
-if ($password != sha1("Football".$uid))
-	die('Hacking attempt got: '.$password.' expected: '.sha1("Football".$uid));
 $cid = $_GET['cid'];
 $rid = $_GET['rid'];
-if($rid != 0 && $cid !=0) {
-	if (!isset($_GET['ou']))
-		die('Hacking attempt - wrong parameters');
-	require_once('./db.inc');
 
-	$result = dbQuery('SELECT * FROM match WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' ORDER BY match_time, hid ;');
-	while($row = dbFetchRow($result)) {
+if($rid != 0 && $cid !=0) {
+	if (!isset($_GET['ou'])) forbidden();
+	
+	$m = $db->prepare("SELECT * FROM match WHERE cid = ? AND rid = ? ORDER BY match_time,hid");
+	$m->bindInt(1,$cid);
+	$m->bindInt(2,$rid);
+	while($row = $m->FetchRow()) {
 		$row['hid']=trim($row['hid']);
 		$row['aid']=trim($row['aid']);
 
@@ -72,7 +69,7 @@ if($rid != 0 && $cid !=0) {
 <?php
 
 	}
-	dbFree($result);
+	unset($m);
 } else {
 ?><p>No Match information available right now</p>
 <?php

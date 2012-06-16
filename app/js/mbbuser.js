@@ -19,14 +19,14 @@
 */
 var MBBUser = new Class({
 	Extends: MBBall,
-	initialize: function(me,params,errordiv) {
-		this.parent(me,errordiv);
+	initialize: function(registered,params,errordiv,messages) {
+		this.parent(errordiv);
 		var regdiv = $('registration');
 		if(regdiv) { //exists means registration is open
 			regdiv.getElementById('register').addEvent('submit', function(e) {
 				e.stop();
 				pageTracker._trackPageview('/football/register/submit');
-				if(confirm("Click OK to register for the competition and agree to the condition")) {
+				if(confirm(messages.register)) {
 					pageTracker._trackPageview('/football/register/agree');
 					var regReq = new MBB.req('register.php', function(response) {
 						pageTracker._trackPageview('/football/register/registered');
@@ -36,7 +36,7 @@ var MBBUser = new Class({
 				}
 			});
 		}
-		if(me.registered) {
+		if(registered) {
 			this.teams = new Object({});
 			this.lastpick = new Object({});
 			var picks = $$('.ppick')
@@ -90,7 +90,7 @@ var MBBUser = new Class({
 							window.location.reload(true); //reload page to pick up picks
 						} else {
 							pageTracker._trackPageview('/football/picks/error-bonus');
-							$('bonus_pick').getElement('textarea').value="ERROR - your picks were made, but the bonus question was NOT answered.  It needs to be a whole number (integer)"
+							$('bonus_pick').getElement('textarea').value=messages.noquestion;
 						}
 					});
 					pickReq.post($('pick'));

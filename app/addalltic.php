@@ -1,6 +1,6 @@
 <?php
 /*
- 	Copyright (c) 2008,2009 Alan Chandler
+ 	Copyright (c) 2008-2012 Alan Chandler
     This file is part of MBBall, an American Football Results Picking
     Competition Management software suite.
 
@@ -18,31 +18,35 @@
     along with MBBall (file COPYING.txt).  If not, see <http://www.gnu.org/licenses/>.
 
 */
-if(!(isset($_GET['uid']) && isset($_GET['pass'])  && isset($_GET['cid'])))
-	die('Hacking attempt - wrong parameters');
-$uid = $_GET['uid'];
-$password = $_GET['pass'];
-if ($password != sha1("Football".$uid))
-	die('Hacking attempt got: '.$password.' expected: '.sha1("Football".$uid));
-require_once('./db.inc');
-$cid=$_GET['cid'];
-dbQuery('BEGIN;');
-//This should give us all the teams 
-dbQuery('INSERT INTO team_in_competition(cid,tid) SELECT '
-	.dbMakeSafe($cid).',t.tid FROM team t LEFT JOIN team_in_competition c ON t.tid = c.tid AND cid = '
-	.dbMakeSafe($cid).' WHERE c.tid IS NULL ORDER BY t.tid;');
+require_once('./inc/db.inc');
+if(!(isset($_GET['cid']))) forbidden();
 
+$cid=$_GET['cid'];
+
+//This should give us all the teams
+$i = $db->prepare("INSERT INTO team_in_competition(cid,tid) SELECT ? AS cid, t.tid FROM team t LEFT JOIN team_in_competition c ON t.tid = c.tid AND cid = ? WHERE c.tid IS NULL ");
+$i->bindInt(1,$cid);
+$i->bindInt(2,$cid);
+
+$t = $db->prepare("SELECT tid FROM team_in_competition WHERE cid = ? ORDER BY tid");
+$t->bindInt(1,$cid);
+
+$db->exec('BEGIN TRANSACTION');
+
+$i->exec();
+unset($i);
 //Now return all the teams in the competition
-$result=dbQuery('SELECT tid FROM team_in_competition WHERE cid = '.dbMakeSafe($cid).' ORDER BY tid;');
+
+
 echo '{"teams":[';
-if($row=dbFetchRow($result)) {
+if($row=$t->FetchRow()) {
 	echo '"'.$row['tid'].'"';
-	while($row = dbFetchRow($result)) {
+	while($row = $t->FetchRow()) {
 		echo ',"'.$row['tid'].'"';
 	}
 }
-dbFree($result);
-dbQuery('COMMIT;');
+unset($t);
+$db->exec("COMMIT");
 
 echo ']}';
 ?>

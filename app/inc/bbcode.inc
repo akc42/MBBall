@@ -30,6 +30,13 @@ function splitFilename($filename) {
 		return array($basename, $extension);
 	} 
 }
+
+$s = $db->prepare("SELECT value FROM settings WHERE name = ?");
+define('MBBALL_EMOTICON_DIR',$s->fetchSetting('emoticon_dir'));
+define('MBBALL_EMOTICON_URL',$s->fetchSetting('emoticon_url'));
+unset($s);
+
+
 //  These are the patterns that we will use to search for some simple bbcode sequences
 $search[0]='/\[b\](.*?)\[\/b\]/';
 $search[1]='/\[s\](.*?)\[\/s\]/';

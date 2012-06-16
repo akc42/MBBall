@@ -1,6 +1,6 @@
 <?php
 /*
- 	Copyright (c) 2008,2009 Alan Chandler
+ 	Copyright (c) 2008-2012 Alan Chandler
     This file is part of MBBall, an American Football Results Picking
     Competition Management software suite.
 
@@ -18,31 +18,37 @@
     along with MBBall (file COPYING.txt).  If not, see <http://www.gnu.org/licenses/>.
 
 */
-if(!(isset($_GET['uid']) && isset($_GET['pass'])  && isset($_GET['cid']) && isset($_GET['rid']) && isset($_GET['hid']) ))
-	die('Hacking attempt - wrong parameters');
-$uid = $_GET['uid'];
-$password = $_GET['pass'];
-if ($password != sha1("Football".$uid))
-	die('Hacking attempt got: '.$password.' expected: '.sha1("Football".$uid));
+require_once('./inc/db.inc');
+if(!(isset($_GET['cid']) && isset($_GET['rid']) && isset($_GET['hid']) )) forbidden();
 
-require_once('./db.inc');
 $cid=$_GET['cid'];
 $rid=$_GET['rid'];
 $hid=$_GET['hid'];
 
-dbQuery('BEGIN ;');
-$result=dbQuery('SELECT * FROM match WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' AND hid = '.dbMakeSafe($hid).';');
-$row=dbFetchRow($result);
+$db->exec("BEGIN TRANSACTION");
+$m = $db->prepare("SELECT * FROM match WHERE cid = ? AND rid = ? AND hid = ? ");
+$m->bindInt(1,$cid);
+$m->bindInt(2,$rid);
+$m->bindString(3,$hid);
+
+$row = $m->FetchRow();
+unset($m);
 if ($row && !is_null($row['aid'])) {
-	dbQuery('UPDATE match SET hid = aid, aid = hid WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' AND hid = '.dbMakeSafe($hid).';');
+	$m = $db->prepare("UPDATE match SET hid = aid, aid = hid WHERE cid = ? AND rid = ? AND hid = ?");
+	$m = $db->prepare("SELECT * FROM match WHERE cid = ? AND rid = ? AND hid = ? ");
+	$m->bindInt(1,$cid);
+	$m->bindInt(2,$rid);
+	$m->bindString(3,$hid);
+	$m->exec();
+	unset($m);
+
 	$aid = $hid;
 	$hid = $row['aid'];
-	dbQuery('COMMIT ;');
+	$db->exec("COMMIT");
 	echo '{"cid":'.$cid.',"rid":'.$rid.',"hid":"'.$hid.'","aid":"'.$aid.'"}';
 } else {
 ?><p>Match doesn't exist or has null aid</p>
 <?php
-	dbQuery('ROLLBACK ;');
+	$db->exec("ROLLBACK");	
 }
-dbFree($result);
 ?>

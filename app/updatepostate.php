@@ -1,6 +1,6 @@
 <?php
 /*
- 	Copyright (c) 2008,2009 Alan Chandler
+ 	Copyright (c) 2008-2012 Alan Chandler
     This file is part of MBBall, an American Football Results Picking
     Competition Management software suite.
 
@@ -18,18 +18,17 @@
     along with MBBall (file COPYING.txt).  If not, see <http://www.gnu.org/licenses/>.
 
 */
-if(!(isset($_GET['uid']) && isset($_GET['pass'])  && isset($_GET['cid'])  && isset($_GET['tid']) && isset($_GET['mp'])))
-	die('Hacking attempt - wrong parameters');
-$uid = $_GET['uid'];
-$password = $_GET['pass'];
-if ($password != sha1("Football".$uid))
-	die('Hacking attempt got: '.$password.' expected: '.sha1("Football".$uid));
-require_once('./db.inc');
+require_once('./inc/db.inc');
+if(!(isset($_GET['cid'])  && isset($_GET['tid']) && isset($_GET['mp']))) forbidden();
+
 $cid=$_GET['cid'];
 $tid=$_GET['tid'];
 $mp=$_GET['mp'];
 
-dbQuery('UPDATE team_in_competition SET made_playoff = '.$mp.' WHERE cid ='.dbMakeSafe($cid).' AND tid = '.dbMakeSafe($tid).';');
+$t = $db->prepare("UPDATE team_in_competition SET made_playoff = ? WHERE cid = ? AND tid = ?");
+$t->bindInt(1,$mp);
+$t->bindInt(2,$cid);
+$t->bindString(3,$tid);
 
 
 echo '{"cid":'.$cid.',"tid":'.$tid.',"state":'.$mp.'}';

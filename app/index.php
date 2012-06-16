@@ -19,14 +19,16 @@
 
 */
 
+define('MBBALL_DB_VERSION', 12);  //Version of the database this works with
 define('DEBUG','yes');  //Define this to get an uncompressed form of the mootools core library
 // Show all errors:
 error_reporting(E_ALL);
-// Path to the Ball directory:
-define('MBBALL_ICON_PATH',	dirname(__FILE__)."/images/"); //URL where football Icons may be found
+
+define('MBBALL_ICON_PATH',	"images/"); //URL where football Icons may be found
 // SMF membergroup IDs for the groups that we have used to define characteristics which control Chat Group
 define('SMF_FOOTBALL',		21);  //Group that can administer
 define('SMF_BABY',		10);  //Baby backup
+
 
 $time_head = microtime(true);
 
@@ -84,11 +86,20 @@ if ($user['data']['admin']) {
 }
 
 $db->exec("BEGIN TRANSACTION");  //The whole page will run within one transaction - so its faster
+$s = $db->prepare("SELECT value FROM settings WHERE name = ?");
+/*
+ * Here is where we add update to the database structure when we go to a new release
+ * $currentVersion = $s->fetchSettings("version");
+ * while ($currentVersion < MBBALL_DB_Version) {
+ * 	$db->exec(file_get_contents(dirname(__FILE__).'/update_'.$currentVersion.'.sql');
+ *  $currentVersion++;
+ * }
+ */
 
 $p = $db->prepare($sql);
 $p->bindString(1,$name);
 $p->bindString(2,$email);
-$p->bindBool(3,$guest);
+$p->bindIntl(3,$guest?1:0);
 $p->bindInt(4,$uid);
 $p->exec();
 if($p->effected() == 0) {
@@ -98,20 +109,23 @@ if($p->effected() == 0) {
 	$p->bindInt(1,$uid);
 	$p->bindString(2,$name);
 	$p->bindString(3,$email);
-	$p->bindBool(4,$guest);
+	$p->bindInt(4,$guest?1:0);
 	$p->exec();
 }
 unset($p);
 unset($user);  //done with it.
 
 
-$s = $db->prepare("SELECT value FROM settings WHERE name = ?");
 define('MBBALL_MAX_ROUND_DISPLAY',$s->fetchSetting('max_round_display'));
 define('MBBALL_FORUM_PATH',$s->fetchSetting('home_url'));
 define('MBBALL_EMOTICON_DIR',$s->fetchSetting('emoticon_dir'));
 define('MBBALL_EMOTICON_URL',$s->fetchSetting('emoticon_url'));
 define('MBBALL_TEMPLATE',$s->fetchSetting('template'));
-
+define('MBBALL_CONDITION',$s->fetchSetting('msgcondition'));
+define('MBBALL_GUESTNOTE',$s->fetchSetting('msgguestnote'));
+$messages = Array();
+$message['noquestion'] = $s->fetchSettings('msgnoquestion');
+$message['register'] = $s->fetchSettings('msgnoquestion');
 
 if(isset($_GET['cid'])) {
 	$cid = $_GET['cid'];
@@ -192,7 +206,7 @@ if ($rounddata = $r->fetchRow()) {
 unset($r);
 
 function head_content() {
-	global $uid, $registered, $cid, $rid
+	global $uid, $registered, $cid, $rid,$messages
 ?>	<title>Melinda's Backups Football Pool</title>
 	<link rel="stylesheet" type="text/css" href="css/ball.css"/>
 	<script src="js/mbball.js" type="text/javascript" charset="UTF-8"></script>
@@ -202,17 +216,27 @@ function head_content() {
 
 var MBBmgr;
 window.addEvent('domready', function() {
-	MBBmgr = new MBBUser({uid: <?php echo $uid;?>,
-				registered:<?php echo ($registered)?'true':'false';?>},
+	MBBmgr = new MBBUser(<?php echo ($registered)?'true':'false';?>,
 				{cid: <?php echo $cid;?>, rid: <?php echo $rid;?>},
                              $('errormessage')
-	);
+{
+<?php 
+	$donefirst = false;
+	foreach($messages as $msgid => $message){
+		if($donefirst) echo ",\n";
+		$dofirst = true;
+		echo "$msgid:'$message'";
+	}
+?>
+}
+                             );
 	MBB.adjustDates($('content'));
 });	
 
 	// -->
 	</script>
 <?php
+	unset($messages);
 }
 function content_title() {
 	global $competitiontitle;

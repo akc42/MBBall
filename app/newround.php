@@ -1,6 +1,6 @@
 <?php
 /*
- 	Copyright (c) 2008,2009 Alan Chandler
+ 	Copyright (c) 2008-2012 Alan Chandler
     This file is part of MBBall, an American Football Results Picking
     Competition Management software suite.
 
@@ -18,23 +18,17 @@
     along with MBBall (file COPYING.txt).  If not, see <http://www.gnu.org/licenses/>.
 
 */
-if(!(isset($_GET['uid']) && isset($_GET['pass']) && isset($_GET['cid']) && isset($_GET['mr']) ))
-	die('Hacking attempt - wrong parameters');
-$uid = $_GET['uid'];
-$password = $_GET['pass'];
+require_once('./inc/db.inc');
+if(!(isset($_GET['cid']) && isset($_GET['mr']) )) forbidden();
 
-if ($password != sha1("Football".$uid))
-	die('Hacking attempt got: '.$password.' expected: '.sha1("Football".$uid));
 $cid = $_GET['cid'];
+
 if($cid !=0) {
 
 	$rid = $_GET['mr'];
 	
-	require_once('./db.inc');
 ?>
 <form id="createroundform" action="createround.php">
-	<input type="hidden" name="uid" value="<?php echo $uid; ?>" />
-	<input type="hidden" name="pass" value="<?php echo $password; ?>" />
 	<input type="hidden" name="cid" value="<?php echo $cid; ?>" />
 	<input id="nextrid" type="hidden" name="rid" value="<?php echo $rid; ?>" />
 	<table class="form">

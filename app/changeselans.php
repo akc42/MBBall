@@ -1,6 +1,6 @@
 <?php
 /*
- 	Copyright (c) 2008,2009 Alan Chandler
+ 	Copyright (c) 2008-2012 Alan Chandler
     This file is part of MBBall, an American Football Results Picking
     Competition Management software suite.
 
@@ -18,44 +18,56 @@
     along with MBBall (file COPYING.txt).  If not, see <http://www.gnu.org/licenses/>.
 
 */
-if(!(isset($_GET['uid']) && isset($_GET['pass'])  && isset($_GET['cid']) && isset($_GET['rid']) && isset($_GET['opid']) ))
-	die('Hacking attempt - wrong parameters');
-$uid = $_GET['uid'];
-$password = $_GET['pass'];
-if ($password != sha1("Football".$uid))
-	die('Hacking attempt got: '.$password.' expected: '.sha1("Football".$uid));
+require_once('./inc/db.inc');
+if(!(isset($_GET['cid']) && isset($_GET['rid']) && isset($_GET['opid']) )) forbidden();
 
-require_once('./db.inc');
 $cid=$_GET['cid'];
 $rid=$_GET['rid'];
 $opid=$_GET['opid'];
 
-dbQuery('BEGIN ;');
-$result=dbQuery('SELECT answer FROM round WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).';');
-if ($row=dbFetchRow($result)) {
+$db->exec("BEGIN TRANSACTION");
+$a = $db->prepare("SELECT answer FROM round WHERE cid = ? AND rid = ? ");
+$a->bindInt(1,$cid);
+$a->bindInt(2,$rid);
+$answer = $a->fetchValue();
+unset($a);
+if ($answer) {
 	if($opid != 0) {
-		dbFree($result);
-		$result=dbQuery('SELECT * FROM option WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' AND opid = '.dbMakeSafe($opid).';');
-		if (dbNumRows($result) == 0) {
+		
+		$o = $db->prepare("SELECT COUNT(*) FROM option WHERE cid = ? AND rid = ? AND opid = ?");
+		$o->bindInt(1,$cid);
+		$o->bindInt(2,$rid);
+		$o->bindInt(3,$opid);
+		$op = $o->fetchValue();
+		unset($o);
+		if ($op != 0) {
+			if ($answer != $opid) {
+					$r = $db->prepare("UPDATE round SET answer = ? WHERE cid = ? AND rid = ? ");
+					$r->bindInt(1,$opid);
+					$r->bindInt(2,$cid);
+					$r->bindInt(3,$rid);
+					$r->exec();
+					unset($r);
+			}
+			$db->exec("COMMIT");
+			echo '{"cid":'.$cid.',"rid":'.$rid.',"opid":'.$opid.'}';
+		} else {
 ?><p>Option matching answer does not exist</p>
 <?php
-  			dbQuery('ROLLBACK ;');
-		} else {
-			if ($row['answer'] != $opid) {
-					dbQuery('UPDATE round SET answer = '.dbMakeSafe($opid).' WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).';');
-			}
-			dbQuery('COMMIT ;');
-			echo '{"cid":'.$cid.',"rid":'.$rid.',"opid":'.$opid.'}';
+			$db->exec("ROLLBACK");
 		}
 	} else {
-		dbQuery('UPDATE round SET answer = 0 WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).';');
-		dbQuery('COMMIT ;');
+		$r = $db->prepare("UPDATE round SET answer = 0 WHERE cid = ? AND rid = ? ");
+		$r->bindInt(1,$cid);
+		$r->bindInt(2,$rid);
+		$r->exec();
+		unset($r);
+		$db->exec("COMMIT");
 		echo '{"cid":'.$cid.',"rid":'.$rid.',"opid":0}';
 	}
 } else {
 ?><p>Round does not exist</p>
 <?php
-  dbQuery('ROLLBACK ;');
+  $db->exec("ROLLBACK");
 }
-dbFree($result);
 ?>

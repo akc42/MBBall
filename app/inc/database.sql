@@ -25,7 +25,7 @@ CREATE TABLE competition (
     cid integer PRIMARY KEY ASC, --Competition ID - 
     description character varying(100),--This is the name that appears in the header for the competition
     condition text,	--This is the text that a user has to agree to in order to register himself for the competition
-    administrator integer, --The uid of the administrator
+    administrator integer DEFAULT 0 NOT NULL, --The uid of the administrator
     make_global boolean DEFAULT 0 NOT NULL, --if set make administrator a global admin next time they log on.
     open boolean DEFAULT 0 NOT NULL, --Says whether a user may register for the competion or not
     pp_deadline bigint DEFAULT 0 NOT NULL, --Playoff Selection Deadline 0 if no selection
@@ -309,7 +309,21 @@ INSERT INTO settings (name,value) VALUES('emoticon_dir','./images/emoticons');--
 INSERT INTO settings (name,value) VALUES('emoticon_url','images/emoticons');--web based location of emoticons
 INSERT INTO settings (name,value) VALUES('template','./inc/template.inc'); -- page template location in filesystem
 INSERT INTO settings (name,value) VALUES('default_competition',0); -- cid of default competition 0 means we don't know what it is
-
+-- Messages used by admin
+INSERT INTO settings (name,value) VALUES('msgdeletecomp','Deleting a Competition will delete all the Rounds and Matches associated with it. Do you wish to Proceed?');
+INSERT INTO settings (name,value) VALUES('msgregister','Click OK to register for the competition and agree to the condition');
+INSERT INTO settings (name,value) VALUES('msgcondition','In order to enter the competition you must agree to the following condition:-');
+INSERT INTO settings (name,value) VALUES('msgguestnote','Baby Backups require special approval from the competition administrator ($$$). Please contact her/him <i>after registering</i> if you are a Baby Backup');
+INSERT INTO settings (name,value) VALUES('msgnoquestion','ERROR - your picks were made, but the bonus question was NOT answered.  It needs to be a whole number (integer)');
+INSERT INTO settings (name,value) VALUES('msgdeadline','Do you mean to set the deadline before now?');
+INSERT INTO settings (name,value) VALUES('msgmatchtime','Do you mean to set the matchtime before now?');
+INSERT INTO settings (name,value) VALUES('msgnomatchdate','Are you sure you want to open this match without a match date set?');
+INSERT INTO settings (name,value) VALUES('msgdeletematch','This will delete the match.  Are you sure?');
+INSERT INTO settings (name,value) VALUES('msgquesdead','Do you mean to set the question deadline before now?');
+INSERT INTO settings (name,value) VALUES('msgnomatchround','There are no open matches, are you sure you wish to open the round?');
+INSERT INTO settings (name,value) VALUES('msgdeleteround','Deleting a Round will delete all the Matches associated with it. Do you wish to Proceed?');
+INSERT INTO settings (name,value) VALUES('msgapprove','You are changing the approval status of a Baby Backup for this Competition. Are you sure you want to do this?');
+INSERT INTO settings (name,value) VALUES('msgunregister','This will Un-Register this User from this Competition. Do you wish to Proceed?');
 -- END OF STANDARD DATA ----------------------------------------------------------
 -- INDEXES --------------------------------------------------------------
 

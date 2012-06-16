@@ -1,6 +1,6 @@
 <?php
 /*
- 	Copyright (c) 2008,2009 Alan Chandler
+ 	Copyright (c) 2008-2012 Alan Chandler
     This file is part of MBBall, an American Football Results Picking
     Competition Management software suite.
 
@@ -18,31 +18,32 @@
     along with MBBall (file COPYING.txt).  If not, see <http://www.gnu.org/licenses/>.
 
 */
-if(!(isset($_POST['uid']) && isset($_POST['pass'])  && isset($_POST['cid']) && isset($_POST['rid']) && isset($_POST['rname']) ))
-	die('Hacking attempt - wrong parameters');
-$uid = $_POST['uid'];
-$password = $_POST['pass'];
-if ($password != sha1("Football".$uid))
-	die('Hacking attempt got: '.$password.' expected: '.sha1("Football".$uid));
+require_once('./inc/db.inc');
+if(!(isset($_POST['cid']) && isset($_POST['rid']) && isset($_POST['rname']) )) forbidden();
 
-require_once('./db.inc');
 $cid=$_POST['cid'];
 $rid=$_POST['rid'];
-dbQuery('BEGIN ;');
-$result=dbQuery('SELECT * FROM competition WHERE cid = '.dbMakeSafe($cid).';');
-if (dbNumRows($result) != 0) {
+
+$db->exec("BEGIN TRANSACTION");
+$c = $db->prepare("SELECT COUNT(*) FROM competition WHERE cid = ?");
+$noComps = $c->fetchValue();
+unset($c);
+if ($noComps != 0) {
+	$r = $db->prepare("INSERT INTO round(cid,rid,name,ou_round) VALUES (?,?,?,?)");
+	$r->bindInt(1,$cid);
+	$r->bindInt(2,$rid);
+	$r->bindString(3,$_POST['rname']);
 	if(isset($_POST['ou'])) {
-		dbQuery('INSERT INTO round(cid, rid, name,ou_round) VALUES ('.dbMakeSafe($cid).','.dbMakeSafe($rid).','
-			.dbPostSafe($_POST['rname']).', TRUE );');
+		$r->bindInt(4,1);
 	} else {
-		dbQuery('INSERT INTO round(cid, rid, name, ou_round) VALUES ('.dbMakeSafe($cid).','.dbMakeSafe($rid).','
-			.dbPostSafe($_POST['rname']).', FALSE );');
+		$r->bindInt(5,0);
 	}
-	dbQuery('COMMIT ;');
+	$r->exec();
+	unset($r);
+	$db->exec("COMMIT");
 	echo '{"cid":'.$cid.',"rid":'.$rid.'}';
 } else {
   echo '<p>Related Competition Does Not Exist</p>';
-	dbQuery('ROLLBACK ;');
+	$db->exec("ROLLBACK");
 }
-dbFree($result);
 ?>

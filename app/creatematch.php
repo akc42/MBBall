@@ -1,6 +1,6 @@
 <?php
 /*
- 	Copyright (c) 2008,2009 Alan Chandler
+ 	Copyright (c) 2008-2012 Alan Chandler
     This file is part of MBBall, an American Football Results Picking
     Competition Management software suite.
 
@@ -18,26 +18,31 @@
     along with MBBall (file COPYING.txt).  If not, see <http://www.gnu.org/licenses/>.
 
 */
-if(!(isset($_GET['uid']) && isset($_GET['pass'])  && isset($_GET['cid']) && isset($_GET['rid']) && isset($_GET['hid']) ))
-	die('Hacking attempt - wrong parameters');
-$uid = $_GET['uid'];
-$password = $_GET['pass'];
-if ($password != sha1("Football".$uid))
-	die('Hacking attempt got: '.$password.' expected: '.sha1("Football".$uid));
+require_once('./inc/db.inc');
+if(!(isset($_GET['cid']) && isset($_GET['rid']) && isset($_GET['hid']) )) forbidden();
 
-require_once('./db.inc');
 $cid=$_GET['cid'];
 $rid=$_GET['rid'];
 $hid=$_GET['hid'];
 
-dbQuery('BEGIN ;');
-$result=dbQuery('SELECT * FROM match WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' AND hid = '.dbMakeSafe($hid).';');
-if (dbNumRows($result) == 0) {
-  dbQuery('INSERT INTO match(cid, rid, hid) VALUES ('.dbMakeSafe($cid).','.dbMakeSafe($rid).','.dbMakeSafe($hid).');');
-  dbQuery('COMMIT ;');
+$db->exec("BEGIN TRANSACTION");
+$m = $db->prepare("SELECT COUNT(*) FROM match WHERE cid = ? AND rid = ? AND  hid = ?");
+$m->bindInt(1,$cid);
+$m->bindInt(2,$rid);
+$m->bindInt(3,$hid);
+
+$noMatches = $m->fetchValue();
+unset($m);
+
+if (noMatches == 0) {
+	$m=$db->prepare("INSERT INTO match(cid,rid,hid) VALUES (?,?,?)");
+	$m->bindInt(1,$cid);
+	$m->bindInt(2,$rid);
+	$m->bindInt(3,$hid);
+	$m->exec();
+	unset($m);
+	$db->exec("COMMIT");
 ?><form action="#" >
-     <input type="hidden" name="uid" value="<?php echo $uid;?>" />
-     <input type="hidden" name="pass" value="<?php echo $password;?>" />
      <input type="hidden" name="cid" value="<?php echo $cid;?>"/>
      <input type="hidden" name="rid" value="<?php echo $rid;?>"/>
      <input type="hidden" name="hid" value="<?php echo $hid;?>" />
@@ -57,8 +62,7 @@ if (dbNumRows($result) == 0) {
 } else {
 ?><p>Match already exists</p>
 <?php
-  dbQuery('ROLLBACK ;');
+  $db->exec("ROLLBACK");
 }
-dbFree($result);
 ?>
 

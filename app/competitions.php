@@ -1,27 +1,39 @@
 <?php
-if(!(isset($_GET['uid']) && isset($_GET['pass'])))
-	die('Hacking attempt - wrong parameters');
-$uid = $_GET['uid'];
-$password = $_GET['pass'];
-if ($password != sha1("Football".$uid))
-	die('Hacking attempt got: '.$password.' expected: '.sha1("Football".$uid));
+/*
+	Copyright (c) 2008-2012 Alan Chandler
+	This file is part of MBBall, an American Football Results Picking
+	Competition Management software suite.
+	
+	MBBall is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+	
+	MBBall is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+	
+	You should have received a copy of the GNU General Public License
+	along with MBBall (file COPYING.txt).  If not, see <http://www.gnu.org/licenses/>.
+*/
 
-require_once('./db.inc');
+require_once('./inc/db.inc');
 
-$resultusers = dbQuery('SELECT uid,name FROM participant WHERE last_logon > extract(epoch from now()) - 31536000 AND is_bb IS NOT TRUE
-				ORDER BY admin_experience DESC, name;');
+
 $userdata = dbFetch($resultusers);
 
-$sql = 'SELECT cid,description,uid,name FROM competition c LEFT JOIN participant p ON c.administrator = p.uid';
+$sql = "SELECT cid,description,uid,name FROM competition c LEFT JOIN participant p ON c.administrator = p.uid";
 if(!isset($_GET['global'])) {
 	// When not global administrator, only see competitions for which are administrator
-	$sql .= ' WHERE c.administrator ='.dbMakeSafe($uid);
+	$sql .= " WHERE c.administrator = ? ORDER BY cid DESC";
+	$c = $db->prepare($sql);
+	$c->bindInt(1,$uid);
+} else {
+	$sql .= " ORDER BY cid DESC";
+	$c = $db->prepare($sql);
 }
-$sql .= ' ORDER BY cid DESC ;';
-$result = dbQuery($sql);
 ?>	<form id="default_competition" action="setdefault.php">
-		<input type="hidden" name="uid" value="<?php echo $uid; ?>" />
-		<input type="hidden" name="pass" value="<?php echo $password; ?>" />
 		<table>
 			<caption>Football Competitions</caption>
 			<thead>
@@ -34,19 +46,12 @@ $result = dbQuery($sql);
 			</thead>
 			<tbody>
 <?php
-if(dbNumRows($result) > 0) {
-	$resultdefault = dbQuery('SELECT cid FROM default_competition;');
-	if(dbNumRows($resultdefault) != 1 ) {
-		die("Database is corrupt - default_competition should have a single row");
-	}
-	$row=dbFetchRow($resultdefault);
-	if (!is_null($row['cid'])) {
-		$dcid = $row['cid'];
-	} else {
-		$dcid = 0;
-	}
+$db->exec("BEGIN TRANSACTION");  //The whole page will run within one transaction - so its faster
+$s = $db->prepare("SELECT value FROM settings WHERE name = ?");
+$dcid = $s->fetchSettings("default_competition");
+unset($s);
 
-	while($row = dbFetchRow($result)) {
+while($row = $c->FetchRow()) {
 ?>
 				<tr>
 					<td id="<?php echo 'C'.$row['cid'];?>" class="selectthis"><?php echo $row['description']; ?></td>
@@ -58,17 +63,14 @@ if(dbNumRows($result) > 0) {
 					<td><div id="<?php echo 'D'.$row['cid']; ?>" class="del"></div></td>
 				</tr>
 <?php
-	}
 }
-dbFree($result);
+unset($c);
 ?>			</tbody>
 		</table>
 	</form>
 <hr/>
 <p id="compserr"></p>
 	<form id="createform" action="createcomp.php">
-		<input type="hidden" name="uid" value="<?php echo $uid; ?>" />
-		<input type="hidden" name="pass" value="<?php echo $password; ?>" />
 		<table class="form">
 			<caption>Create Competition</caption>
 			<tbody>
@@ -81,11 +83,17 @@ dbFree($result);
 			<label>Administrator<br/>
 			<select id="adm" name="adm" class="user">
 <?php
-	foreach($userdata as $user) {
-?>				<option value="<?php echo $user['uid'];?>"
-                    <?php if ($user['uid'] == $uid) echo 'selected="selected"' ;?>><?php echo $user['name'] ;?></option>
+//Participants who have logged in in the last year
+$sql = "SELECT uid,name FROM participant WHERE last_logon > strftime('%s','now') - 31536000";
+$sql .= "AND is_guest = 0 ORDER BY admin_experience DESC, name COLLATE NOCASE";
+$u = $db->prepare($sql);
+while ($row = $u->fetchRow()){
+?>				<option value="<?php echo $row['uid'];?>"
+                    <?php if ($row['uid'] == $uid) echo 'selected="selected"' ;?>><?php echo $row['name'] ;?></option>
 <?php
-	}
+}
+unset($u);
+$db->exec("ROLLBACK");
 ?>			</select></label>
 					</td>
 					<td class="option1">

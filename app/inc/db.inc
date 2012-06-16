@@ -126,8 +126,8 @@ class STMT {
 	public function bindInt($i,$value) {
 		$this->_s->bindValue($i,$value,PDO::PARAM_INT);
 	}
-	public function bindBool($i,$value) {
-		$this->_s->bindValue($i,$value,PDO::PARAM_BOOL);
+	public function bindNull($i){
+		$this->_s->bindValue($i,null,PDO::PARAM_NULL);
 	}
 	public function exec() {
 		self::$count++;

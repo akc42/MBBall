@@ -1,6 +1,6 @@
 <?php
 /*
- 	Copyright (c) 2008,2009 Alan Chandler
+ 	Copyright (c) 2008-2012 Alan Chandler
     This file is part of MBBall, an American Football Results Picking
     Competition Management software suite.
 
@@ -18,40 +18,42 @@
     along with MBBall (file COPYING.txt).  If not, see <http://www.gnu.org/licenses/>.
 
 */
-if(!(isset($_GET['uid']) && isset($_GET['pass']) && isset($_GET['cid']) && isset($_GET['rid'])
-		&& isset($_GET['auid']) && isset($_GET['gap']) && isset($_GET['pod']) && isset($_GET['name']) ))
-	die('Hacking attempt - wrong parameters');
-$uid = $_GET['uid'];
-$password = $_GET['pass'];
+require_once('./inc/db.inc');
+if(!(isset($_GET['cid']) && isset($_GET['rid']) && isset($_GET['auid']) && isset($_GET['gap']) && isset($_GET['pod']) && isset($_GET['name']) ))
+	forbidden();
 
-if ($password != sha1("Football".$uid))
-	die('Hacking attempt got: '.$password.' expected: '.sha1("Football".$uid));
-$uid = $_GET['auid']; // So we can emulate the other user
-$password = sha1("Football".$uid); //So we can emulate the other user
 $cid = $_GET['cid'];
 $rid = $_GET['rid'];
 $gap = $_GET['gap'];
 $playoff_deadline = $_GET['pod'];
 
 if($rid != 0 && $cid !=0) {
-	require_once('./db.inc');
+
 	$time_at_top = time();
-	$resultround = dbQuery('SELECT * FROM round WHERE open is TRUE AND cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($_GET['rid']).' ;');
-	$rounddata = dbFetchRow($resultround);
-	if($rounddata) {
-		// If user is registered and we can do picks then we need to display the  Picks Section
-		$sql = 'SELECT m.hid , m.aid , p.pid , m.combined_score AS cs, p.over_selected , p.comment AS comment, m.comment AS adm_comment, m.match_time';
-		$sql .= ' FROM match m LEFT JOIN pick p ';
-		$sql .= 'ON m.cid = p.cid AND m.rid = p.rid AND m.hid = p.hid AND p.uid = '.dbMakeSafe($uid);
-		$sql .= ' WHERE m.cid = '.dbMakeSafe($cid).' AND m.rid = '.dbMakeSafe($rid).' AND m.open IS TRUE AND m.match_time > '.dbMakeSafe($time_at_top +$gap);
+	$r =$db->prepare("SELECT * FROM round WHERE open = 1 AND cid = ? AND rid = ?");
+	$r->bindInt(1,$cid);
+	$r->bindInt(2,$rid);
+	if($rounddata = $r->fetchRow()) {
+		$m = $db->prepare("SELECT COUNT(*) FROM match WHERE cid = ? AND rid = ? AND open = 1");
+		$m->bindInt(1,$cid);
+		$m->bindInt(2,$rid);
+		$nomatches = $m->fetchValue();
+		unset($m);
+	// If user is registered and we can do picks then we need to display the  Picks Section
+		$sql = "SELECT m.hid , m.aid , p.pid , m.combined_score AS cs, p.over_selected , p.comment AS comment, m.comment AS adm_comment, m.match_time";
+		$sql .= " FROM match m LEFT JOIN pick p ON m.cid = p.cid AND m.rid = p.rid AND m.hid = p.hid AND p.uid = ?";
+		$sql .= " WHERE m.cid = ? AND m.rid = ? AND m.open = 1 AND m.match_time > ?";
 		$sql .= ' ORDER BY m.match_time, m.hid;';
-		$result = dbQuery($sql);
-		$nomatches = dbNumRows($result);
+		$m = $db->prepare("SELECT * FROM match WHERE cid = ? AND rid = ? AND open = 1 ORDER BY match_time, hid LIMIT 8 OFFSET ?");
+		$m->bindInt(1,$uid);
+		$m->bindInt(2,$cid);
+		$m->bindInt(3,$rid);
+		$m->bindInt(4,($time_at_top +$gap));
 	}
-	if(($playoff_deadline != 0 && $playoff_deadline > $time_at_top) || $rounddata && ($nomatches > 0 || ( $rounddata['valid_question'] == 't'  && $rounddata['deadline'] > $time_at_top))) {
+	unset($r);
+	
+	if(($playoff_deadline != 0 && $playoff_deadline > $time_at_top) || $rounddata && ($nomatches > 0 || ( $rounddata['valid_question'] == 1  && $rounddata['deadline'] > $time_at_top))) {
 ?><form id="pick">
-	<input type="hidden" name="uid" value="<?php echo $uid;?>" />
-	<input type="hidden" name="pass" value="<?php echo $password;?>" />
 	<input type="hidden" name="cid" value="<?php echo $cid;?>" />
 	<input type="hidden" name="rid" value="<?php echo $rid;?>" />
 	<input type="hidden" name="gap" value="<?php echo $gap;?>" />
@@ -60,8 +62,8 @@ if($rid != 0 && $cid !=0) {
 		<caption>Entering Picks on behalf of :<?php echo $_GET['name'];?></caption>
 		<tbody>
 <?php	
-		require_once('./bbcode.inc');
-		if ($rounddata && ($nomatches > 0 || $rounddata['valid_question'] == 't' )) {
+		require_once('./inc/bbcode.inc');
+		if ($rounddata && ($nomatches > 0 || $rounddata['valid_question'] == 1 )) {
 ?>			<tr>
 				<td id="picks">
 <?php
@@ -72,7 +74,7 @@ if($rid != 0 && $cid !=0) {
 							<tr>
 								<th class="team">Team Pick</th>
 <?php
-				if ($rounddata['ou_round'] == 't') {
+				if ($rounddata['ou_round'] == 1) {
 ?>								<th class="score">Combined Score</th>
 <?php
 				}
@@ -82,7 +84,7 @@ if($rid != 0 && $cid !=0) {
 						</thead>
 						<tbody>
 <?php
-				while($row=dbFetchRow($result)) {
+				while($row=$m->FetchRow()) {
 					$row['hid']=trim($row['hid']);
 					$row['aid']=trim($row['aid']);
 					$row['pid']=trim($row['pid']);
@@ -123,7 +125,7 @@ if($rid != 0 && $cid !=0) {
 									</table>
 								</td>
 <?php
-					if ($rounddata['ou_round'] == 't') {
+					if ($rounddata['ou_round'] == 1) {
 ?>								<td>
 									<table>
 										<tbody>
@@ -137,11 +139,11 @@ if($rid != 0 && $cid !=0) {
 												<td><input	type="radio"
 														name="<?php echo 'O'.$row['hid'];?>"
 														value="U"
-														<?php if ($row['over_selected'] == 'f') echo 'checked="checked"';?>/></td>
+														<?php if ($row['over_selected'] == 0) echo 'checked="checked"';?>/></td>
 												<td><input	type="radio"
 														name="<?php echo 'O'.$row['hid'];?>"
 														value="O"
-														<?php if ($row['over_selected'] == 't') echo 'checked="checked"';?>/></td>
+														<?php if ($row['over_selected'] == 1) echo 'checked="checked"';?>/></td>
 											</tr>
 										</tbody>
 									</table>
@@ -157,11 +159,11 @@ if($rid != 0 && $cid !=0) {
 					</table>
 <?php
 			}
-			dbFree($result);
+			unset($m);
 ?>				</td>
 				<td id="bonus_pick">
 <?php	
-			if ($rounddata['valid_question']) {
+			if ($rounddata['valid_question'] == 1) {
 ?>					<table>
 						<caption>Bonus Question</caption>
 						<thead>
@@ -169,19 +171,26 @@ if($rid != 0 && $cid !=0) {
 						</thead>
 						<tbody>
 <?php
-				$result=dbQuery('SELECT * FROM option WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' ORDER BY opid;');
-				$noopts = dbNumRows($result);  //No of multichoice examples 0= numeric answer required
-				$resultop = dbQuery('SELECT * FROM option_pick WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid)
-						.' AND uid = '.dbMakeSafe($uid).'ORDER BY opid;');
-				$optdata = dbFetchRow($resultop); //even on multichoice there is only going to be one pick
+				$o = $db->prepare("SELECT COUNT(*) FROM option WHERE cid = ? AND rid = ?");
+				$o->bindInt(1,$cid);
+				$o->bindInt(2,$rid);
+				$noopts = $o->fetchValue();
+				unset($o);
+				$o = $db->prepare("SELECT * FROM option WHERE cid = ? AND rid = ? ORDER BY opid");
+				$o->bindInt(1,$cid);
+				$o->bindInt(2,$rid);
+
+				$p = $db->prepare("SELECT * FROM option_pick WHERE cid = ? AND rid = ? AND uid = ? ORDER BY opid");
+				$optdata = $p->FetchRow(); //even on multichoice there is only going to be one pick
+				unset($p);
+				
 				if ($noopts > 0) {
 		//Question is multichoice
-					for($i=1; $i<=$noopts;$i++) {
-		//We get one loop round anyway if noopts = 0
-						$row = dbFetchRow($result);
+					$firsttodo = true;
+					while($row = $o->fetchRow()) {
 ?>							<tr>
 <?php
-						if($i == 1) {
+						if($firsttodo) {
 ?>								<td class="question" rowspan ="<?php echo $noopts ;?>"><?php echo dbBBcode($rounddata['question']);?></td>
 								
 <?php
@@ -190,12 +199,13 @@ if($rid != 0 && $cid !=0) {
 ?>								<td><input type="radio" name="opid" value="<?php echo $row['opid'];?>" <?php if((int)$optdata['opid'] == (int)$row['opid']) echo 'checked="checked"';?>	/><?php echo $row['label'];?></td>
 <?php
 
-						if($i == 1) {
+						if($firsttodo) {
 ?>								<td rowspan ="<?php echo $noopts ;?>">
 <textarea class="comment" name="Cbonus"><?php echo $optdata['comment'];?></textarea>
 								</td>
 <?php
 						}
+						$firsttodo = false;
 ?>							</tr>
 <?php
 					}
@@ -208,35 +218,40 @@ if($rid != 0 && $cid !=0) {
 								</td>
 <?php
 				}
+				unset($o);
+				unset($optdata);
 ?>						</tbody>
 					</table>
 <?php
 			} // end valid question check
-			dbFree($result);
-			dbFree($resultop);
 ?>				</td>
 			</tr>
 <?php
 		}
 		if($playoff_deadline != 0 && $playoff_deadline > $time_at_top) {
-			require_once('./team.inc');
+			require_once('./inc/team.inc');
 		//Playoff selection is part of this competition
 ?>			<tr>
 				<td id="playoff_pick" colspan="2">
 <?php
-			$result=dbQuery('SELECT tid,divid,confid FROM div_winner_pick WHERE cid = '.dbMakeSafe($cid).' AND uid = '.dbMakeSafe($uid).';');
+			$w = $db->prepare("SELECT tid,divid,confid FROM div_winner_pick WHERE cid = ? AND uid = ? ");
+			$w->bindInt(1,$cid);
+			$w->bindInt(2,$uid);
 			$dw = array(array());
-			while($row = dbFetchRow($result)) {
+			while($row = $w->FetchRow()) {
 				$row['tid'] = trim($row['tid']);			
 				$dw[$row['confid']][$row['divid']] = $row['tid'];
 			}
-			dbFree($result);
-			$result=dbQuery('SELECT tid,opid,confid FROM wildcard_pick WHERE cid = '.dbMakeSafe($cid).' AND uid = '.dbMakeSafe($uid).';');
+			unset($w);
+			$w = $db->prepare("SELECT tid,opid,confid FROM wildcard_pick WHERE cid = ? AND uid = ? ");
+			$w->bindInt(1,$cid);
+			$w->bindInt(2,$uid);
 			$wild = array(array());
-			while($row = dbFetchRow($result)) {
+			while($row = $w->FetchRow()) {
 				$row['tid'] = trim($row['tid']);
 				$wild[$row['confid']][$row['opid']] = $row['tid'];
 			}
+			unset($w);
 ?>					<table>
 						<caption>Pick divisional winner and wildcard picks for each conference</caption>
 						<thead>
@@ -318,6 +333,6 @@ if($rid != 0 && $cid !=0) {
 </form>
 <?php
 	}
-	dbFree($resultround);
+	unset($rounddata);
 }
 ?>

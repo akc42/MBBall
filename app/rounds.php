@@ -1,6 +1,6 @@
 <?php
 /*
- 	Copyright (c) 2008,2009 Alan Chandler
+ 	Copyright (c) 2008-2012 Alan Chandler
     This file is part of MBBall, an American Football Results Picking
     Competition Management software suite.
 
@@ -18,17 +18,14 @@
     along with MBBall (file COPYING.txt).  If not, see <http://www.gnu.org/licenses/>.
 
 */
-if(!(isset($_GET['uid']) && isset($_GET['pass']) && isset($_GET['cid'])))
-	die('Hacking attempt - wrong parameters');
-$uid = $_GET['uid'];
-$password = $_GET['pass'];
-if ($password != sha1("Football".$uid))
-	die('Hacking attempt got: '.$password.' expected: '.sha1("Football".$uid));
+require_once('./inc/db.inc');
+if(!isset($_GET['cid'])) forbidden();
+
 $cid = $_GET['cid'];
+
 if ($cid != 0) {
-	require_once('./db.inc');
-	$result = dbQuery('SELECT rid,name,ou_round,open FROM round WHERE cid = '.dbMakeSafe($cid).' ORDER BY rid DESC ;');
-	
+	$r = $db->prepare("SELECT rid,name,ou_round,open FROM round WHERE cid = ? ORDER BY rid DESC");
+	$r->bindInt(1,$cid);
 ?>
 <table>
 	<caption>Rounds</caption>
@@ -41,17 +38,17 @@ if ($cid != 0) {
 	</thead>
 	<tbody>
 <?php
-	while($row = dbFetchRow($result)) {
+	while($row = $r->FetchRow()) {
 		$rid = $row['rid'];
 ?>		<tr>
 			<td id="<?php echo 'R'.$rid;?>" class="selectthis"><?php echo $rid; ?></td>
 			<td id="<?php echo 'S'.$rid;?>" class="selectthis"><?php echo $row['name'];?></td>
 			<td><div id="<?php echo 'E'.$rid; ?>" class="del">
-					<input type="hidden" name="open" value="<?php echo ($row['open'] == 't')?$rid:0;?>" /></div></td>
+					<input type="hidden" name="open" value="<?php echo ($row['open'] == 1)?$rid:0;?>" /></div></td>
 		</tr>
 <?php
 	}
-	dbFree($result);
+	unset($r);
 
 ?>	</tbody>
 </table>

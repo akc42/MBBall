@@ -1,6 +1,6 @@
 <?php
 /*
- 	Copyright (c) 2008,2009 Alan Chandler
+ 	Copyright (c) 2008-2012 Alan Chandler
     This file is part of MBBall, an American Football Results Picking
     Competition Management software suite.
 
@@ -18,15 +18,12 @@
     along with MBBall (file COPYING.txt).  If not, see <http://www.gnu.org/licenses/>.
 
 */
-if(!(isset($_POST['uid']) && isset($_POST['pass'])  && isset($_POST['defcomps'])))
-	die('Hacking attempt - wrong parameters');
-$uid = $_POST['uid'];
-$password = $_POST['pass'];
-if ($password != sha1("Football".$uid))
-	die('Hacking attempt got: '.$password.' expected: '.sha1("Football".$uid));
-require_once('./db.inc');
+require_once('./inc/db.inc');
+if(!(isset($_POST['defcomps']))) forbidden();
 
-dbQuery('UPDATE default_competition SET cid = '.dbMakeSafe($_POST['defcomps']).' ;');
-
+$c = $db->prepare("UPDATE settings SET value = ? WHERE name = 'default_competition'");
+$c->bindInt(1,$_POST['defcomps']);
+$c->exec();
+unset($c);
 echo '{"cid":'.$_POST['defcomps'].'}';
 ?>

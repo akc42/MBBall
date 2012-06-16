@@ -21,8 +21,8 @@
 
 var MBBAdmin = new Class({
 	Extends: MBBall,
-	initialize: function(me,cid,errordiv) {
-		this.parent(me,errordiv);
+	initialize: function(admin,cid,errordiv,messages) {
+		this.parent(errordiv);
 		var params = {'cid':cid, 'rid':0};
 		var emoticons;
 		this.competitions = new MBB.subPage(this,'competitions.php',$('competitions'),function (div) {
@@ -52,7 +52,7 @@ var MBBAdmin = new Class({
 			div.getElements('.del').each(function (comp,i) {
 				comp.addEvent('click', function(e) {
 					e.stop();
-					if(confirm('Deleting a Competition will delete all the Rounds and Matches associated with it. Do you wish to Proceed?')) {
+					if(confirm(messages.deletecomp)) {
 						var deleteReq = new MBB.req('deletecomp.php',function (response) {
 							if (params.cid == response.cid) {
 								params.cid = 0;
@@ -87,7 +87,7 @@ var MBBAdmin = new Class({
 				var el = $('playoffdeadline');
 				var oldtime = el.value;
 				var pod = new Calendar.Single(el,{format:'j M Y g:i a (D)',width:'235px',onHideStart:function(){
-					if(new Date(el.value *1000) > new Date() || confirm('Do you mean to set the deadline before now')){
+					if(new Date(el.value *1000) > new Date() || confirm(messages.deadline)){
 						oldtime = el.value;
 						el.fireEvent('change');
 					} else {
@@ -146,7 +146,7 @@ var MBBAdmin = new Class({
 						var matchtime = div.getElement('input[name=mtime]');
 						var oldtime = matchtime.value;
 						var matchcal = new Calendar.Single(matchtime,{format:'D j M g:ia',width:'172px',onHideStart:function(){
-							if(new Date(matchtime.value *1000) > new Date() || confirm('Do you mean to set the matchtime before now')){
+							if(new Date(matchtime.value *1000) > new Date() || confirm(messages.matchtime)){
 								oldtime = matchtime.value;
 								matchtime.fireEvent('change');
 							} else {
@@ -173,7 +173,7 @@ var MBBAdmin = new Class({
 									aid.highlight('#F00');
 								}
 								if ( validated && (matchtime.value == '' || matchtime.value == 0)) {  //Ask user to confirm if no matchdate is set
-									if (!confirm('Are you sure you want to open this match without a match date set?')) {
+									if (!confirm(messages.nomatchdate)) {
 										validated = false;
 										this.checked = false;
 									}
@@ -233,7 +233,7 @@ var MBBAdmin = new Class({
 						});
 						div.getElement('.del').addEvent('click',function(e) {
 						  e.stop(); 
-							if(confirm('This will delete the match.  Are you sure?')) {
+							if(confirm(messages.deletematch)) {
 								var deleteReq = new MBB.req('deletematch.php',function(response) {
 									div.dispose();
 									$('T'+response.hid).removeClass('inmatch');
@@ -298,7 +298,7 @@ var MBBAdmin = new Class({
 						var dead = $('deadline');
 						var oldtime = dead.value;
 						var deadcal = new Calendar.Single(dead,{format:'j M Y g:i a (D)',width:'235px',onHideStart:function(){
-							if(new Date(dead.value *1000) > new Date() || confirm('Do you mean to set the question deadline before now')){
+							if(new Date(dead.value *1000) > new Date() || confirm(messages.quesdead)){
 								oldtime = dead.value;
 								dead.fireEvent('change');
 							} else {
@@ -340,7 +340,7 @@ var MBBAdmin = new Class({
 											return (!match.checked);
 										})
 									) {
-									if (! confirm('There are no open matches, are you sure you wish to open the round?')) {
+									if (! confirm(messages.nomatchround)) {
 										validated = false;
 										this.checked = false;
 									}
@@ -620,7 +620,7 @@ var MBBAdmin = new Class({
 						div.getElements('.del').each(function (comp,i) {
 							comp.addEvent('click', function(e) {
 								e.stop();
-								if(confirm('Deleting a Round will delete all the Matches associated with it. Do you wish to Proceed?')) {
+								if(confirm(messages.deleteround)) {
 									var deleteReq = new MBB.req('deleteround.php',function (response) {
 										maxround--;
 										if (params.cid == response.cid && params.rid == response.rid) {
@@ -709,12 +709,12 @@ var MBBAdmin = new Class({
 					});
 					if(params.cid !=0) {
 						MBB.adjustDates(div);
-						$$('#registered input.bbapprove').addEvent('change',function(e) {
+						$$('#registered input.gapprove').addEvent('change',function(e) {
 							e.stop();
-							if(confirm('You are changing the approval status of a Baby Backup for this Competition. Are you sure you want to do this?')) {
-								var updateBBa = new MBB.req('bbapprove.php',function(response) {
+							if(confirm(messages.approve)) {
+								var updatega = new MBB.req('gapprove.php',function(response) {
 								});
-								updateBBa.get(Object.merge(params,{'bbuid':this.name,'approval':this.checked}));
+								updatega.get(Object.merge(params,{'bbuid':this.name,'approval':this.checked}));
 							} else {
 								this.checked = !this.checked;
 							}
@@ -722,7 +722,7 @@ var MBBAdmin = new Class({
 						div.getElements('.del').each(function (comp,i) {
 							comp.addEvent('click', function(e) {
 								e.stop();
-								if(confirm('This will Un-Register this User from this Competition. Do you wish to Proceed?')) {
+								if(confirm(messages.unregister)) {
 									var deleteReq = new MBB.req('deleteregistration.php',function (response) {
 										owner.adminreg.loadPage(Object.merge(params,{'bbar':$('bbapproval').checked}));
 									});
@@ -747,7 +747,7 @@ var MBBAdmin = new Class({
 			});
 			this.rounds.loadPage(params);	
 		});
-		if (this.me.admin) {
+		if (admin) {
 			Object.append(params,{'global':true});
 		}
 		this.competitions.loadPage(params);

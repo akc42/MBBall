@@ -1,6 +1,6 @@
 <?php
 /*
- 	Copyright (c) 2008,2009 Alan Chandler
+ 	Copyright (c) 2008-2012 Alan Chandler
     This file is part of MBBall, an American Football Results Picking
     Competition Management software suite.
 
@@ -18,16 +18,16 @@
     along with MBBall (file COPYING.txt).  If not, see <http://www.gnu.org/licenses/>.
 
 */
-if(!(isset($_GET['uid']) && isset($_GET['pass'])  && isset($_GET['cid'])  && isset($_GET['tid'])))
-	die('Hacking attempt - wrong parameters');
-$uid = $_GET['uid'];
-$password = $_GET['pass'];
-if ($password != sha1("Football".$uid))
-	die('Hacking attempt got: '.$password.' expected: '.sha1("Football".$uid));
-require_once('./db.inc');
+require_once('./inc/db.inc');
+if(!(isset($_GET['cid'])  && isset($_GET['tid']))) forbidden();
+
 $cid=$_GET['cid'];
 $tid=$_GET['tid'];
-dbQuery('INSERT INTO team_in_competition(cid,tid) VALUES('.dbMakeSafe($cid).','.dbMakeSafe($tid).');');
+$t = $db->prepare("INSERT INTO team_in_competition(cid,tid) VALUES(?,?)");
+$t->bindInt(1,$cid);
+$t->bindString(2,$tid);
+$t->exec();
+unset($t);
 
 
 echo '{"cid":'.$cid.',"tid":"'.$tid.'"}';

@@ -1,6 +1,6 @@
 <?php
 /*
- 	Copyright (c) 2008,2009 Alan Chandler
+ 	Copyright (c) 2008-2012 Alan Chandler
     This file is part of MBBall, an American Football Results Picking
     Competition Management software suite.
 
@@ -18,29 +18,36 @@
     along with MBBall (file COPYING.txt).  If not, see <http://www.gnu.org/licenses/>.
 
 */
-if(!(isset($_GET['uid']) && isset($_GET['pass'])  && isset($_GET['cid']) && isset($_GET['rid']) && isset($_GET['opid']) && isset($_GET['label']) ))
-	die('Hacking attempt - wrong parameters');
-$uid = $_GET['uid'];
-$password = $_GET['pass'];
-if ($password != sha1("Football".$uid))
-	die('Hacking attempt got: '.$password.' expected: '.sha1("Football".$uid));
+require_once('./inc/db.inc');
+if(!(isset($_GET['cid']) && isset($_GET['rid']) && isset($_GET['opid']) && isset($_GET['label']) )) forbidden();
 
-require_once('./db.inc');
 $cid=$_GET['cid'];
 $rid=$_GET['rid'];
 $opid=$_GET['opid'];
 
-dbQuery('BEGIN ;');
-$result=dbQuery('SELECT * FROM option WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' AND opid = '.dbMakeSafe($opid).';');
-if (dbNumRows($result) != 0) {
-	dbQuery('UPDATE OPTION SET label = '.dbPostSafe($_GET['label']).' WHERE cid = '.dbMakeSafe($cid).' AND rid = '.dbMakeSafe($rid).' AND opid = '.dbMakeSafe($opid).';');
-	dbQuery('COMMIT ;');
+$db->exec("BEGIN TRANSACTION");
+
+$o = $db->prepare("SELECT COUNT(*) FROM option WHERE cid = ? AND rid = ? AND opid = ? ");
+$o->bindInt(1,$cid);
+$o->bindInt(2,$rid);
+$o->bindInt(3,$opid);
+
+if ($o->fetchValue() != 0) {
+	unset($o);
+	$o = $db->prepare("UPDATE OPTION SET label = ? WHERE cid = ? AND rid = ? AND opid = ? ");
+	$o->bindString(1,$_GET['label']);
+	$o->bindInt(1,$cid);
+	$o->bindInt(2,$rid);
+	$o->bindInt(3,$opid);
+	$o->exec();
+	unset($o);
+	$db->exec("COMMIT");
 	echo '{"cid":'.$cid.',"rid":'.$rid.',"opid":'.$opid.',"label":"'.$_GET['label'].'"}';
 } else {
+	unset($o);
 ?><p>Option does not exist</p>
 <?php
-  dbQuery('ROLLBACK ;');
+	$db->exec("ROLLBACK");
 }
-dbFree($result);
 ?>
 

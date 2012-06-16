@@ -20,21 +20,29 @@
 
 */
 define('DEBUG','yes'); //define debug mode to get uncompressed mootools loaded
-if (!(isset($_GET['global']) || isset($_GET['cid'])))
-	die('Hacking attempt - need cid or global');
 
 require_once('./inc/db.inc'); //This will also validate user
+if (!(isset($_GET['global']) || isset($_GET['cid']))) forbidden();
+
 
 $s = $db->prepare("SELECT value FROM settings WHERE name = ?");
 define('MBBALL_EMOTICON_DIR',$s->fetchSetting('emoticon_dir'));
 define('MBBALL_EMOTICON_URL',$s->fetchSetting('emoticon_url'));
 define('MBBALL_TEMPLATE',$s->fetchSetting('template'));
+$messages = Array();
+$messages['deletecomp'] = $s->fetchSetting('msgdeletecomp');
+$messages['deadline'] = $s->fetchSetting('msgdeadline');
+$messages['nomatchdate'] = $s->fetchSetting('msgnomatchdate');
+$messages['deletematch'] = $s->fetchSetting('msgdeletematch');
+$messages['quesdead'] = $s->fetchSetting('msgquesdead');
+$messages['nomatchround'] = $s->fetchSetting('msgnomatchround');
+$messages['deleteround'] = $s->fetchSetting('msgdeleteround');
+$messages['approve'] = $s->fetchSetting('msgapprove');
+$messages['unregister'] = $s->fetchSetting('msgunregister');
 unset($s);
 
-require_once('./inc/bbcode.inc');
-
 function head_content () {
-	global $uid
+	global $messages
 
 ?>	<title>Melinda's Backups Football Pool Administration</title>
 	<link rel="stylesheet" type="text/css" href="calendar/calendar.css"/>
@@ -55,16 +63,26 @@ function head_content () {
 
 var MBBmgr;
 window.addEvent('domready', function() {
-	MBBmgr = new MBBAdmin({uid: '<?php echo $uid;?>',
-				admin :<?php if(isset($_GET['global'])) {echo 'true';} else {echo 'false';}?>},
-				<?php if(isset($_GET['cid'])) {echo $_GET['cid'] ;}else{ echo '0';}?>,
-                                $('errormessage')
-                             );
+	MBBmgr = new MBBAdmin(
+						<?php if(isset($_GET['global'])) {echo 'true';} else {echo 'false';}?>,<?php if(isset($_GET['cid'])) {echo $_GET['cid'] ;}else{ echo '0';}?>,$('errormessage'),
+{
+<?php 
+//TODO: Go through all the messages in mbbadmin and give them names to be added to the object here.  Read text from settings datatable
+	$donefirst = false;
+	foreach($messages as $msgid => $message){
+		if($donefirst) echo ",\n";
+		$dofirst = true;
+		echo "$msgid:'$message'";
+	}
+?>
+}
+						);
 });	
 
 	// -->
 	</script>
 <?php
+	unset($messages);
 }
 function content_title() {
 	echo 'Administration Page';

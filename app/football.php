@@ -1,6 +1,6 @@
 <?php
 /*
- 	Copyright (c) 2008,-2011 Alan Chandler
+ 	Copyright (c) 2008-2012 Alan Chandler
     This file is part of MBBall, an American Football Results Picking
     Competition Management software suite.
 
@@ -15,14 +15,13 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with MBBall (file supporting/COPYING.txt).  If not, 
-    see <http://www.gnu.org/licenses/>.
+    along with MBBall (file COPYING.txt).  If not, see <http://www.gnu.org/licenses/>.
 
 */
-
 require_once('./inc/db.inc');
 $s = $db->prepare("SELECT value FROM settings WHERE name = ?");
 define('MBBALL_TEMPLATE',$s->fetchSetting('template'));
+unset($s);
 setcookie('MBBall','',time() - 3600);  //Expire the cookie
 function head_content() {
 ?>

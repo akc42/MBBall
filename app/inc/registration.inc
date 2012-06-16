@@ -19,11 +19,10 @@
 
 */
 ?><form id="register" action="register.php">
-	<input type="hidden" name="uid" value="<?php echo $uid;?>" />
 	<input type="hidden" name="cid" value="<?php echo $cid;?>" />
     <input type="hidden" name="name" value="<?php echo $name;?>" />
     <input type="hidden" name="email" value="<?php echo $email;?>" />
-    <input type="hidden" name="bb" value="<?php echo (in_array(SMF_BABY,$groups))?'true':'false';?>" />
+    <input type="hidden" name="bb" value="<?php echo ($guest)?'true':'false';?>" />
    
 <!-- registration block to be floated right -->
 	<h1>Register for this Competition</h2>
@@ -33,14 +32,14 @@ if($condition == '') {
 <?php
 } else {
 	require_once('./bbcode.inc');
-?>	<p><?php echo $name ;?>, In order to enter the competition you must agree to the following condition:-</p>
+?>	<p><?php echo "$name ,".MBBALL_CONDITION;?></p>
 	<p class="condition"><?php echo dbBBcode($condition);?></p>
 		<div id="agree"><input type="submit" value="I Agree" /></div>
 <?php
 }
 if ($guest && $approval_required) {
-?>	<p class="bbcond"><sup>*</sup>Baby Backups require special approval from the competition administrator (<?php echo $admName ;?>).
-	Please contact her/him <i>after registering</i> if you are a Baby Backup</p>
+	$guestNote = str_replace("$$$",$admName,MBBALL_GUESTNOTE);
+?>	<p class="bbcond"><sup>*</sup><?php echo $guestNote ;?></p>
 <?php
 }
 ?></form>
