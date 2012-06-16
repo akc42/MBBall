@@ -23,24 +23,82 @@
 
 	USAGE.
 	
-	1. Place this file in the application directory of the old (Postgres based) version of football
-	2. Create a subdirectory called db and copy database.sql from the app/inc directory there
+	1. Copy this file from the supporting directory into the application directory
+	2. Alter the database connection parameters below to match the Postgres database 
+		you are connecting to
+*/
+
+$db_server = 'localhost';
+$db_name = 'melindas_ball';
+$db_user = 'melindas_ball';
+$db_password = 'xxxxxx';
+
+/*
 	3. In a web browser call up dump.php (at the appropriate url).
 	
 	RESULT
 	
-	This should create football.ini and a set of .db files representing each of the competitions that were contained on the main database
+	This should create footballpg.db in the normal data directory.  It can be renamed
+	football.db so it can be used in the main application
 */
 
 
-if (file_exists('./db/football.db')) unlink('./db/football.db');
-$db=new PDO('sqlite:./db/football.db');
-$db->exec(file_get_contents('./db/database.sql'));  //setup database
 
-define ('BALL',1);   //defined so we can control access to some of the files.
-require_once('db.inc');
+
+// This is a copy of the OLD db.inc so its stand alone and will work in the new environment
+
+pg_connect("host=$db_server dbname=$db_name user=$db_user password=$db_password")
+		or die('Could not connect to database: ' . pg_last_error());
+function dbQuery($sql) {
+	$result = pg_query($sql);
+	if (!$result) {
+		echo '<tt>';
+		echo "<br/><br/>\n";
+		print_r(debug_backtrace());
+		echo "<br/><br/>\n";
+		echo $sql;
+		echo "<br/><br/>\n\n";
+		echo pg_last_error();
+		echo "<br/><br/>\n\n";
+		echo '</tt>';
+		die('<p>Please inform <i>webmaster@melindasbackups.com</i> that a database query failed in the football and include the above text.<br/><br/>Thank You</p>');
+	}
+	return $result;
+}
+function dbMakeSafe($value) {
+	if (!get_magic_quotes_gpc()) {
+		$value=pg_escape_string($value);
+	}
+	return "'".$value."'" ;
+}
+function dbPostSafe($text) {
+  if ($text == '') return 'NULL';
+  return dbMakeSafe(htmlentities($text,ENT_QUOTES,'UTF-8',false));
+}
+function dbNumRows($result) {
+	return pg_num_rows($result);
+}
+function dbFetchRow($result) {
+	return pg_fetch_assoc($result);
+}
+function dbFree($result){
+	pg_free_result($result);
+}
+function dbRestartQuery($result) {
+	pg_result_seek($result,0);
+}
+function dbFetch($result) {
+	return pg_fetch_all($result);
+}
+
+//START of dump program proper
+
 
 echo "<p>Starting Information Transfer<br/>\n";
+
+if (file_exists('../data/footballpg.db')) unlink('../data/footballpg.db');
+$db=new PDO('sqlite:../data/footballpg.db');
+$db->exec(file_get_contents('./inc/database.sql'));  //setup database with initial settings
 
 dbQuery('BEGIN;');
 $result=dbQuery("SELECT cid FROM default_competition LIMIT 1");
