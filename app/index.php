@@ -99,7 +99,7 @@ $s = $db->prepare("SELECT value FROM settings WHERE name = ?");
 $p = $db->prepare($sql);
 $p->bindString(1,$name);
 $p->bindString(2,$email);
-$p->bindIntl(3,$guest?1:0);
+$p->bindInt(3,$guest?1:0);
 $p->bindInt(4,$uid);
 $p->exec();
 if($p->effected() == 0) {
@@ -118,14 +118,14 @@ unset($user);  //done with it.
 
 define('MBBALL_MAX_ROUND_DISPLAY',$s->fetchSetting('max_round_display'));
 define('MBBALL_FORUM_PATH',$s->fetchSetting('home_url'));
-define('MBBALL_EMOTICON_DIR',$s->fetchSetting('emoticon_dir'));
-define('MBBALL_EMOTICON_URL',$s->fetchSetting('emoticon_url'));
+//define('MBBALL_EMOTICON_DIR',$s->fetchSetting('emoticon_dir'));
+//define('MBBALL_EMOTICON_URL',$s->fetchSetting('emoticon_url'));
 define('MBBALL_TEMPLATE',$s->fetchSetting('template'));
 define('MBBALL_CONDITION',$s->fetchSetting('msgcondition'));
 define('MBBALL_GUESTNOTE',$s->fetchSetting('msgguestnote'));
 $messages = Array();
-$message['noquestion'] = $s->fetchSettings('msgnoquestion');
-$message['register'] = $s->fetchSettings('msgnoquestion');
+$message['noquestion'] = $s->fetchSetting('msgnoquestion');
+$message['register'] = $s->fetchSetting('msgnoquestion');
 
 if(isset($_GET['cid'])) {
 	$cid = $_GET['cid'];
