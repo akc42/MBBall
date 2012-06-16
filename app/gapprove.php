@@ -19,16 +19,13 @@
 
 */
 require_once('./inc/db.inc');
-if(!(isset($_GET['uid']) && isset($_GET['pass'])  && isset($_GET['cid']) && isset($_GET['bbuid']) && isset($_GET['approval']) ))
-	die('Hacking attempt - wrong parameters');
-$uid = $_GET['uid'];
-$password = $_GET['pass'];
-if ($password != sha1("Football".$uid))
-	die('Hacking attempt got: '.$password.' expected: '.sha1("Football".$uid));
-require_once('./db.inc');
+if(!(isset($_GET['cid']) && isset($_GET['bbuid']) && isset($_GET['approval']) )) forbidden();
 
-dbQuery('UPDATE registration SET bb_approved = '.dbMakeSafe($_GET['approval']).' WHERE cid = '.dbMakeSafe($_GET['cid']).' AND uid = '.dbMakeSafe($_GET['bbuid']).';');
-
-
+$r = $db->prepare("UPDATE registration SET approved = ? WHERE cid = ? AND uid = ? ");
+$r->bindInt(1,$_GET['approval']);
+$r->bindInt(2,$_GET['cid']);
+$r->bindInt(3,$_GET['bbuid']);
+$r->exec();
+unset($r);
 echo '{"cid":'.$_GET['cid'].', "uid":'.$_GET['bbuid'].',"approve":'.$_GET['approval'].'}';
 ?>
