@@ -22,10 +22,10 @@
 ?><div id="emoticons">
 <?php
 // Open a known directory, and proceed to read its contents
-
+	require_once('./inc/bbcode.inc');
 	$fns = scandir(MBBALL_EMOTICON_DIR);
 	foreach ($fns as $filename) {
-		if(filetype($dir.'/'.$filename) == 'file') {
+		if(filetype(MBBALL_EMOTICON_DIR.'/'.$filename) == 'file') {
 			$split = splitFIlename($filename);
 			if($split[1] == 'gif') {
 				echo '<img src="'.MBBALL_EMOTICON_URL.'/'.$filename.'" alt=":'.$split[0].'" title="'.$split[0].'" />',"\n";

@@ -26,8 +26,8 @@ if (!(isset($_GET['global']) || isset($_GET['cid']))) forbidden();
 
 
 $s = $db->prepare("SELECT value FROM settings WHERE name = ?");
-define('MBBALL_EMOTICON_DIR',$s->fetchSetting('emoticon_dir'));
-define('MBBALL_EMOTICON_URL',$s->fetchSetting('emoticon_url'));
+//define('MBBALL_EMOTICON_DIR',$s->fetchSetting('emoticon_dir'));
+//define('MBBALL_EMOTICON_URL',$s->fetchSetting('emoticon_url'));
 define('MBBALL_TEMPLATE',$s->fetchSetting('template'));
 $messages = Array();
 $messages['deletecomp'] = $s->fetchSetting('msgdeletecomp');
@@ -45,10 +45,10 @@ function head_content () {
 	global $messages
 
 ?>	<title>Melinda's Backups Football Pool Administration</title>
-	<link rel="stylesheet" type="text/css" href="calendar/calendar.css"/>
-	<link rel="stylesheet" type="text/css" href="ball.css"/>
+	<link rel="stylesheet" type="text/css" href="js/calendar/calendar.css"/>
+	<link rel="stylesheet" type="text/css" href="css/ball.css"/>
 <?php
-	if(defined(DEBUG)) {
+	if(defined('DEBUG')) {
 ?>	<script src="js/mootools-dragmove-1.4.0.1.js" type="text/javascript" charset="UTF-8"></script>
 <?php
 	} else {
@@ -71,7 +71,7 @@ window.addEvent('domready', function() {
 	$donefirst = false;
 	foreach($messages as $msgid => $message){
 		if($donefirst) echo ",\n";
-		$dofirst = true;
+		$donefirst = true;
 		echo "$msgid:'$message'";
 	}
 ?>
@@ -93,6 +93,7 @@ function menu_items() {
 <?php
 }
 function content() {
+	global $db;
 ?><div id="errormessage"></div>
 <table class="layout">
 	<tbody>

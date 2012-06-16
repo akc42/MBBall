@@ -20,9 +20,6 @@
 
 require_once('./inc/db.inc');
 
-
-$userdata = dbFetch($resultusers);
-
 $sql = "SELECT cid,description,uid,name FROM competition c LEFT JOIN participant p ON c.administrator = p.uid";
 if(!isset($_GET['global'])) {
 	// When not global administrator, only see competitions for which are administrator
@@ -48,7 +45,7 @@ if(!isset($_GET['global'])) {
 <?php
 $db->exec("BEGIN TRANSACTION");  //The whole page will run within one transaction - so its faster
 $s = $db->prepare("SELECT value FROM settings WHERE name = ?");
-$dcid = $s->fetchSettings("default_competition");
+$dcid = $s->fetchSetting("default_competition");
 unset($s);
 
 while($row = $c->FetchRow()) {
@@ -85,7 +82,7 @@ unset($c);
 <?php
 //Participants who have logged in in the last year
 $sql = "SELECT uid,name FROM participant WHERE last_logon > strftime('%s','now') - 31536000";
-$sql .= "AND is_guest = 0 ORDER BY admin_experience DESC, name COLLATE NOCASE";
+$sql .= " AND is_guest = 0 ORDER BY admin_experience DESC, name COLLATE NOCASE";
 $u = $db->prepare($sql);
 while ($row = $u->fetchRow()){
 ?>				<option value="<?php echo $row['uid'];?>"

@@ -19,14 +19,14 @@
 
 */
 
-require_once('./inc/db');
+require_once('./inc/db.inc');
 if (!isset($_GET['cid'])) forbidden();
 $cid = $_GET['cid'];
 
 if ($cid != 0) {
 
 	
-	$c = $db->prepare("SELECT description,administrator FROM competition c LEFT JOIN participant u ON u.uid = c.administrator WHERE cid = ?");
+	$c = $db->prepare("SELECT c.*,u.name FROM competition c LEFT JOIN participant u ON u.uid = c.administrator WHERE cid = ?");
 	$c->bindInt(1,$cid);	
 	if($comp = $c->FetchRow()) {
 ?>
@@ -49,12 +49,12 @@ if ($cid != 0) {
 		<select id="administrator" name="adm" class="user">
 <?php
 			$sql = "SELECT uid,name FROM participant WHERE last_logon > strftime('%s','now') - 31536000";
-			$sql .= "AND is_guest = 0 ORDER BY admin_experience DESC, name COLLATE NOCASE";
+			$sql .= " AND is_guest = 0 ORDER BY admin_experience DESC, name COLLATE NOCASE";
 			$u = $db->prepare($sql);
 			while ($user = $u->fetchRow()){
 
 ?>			<option value="<?php echo $user['uid'];?>" 
-				<?php if ($user['uid'] == $row['administrator']) echo 'selected="selected"' ;?>><?php echo $user['name'] ;?></option>
+				<?php if ($user['uid'] == $comp['administrator']) echo 'selected="selected"' ;?>><?php echo $user['name'] ;?></option>
 <?php
 			}
 			unset($u);

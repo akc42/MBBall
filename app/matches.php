@@ -36,8 +36,6 @@ if($rid != 0 && $cid !=0) {
 
 ?><div class="match">
      <form  action="#" >
-     <input type="hidden" name="uid" value="<?php echo $uid;?>" />
-     <input type="hidden" name="pass" value="<?php echo $password;?>" />
 		<input type="hidden" name="cid" value="<?php echo $cid;?>"/>
 		<input type="hidden" name="rid" value="<?php echo $rid;?>"/>
 		<input type="hidden" name="hid" value="<?php echo $row['hid'];?>" />

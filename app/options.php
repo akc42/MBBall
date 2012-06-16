@@ -44,7 +44,7 @@ if($rid != 0 && $cid !=0) {
 
      <tbody>
 <?php 
-     while($row = dbFetchRow($optionresult)) {
+     while($row = $o->FetchRow()) {
           if ($doFirst) {
 ?>       <tr>
          <td><input id="nullanswer" type="radio" name="option" value="0" <?php if ($_GET['answer'] == 0) echo 'checked="checked"';?> /></td>

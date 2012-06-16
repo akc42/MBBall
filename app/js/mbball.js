@@ -59,7 +59,7 @@ MBB = function() {
             loadPage: function(params) {
 		        this.div.empty();
 		        this.div.addClass('loading');
-	            this.request.get(Object.merge(reqOpts,params || {}));
+	            this.request.get(params);
             }
         }),
         req: new Class({

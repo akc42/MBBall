@@ -124,8 +124,8 @@ define('MBBALL_TEMPLATE',$s->fetchSetting('template'));
 define('MBBALL_CONDITION',$s->fetchSetting('msgcondition'));
 define('MBBALL_GUESTNOTE',$s->fetchSetting('msgguestnote'));
 $messages = Array();
-$message['noquestion'] = $s->fetchSetting('msgnoquestion');
-$message['register'] = $s->fetchSetting('msgnoquestion');
+$messages['noquestion'] = $s->fetchSetting('msgnoquestion');
+$messages['register'] = $s->fetchSetting('msgnoquestion');
 
 if(isset($_GET['cid'])) {
 	$cid = $_GET['cid'];
@@ -218,13 +218,13 @@ var MBBmgr;
 window.addEvent('domready', function() {
 	MBBmgr = new MBBUser(<?php echo ($registered)?'true':'false';?>,
 				{cid: <?php echo $cid;?>, rid: <?php echo $rid;?>},
-                             $('errormessage')
+                             $('errormessage'),
 {
 <?php 
 	$donefirst = false;
 	foreach($messages as $msgid => $message){
 		if($donefirst) echo ",\n";
-		$dofirst = true;
+		$donefirst = true;
 		echo "$msgid:'$message'";
 	}
 ?>
