@@ -96,9 +96,9 @@ function dbFetch($result) {
 
 echo "<p>Starting Information Transfer<br/>\n";
 
-if (file_exists('../data/footballpg.db')) unlink('../data/footballpg.db');
-$db=new PDO('sqlite:../data/footballpg.db');
-$db->exec(file_get_contents('./inc/database.sql'));  //setup database with initial settings
+if (file_exists('footballpg.db')) unlink('footballpg.db');
+$db=new PDO('sqlite:footballpg.db');
+$db->exec(file_get_contents('database.sql'));  //setup database with initial settings
 
 dbQuery('BEGIN;');
 $result=dbQuery("SELECT cid FROM default_competition LIMIT 1");
