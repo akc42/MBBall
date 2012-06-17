@@ -44,13 +44,15 @@ CREATE TABLE conference (
 
 -- User Pick of each division winner
 CREATE TABLE div_winner_pick (
-    cid integer NOT NULL REFERENCES competition(cid) ON UPDATE CASCADE ON DELETE CASCADE, -- Competition ID
-    uid integer NOT NULL REFERENCES participant(uid) ON UPDATE CASCADE ON DELETE CASCADE, --User ID
+    cid integer NOT NULL, -- Competition ID
+    uid integer NOT NULL, --User ID
     confid character(3) NOT NULL REFERENCES conference(confid) ON UPDATE CASCADE ON DELETE CASCADE, --Conference ID
     divid character(1) NOT NULL REFERENCES division(divid) ON UPDATE CASCADE ON DELETE CASCADE, --Division ID
-    tid character(3) NOT NULL REFERENCES team(tid) ON UPDATE CASCADE ON DELETE CASCADE, --Team who will win division
+    tid character(3) NOT NULL, --Team who will win division
     submit_time bigint DEFAULT (strftime('%s','now')) NOT NULL, --Time of submission
-    primary key (cid,uid,confid,divid)
+    PRIMARY KEY (cid,uid,confid,divid),
+    FOREIGN KEY (cid,uid) REFERENCES registration(cid,uid) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (cid,tid) REFERENCES team_in_competition(cid,tid) ON UPDATE CASCADE ON DELETE CASCADE    
 );
 
 --Football Conference Division
@@ -61,10 +63,10 @@ CREATE TABLE division (
 
 
 CREATE TABLE match (
-    cid integer NOT NULL REFERENCES competition(cid) ON UPDATE CASCADE ON DELETE CASCADE, -- Competition ID
-    rid integer NOT NULL REFERENCES round(rid) ON UPDATE CASCADE ON DELETE CASCADE, --Round ID
-    hid character(3) NOT NULL REFERENCES team(tid) ON UPDATE CASCADE ON DELETE CASCADE, -- Home Team ID
-    aid character(3) REFERENCES team(tid) ON UPDATE CASCADE ON DELETE SET NULL, --Away Team ID
+    cid integer NOT NULL, -- Competition ID
+    rid integer NOT NULL, --Round ID
+    hid character(3) NOT NULL, -- Home Team ID
+    aid character(3) , --Away Team ID
     comment text, --Administrators Comment for the Match
     ascore integer, --Away Team Score
     hscore integer, --Home Team Score
@@ -72,26 +74,32 @@ CREATE TABLE match (
     open boolean DEFAULT 0 NOT NULL, --True if Match is set up and ready
     match_time bigint , --Time match is due to be played
     underdog character(1),  --If NOT NULL this is an underdog match with the character being 'A' or 'H' specifying underdog team
-    PRIMARY KEY (cid,rid,hid)
+    PRIMARY KEY (cid,rid,hid),
+    FOREIGN KEY (cid,rid) REFERENCES round(cid,rid) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (cid,hid) REFERENCES team_in_competition(cid,tid) ON UPDATE CASCADE ON DELETE CASCADE ,   
+    FOREIGN KEY (cid,aid) REFERENCES team_in_competition(cid,tid) ON UPDATE CASCADE ON DELETE SET NULL    
 );
 
 -- Holds one possible answer to the round question
 CREATE TABLE option (
-    cid integer NOT NULL REFERENCES competition(cid) ON UPDATE CASCADE ON DELETE CASCADE, -- Competition ID
-    rid integer NOT NULL REFERENCES round(rid) ON UPDATE CASCADE ON DELETE CASCADE, --Round ID
+    cid integer NOT NULL, -- Competition ID
+    rid integer NOT NULL, --Round ID
     opid integer NOT NULL, --Option ID
     label character varying, --Simple Label for this Option
-    PRIMARY KEY(cid,rid,opid)
+    PRIMARY KEY(cid,rid,opid),
+    FOREIGN KEY (cid,rid) REFERENCES round(cid,rid) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE TABLE option_pick (
-    cid integer NOT NULL REFERENCES competition(cid) ON UPDATE CASCADE ON DELETE CASCADE, -- Competition ID
-    uid integer NOT NULL REFERENCES participant(uid) ON UPDATE CASCADE ON DELETE CASCADE, --User ID
-    rid integer NOT NULL REFERENCES round(rid) ON UPDATE CASCADE ON DELETE CASCADE, --Round ID
+    cid integer NOT NULL, -- Competition ID
+    uid integer NOT NULL, --User ID
+    rid integer NOT NULL, --Round ID
     opid integer NOT NULL , --ID of Question Option Selected as Correct if multichoice, else value of answer (only if multichoice)
     comment text, --General Comment from user about the round
     submit_time bigint DEFAULT (strftime('%s','now')) NOT NULL, --Time of Submission
     PRIMARY KEY (cid,uid,rid)
+    FOREIGN KEY (cid,rid) REFERENCES round(cid,rid) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (cid,uid) REFERENCES registration(cid,uid) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 --forum user who will participate in one or more competitions
@@ -107,15 +115,19 @@ CREATE TABLE participant (
 );
 
 CREATE TABLE pick (
-    cid integer NOT NULL REFERENCES competition(cid) ON UPDATE CASCADE ON DELETE CASCADE, -- Competition ID
-    uid integer NOT NULL REFERENCES participant(uid) ON UPDATE CASCADE ON DELETE CASCADE, --User ID
-    rid integer NOT NULL REFERENCES round(rid) ON UPDATE CASCADE ON DELETE CASCADE, --Round ID
-    hid character(3) NOT NULL REFERENCES team(tid) ON UPDATE CASCADE ON DELETE CASCADE, -- Home Team ID
+    cid integer NOT NULL, -- Competition ID
+    uid integer NOT NULL, --User ID.scha
+    rid integer NOT NULL, --Round ID
+    hid character(3) NOT NULL, -- Home Team ID
     comment text, --Comment on the pick and why it was chosen
     pid character(3), --ID of Team Picked to Win (NULL for Draw)
     over_selected boolean, --true (=1) if over score is selected
     submit_time bigint DEFAULT (strftime('%s','now')) NOT NULL, --Time of submission
-    PRIMARY KEY (cid,uid,rid,hid)
+    PRIMARY KEY (cid,uid,rid,hid),
+    FOREIGN KEY (cid,rid) REFERENCES round(cid,rid) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (cid,uid) REFERENCES registration(cid,uid) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (cid,hid) REFERENCES team_in_competition(cid,tid) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (cid,pid) REFERENCES team_in_competition(cid,tid) ON UPDATE CASCADE ON DELETE SET NULL
 );
 
 --Participant registered for particular competition
@@ -170,13 +182,15 @@ CREATE TABLE team_in_competition (
 
 --Users Pick of WildCard Entries for each conference
 CREATE TABLE wildcard_pick (
-    cid integer NOT NULL REFERENCES competition(cid) ON UPDATE CASCADE ON DELETE CASCADE, -- Competition ID
-    uid integer NOT NULL REFERENCES participant(uid) ON UPDATE CASCADE ON DELETE CASCADE, --User ID
+    cid integer NOT NULL, -- Competition ID
+    uid integer NOT NULL, --User ID
     confid character(3) NOT NULL REFERENCES conference(confid) ON UPDATE CASCADE ON DELETE CASCADE, --Conference ID
     opid smallint DEFAULT 1 NOT NULL, -- Either 1 or 2 depending on which wildcard pick for the conference it is
-    tid character(3) NOT NULL REFERENCES team(tid) ON UPDATE CASCADE ON DELETE CASCADE, --Pick
+    tid character(3) NOT NULL, --Pick
     submit_time bigint DEFAULT (strftime('%s','now')) NOT NULL, --Time of Submission
     PRIMARY KEY(cid,uid,confid,opid)
+    FOREIGN KEY (cid,uid) REFERENCES registration(cid,uid) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (cid,tid) REFERENCES team_in_competition(cid,tid) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 -- END OF TABLES -------------------------------------------------------------------------------------------------
