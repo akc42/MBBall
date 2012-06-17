@@ -237,6 +237,7 @@ while ($nom > 0) {
 		}
 ?>			</tr>
 <?php
+		$m->close();
 		$p->close();
 	}
 ?>	</tbody>
