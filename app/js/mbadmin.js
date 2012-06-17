@@ -69,7 +69,7 @@ var MBBAdmin = new Class({
 				e.stop();
 				if(MBB.textValidate($('desc'))) {
 					var createReq = new MBB.req('createcomp.php', function(response) {
-						if (params.cid == 0) {
+						if (params.cid == 0 || $('def').checked ) {
 							params.cid = response.cid;
 							owner.competition.loadPage(params);
 						}
