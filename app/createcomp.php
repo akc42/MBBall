@@ -41,16 +41,20 @@ $c->bindString(1,$_POST['desc']);
 $c->bindInt(2,$adm);
 $c->exec();
 unset($c);
-$lastVal = $db->lastInsertID();
+
+$c = $db->prepare("SELECT last_insert_rowid()");
+$lastval = $c->fetchValue();
+unset($c);
 
 $c = $db->prepare("SELECT COUNT(*) FROM competition");
 $noComps =  $c->fetchValue();
 unset($c);
 
-$d = $db->prepare("UPDATE settings SET value = ? WHERE name = 'default_competition");
-$d->bindInt(1,$lastval);
 if(isset($_POST['setdefault']) || $noComps <= 1) {
-	dbQuery('UPDATE default_competition SET cid = '.dbMakeSafe($lastval).' ;');
+	$d = $db->prepare("UPDATE settings SET value = ? WHERE name = 'default_competition'");
+	$d->bindInt(1,$lastval);
+	$d->exec();
+	unset($d);
 }
 $db->exec("COMMIT");
 
