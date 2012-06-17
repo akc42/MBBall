@@ -26,6 +26,13 @@ define('SMF_BABY',		10);  //Baby backup
 define('MBBALL_KEY','Football9Key7AID'); //Must match index.php of main app (and change for new installations)
 define('MBBALL_CHECK','FOOTBILL'); //8 chars must match index.php of main app (and change for new installations)
 
+
+/*
+ * NOTE: This file can be used as a template for other similar applications.  We do not necessarily have to return
+ * the same parameters nor use SMF to validate ourselves.  We are just doing that in the context of Melinda's Backups in this case
+ */
+
+
 function forbidden() {
 	header('HTTP/1.0 403 Forbidden');
 	?><html>
@@ -85,30 +92,13 @@ function simple_decrypt($text)
 }
 
 
-if(!(isset($_GET['name']) && isset($_GET['guest']))) forbidden();
+if(!isset($_GET['name'])) forbidden();
 /*
  * In order to protect against malicious attempts to get user data, we require a hidden key
  */
-if(substr(simple_decrypt($_GET['name']),0,8) != MBBALL_CHECK ) {
-	echo "var got = '".simple_decrypt($_GET['name'])."';";
-	exit;
-}
+if(substr(simple_decrypt($_GET['name']),0,8) != MBBALL_CHECK ) forbidden();
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/forum/SSI.php');
-//If not logged in to the forum, not allowed any further so redirect to page to say so
-if($user_info['is_guest']) {
-	/*
-	 * The user is a guest, so we want to direct him to the url passed over for guests
-	 * We do this by echoing javascript which will execute immediately it has been loaded by the client
-	 * in the context of opening football's index.php page.  
-	 * 
-	 * This means that the url passed over in the 'guest' query string variable can be relative to that
-	 * index.php page
-	 */
-	echo "window.location ".simple_decrypt($_GET['guest']).";\n";  
-	exit;
-}
-
 
 $user = Array();
 $user_data = Array();
@@ -125,14 +115,27 @@ $user['admin'] = in_array(SMF_FOOTBALL,$groups);
 $user['guest'] = in_array(SMF_BABY,$groups);
 /*
  * The following is javascript run in the context of the index.php page that tried to load us
- * as a result we are setting a cookie in that context and then reloading the page so that it 
- * has the cookie and therefore doesn't come back here.
+ * as a result we are setting a cookie in that context ...
  * NOTE: we are assuming mootools is loaded too
  */
 
 echo "var Cookiedata = '".simple_encrypt(serialize($user))."';\n";  //ecrypted serialised version of the user data
 echo "Cookie.write('MBBall',Cookiedata);\n"; //Write the cookie
-echo "window.location.reload();\n"; //And reload the page - which now the cookie is set should progress normally
+//If not logged in to the forum, not allowed any further so redirect to page to say so
+if($user_info['is_guest']) {
+	/*
+	 * The user is a guest, so we want to direct him to the url that tells him to sign into the forum
+	 * We need to set the cookie so that we authorise use of the page.  Football.php will remove the cookie again.
+ 	 */
+	echo "window.location = 'football.php';\n";
+} else {
+	/*
+	 * ... and then reloading the page no that it 
+ 	 * has the cookie and therefore continues loading the page rather than coming back here
+	 * 
+	 */
+	echo "window.location.reload();\n"; //And reload the page - which now the cookie is set should progress normally
+}
 unset($user_info);
 unset($groups);
 

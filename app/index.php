@@ -65,7 +65,7 @@ if(!isset($_COOKIE['MBBall'])) {
  * which would be unfortunate, since we need to ensure we get a different value each time, and two it prevents a pattern 
  * emerging for that parameter which sniffers could monitor and replicate.
  */
-	echo MBBALL_AUTH."?name=".urlencode(simple_encrypt(MBBALL_CHECK.time()))."&guest=".urlencode(simple_encrypt('football.php')); 
+	echo MBBALL_AUTH."?name=".urlencode(simple_encrypt(MBBALL_CHECK.time())); 
 ?>" type="text/javascript" charset="UTF-8"></script>
 </head>
 <body>Authorising ...</body>
@@ -132,11 +132,12 @@ define('MBBALL_GUESTNOTE',$s->fetchSetting('msgguestnote'));
 $messages = Array();
 $messages['noquestion'] = $s->fetchSetting('msgnoquestion');
 $messages['register'] = $s->fetchSetting('msgnoquestion');
+$dcid = $s->fetchSetting('default_competition');
 
 if(isset($_GET['cid'])) {
 	$cid = $_GET['cid'];
 } else {
-	$cid = $s->fetchSetting('default_competition');
+	$cid = $dcid;
 	if ($cid == 0) {
 		if($global_admin) {
 			header( 'Location: admin.php?uid='.$uid.'&global=true' ) ;
@@ -166,7 +167,7 @@ $admin = false;
 if ($uid == $row['administrator']) {
 	//User is administrator of this competition
 	$admin = true;
-	$a = $db->prepare("UPDATE participant SET admin_experience = TRUE WHERE uid = ?");
+	$a = $db->prepare("UPDATE participant SET admin_experience = 1 WHERE uid = ?");
 	$a->bindInt(1,$uid);
 	$a->exec();	
 	unset($a);
@@ -249,7 +250,7 @@ function content_title() {
 	echo $competitiontitle;
 }
 function menu_items () {
-	global $cid,$rid,$uid,$global_admin,$admin,$db;
+	global $cid,$rid,$uid,$dcid,$global_admin,$admin,$db;
 ?>		<li><a href="/forum"><span>Return to the Forum</span></a></li>
 <?php
 	$maxrid = $rid;
@@ -283,11 +284,12 @@ function menu_items () {
 	// where there is at least one open rouund or it is taking registrations and we are not yet registered
 	$sql = "SELECT c.cid AS cid, c.description AS name FROM competition c LEFT JOIN registration u ON c.cid = u.cid AND u.uid  = ?";
 	$sql .= " LEFT JOIN round r ON c.cid = r.cid  WHERE c.cid <> ?";
-	$sql .= " AND (c.open = 1 OR r.open = 1) GROUP BY c.cid, c.description ORDER BY c.cid DESC";
+	$sql .= " AND (c.open = 1 OR r.open = 1 OR c.cid = ?) GROUP BY c.cid, c.description ORDER BY c.cid DESC";
 
 	$c = $db->prepare($sql);
 	$c->bindInt(1,$uid);
 	$c->bindInt(2,$cid);
+	$c->bindInt(3,$dcid);
 	$do_first = true;
 	while($row = $c->fetchRow()){
 		if($do_first) {
@@ -308,18 +310,18 @@ function menu_items () {
 <?php
 	}
 	unset($c);
-	
-	if($admin) {
-		// Am Administrator of this competition - let me also do Admin things
-		?>		<li><a href="admin.php?<?php echo 'uid='.$uid.'&cid='.$cid;?>"><span>Administration</span></a></li>
-	<?php 
-	} else {		
-		if($global_admin) {
-	// Am Global Administrator - let me also do Admin things
+		
+	if($global_admin) {
+// Am Global Administrator - let me also do Admin things
 ?>		<li><a href="admin.php?<?php echo 'uid='.$uid.'&global=true&cid='.$cid;?>"><span>Global Admin</span></a></li>
 
 <?php
-		}
+	}else {	
+		if($admin) {
+	// Am Administrator of this competition - let me also do Admin things
+		?>		<li><a href="admin.php?<?php echo 'uid='.$uid.'&cid='.$cid;?>"><span>Administration</span></a></li>
+	<?php 
+		} 
 	}
 }
 
