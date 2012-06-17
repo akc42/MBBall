@@ -28,54 +28,60 @@ define('MBBALL_ICON_PATH',	"images/"); //URL where football Icons may be found
 // SMF membergroup IDs for the groups that we have used to define characteristics which control Chat Group
 define('SMF_FOOTBALL',		21);  //Group that can administer
 define('SMF_BABY',		10);  //Baby backup
-
+define('MBBALL_AUTH','http://www.melindasbackups.com/auth/football.php');  //This should contain an autorisation script
+define('MBBALL_KEY','Football9Key7AID'); //Must match same ones in url above (and change for new installations) - see also inc/db.inc
+define('MBBALL_CHECK','FOOTBILL'); //8 chars must match same ones in url above (and change for new installations)
 
 $time_head = microtime(true);
 
-if(!isset($_COOKIE['MBBall'])) {
-	require_once($_SERVER['DOCUMENT_ROOT'].'/forum/SSI.php');
-	//If not logged in to the forum, not allowed any further so redirect to page to say so
-	$user = Array();
-	$user_data = Array();
-	
-	$groups =& $user_info['groups'];
-	if(isset($user_info['id'])) { //check if this is SMFv2
-		$user['uid'] =& $user_info['id'];
-	} else {
-		$user['uid'] = $ID_MEMBER;
-	}
-	$user_data['name'] =& $user_info['name'];
-	$user_data['email'] =& $user_info['email'];
-	$user_data['admin'] = in_array(SMF_FOOTBALL,$groups); 
-	$user_data['guest'] = in_array(SMF_BABY,$groups);
-	$user['data'] = $user_data;
-	$user['timestamp'] = time();
-    $user['key'] = sha1('Football19Key'.$user['timestamp'].$user['uid'].serialize($user['data']));//NOTE - keep first part of SHA1 same as in inc/db.inc
-	setcookie('MBBall',serialize($user),0);  //Cookie only lasts this session, 
-	$_COOKIE['MBBall'] = serialize($user);  //Make a copy for this access
-	unset($user);
-	unset($user_data);
-	if($user_info['is_guest']) {
-		header( 'Location: football.php' ) ;
-		exit;
-	}
-	unset($user_info);
-	unset($groups);
+function simple_encrypt($text)
+{
+	return trim(base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,
+			MBBALL_KEY, $text, MCRYPT_MODE_ECB,
+			mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256,
+					MCRYPT_MODE_ECB), MCRYPT_RAND))));
 }
-	
 
 
-
-$time_db = microtime(true);
+if(!isset($_COOKIE['MBBall'])) {
+/*
+ * If the cookie isn't set we need to go get authorisation from whoever is designated to do so
+ */
+?><!DOCTYPE html >
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<?php
+	if(defined('DEBUG')) {
+?><script src="js/mootools-core-1.4.5-full-nocompat.js" type="text/javascript" charset="UTF-8"></script>
+<?php
+	} else {
+?>	<script src="js/mootools-core-1.4.5-full-nocompat-yc.js" type="text/javascript" charset="UTF-8"></script>
+<?php
+	}
+?> <script src="<?php 
+/*
+ * The time added in the url below serves two purposes.  One it prevents the browser caching the script
+ * which would be unfortunate, since we need to ensure we get a different value each time, and two it prevents a pattern 
+ * emerging for that parameter which sniffers could monitor and replicate.
+ */
+	echo MBBALL_AUTH."?name=".urlencode(simple_encrypt(MBBALL_CHECK.time()))."&guest=".urlencode(simple_encrypt('football.php')); 
+?>" type="text/javascript" charset="UTF-8"></script>
+</head>
+<body>Authorising ...</body>
+</html>
+<?php
+	exit;
+}	
 
 require_once('./inc/db.inc');
 if($uid == 0) forbidden(); //Extra guard against guests who having gone to football, login again
-$email = $user['data']['email'];
-$guest = $user['data']['guest'];
-$name = $user['data']['name'];
+$email = $user['email'];
+$guest = $user['guest'];
+$name = $user['name'];
 //Update participant record with this user
 $sql = "UPDATE participant SET name = ?, email = ?, is_guest = ?, last_logon = strftime('%s','now')";
-if ($user['data']['admin']) {
+if ($user['admin']) {
 	$sql .= ", admin_experience = 1,is_global_admin = 1 WHERE uid = ?"; 
 	$sql2 = "INSERT INTO participant(uid,name,email,is_guest,last_logon,admin_experience,is_global_admin) VALUES(?,?,?,?,strftime('%s','now'),1,1)";
 	$global_admin = true;
@@ -91,7 +97,7 @@ $s = $db->prepare("SELECT value FROM settings WHERE name = ?");
  * Here is where we add update to the database structure when we go to a new release
  * $currentVersion = $s->fetchSettings("version");
  * while ($currentVersion < MBBALL_DB_Version) {
- * 	$db->exec(file_get_contents(dirname(__FILE__).'/update_'.$currentVersion.'.sql');
+ * 	$db->exec(file_get_contents(dirname(__FILE__).'/inc/update_'.$currentVersion.'.sql');
  *  $currentVersion++;
  * }
  */
@@ -368,9 +374,9 @@ if ($playoff_deadline != 0) {
 <?php
 }	
 function foot_content() {
-	global $db,$time_head,$time_db;
+	global $db,$time_head;
 ?>	<div id="copyright">MBball <span><?php include('./inc/version.inc');?></span> &copy; 2008-2012 Alan Chandler.  Licenced under the GPL</div>
-	<div id="timing"><?php $time_now = microtime(true); printf("With %d queries, page displayed in %.3f secs of which %.3f secs was in forum checks",$db->getCounts(),$time_now - $time_head,$time_db-$time_head);?></div>
+	<div id="timing"><?php $time_now = microtime(true); printf("With %d queries, page displayed in %.3f secs",$db->getCounts(),$time_now - $time_head);?></div>
 <?php
 }
 require_once(MBBALL_TEMPLATE); 

@@ -19,10 +19,10 @@
     see <http://www.gnu.org/licenses/>.
 
 */
-
+define('GOOGLE_ACCOUNT','UA-6767755-1');  //Google account of the forum we are requesting details from
 define('DATA_DIR','/home/alan/dev/football/data/');
-define('GOOGLE_ACCOUNT','UA-6767755-1');
-
+if (!defined('MBBALL_KEY')) define('MBBALL_KEY','Football9Key7AID'); //Must match same ones in index.php (and change for new installations)
+	
 
 
 function forbidden() {
@@ -64,16 +64,22 @@ function forbidden() {
 <?php
 exit;
 }
+function simple_decrypt($text)
+{
+	return trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, MBBALL_KEY,
+			base64_decode($text), MCRYPT_MODE_ECB,
+			mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256,
+					MCRYPT_MODE_ECB), MCRYPT_RAND)));
+}
+
 function tick() {
 	echo '<img src="images/tick.gif" alt="Correct" />';
 }
 
 //Check that call is legit
 if(!isset($_COOKIE['MBBall'])) forbidden();
-$user = unserialize($_COOKIE['MBBall']);
-//NOTE - keep sha1 in step with same value in index.php
-if ($user['key'] != sha1('Football19Key'.$user['timestamp'].$user['uid'].serialize($user['data']))) forbidden();
-$uid = $user['uid']; //This is the one parameter that is important.
+$user = unserialize(simple_decrypt($_COOKIE['MBBall']));
+$uid = $user['uid'];
 
 //This is a convenient place to force everything we output to not be cached 
 header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
