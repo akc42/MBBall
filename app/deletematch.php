@@ -26,14 +26,14 @@ $rid=$_GET['rid'];
 $hid=$_GET['hid'];
 
 $db->exec("BEGIN TRANSACTION");
-$m = $db->prepare("SELECT COUNT(*) FROM match WHERE cid = ? AND rid = ? AND hid = ? ");
+$m = $db->prepare("SELECT aid FROM match WHERE cid = ? AND rid = ? AND hid = ? ");
 $m->bindInt(1,$cid);
 $m->bindInt(2,$rid);
 $m->bindString(3,$hid);
-$noMatch = $m->fetchValue();
+$aid = $m->fetchValue();
 unset($m);
 
-if ($noMatch != 0) {
+if ($aid) {
 	$m = $db->prepare("DELETE FROM match WHERE cid = ? AND rid = ? AND hid = ? ");
 	$m->bindInt(1,$cid);
 	$m->bindInt(2,$rid);
@@ -42,7 +42,7 @@ if ($noMatch != 0) {
 	unset($m);
 	$db->exec("COMMIT");
 
-    echo '{"cid":'.$cid.',"rid":'.$rid.', "hid":"'.$hid.'","aid":"'.$row['aid'].'"}';
+    echo '{"cid":'.$cid.',"rid":'.$rid.', "hid":"'.$hid.'","aid":"'.$aid.'"}';
 
 } else {
 ?><p>Match doesn't exist</p>

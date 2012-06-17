@@ -34,11 +34,11 @@ $m->bindInt(3,$hid);
 $noMatches = $m->fetchValue();
 unset($m);
 
-if (noMatches == 0) {
+if ($noMatches == 0) {
 	$m=$db->prepare("INSERT INTO match(cid,rid,hid) VALUES (?,?,?)");
 	$m->bindInt(1,$cid);
 	$m->bindInt(2,$rid);
-	$m->bindInt(3,$hid);
+	$m->bindString(3,$hid);
 	$m->exec();
 	unset($m);
 	$db->exec("COMMIT");

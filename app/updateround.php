@@ -23,7 +23,7 @@ if(!(isset($_POST['cid']) && isset($_POST['rid']) && isset($_POST['rname'])
 	&& isset($_POST['deadline']) && isset($_POST['value']) )) forbidden();
 
 $sql = "UPDATE round SET name = ?, value = ?, deadline = ?, open = ?, ou_round = ?, valid_question = ?,answer = ?, ";
-$sql .= "question = ? WHERE cid = ? AND rid = ?";
+$sql .= "question = ?,comment = ? WHERE cid = ? AND rid = ?";
 $r = $db->prepare($sql);
 $r->bindString(1,$_POST['rname']);
 $r->bindInt(2,$_POST['value']);
@@ -42,8 +42,9 @@ if (isset($_POST['validquestion'])) {
 	$r->bindNull(8);
 }
 $r->bindString(9,isset($_POST['question'])?$_POST['question']:'');
-$r->bindInt(10,$cid);
-$r->bindInt(11,$rid);
+$r->bindString(10,isset($_POST['bonuscomment'])?$_POST['bonuscomment']:'');
+$r->bindInt(11,$cid);
+$r->bindInt(12,$rid);
 $r->exec();
 unset($r);
 

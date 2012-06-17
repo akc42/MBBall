@@ -173,8 +173,11 @@ div.del:hover, div.del:active {background-position:left bottom;}
 	color:#FFFFCC;
 }
 
-#round{width:400px;}
+#round{width:600px;}
 
+textarea#question{height:140px;}
+#bonuscomment{height:220px;}
+textarea#condition{height:180px}
 #matches {
 	width:772px;
 	padding:0px;
@@ -206,7 +209,7 @@ div.del:hover, div.del:active {background-position:left bottom;}
 #addall:hover, #addall:active {background-position:left bottom;}
 
 
-textarea#condition, textarea#question, textarea.question, textarea.comment {
+textarea.question, textarea.comment {
 	height:100px;
 	padding:3px;
 	background-color:white;

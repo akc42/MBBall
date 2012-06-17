@@ -53,6 +53,11 @@ if($rid != 0 && $cid !=0) {
 			<textarea id="question" name="question"><?php echo $row['question'];?></textarea>
 		</label>
 				</td>
+				<td rowspan="5">
+		<label>Comment on Question<br/>
+			<textarea id="bonuscomment" name="bonuscomment"><?php echo $row['comment'];?></textarea>
+		</label>
+				</td>
 			</tr>
 			<tr>
 				<td class="option1">

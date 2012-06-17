@@ -26,7 +26,7 @@ $rid = $_GET['rid'];
 
 if( $cid !=0) {
 	$t = $db->prepare("SELECT COUNT(*) FROM team_in_competition WHERE cid = ?");
-
+	$t->bindInt(1,$cid);
 	if($t->fetchValue() > 0) {
 		$ticexists = true;
 	} else {
@@ -64,7 +64,7 @@ if($row['mp'] == 1) echo 'checked="checked"';?> />
 ?>			</td>
 			<td id="tnic">
 <?php
-	$sql = "SELECT t.tid FROM team t EXCEPT SELECT c.tid FROM team_in_competition c WHERE c.cid = ? ORDER BY tid";
+	$sql = "SELECT t.tid AS tid FROM team t EXCEPT SELECT c.tid AS tid FROM team_in_competition c WHERE c.cid = ? ORDER BY tid";
 	$t = $db->prepare($sql);
 	$t->bindInt(1,$cid);
 	while($row = $t->FetchRow()) {

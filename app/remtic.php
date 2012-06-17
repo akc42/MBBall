@@ -1,6 +1,6 @@
 <?php
 /*
- 	Copyright (c) 2008,2009 Alan Chandler
+ 	Copyright (c) 2008-2012 Alan Chandler
     This file is part of MBBall, an American Football Results Picking
     Competition Management software suite.
 
@@ -18,6 +18,7 @@
     along with MBBall (file COPYING.txt).  If not, see <http://www.gnu.org/licenses/>.
 
 */
+require_once('./inc/db.inc');
 if(!(isset($_GET['cid'])  && isset($_GET['tid']))) forbidden();
 
 $cid=$_GET['cid'];

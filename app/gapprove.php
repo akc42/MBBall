@@ -22,7 +22,7 @@ require_once('./inc/db.inc');
 if(!(isset($_GET['cid']) && isset($_GET['bbuid']) && isset($_GET['approval']) )) forbidden();
 
 $r = $db->prepare("UPDATE registration SET approved = ? WHERE cid = ? AND uid = ? ");
-$r->bindInt(1,$_GET['approval']);
+$r->bindInt(1,($_GET['approval'] == 'true')?1:0);
 $r->bindInt(2,$_GET['cid']);
 $r->bindInt(3,$_GET['bbuid']);
 $r->exec();

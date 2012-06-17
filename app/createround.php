@@ -26,6 +26,7 @@ $rid=$_POST['rid'];
 
 $db->exec("BEGIN TRANSACTION");
 $c = $db->prepare("SELECT COUNT(*) FROM competition WHERE cid = ?");
+$c->bindInt(1,$cid);
 $noComps = $c->fetchValue();
 unset($c);
 if ($noComps != 0) {

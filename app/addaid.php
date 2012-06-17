@@ -34,6 +34,7 @@ $m->bindString(3,$hid);
 
 $row = $m->fetchRow();
 unset($m);
+
 if ($row && is_null($row['aid'])) {
 	$m = $db->prepare("UPDATE match SET aid = ? WHERE cid = ? AND rid = ? AND hid = ?");
 	$m->bindString(1,$aid);
@@ -49,5 +50,5 @@ if ($row && is_null($row['aid'])) {
 <?php
 	$db->exec("ROLLBACK");
 }
-dbFree($result);
+;
 ?>

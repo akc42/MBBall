@@ -26,10 +26,10 @@ $tid=$_GET['tid'];
 $mp=$_GET['mp'];
 
 $t = $db->prepare("UPDATE team_in_competition SET made_playoff = ? WHERE cid = ? AND tid = ?");
-$t->bindInt(1,$mp);
+$t->bindInt(1,($mp == 'true')?1:0);
 $t->bindInt(2,$cid);
 $t->bindString(3,$tid);
 
 
-echo '{"cid":'.$cid.',"tid":'.$tid.',"state":'.$mp.'}';
+echo '{"cid":'.$cid.',"tid":"'.$tid.'","state":'.$mp.'}';
 ?>

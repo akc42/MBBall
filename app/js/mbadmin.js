@@ -71,6 +71,7 @@ var MBBAdmin = new Class({
 					var createReq = new MBB.req('createcomp.php', function(response) {
 						if (params.cid == 0 || $('def').checked ) {
 							params.cid = response.cid;
+							params.rid = 0;
 							owner.competition.loadPage(params);
 						}
 						owner.competitions.loadPage(params);
@@ -496,7 +497,7 @@ var MBBAdmin = new Class({
 													match.getElement('div.aid').getFirst().set('text',teamName);
 													team.getParent().addClass('inmatch');
 												});
-												addaidReq.get($merge(params,{
+												addaidReq.get(Object.merge(params,{
 													'hid':match.getElement('input[name=hid]').value,
 													'aid':teamName}));
 												return false;
