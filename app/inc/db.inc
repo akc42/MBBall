@@ -111,7 +111,9 @@ class DB extends PDO {
         return self::$instance;
     }
     public function prepare($sql,$options=NULL) {
-    	return new STMT(parent::prepare($sql));
+    	$s = parent::prepare($sql);
+    	if(!$s) print_r($this->errorInfo());
+    	return new STMT($s);
     }
     public function getCounts() {
     	return STMT::getCount();
