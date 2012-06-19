@@ -19,7 +19,7 @@
 
 */
 
-define('GOOGLE_ACCOUNT','UA-6767400-1');  //Google account of the forum we are requesting details from
+define('GOOGLE_ACCOUNT','UA-6767400-1');  //Google account of the forum we are requesting details from (melindasbacksup.com)
 
 define('SMF_FOOTBALL',		21);  //Group that can administer
 define('SMF_BABY',		10);  //Baby backup

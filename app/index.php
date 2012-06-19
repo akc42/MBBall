@@ -28,7 +28,7 @@ define('MBBALL_ICON_PATH',	"images/"); //URL where football Icons may be found
 // SMF membergroup IDs for the groups that we have used to define characteristics which control Chat Group
 define('SMF_FOOTBALL',		21);  //Group that can administer
 define('SMF_BABY',		10);  //Baby backup
-define('MBBALL_AUTH','http://www.melindasbackups.com/auth/football.php');  //This should contain an autorisation script
+define('MBBALL_AUTH','http://football.home/auth/jsonauth.php');  //This should contain an authorisation script
 define('MBBALL_KEY','Football9Key7AID'); //Must match same ones in url above (and change for new installations) - see also inc/db.inc
 define('MBBALL_CHECK','FOOTBILL'); //8 chars must match same ones in url above (and change for new installations)
 
@@ -131,7 +131,7 @@ define('MBBALL_CONDITION',$s->fetchSetting('msgcondition'));
 define('MBBALL_GUESTNOTE',$s->fetchSetting('msgguestnote'));
 $messages = Array();
 $messages['noquestion'] = $s->fetchSetting('msgnoquestion');
-$messages['register'] = $s->fetchSetting('msgnoquestion');
+$messages['register'] = $s->fetchSetting('msgregister');
 $dcid = $s->fetchSetting('default_competition');
 
 if(isset($_GET['cid'])) {
