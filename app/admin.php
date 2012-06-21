@@ -56,9 +56,18 @@ function head_content () {
 <?php
 	}
 ?>	<script src="js/calendar/calendar.js" type="text/javascript" charset="UTF-8"></script>
-	<script src="js/mbball.js" type="text/javascript" charset="UTF-8"></script>
+<?php
+	if(defined('DEBUG')) {
+?>	<script src="js/mbball.js" type="text/javascript" charset="UTF-8"></script>
 	<script src="js/mbadmin.js" type="text/javascript" charset="UTF-8"></script>
-	<script type="text/javascript">
+<?php
+} else {
+?>	<script src="js/mbball-min-<?php include('./inc/version.inc');?>.js" type="text/javascript" charset="UTF-8"></script>
+	<script src="js/mbadmin-min-<?php include('./inc/version.inc');?>.js" type="text/javascript" charset="UTF-8"></script>
+<?php
+} 
+?>	<script type="text/javascript">
+
 	<!--
 
 var MBBmgr;

@@ -216,9 +216,18 @@ function head_content() {
 	global $uid, $registered, $cid, $rid,$messages
 ?>	<title>Melinda's Backups Football Pool</title>
 	<link rel="stylesheet" type="text/css" href="css/ball.css"/>
-	<script src="js/mbball.js" type="text/javascript" charset="UTF-8"></script>
+<?php
+if (defined('DEBUG')) {
+?>	<script src="js/mbball.js" type="text/javascript" charset="UTF-8"></script>
 	<script src="js/mbuser.js" type="text/javascript" charset="UTF-8"></script>
-	<script type="text/javascript">
+<?php
+} else {
+?>	<script src="js/mbball-min-<?php include('./inc/version.inc');?>.js" type="text/javascript" charset="UTF-8"></script>
+	<script src="js/mbuser-min-<?php include('./inc/version.inc');?>.js" type="text/javascript" charset="UTF-8"></script>
+<?php
+} 
+?>	<script type="text/javascript">
+
 	<!--
 
 var MBBmgr;
