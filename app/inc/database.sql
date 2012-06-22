@@ -73,7 +73,7 @@ CREATE TABLE match (
     combined_score integer, --Value of Combined Score for an over/under question (add 0.5 to this for the question)
     open boolean DEFAULT 0 NOT NULL, --True if Match is set up and ready
     match_time bigint , --Time match is due to be played
-    underdog character(1),  --If NOT NULL this is an underdog match with the character being 'A' or 'H' specifying underdog team
+    underdog integer DEFAULT 0 NOT NULL,  -- If 0 then not an underdog game, else if -ve additional points for away team, +ve additional points for home team
     PRIMARY KEY (cid,rid,hid),
     FOREIGN KEY (cid,rid) REFERENCES round(cid,rid) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (cid,hid) REFERENCES team_in_competition(cid,tid) ON UPDATE CASCADE ON DELETE CASCADE ,   
