@@ -38,7 +38,7 @@ if ($rid != 0) {
 	$u->bindInt(1,$cid);
 	$u->bindInt(2,$rid);
 	
-	$sql = "SELECT p.hid AS hid,pid, over_selected, p.comment AS comment, pscore, oscore";
+	$sql = "SELECT p.aid AS aid,pid, over_selected, p.comment AS comment, pscore, oscore";
 	$sql .= " FROM match_score m JOIN match USING (cid,rid,aid) LEFT JOIN pick p USING (cid,rid,aid,uid)";
 	$sql .= " WHERE m.cid = ? AND m.rid = ? AND m.uid = ?";
 	$sql .= " ORDER BY match.match_time , m.aid LIMIT 8 OFFSET ? ";
@@ -186,7 +186,7 @@ while ($nom > 0) {
 		$m->close();
 		while ($row=$m->FetchRow()) {
 			$pickdata = $p->FetchRow();
-			if(!is_null($pickdata['hid'])) {
+			if(!is_null($pickdata['aid'])) {
 				if($pickdata['pscore'] > 0) {
 ?>				<td class="win tid">
 <?php
@@ -232,7 +232,7 @@ while ($nom > 0) {
 		$p->close();
 		while ($row=$m->FetchRow()) {
 			$pickdata = $p->FetchRow();
-?>				<td class="comment" colspan="2"><?php if(!( is_null($pickdata ['hid']) || is_null($pickdata['comment']))) echo dbBBcode($pickdata['comment']);?></td>
+?>				<td class="comment" colspan="2"><?php if(!( is_null($pickdata ['aid']) || is_null($pickdata['comment']))) echo dbBBcode($pickdata['comment']);?></td>
 <?php
 		}
 ?>			</tr>

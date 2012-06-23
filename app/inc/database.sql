@@ -123,7 +123,7 @@ CREATE TABLE pick (
     pid character(3), --ID of Team Picked to Win (NULL for Draw)
     over_selected boolean, --true (=1) if over score is selected
     submit_time bigint DEFAULT (strftime('%s','now')) NOT NULL, --Time of submission
-    PRIMARY KEY (cid,uid,rid,hid),
+    PRIMARY KEY (cid,uid,rid,aid),
     FOREIGN KEY (cid,rid) REFERENCES round(cid,rid) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (cid,uid) REFERENCES registration(cid,uid) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (cid,aid) REFERENCES team_in_competition(cid,tid) ON UPDATE CASCADE ON DELETE CASCADE,
