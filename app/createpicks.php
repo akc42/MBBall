@@ -60,29 +60,29 @@ if (isset($_POST['bqdeadline']) && $_POST['bqdeadline'] > time()) {
 }
 
 if ($rid != 0) { //only expecting picks from a round if there is one.
-	$m = $db("SELECT hid FROM match WHERE open = 1 AND match_time > ? AND cid = ? AND rid = ? ");
+	$m = $db("SELECT aid FROM match WHERE open = 1 AND match_time > ? AND cid = ? AND rid = ? ");
 	$m->bindInt(1,time()+$gap);
 	$m->bindInt(2,$cid);
 	$m->bindInt(3,$rid);
-	$p = $db->prepare("INSERT OR REPLACE INTO pick(uid,cid,rid,hid,pid,over_selected,comment) VALUES (?,?,?,?,?,?,?");
+	$p = $db->prepare("INSERT OR REPLACE INTO pick(uid,cid,rid,aid,pid,over_selected,comment) VALUES (?,?,?,?,?,?,?");
 	$p->bindInt(1,$uid);
 	$p->bindInt(2,$cid);
 	$p->bindInt(3,$rid);
     while($row = $m->FetchRow()) {
-	    $row['hid'] = trim($row['hid']);
+	    $row['aid'] = trim($row['aid']);
 	    if( $pid != 'NULL' || $over != 'NULL' || $comment != 'NULL') {
-	  		if(isset($_POST['M'.$row['hid']])) {
-	  			$p->bindString(4,$_POST['M'.$row['hid']]);
+	  		if(isset($_POST['M'.$row['aid']])) {
+	  			$p->bindString(4,$_POST['M'.$row['aid']]);
 	  		} else {
 	  			$p->bindNull(4);
 	  		}
-	  		if(isset($_POST['O'.$row['hid']])) {
-	  			$p->bindInt(5,$_POST['O'.$row['hid']] == 'O'?1:0);
+	  		if(isset($_POST['O'.$row['aid']])) {
+	  			$p->bindInt(5,$_POST['O'.$row['aid']] == 'O'?1:0);
 	  		} else {
 	  			$p->bindNull(5);
 	  		}
-	  		if(isset($_POST['C'.$row['hid']])) {
-	  			$p->bindString(6,$_POST['C'.$row['hid']]);
+	  		if(isset($_POST['C'.$row['haid']])) {
+	  			$p->bindString(6,$_POST['C'.$row['aid']]);
 	  		} else {
 	  			$p->bindNull(6);
 	  		}

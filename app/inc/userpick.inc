@@ -62,9 +62,9 @@ if ($rid != 0) {
 						<tbody>
 <?php
 		     // If user is registered and we can do picks then we need to display the  Picks Section
-		    $sql = "SELECT m.hid , m.aid , p.pid , m.combined_score AS cs, p.over_selected , p.comment AS comment, m.comment AS adm_comment, m.match_time";
+		    $sql = "SELECT m.aid , m.hid , p.pid , m.combined_score AS cs, p.over_selected , p.comment AS comment, m.comment AS adm_comment, m.match_time";
 		    $sql .= " FROM match m LEFT JOIN pick p ";
-		    $sql .= "ON m.cid = p.cid AND m.rid = p.rid AND m.hid = p.hid AND p.uid = ? ";
+		    $sql .= "ON m.cid = p.cid AND m.rid = p.rid AND m.aid = p.aid AND p.uid = ? ";
 		    $sql .= " WHERE m.cid = ? AND m.rid = ? AND m.open = 1 AND m.match_time > ?";
 		    $sql .= ' ORDER BY m.match_time, m.hid;';
 		    $m = $db->prepare($sql);
@@ -73,8 +73,8 @@ if ($rid != 0) {
 		    $m->bindInt(3,$rid);
 		    $m->bindInt(4,$time_at_top+$gap);
 			while($row=$m->fetchRow()) {
-			    $row['hid'] = trim($row['hid']);
 			    $row['aid'] = trim($row['aid']);
+			    $row['hid'] = trim($row['hid']);
 			    $row['pid'] = trim($row['pid']);
 ?>							<tr>
 								<td>
@@ -82,7 +82,7 @@ if ($rid != 0) {
 										<thead>
 											<tr>
 												<th colspan="2">
-													<span class="hid"><?php echo $row['hid'];?></span>@<span class="aid"><?php echo $row['aid'];?></span>
+													<span class="aid"><?php echo $row['haid'];?></span>@<span class="hid"><?php echo $row['hid'];?></span>
 												</th>
 											</tr>
 											<tr>
@@ -92,13 +92,13 @@ if ($rid != 0) {
 										<tbody>
 											<tr>
 												<td><input	type="radio"
-													name="<?php echo 'M'.$row['hid'];?>"
-													value="<?php echo $row['hid'];?>"
-													<?php if ($row['pid'] == $row['hid']) echo 'checked="checked"';?>/></td>
-												<td><input	type="radio"
-													name="<?php echo 'M'.$row['hid'];?>"
+													name="<?php echo 'M'.$row['aid'];?>"
 													value="<?php echo $row['aid'];?>"
-											 		<?php if ($row['pid'] == $row['aid']) echo 'checked="checked"';?>/></td>
+													<?php if ($row['pid'] == $row['aid']) echo 'checked="checked"';?>/></td>
+												<td><input	type="radio"
+													name="<?php echo 'M'.$row['aid'];?>"
+													value="<?php echo $row['hid'];?>"
+											 		<?php if ($row['pid'] == $row['hid']) echo 'checked="checked"';?>/></td>
 											</tr>
 		 									<tr>
 												<td colspan="2" <?php if (($row['match_time'] - $gap)< ($time_at_top+86400)) echo 'class="limited"' ;?> >
@@ -126,11 +126,11 @@ if ($rid != 0) {
 											</tr>
 											<tr>
 												<td><input	type="radio"
-														name="<?php echo 'O'.$row['hid'];?>"
+														name="<?php echo 'O'.$row['aid'];?>"
 														value="U"
 														<?php if ($row['over_selected'] == 0) echo 'checked="checked"';?>/></td>
 												<td><input	type="radio"
-														name="<?php echo 'O'.$row['hid'];?>"
+														name="<?php echo 'O'.$row['aid'];?>"
 														value="O"
 														<?php if ($row['over_selected'] == 1) echo 'checked="checked"';?>/></td>
 											</tr>
@@ -140,7 +140,7 @@ if ($rid != 0) {
 <?php
     			}
 ?>								<td class="comment"><?php echo dbBBcode($row['adm_comment']);?></td>
-								<td><textarea name="<?php echo 'C'.$row['hid'];?>" class="comment" rows="2" cols="20"><?php echo $row['comment'];?></textarea></td>
+								<td><textarea name="<?php echo 'C'.$row['aid'];?>" class="comment" rows="2" cols="20"><?php echo $row['comment'];?></textarea></td>
 							</tr>
 <?php
     		}

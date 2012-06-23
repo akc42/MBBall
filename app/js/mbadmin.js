@@ -160,18 +160,18 @@ var MBBAdmin = new Class({
 						div.getElements('input').append(div.getElements('textarea')).addEvent('change', function(e) {
 							var validated = true;
 							if(this.name == 'cscore'
-									|| this.name == 'hscore' 
-									|| this.name == 'ascore') {
+									|| this.name == 'ascore' 
+									|| this.name == 'hscore') {
 								if(!MBB.intValidate(this)) {
 									validated = false;
 								}
 							}
 							if (this.name == 'open' && this.checked) {
-								var aid = div.getElement('input[name=aid]');
-								if (aid.value ==  '' || aid.value == null) {
+								var hid = div.getElement('input[name=hid]');
+								if (hid.value ==  '' || hid.value == null) {
 									this.checked = false;
 									validated = false;
-									aid.highlight('#F00');
+									hid.highlight('#F00');
 								}
 								if ( validated && (matchtime.value == '' || matchtime.value == 0)) {  //Ask user to confirm if no matchdate is set
 									if (!confirm(messages.nomatchdate)) {
@@ -197,39 +197,39 @@ var MBBAdmin = new Class({
 								updateReq.post(div.getElement('form'));
 							}
 						});
-						div.getElement('.hid').addEvent('click',function(e) {
-							e.stop();
-							// switch aid/hid over
-							var aid = div.getElement('input[name=aid]');
-							if(aid.value != null && aid.value != '' ) {
-								// Can only switch if aid exists
-								var switchReq = new MBB.req('switchhid.php',function(response){
-									div.getElement('input[name=hid]').value = response.hid;
-									aid.value = response.aid;
-									e.target.set('text',response.hid);
-									div.getElement('.aid').getFirst().set('text',response.aid);
-									$('userpick').empty();
-								});
-								switchReq.get(Object.merge(params,{'hid':this.getElement('span').get('text')}));
-							}
-						});
 						div.getElement('.aid').addEvent('click',function(e) {
 							e.stop();
-							var aid = div.getElement('input[name=aid]');
-							if(aid.value != null && aid.value != '' ) {
+							// switch aid/hid over
+							var hid = div.getElement('input[name=hid]');
+							if(hid.value != null && hid.value != '' ) {
+								// Can only switch if aid exists
+								var switchReq = new MBB.req('switchaid.php',function(response){
+									div.getElement('input[name=aid]').value = response.aid;
+									hid.value = response.hid;
+									e.target.set('text',response.aid);
+									div.getElement('.hid').getFirst().set('text',response.hid);
+									$('userpick').empty();
+								});
+								switchReq.get(Object.merge(params,{'aid':this.getElement('span').get('text')}));
+							}
+						});
+						div.getElement('.hid').addEvent('click',function(e) {
+							e.stop();
+							var hid = div.getElement('input[name=hid]');
+							if(hid.value != null && hid.value != '' ) {
 								var open = div.getElement('input[name=open]');
 								if (open.checked) {
 									open.highlight('#F00');
 								} else {
-									var removeaidReq = new MBB.req('removeaid.php',function(response){
-									// remove aid from match
-										aid.value = null;
+									var removehidReq = new MBB.req('removehid.php',function(response){
+									// remove hid from match
+										hid.value = null;
 										e.target.set('text','---');
-										$('T'+response.aid).removeClass('inmatch');
+										$('T'+response.hid).removeClass('inmatch');
 										$('userpick').empty();
 									});
 								}
-								removeaidReq.get(Object.merge(params,{'hid':div.getElement('input[name=hid]').value}));
+								removehidReq.get(Object.merge(params,{'haid':div.getElement('input[name=aid]').value}));
 							}
 						});
 						div.getElement('.del').addEvent('click',function(e) {
@@ -237,12 +237,12 @@ var MBBAdmin = new Class({
 							if(confirm(messages.deletematch)) {
 								var deleteReq = new MBB.req('deletematch.php',function(response) {
 									div.dispose();
-									$('T'+response.hid).removeClass('inmatch');
-									var aid = $('T'+response.aid);
-									if(aid) aid.removeClass('inmatch'); //only if not null
+									$('T'+response.aid).removeClass('inmatch');
+									var hid = $('T'+response.hid);
+									if(hid) hid.removeClass('inmatch'); //only if not null
 									$('userpick').empty();
 								});
-								deleteReq.get(Object.merge(params,{'hid':div.getElement('input[name=hid]').value}));
+								deleteReq.get(Object.merge(params,{'aid':div.getElement('input[name=aid]').value}));
 							}
 						});
 					};
@@ -489,17 +489,17 @@ var MBBAdmin = new Class({
 									if(!this.getParent().hasClass('inmatch')) {
 										var teamName = this.get('text');
 										if ($$('.match').every(function(match) {
-											var aidSpan = match.getElement('input[name=aid]'); 
-											if(aidSpan.value == '') {
+											var hidSpan = match.getElement('input[name=hid]'); 
+											if(hidSpan.value == '') {
 												// found a match so we can add this team to it
-												var addaidReq = new MBB.req('addaid.php', function(response) {
-													aidSpan.value = teamName;
-													match.getElement('div.aid').getFirst().set('text',teamName);
+												var addhidReq = new MBB.req('addhid.php', function(response) {
+													hidSpan.value = teamName;
+													match.getElement('div.hid').getFirst().set('text',teamName);
 													team.getParent().addClass('inmatch');
 												});
-												addaidReq.get(Object.merge(params,{
-													'hid':match.getElement('input[name=hid]').value,
-													'aid':teamName}));
+												addhidReq.get(Object.merge(params,{
+													'aid':match.getElement('input[name=aid]').value,
+													'hid':teamName}));
 												return false;
 											}
 											return true;
@@ -512,7 +512,7 @@ var MBBAdmin = new Class({
 												setMatchEvents(match);
 												team.getParent().addClass('inmatch');
 											});
-											matchPage.loadPage(Object.merge(params,{'hid':teamName}));
+											matchPage.loadPage(Object.merge(params,{'aid':teamName}));
 										}
 									}
 								}

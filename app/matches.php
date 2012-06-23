@@ -27,7 +27,7 @@ $rid = $_GET['rid'];
 if($rid != 0 && $cid !=0) {
 	if (!isset($_GET['ou'])) forbidden();
 	
-	$m = $db->prepare("SELECT * FROM match WHERE cid = ? AND rid = ? ORDER BY match_time,hid");
+	$m = $db->prepare("SELECT * FROM match WHERE cid = ? AND rid = ? ORDER BY match_time,aid");
 	$m->bindInt(1,$cid);
 	$m->bindInt(2,$rid);
 	while($row = $m->FetchRow()) {
@@ -38,19 +38,19 @@ if($rid != 0 && $cid !=0) {
      <form  action="#" >
 		<input type="hidden" name="cid" value="<?php echo $cid;?>"/>
 		<input type="hidden" name="rid" value="<?php echo $rid;?>"/>
-		<input type="hidden" name="hid" value="<?php echo $row['hid'];?>" />
 		<input type="hidden" name="aid" value="<?php echo $row['aid'];?>" />
-					<div class="hid"><span><?php echo $row['hid'];?></span></div><div class="at">@</div>
-					<div class="aid"><span><?php echo (is_null($row['aid'])? '---':$row['aid']);?></span></div>
+		<input type="hidden" name="hid" value="<?php echo $row['hid'];?>" />
+					<div class="aid"><span><?php echo $row['aid'];?></span></div><div class="at">@</div>
+					<div class="hid"><span><?php echo (is_null($row['hid'])? '---':$row['hid']);?></span></div>
 					<div class="open">
 		<label><input type="checkbox" name="open" <?php if($row['open'] == 't') echo 'checked="checked"';?>/>Open</label>
 					</div>
 					<div class="del"></div>
-					<div class="hscore">
-		<input type="text" name="hscore" value="<?php echo $row['hscore'];?>"/>
-					</div>
 					<div class="ascore">
-		<input type="text" name="ascore" value="<?php echo $row['ascore'];?>"/>
+		<input type="text" name="hscore" value="<?php echo $row['ascore'];?>"/>
+					</div>
+					<div class="hscore">
+		<input type="text" name="ascore" value="<?php echo $row['hscore'];?>"/>
 					</div>
 					<div class="cscore">
 		<input type="text" name="cscore" value="<?php echo $row['combined_score'];?>" <?php if($_GET['ou'] != 'true') echo 'readonly="readonly"';?> />

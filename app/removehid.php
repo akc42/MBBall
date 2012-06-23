@@ -19,32 +19,32 @@
 
 */
 require_once('./inc/db.inc');
-if(!(isset($_GET['cid']) && isset($_GET['rid']) && isset($_GET['hid']) )) forbidden();
+if(!(isset($_GET['cid']) && isset($_GET['rid']) && isset($_GET['aid']) )) forbidden();
 
 $cid=$_GET['cid'];
 $rid=$_GET['rid'];
-$hid=$_GET['hid'];
+$aid=$_GET['haid'];
 
 $db->exec("BEGIN TRANSACTION");
-$m = $db->prepare("SELECT * FROM match WHERE cid = ? AND rid = ? AND hid = ?");
+$m = $db->prepare("SELECT * FROM match WHERE cid = ? AND rid = ? AND aid = ?");
 $m->bindInt(1,$cid);
 $m->bindInt(2,$rid);
-$m->bindString(3,$hid);
+$m->bindString(3,$aid);
 $row = $m->FetchRow();
 unset($m);
-if ($row && !is_null($row['aid'])) {
-	$m = $db->prepare("UPDATE match SET aid = NULL WHERE cid = ? AND rid = ? AND hid = ?");
+if ($row && !is_null($row['hid'])) {
+	$m = $db->prepare("UPDATE match SET hid = NULL WHERE cid = ? AND rid = ? AND aid = ?");
 	$m->bindInt(1,$cid);
 	$m->bindInt(2,$rid);
-	$m->bindString(3,$hid);
+	$m->bindString(3,$aid);
 	$m->exec();
 	unset($m);
 	
 	$db->exec("COMMIT");
-    echo '{"cid":'.$cid.',"rid":'.$rid.',"hid":"'.$hid.'","aid":"'.$row['aid'].'"}';
+    echo '{"cid":'.$cid.',"rid":'.$rid.',"aid":"'.$aid.'","hid":"'.$row['hid'].'"}';
   
 } else {
-?><p>Match doesn't exist or Away Team not present</p>
+?><p>Match doesn't exist or Home Team not present</p>
 <?php
 	$db->exec("ROLLACK");
 }

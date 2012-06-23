@@ -19,40 +19,40 @@
 
 */
 require_once('./inc/db.inc');
-if(!(isset($_GET['cid']) && isset($_GET['rid']) && isset($_GET['hid']) )) forbidden();
+if(!(isset($_GET['cid']) && isset($_GET['rid']) && isset($_GET['aid']) )) forbidden();
 
 $cid=$_GET['cid'];
 $rid=$_GET['rid'];
-$hid=$_GET['hid'];
+$aid=$_GET['aid'];
 
 $db->exec("BEGIN TRANSACTION");
-$m = $db->prepare("SELECT COUNT(*) FROM match WHERE cid = ? AND rid = ? AND  hid = ?");
+$m = $db->prepare("SELECT COUNT(*) FROM match WHERE cid = ? AND rid = ? AND  aid = ?");
 $m->bindInt(1,$cid);
 $m->bindInt(2,$rid);
-$m->bindInt(3,$hid);
+$m->bindInt(3,$aid);
 
 $noMatches = $m->fetchValue();
 unset($m);
 
 if ($noMatches == 0) {
-	$m=$db->prepare("INSERT INTO match(cid,rid,hid) VALUES (?,?,?)");
+	$m=$db->prepare("INSERT INTO match(cid,rid,aid) VALUES (?,?,?)");
 	$m->bindInt(1,$cid);
 	$m->bindInt(2,$rid);
-	$m->bindString(3,$hid);
+	$m->bindString(3,$aid);
 	$m->exec();
 	unset($m);
 	$db->exec("COMMIT");
 ?><form action="#" >
      <input type="hidden" name="cid" value="<?php echo $cid;?>"/>
      <input type="hidden" name="rid" value="<?php echo $rid;?>"/>
-     <input type="hidden" name="hid" value="<?php echo $hid;?>" />
-     <input type="hidden" name="aid" />
-     <div class="hid"><span><?php echo $hid ;?></span></div><div class="at">@</div>
-     <div class="aid"><span>---</span></div>
+     <input type="hidden" name="aid" value="<?php echo $aid;?>" />
+     <input type="hidden" name="hid" />
+     <div class="aid"><span><?php echo $aid ;?></span></div><div class="at">@</div>
+     <div class="hid"><span>---</span></div>
      <div class="open"><label><input type="checkbox" name="open" />Open</label></div>
      <div class="del"></div>
-     <div class="hscore"><input type="text" name="hscore"/></div>
-  <div class="ascore"><input type="text" name="ascore"/></div>
+     <div class="ascore"><input type="text" name="ascore"/></div>
+  <div class="hscore"><input type="text" name="hscore"/></div>
   <div class="cscore"><input type="text" name="cscore" /></div>
   <div class="mtime"><input type="hidden" name="mtime"  /></div>
   <div class="comment"><textarea name="comment"></textarea></div>

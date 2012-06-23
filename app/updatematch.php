@@ -19,24 +19,24 @@
 
 */
 require_once('./inc/db.inc');
-if(!(isset($_POST['cid']) && isset($_POST['rid']) && isset($_POST['hid']) )) forbidden();
+if(!(isset($_POST['cid']) && isset($_POST['rid']) && isset($_POST['aid']) )) forbidden();
 
 $cid=$_POST['cid'];
 $rid=$_POST['rid'];
-$hid=$_POST['hid'];
+$aid=$_POST['aid'];
 
 $db->exec("BEGIN TRANSACTION");
-$m = $db->prepare("SELECT COUNT(*) FROM match WHERE cid = ? AND rid = ? AND hid = ?");
+$m = $db->prepare("SELECT COUNT(*) FROM match WHERE cid = ? AND rid = ? AND aid = ?");
 $m->bindInt(1,$cid);
 $m->bindInt(2,$rid);
-$m->bindString(3,$hid);
+$m->bindString(3,$aid);
 $noMatch = $m->fetchValue();
 unset($m);
 if ($noMatch != 0) {
 	
 	$sql = "UPDATE match SET open = ?, hscore = ?, ascore = ?,combined_score = ?, match_time = ?, comment = ? ";
-	$sql .= " WHERE cid = ? AND rid = ? AND hid = ?";
-	$sql = 'UPDATE match SET';
+	$sql .= " WHERE cid = ? AND rid = ? AND aid = ?";
+
 	$m = $db->prepare($sql);
 	$m->bindInt(1,isset($_POST['open'])?1:0);
 	if(isset($_POST['hscore'])) {
@@ -66,11 +66,11 @@ if ($noMatch != 0) {
 	}
 	$m->bindInt(7,$cid);
 	$m->bindInt(8,$rid);
-	$m->bindString(9,$hid);
+	$m->bindString(9,$aid);
 	$m->exec();
 	unset($m);
 	$db->exec("COMMIT");
-	echo '{"cid":'.$cid.',"rid":'.$rid.',"hid":"'.$hid.'"}';
+	echo '{"cid":'.$cid.',"rid":'.$rid.',"aid":"'.$aid.'"}';
 
 } else {
 ?><p>Match does not exist</p>

@@ -216,11 +216,11 @@ $m=$db->prepare("
 while($r2=dbFetchRow($result)) {
 	$m->bindValue(1,$r2['cid'],PDO::PARAM_INT);
 	$m->bindValue(2,$r2['rid'],PDO::PARAM_INT);
-	$m->bindValue(3,$r2['hid']);
-	$m->bindValue(4,$r2['aid']);
+	$m->bindValue(3,$r2['aid']); //NOTE: These are switched round in new setup
+	$m->bindValue(4,$r2['hid']); //NOTE: These are switched round in new setup
 	$m->bindValue(5,$r2['comment']);
-	$m->bindValue(6,$r2['ascore'],PDO::PARAM_INT);
-	$m->bindValue(7,$r2['hscore'],PDO::PARAM_INT);
+	$m->bindValue(6,$r2['hscore'],PDO::PARAM_INT);//NOTE: These are switched round in new setup
+	$m->bindValue(7,$r2['ascore'],PDO::PARAM_INT);//NOTE: These are switched round in new setup
 	$m->bindValue(8,$r2['combined_score'],PDO::PARAM_INT);
 	$m->bindValue(9,($r2['open'] == 't')?1:0,PDO::PARAM_INT);
 	$m->bindValue(10,$r2['match_time'],PDO::PARAM_INT);
@@ -265,12 +265,12 @@ echo "done tic <br/>\n";
 	Setup Match Picks
 */
 $result=dbQuery("SELECT * FROM pick");
-$p=$db->prepare("INSERT INTO pick(cid,uid,rid,hid,comment,pid,over_selected,submit_time) VALUES (?,?,?,?,?,?,?,?)");
+$p=$db->prepare("INSERT INTO pick(cid,uid,rid,aid,comment,pid,over_selected,submit_time) VALUES (?,?,?,?,?,?,?,?)");
 while($r2=dbFetchRow($result)) {
 	$p->bindValue(1,$r2['cid'],PDO::PARAM_INT);
 	$p->bindValue(2,$r2['uid'],PDO::PARAM_INT);
 	$p->bindValue(3,$r2['rid'],PDO::PARAM_INT);
-	$p->bindValue(4,$r2['hid']);
+	$p->bindValue(4,$r2['hid']);//NOTE: These are switched to aid
 	$p->bindValue(5,$r2['comment']);
 	$p->bindValue(6,$r2['pid']);
 	$p->bindValue(7,($r2['over_selected'] == 't')?1:0,PDO::PARAM_INT);

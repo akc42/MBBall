@@ -19,25 +19,25 @@
 
 */
 require_once('./inc/db.inc');
-if(!(isset($_GET['cid']) && isset($_GET['rid']) && isset($_GET['hid']) )) forbidden();
+if(!(isset($_GET['cid']) && isset($_GET['rid']) && isset($_GET['aid']) )) forbidden();
 
 $cid=$_GET['cid'];
 $rid=$_GET['rid'];
-$hid=$_GET['hid'];
+$aid=$_GET['aid'];
 
 $db->exec("BEGIN TRANSACTION");
-$m = $db->prepare("SELECT aid FROM match WHERE cid = ? AND rid = ? AND hid = ? ");
+$m = $db->prepare("SELECT hid FROM match WHERE cid = ? AND rid = ? AND aid = ? ");
 $m->bindInt(1,$cid);
 $m->bindInt(2,$rid);
-$m->bindString(3,$hid);
-$aid = $m->fetchValue();
+$m->bindString(3,$aid);
+$hid = $m->fetchValue();
 unset($m);
 
-if ($aid) {
-	$m = $db->prepare("DELETE FROM match WHERE cid = ? AND rid = ? AND hid = ? ");
+if ($hid) {
+	$m = $db->prepare("DELETE FROM match WHERE cid = ? AND rid = ? AND aid = ? ");
 	$m->bindInt(1,$cid);
 	$m->bindInt(2,$rid);
-	$m->bindString(3,$hid);
+	$m->bindString(3,$aid);
 	$m->exec();
 	unset($m);
 	$db->exec("COMMIT");

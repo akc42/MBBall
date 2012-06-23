@@ -32,7 +32,7 @@ CREATE TABLE competition (
     gap integer DEFAULT 300 NOT NULL, --Seconds to go before match to make pick deadline
     guest_approval boolean DEFAULT 0 NOT NULL, --Set if BB''s Need Approval after registering to play
     creation_date bigint DEFAULT (strftime('%s','now')) NOT NULL, --Date Competition Created
-    results_cache text, -- php serialized cache of recent result table
+    results_cache text, -- php serialized cache of summary.inc when rid = maxround
     cache_store_date bigint DEFAULT (strftime('%s','now'))
 );
 
@@ -65,8 +65,8 @@ CREATE TABLE division (
 CREATE TABLE match (
     cid integer NOT NULL, -- Competition ID
     rid integer NOT NULL, --Round ID
-    hid character(3) NOT NULL, -- Home Team ID
-    aid character(3) , --Away Team ID
+    aid character(3) NOT NULL, -- Away Team ID
+    hid character(3) , --Home Team ID
     comment text, --Administrators Comment for the Match
     ascore integer, --Away Team Score
     hscore integer, --Home Team Score
@@ -74,10 +74,10 @@ CREATE TABLE match (
     open boolean DEFAULT 0 NOT NULL, --True if Match is set up and ready
     match_time bigint , --Time match is due to be played
     underdog integer DEFAULT 0 NOT NULL,  -- If 0 then not an underdog game, else if -ve additional points for away team, +ve additional points for home team
-    PRIMARY KEY (cid,rid,hid),
+    PRIMARY KEY (cid,rid,aid),
     FOREIGN KEY (cid,rid) REFERENCES round(cid,rid) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY (cid,hid) REFERENCES team_in_competition(cid,tid) ON UPDATE CASCADE ON DELETE CASCADE ,   
-    FOREIGN KEY (cid,aid) REFERENCES team_in_competition(cid,tid) ON UPDATE CASCADE ON DELETE SET NULL    
+    FOREIGN KEY (cid,aid) REFERENCES team_in_competition(cid,tid) ON UPDATE CASCADE ON DELETE CASCADE ,   
+    FOREIGN KEY (cid,hid) REFERENCES team_in_competition(cid,tid) ON UPDATE CASCADE ON DELETE SET NULL    
 );
 
 -- Holds one possible answer to the round question
@@ -118,7 +118,7 @@ CREATE TABLE pick (
     cid integer NOT NULL, -- Competition ID
     uid integer NOT NULL, --User ID.scha
     rid integer NOT NULL, --Round ID
-    hid character(3) NOT NULL, -- Home Team ID
+    aid character(3) NOT NULL, -- Away Team ID
     comment text, --Comment on the pick and why it was chosen
     pid character(3), --ID of Team Picked to Win (NULL for Draw)
     over_selected boolean, --true (=1) if over score is selected
@@ -126,7 +126,7 @@ CREATE TABLE pick (
     PRIMARY KEY (cid,uid,rid,hid),
     FOREIGN KEY (cid,rid) REFERENCES round(cid,rid) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (cid,uid) REFERENCES registration(cid,uid) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY (cid,hid) REFERENCES team_in_competition(cid,tid) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (cid,aid) REFERENCES team_in_competition(cid,tid) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (cid,pid) REFERENCES team_in_competition(cid,tid) ON UPDATE CASCADE ON DELETE SET NULL
 );
 
@@ -199,7 +199,7 @@ CREATE TABLE wildcard_pick (
 
 --points user scored in a match from the pick and over/under question (if present)
 CREATE VIEW match_score AS
- SELECT m.cid, m.rid, m.hid, u.uid, 
+ SELECT m.cid, m.rid, m.aid, u.uid, 
         CASE
             WHEN p.uid IS NULL THEN 0
             ELSE 1
@@ -211,9 +211,9 @@ CREATE VIEW match_score AS
    FROM registration u
    JOIN match m USING(cid)
    JOIN round r USING (cid,rid)
-   LEFT JOIN pick p ON  p.cid = m.cid AND p.rid = m.rid AND p.hid = m.hid AND p.uid = u.uid
+   LEFT JOIN pick p ON  p.cid = m.cid AND p.rid = m.rid AND p.aid = m.aid AND p.uid = u.uid
 	AND ((m.hscore >= m.ascore AND p.pid = m.hid) OR (m.hscore <= m.ascore AND p.pid = m.aid))
-   LEFT JOIN pick o ON  o.cid = m.cid AND o.rid = m.rid AND o.hid = m.hid AND o.uid = u.uid AND r.ou_round = 1
+   LEFT JOIN pick o ON  o.cid = m.cid AND o.rid = m.rid AND o.aid = m.aid AND o.uid = u.uid AND r.ou_round = 1
  	AND (CAST((m.hscore + m.ascore) AS REAL) > (CAST( m.combined_score AS REAL) + 0.5)) == o.over_selected 
   WHERE r.open = 1 AND m.open = 1;
 

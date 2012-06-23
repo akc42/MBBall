@@ -39,9 +39,9 @@ if ($rid != 0) {
 	$u->bindInt(2,$rid);
 	
 	$sql = "SELECT p.hid AS hid,pid, over_selected, p.comment AS comment, pscore, oscore";
-	$sql .= " FROM match_score m JOIN match USING (cid,rid,hid) LEFT JOIN pick p USING (cid,rid,hid,uid)";
+	$sql .= " FROM match_score m JOIN match USING (cid,rid,aid) LEFT JOIN pick p USING (cid,rid,aid,uid)";
 	$sql .= " WHERE m.cid = ? AND m.rid = ? AND m.uid = ?";
-	$sql .= " ORDER BY match.match_time , m.hid LIMIT 8 OFFSET ? ";
+	$sql .= " ORDER BY match.match_time , m.aid LIMIT 8 OFFSET ? ";
 	$p = $db->prepare($sql);
 	$p->bindInt(1,$cid);
 	$p->bindInt(2,$rid);
@@ -51,7 +51,7 @@ if ($rid != 0) {
 	$m->bindInt(2,$rid);
 	$nom = $m->fetchValue();
 	unset($m);
-	$m = $db->prepare("SELECT * FROM match WHERE cid = ? AND rid = ? AND open = 1 ORDER BY match_time, hid LIMIT 8 OFFSET ?");
+	$m = $db->prepare("SELECT * FROM match WHERE cid = ? AND rid = ? AND open = 1 ORDER BY match_time, aid LIMIT 8 OFFSET ?");
 	$m->bindInt(1,$cid);
 	$m->bindInt(2,$rid);
 
@@ -82,20 +82,20 @@ while ($nom > 0) {
 		$do_first = false;
 ?>			<th colspan="2" class="tid">
 <?php
-		if(!(is_null($row['hscore']) || is_null($row['ascore']) || $row['hscore'] < $row['ascore'])) {
+		if(!(is_null($row['ascore']) || is_null($row['hscore']) || $row['ascore'] < $row['hscore'])) {
 			//Home win
-?>				<span class="win hid"><?php tick();
+?>				<span class="win aid"><?php tick();
 		} else {
-?>				<span class="hid"><?php
+?>				<span class="aid"><?php
 		}
-		echo $row['hid']; ?><span>@
+		echo $row['aid']; ?><span>@
 <?php
-		if(!(is_null($row['hscore']) || is_null($row['ascore']) || $row['hscore'] > $row['ascore'])) {
+		if(!(is_null($row['ascore']) || is_null($row['hscore']) || $row['ascore'] > $row['hscore'])) {
 			//Away win
-?>				<span class="win aid"><?php echo $row['aid']; tick()?></span>
+?>				<span class="win hid"><?php echo $row['hid']; tick()?></span>
 <?php
 		} else {
-?>				<span class="aid"><?php	echo $row['aid'];?></span>
+?>				<span class="hid"><?php	echo $row['hid'];?></span>
 <?php
 		}
 ?>			</th>
@@ -133,8 +133,8 @@ while ($nom > 0) {
 	
 	$m->close();  //put the results back to the start so we can interate over them again
 	while($row = $m->fetchRow()) {
-?>			<th class="score" ><?php if(!is_null($row['hscore'])) echo $row['hscore'];?></th>
-			<th class="score"><?php if(!is_null($row['ascore'])) echo $row['ascore'];?></th>
+?>			<th class="score" ><?php if(!is_null($row['ascore'])) echo $row['ascore'];?></th>
+			<th class="score"><?php if(!is_null($row['hscore'])) echo $row['hscore'];?></th>
 <?php
 	}
 ?>		</tr>
@@ -147,8 +147,8 @@ while ($nom > 0) {
 		while($row = $m->FetchRow()) {
 		//This is an over or under guessing round, so we need to also show the over/under results
 			$cs = $row['combined_score']+0.5;
-			if(!(is_null($row['hscore']) || is_null($row['ascore']))) {
-				$scores=$row['hscore']+$row['ascore'];
+			if(!(is_null($row['ascore']) || is_null($row['hscore']))) {
+				$scores=$row['ascore']+$row['hscore'];
 ?>			<th class="score"><?php echo $cs;?></th>
 			<th class="ou"><?php echo ($scores>$cs)?'Over':'Under';?></th>
 <?php
