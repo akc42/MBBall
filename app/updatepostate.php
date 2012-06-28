@@ -25,11 +25,19 @@ $cid=$_GET['cid'];
 $tid=$_GET['tid'];
 $mp=$_GET['mp'];
 
+$db->exec("BEGIN TRANSACTION")
+
 $t = $db->prepare("UPDATE team_in_competition SET made_playoff = ? WHERE cid = ? AND tid = ?");
 $t->bindInt(1,($mp == 'true')?1:0);
 $t->bindInt(2,$cid);
 $t->bindString(3,$tid);
 
+$c = $db->prepare("UPDATE competition SET results_cache = NULL  WHERE cid = ?");
+$c->bindInt(1,$cid);
+$c->exec();
+unset($c);
+
+$db->exec("COMMIT");
 
 echo '{"cid":'.$cid.',"tid":"'.$tid.'","state":'.$mp.'}';
 ?>

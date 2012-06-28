@@ -65,9 +65,12 @@ if($rid != 0 && $cid !=0) {
 				</td>
 			</tr>
 			<tr>
-				<td>
+				<td colspan="2">
 		<label>Points for correct pick<br/>
-			<input id="value" name="value" type="text" value="<?php echo $row['value'];?>" />
+			<input id="value" name="value" type="hidden" value="<?php echo $row['value'];?>" />
+			<div id ="pointsslider">
+			  <div class="slider"><div class="knob"><?php echo $row['value'];?></div></slider>
+			</div>
 		</label>
 				</td>
 			</tr>

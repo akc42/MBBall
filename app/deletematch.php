@@ -26,23 +26,39 @@ $rid=$_GET['rid'];
 $aid=$_GET['aid'];
 
 $db->exec("BEGIN TRANSACTION");
-$m = $db->prepare("SELECT hid FROM match WHERE cid = ? AND rid = ? AND aid = ? ");
+$m = $db->prepare("SELECT open FROM match WHERE cid = ? AND rid = ? AND aid = ? ");
 $m->bindInt(1,$cid);
 $m->bindInt(2,$rid);
 $m->bindString(3,$aid);
-$hid = $m->fetchValue();
+$open = $m->fetchValue();
 unset($m);
 
-if ($hid) {
-	$m = $db->prepare("DELETE FROM match WHERE cid = ? AND rid = ? AND aid = ? ");
-	$m->bindInt(1,$cid);
-	$m->bindInt(2,$rid);
-	$m->bindString(3,$aid);
-	$m->exec();
-	unset($m);
-	$db->exec("COMMIT");
+if ($open) {
+  $m = $db->prepare("DELETE FROM match WHERE cid = ? AND rid = ? AND aid = ? ");
+  $m->bindInt(1,$cid);
+  $m->bindInt(2,$rid);
+  $m->bindString(3,$aid);
+  $m->exec();
+  unset($m);
 
-    echo '{"cid":'.$cid.',"rid":'.$rid.', "hid":"'.$hid.'","aid":"'.$aid.'"}';
+  if($open <> 0) {
+    //Need to clear caches if match is open - doesn't matter if not
+    $c = $db->prepare("UPDATE competition SET results_cache = NULL  WHERE cid = ?");
+    $c->bindInt(1,$cid);
+    $c->exec();
+    unset($c);
+
+  //clear cache for relevant round
+    $r = $db->prepare("UPDATE round SET results_cache = NULL WHERE cid =? AND rid = ?");
+    $r->bindInt(1,$cid);
+    $r->bindInt(2,$rid);
+    $r->exec();
+    unset($r);
+  }
+
+  $db->exec("COMMIT");
+
+  echo '{"cid":'.$cid.',"rid":'.$rid.', "hid":"'.$hid.'","aid":"'.$aid.'"}';
 
 } else {
 ?><p>Match doesn't exist</p>

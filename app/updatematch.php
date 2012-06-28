@@ -34,47 +34,66 @@ $noMatch = $m->fetchValue();
 unset($m);
 if ($noMatch != 0) {
 	
-	$sql = "UPDATE match SET open = ?, hscore = ?, ascore = ?,combined_score = ?, match_time = ?, comment = ? ";
-	$sql .= " WHERE cid = ? AND rid = ? AND aid = ?";
+  $sql = "UPDATE match SET open = ?, hscore = ?, ascore = ?,combined_score = ?, match_time = ?, comment = ?, underdog = ? ";
+  $sql .= " WHERE cid = ? AND rid = ? AND aid = ?";
 
-	$m = $db->prepare($sql);
-	$m->bindInt(1,isset($_POST['open'])?1:0);
-	if(isset($_POST['hscore'])) {
-		$m->bindInt(2,$_POST['hscore']);
-	}else {
-		$m->bindNull(2);
-	}
-	if(isset($_POST['ascore'])) {
-		$m->bindInt(3,$_POST['ascore']);
-	}else {
-		$m->bindNull(3);
-	}
-	if(isset($_POST['cscore'])) {
-		$m->bindInt(4,$_POST['cscore']);
-	}else {
-		$m->bindNull(4);
-	}
-	if(isset($_POST['mtime']) && $_POST['mtime'] != 0) {
-		$m->bindInt(5,$_POST['mtime']);
-	}else {
-		$m->bindNull(5);
-	}
-	if(isset($_POST['comment'])) {
-		$m->bindString(6,$_POST['comment']);
-	}else {
-		$m->bindNull(6);
-	}
-	$m->bindInt(7,$cid);
-	$m->bindInt(8,$rid);
-	$m->bindString(9,$aid);
-	$m->exec();
-	unset($m);
-	$db->exec("COMMIT");
-	echo '{"cid":'.$cid.',"rid":'.$rid.',"aid":"'.$aid.'"}';
+  $m = $db->prepare($sql);
+  $m->bindInt(1,isset($_POST['open'])?1:0);
+  if(isset($_POST['hscore'])) {
+    $m->bindInt(2,$_POST['hscore']);
+  }else {
+    $m->bindNull(2);
+  }
+  if(isset($_POST['ascore'])) {
+    $m->bindInt(3,$_POST['ascore']);
+  }else {
+    $m->bindNull(3);
+  }
+  if(isset($_POST['cscore'])) {
+    $m->bindInt(4,$_POST['cscore']);
+  }else {
+    $m->bindNull(4);
+  }
+  if(isset($_POST['mtime']) && $_POST['mtime'] != 0) {
+    $m->bindInt(5,$_POST['mtime']);
+  }else {
+    $m->bindNull(5);
+  }
+  if(isset($_POST['comment'])) {
+    $m->bindString(6,$_POST['comment']);
+  }else {
+    $m->bindNull(6);
+  }
+  if(isset($_POST['underdog'])) {
+    $m->bindInt(7,$_POST['underdog']);
+  } else {
+    $m->bindInt(7,0);
+  }
+  $m->bindInt(8,$cid);
+  $m->bindInt(9,$rid);
+  $m->bindString(10,$aid);
+  $m->exec();
+  unset($m);
+  if(isset($_POST['open'])) {
+    //Only need to break cache if this is an open match
+    $c = $db->prepare("UPDATE competition SET results_cache = NULL  WHERE cid = ?");
+    $c->bindInt(1,$cid);
+    $c->exec();
+    unset($c);
+    
+    $r = $db->prepare("UPDATE round SET results_cache = NULL WHERE cid =? AND rid = ?");
+    $r->bindInt(1,$cid);
+    $r->bindInt(2,$rid);
+    $r->exec();
+    unset($r);
+  }
+
+  $db->exec("COMMIT");
+  echo '{"cid":'.$cid.',"rid":'.$rid.',"aid":"'.$aid.'"}';
 
 } else {
 ?><p>Match does not exist</p>
 <?php
-	$db->exec("ROLLBACK");
+  $db->exec("ROLLBACK");
 }
 ?>

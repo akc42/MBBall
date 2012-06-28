@@ -1,6 +1,6 @@
 // MooTools: the javascript framework.
-// Load this file's selection again by visiting: http://mootools.net/more/cb856aec8e5f29b219ba13120de5e0ca 
-// Or build this file again with packager using: packager build More/Drag.Move
+// Load this file's selection again by visiting: http://mootools.net/more/d03cae8355c22f08b1d93d277be4b27b 
+// Or build this file again with packager using: packager build More/Class.Binds More/Drag More/Drag.Move
 /*
 ---
 
@@ -33,6 +33,45 @@ provides: [MooTools.More]
 MooTools.More = {
 	'version': '1.4.0.1',
 	'build': 'a4244edf2aa97ac8a196fc96082dd35af1abab87'
+};
+
+
+/*
+---
+
+script: Class.Binds.js
+
+name: Class.Binds
+
+description: Automagically binds specified methods in a class to the instance of the class.
+
+license: MIT-style license
+
+authors:
+  - Aaron Newton
+
+requires:
+  - Core/Class
+  - /MooTools.More
+
+provides: [Class.Binds]
+
+...
+*/
+
+Class.Mutators.Binds = function(binds){
+	if (!this.prototype.initialize) this.implement('initialize', function(){});
+	return Array.from(binds).concat(this.prototype.Binds || []);
+};
+
+Class.Mutators.initialize = function(initialize){
+	return function(){
+		Array.from(this.Binds).each(function(name){
+			var original = this[name];
+			if (original) this[name] = original.bind(this);
+		}, this);
+		return initialize.apply(this, arguments);
+	};
 };
 
 

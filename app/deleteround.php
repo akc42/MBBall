@@ -38,6 +38,11 @@ $r->bindInt(2,$rid);
 $r->exec();
 unset($r);
 
+$c = $db->prepare("UPDATE competition SET results_cache = NULL  WHERE cid = ?");
+$c->bindInt(1,$cid);
+$c->exec();
+unset($c);
+
 $db->exec("COMMIT");
 
 echo '{"cid":'.$cid.', "rid":'.$rid.'}';

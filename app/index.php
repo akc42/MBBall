@@ -124,6 +124,7 @@ unset($user);  //done with it.
 
 define('MBBALL_MAX_ROUND_DISPLAY',$s->fetchSetting('max_round_display'));
 define('MBBALL_FORUM_PATH',$s->fetchSetting('home_url'));
+define('MBBALL_CACHE_AGE',$s->fetchSetting('cache_age'));
 //define('MBBALL_EMOTICON_DIR',$s->fetchSetting('emoticon_dir'));
 //define('MBBALL_EMOTICON_URL',$s->fetchSetting('emoticon_url'));
 define('MBBALL_TEMPLATE',$s->fetchSetting('template'));
@@ -180,6 +181,7 @@ $condition = $row['condition'];
 $admName = $row['name'];
 $competitiontitle = $row['description'];
 $competitionCache = $row['results_cache'];
+$competitionCacheDate = $row['cache_store_date'];
 unset($c);
 
 $r = $db->prepare("SELECT * FROM registration WHERE uid = ? AND cid = ?");
@@ -335,8 +337,8 @@ function menu_items () {
 }
 
 function content() {
-	global $db,$cid,$rid,$uid,$registered,$signedup,$admName,$registration_allowed,$guest,
-		$rounddata,$gap,$playoff_deadline,$approval_required,$email,$global_admin,$name,$condition,$search,$replace,$competitionCache;
+	global $db,$cid,$rid,$uid,$registered,$signedup,$admName,$registration_allowed,$guest,$time_head,$rounddata,$gap,
+		$playoff_deadline,$approval_required,$email,$global_admin,$name,$condition,$search,$replace,$competitionCache,$competitionCacheDate;
 ?><div id="errormessage"></div>
 	<table class="layout">
 		<tbody>
@@ -370,16 +372,24 @@ function content() {
 			</tr>
 <?php
 } else {
-?>			<tr><td colspan="2"><div id="summary"><?php require_once ('./inc/summary.inc');?></div></td></tr>
+?>			<tr><td colspan="2"><div id="summary"><?php require_once ('./inc/summary.inc');?></div>
+<div class="timing"><?php $time_now = microtime(true); printf("With %d queries so far in %.3f secs",$db->getCounts(),$time_now - $time_head);?></div>
+</td></tr>
 <?php
 }
-?>			<tr><td colspan="2"><div id="picks"><?php require_once('./inc/picks.inc');?></div></td></tr>
+?>			<tr><td colspan="2"><div id="picks"><?php require_once('./inc/picks.inc');?></div>
+<div class="timing"><?php $time_now = microtime(true); printf("With %d queries so far in %.3f secs",$db->getCounts(),$time_now - $time_head);?></div>
+</td></tr>
 <?php
 if ($playoff_deadline != 0) {
-?>			<tr><td colspan="2"><div id="popicks"><?php require_once('./inc/playoff.inc');?></div></td></tr>
+?>			<tr><td colspan="2"><div id="popicks"><?php require_once('./inc/playoff.inc');?></div>
+<div class="timing"><?php $time_now = microtime(true); printf("With %d queries so far in %.3f secs",$db->getCounts(),$time_now - $time_head);?></div>
+</td></tr>
 <?php
 }
-?>			<tr><td colspan="2"><div id="tics"><?php require_once('./inc/tic.inc');?></div></td></tr>
+?>			<tr><td colspan="2"><div id="tics"><?php require_once('./inc/tic.inc');?></div>
+<div class="timing"><?php $time_now = microtime(true); printf("With %d queries so far in %.3f secs",$db->getCounts(),$time_now - $time_head);?></div>
+</td></tr>
 		</tbody>
 	</table>
 <?php

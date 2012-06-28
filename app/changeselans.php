@@ -32,39 +32,49 @@ $a->bindInt(2,$rid);
 $answer = $a->fetchValue();
 unset($a);
 if ($answer) {
-	if($opid != 0) {
-		
-		$o = $db->prepare("SELECT COUNT(*) FROM option WHERE cid = ? AND rid = ? AND opid = ?");
-		$o->bindInt(1,$cid);
-		$o->bindInt(2,$rid);
-		$o->bindInt(3,$opid);
-		$op = $o->fetchValue();
-		unset($o);
-		if ($op != 0) {
-			if ($answer != $opid) {
-					$r = $db->prepare("UPDATE round SET answer = ? WHERE cid = ? AND rid = ? ");
-					$r->bindInt(1,$opid);
-					$r->bindInt(2,$cid);
-					$r->bindInt(3,$rid);
-					$r->exec();
-					unset($r);
-			}
-			$db->exec("COMMIT");
-			echo '{"cid":'.$cid.',"rid":'.$rid.',"opid":'.$opid.'}';
-		} else {
+  if($opid != 0) {
+    $o = $db->prepare("SELECT COUNT(*) FROM option WHERE cid = ? AND rid = ? AND opid = ?");
+    $o->bindInt(1,$cid);
+    $o->bindInt(2,$rid);
+    $o->bindInt(3,$opid);
+    $op = $o->fetchValue();
+    unset($o);
+    if ($op != 0) {
+      if ($answer != $opid) {
+	$r = $db->prepare("UPDATE round SET answer = ?,results_cache = NULL WHERE cid = ? AND rid = ? ");
+	$r->bindInt(1,$opid);
+	$r->bindInt(2,$cid);
+	$r->bindInt(3,$rid);
+	$r->exec();
+	unset($r);
+	//Need to clear caches 
+	$c = $db->prepare("UPDATE competition SET results_cache = NULL  WHERE cid = ?");
+	$c->bindInt(1,$cid);
+	$c->exec();
+	unset($c);
+
+      }
+      $db->exec("COMMIT");
+      echo '{"cid":'.$cid.',"rid":'.$rid.',"opid":'.$opid.'}';
+    } else {
 ?><p>Option matching answer does not exist</p>
 <?php
-			$db->exec("ROLLBACK");
-		}
-	} else {
-		$r = $db->prepare("UPDATE round SET answer = 0 WHERE cid = ? AND rid = ? ");
-		$r->bindInt(1,$cid);
-		$r->bindInt(2,$rid);
-		$r->exec();
-		unset($r);
-		$db->exec("COMMIT");
-		echo '{"cid":'.$cid.',"rid":'.$rid.',"opid":0}';
-	}
+      $db->exec("ROLLBACK");
+    }
+  } else {
+    $r = $db->prepare("UPDATE round SET answer = 0 , results_cache = NULL WHERE cid = ? AND rid = ? ");
+    $r->bindInt(1,$cid);
+    $r->bindInt(2,$rid);
+    $r->exec();
+    unset($r);
+    //Need to clear caches 
+    $c = $db->prepare("UPDATE competition SET results_cache = NULL  WHERE cid = ?");
+    $c->bindInt(1,$cid);
+    $c->exec();
+    unset($c);
+    $db->exec("COMMIT");
+    echo '{"cid":'.$cid.',"rid":'.$rid.',"opid":0}';
+  }
 } else {
 ?><p>Round does not exist</p>
 <?php

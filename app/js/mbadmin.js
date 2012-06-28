@@ -157,16 +157,17 @@ var MBBAdmin = new Class({
 							return true;
 						}});
 
-						div.getElements('input').append(div.getElements('textarea')).addEvent('change', function(e) {
-							var validated = true;
-							if(this.name == 'cscore'
+						div.getElements('input[type=text]').append(div.getElements('input[type=checkbox]')).append(div.getElements('textarea')).addEvent('change', function(e) {
+						  e.stop();
+						  var validated = true;
+							if(validated && (this.name == 'cscore'
 									|| this.name == 'ascore' 
-									|| this.name == 'hscore') {
+									|| this.name == 'hscore')) {
 								if(!MBB.intValidate(this)) {
 									validated = false;
 								}
 							}
-							if (this.name == 'open' && this.checked) {
+							if (validated && this.name == 'open' && this.checked) {
 								var hid = div.getElement('input[name=hid]');
 								if (hid.value ==  '' || hid.value == null) {
 									this.checked = false;
@@ -190,9 +191,8 @@ var MBBAdmin = new Class({
 							}	
 							if (validated) {
 								var updateReq = new MBB.req('updatematch.php',function(response) {
-									//Should not be necessary to update page (but may have effected the user picks part)
-								$('userpick').empty();
-
+								  //Should not be necessary to update page (but may have effected the user picks part)
+								  $('userpick').empty();
 								});
 								updateReq.post(div.getElement('form'));
 							}
@@ -245,6 +245,60 @@ var MBBAdmin = new Class({
 								deleteReq.get(Object.merge(params,{'aid':div.getElement('input[name=aid]').value}));
 							}
 						});
+						var underdog = div.getElement('input[name=underdog]');
+						var scoreMap = [0,1,2,4,8,12];  //This maps the individual absolute value of the slider to a score increment
+						var AwayUnder = false;	//set true if we need to negate values (because its the array side that is the underdog
+						var inputValue = underdog.value.toInt();
+						if (inputValue < 0) {
+						  AwayUnder = true;
+						  inputValue = - inputValue;
+						}
+						var indexedValue = scoreMap.indexOf(inputValue);  //convert from score to step value
+						if (indexedValue < 0 ) indexedValue = 0;
+						if (AwayUnder && indexedValue > 0){
+						  indexedValue = -indexedValue;
+						  div.getElement('.aid').getElement('span').addClass('isUnderdog');
+						  div.getElement('.open').addClass('isUnderdog');
+						} else if (indexedValue != 0) {
+						  div.getElement('.hid').getElement('span').addClass('isUnderdog');
+						  div.getElement('.open').addClass('isUnderdog');
+						} 
+						var slider = div.getElement('.slider');
+						var knob = slider.getElement('.knob');
+						new Slider(slider,knob,{
+						  minstep:-5,
+						  maxstep:5,
+						  initial:indexedValue,
+						  minortick:1,
+						  majortick:10,
+						  onTick: function(step) {
+						    knob.set("text",scoreMap[Math.abs(step)]);
+						  },
+						  onChange:function(step) {
+						    if (step == 0) {
+						      div.getElement('.aid').getElement('span').removeClass('isUnderdog');
+						      div.getElement('.hid').getElement('span').removeClass('isUnderdog');
+						      div.getElement('.open').removeClass('isUnderdog');
+						      underdog.value = 0;
+						    } else if (step < 0 ) {
+						      div.getElement('.aid').getElement('span').addClass('isUnderdog');
+						      div.getElement('.hid').getElement('span').removeClass('isUnderdog');
+						      div.getElement('.open').addClass('isUnderdog');
+						      underdog.value = -scoreMap[-step];
+						    } else {
+						      div.getElement('.hid').getElement('span').addClass('isUnderdog');
+						      div.getElement('.aid').getElement('span').removeClass('isUnderdog');
+						      div.getElement('.open').addClass('isUnderdog');
+						      underdog.value = scoreMap[step];
+						    }
+						    var updateReq = new MBB.req('updatematch.php',function(response) {
+							//Should not be necessary to update page (but may have effected the user picks part)
+						      $('userpick').empty();
+						    });
+						    updateReq.post(div.getElement('form'));
+						  }
+						});
+		 
 					};
 					var changeSelectedAnswer = function(e) {
 					  //called when an option has been selected as the correct answer
@@ -354,6 +408,30 @@ var MBBAdmin = new Class({
 								});
 								updateReq.post($('roundform'));
 							}
+						});
+						var scoreMap = [1,2,4,6,8,12,16];
+						var points = div.getElement('input[name=value]');
+						var slider = div.getElement('.slider');
+						var knob = slider.getElement('.knob');
+						var stepValue = scoreMap.indexOf(points.value.toInt());
+						if (stepValue < 0) stepValue = 0;
+						new Slider(slider,knob,{
+						  minstep:0,
+						  maxstep:6,
+						  initial:stepValue,
+						  minortick:1,
+						  majortick:10,
+						  onTick:function(step) {
+						    knob.set("text",scoreMap[step]);
+						  },
+						  onChange:function(step) {
+						    points.value = scoreMap[step];
+						    var updateReq = new MBB.req('updateround.php', function(response) {
+							    //Should not be necessary to update page
+							    $('userpick').empty(); //but user picks may have changed
+						    });
+						    updateReq.post($('roundform'));
+						  }
 						});
 						// if user clicks on create option area we need to create an option
 						$('option').addEvent('click', function(e) {

@@ -22,8 +22,10 @@ require_once('./inc/db.inc');
 if(!(isset($_POST['cid']) && isset($_POST['rid']) && isset($_POST['rname'])
 	&& isset($_POST['deadline']) && isset($_POST['value']) )) forbidden();
 
+$db->exec("BEGIN TRANSACTION");
+
 $sql = "UPDATE round SET name = ?, value = ?, deadline = ?, open = ?, ou_round = ?, valid_question = ?,answer = ?, ";
-$sql .= "question = ?,comment = ? WHERE cid = ? AND rid = ?";
+$sql .= "question = ?,comment = ? , results_cache = NULL WHERE cid = ? AND rid = ?";
 $r = $db->prepare($sql);
 $r->bindString(1,$_POST['rname']);
 $r->bindInt(2,$_POST['value']);
@@ -47,6 +49,17 @@ $r->bindInt(11,$cid);
 $r->bindInt(12,$rid);
 $r->exec();
 unset($r);
+
+if(isset($_POST['open'])) {
+  //Only need to break cache if this is an open round
+  $c = $db->prepare("UPDATE competition SET results_cache = NULL  WHERE cid = ?");
+  $c->bindInt(1,$cid);
+  $c->exec();
+  unset($c);
+}
+
+
+$db->exec("COMMIT");
 
 echo '{"cid":'.$_POST['cid'].',"rid":'.$_POST['rid'].'}';
 ?>

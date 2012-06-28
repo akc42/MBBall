@@ -23,12 +23,27 @@ if(!(issetisset($_GET['cid']) && isset($_GET['ruid']))) forbidden();
 
 $cid=$_GET['cid'];
 $ruid = $_GET['ruid'];
+$db->exec("BEGIN TRANSACTION");
 
 $r = $db->prepare("DELETE FROM registration WHERE cid = ? AND uid = ?");
 $r->bindInt(1,$cid);
 $r->bindInt(2,$ruid);
 $r->exec();
 unset($r);
+
+//Need to clear caches as this person will no longer be in the competiion
+$c = $db->prepare("UPDATE competition SET results_cache = NULL  WHERE cid = ?");
+$c->bindInt(1,$cid);
+$c->exec();
+unset($c);
+
+$r = $db->prepare("UPDATE round SET results_cache = NULL WHERE cid =? ");
+$r->bindInt(1,$cid);
+$r->exec();
+unset($r);
+
+
+$db->exec("COMMIT");
 
 echo '{"cid":'.$cid.',"ruid":"'.$ruid.'"}';
 ?>

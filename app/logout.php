@@ -19,15 +19,10 @@
 
 */
 require_once('./inc/db.inc');
-if(!(isset($_GET['uid']) && isset($_GET['pass']) ))
-	die('Hacking attempt - wrong parameters');
-$uid = $_GET['uid'];
-if ($_GET['pass'] != sha1("Football".$uid))
-	die('Hacking attempt got: '.$_GET['password'].' expected: '.sha1("Key".$uid));
 
 $txt = 'MBball version: '.$_GET['mbchat'].', Mootools Version : '.$_GET['version'].' build '.$_GET['build'] ;
 $txt .=' Browser : '.$_GET['browser'].' on Platform : '.$_GET['platform'];
-require_once('./db.inc');
+
 // Do something here maybe
 echo '{"Logout" : '.$txt.'}' ;
 ?> 

@@ -35,34 +35,42 @@ if($rid != 0 && $cid !=0) {
 		$row['aid']=trim($row['aid']);
 
 ?><div class="match">
-     <form  action="#" >
-		<input type="hidden" name="cid" value="<?php echo $cid;?>"/>
-		<input type="hidden" name="rid" value="<?php echo $rid;?>"/>
-		<input type="hidden" name="aid" value="<?php echo $row['aid'];?>" />
-		<input type="hidden" name="hid" value="<?php echo $row['hid'];?>" />
-					<div class="aid"><span><?php echo $row['aid'];?></span></div><div class="at">@</div>
-					<div class="hid"><span><?php echo (is_null($row['hid'])? '---':$row['hid']);?></span></div>
-					<div class="open">
-		<label><input type="checkbox" name="open" <?php if($row['open'] == 't') echo 'checked="checked"';?>/>Open</label>
-					</div>
-					<div class="del"></div>
-					<div class="ascore">
-		<input type="text" name="hscore" value="<?php echo $row['ascore'];?>"/>
-					</div>
-					<div class="hscore">
-		<input type="text" name="ascore" value="<?php echo $row['hscore'];?>"/>
-					</div>
-					<div class="cscore">
-		<input type="text" name="cscore" value="<?php echo $row['combined_score'];?>" <?php if($_GET['ou'] != 'true') echo 'readonly="readonly"';?> />
-					</div>
-					<div class="mtime">
-		<input type="hidden" name="mtime" value="<?php echo $row['match_time'];?>" />
-					</div>
-					<div class="comment">
-		<textarea name="comment"><?php echo $row['comment'];?></textarea>
-					</div>
-	</form> 
-	<div class="clear"></div>
+  <form  action="updatematch.php" >
+    <input type="hidden" name="cid" value="<?php echo $cid;?>"/>
+    <input type="hidden" name="rid" value="<?php echo $rid;?>"/>
+    <input type="hidden" name="aid" value="<?php echo $row['aid'];?>" />
+    <input type="hidden" name="hid" value="<?php echo $row['hid'];?>" />
+    <input type="hidden" name="underdog" value="<?php echo $row['underdog'];?>" />
+    <div>
+      <div class="aid"><span><?php echo $row['aid'];?></span></div><div class="at">@</div>
+      <div class="hid"><span><?php echo ((is_null($row['hid']) || $row['hid'] == "")? '---':$row['hid']);?></span></div>
+      <div class="open">
+	<label><input type="checkbox" name="open" <?php if($row['open'] == 1) echo 'checked="checked"';?>/>Open</label>
+      </div>
+      <div class="del"></div>
+   </div>
+   <div class="clear">
+      <div class="ascore">
+	<input type="text" name="hscore" value="<?php echo $row['ascore'];?>"/>
+      </div>
+      <div class="hscore">
+	<input type="text" name="Hscore" value="<?php echo $row['hscore'];?>"/>
+      </div>
+      <div class="cscore">
+	<input type="text" name="cscore" value="<?php echo $row['combined_score'];?>" <?php if($_GET['ou'] != 'true') echo 'readonly="readonly"';?> />
+      </div>
+    </div>
+    <div class="mtime clear">
+      <input type="hidden" name="mtime" value="<?php echo $row['match_time'];?>" />
+    </div>
+    <div class="comment">
+      <textarea name="comment clear"><?php echo $row['comment'];?></textarea>
+    </div>
+    <div class="underdog clear">
+      <div class="slider"><div class="knob"><?php echo abs($row['underdog']);?></div></div>
+    </div>
+  </form> 
+  <div class="clear"></div>
 </div>
 <?php
 

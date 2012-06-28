@@ -49,23 +49,20 @@ function head_content () {
 	<link rel="stylesheet" type="text/css" href="css/ball.css"/>
 <?php
 	if(defined('DEBUG')) {
-?>	<script src="js/mootools-dragmove-1.4.0.1.js" type="text/javascript" charset="UTF-8"></script>
-<?php
-	} else {
-?>	<script src="js/mootools-dragmove-1.4.0.1-yc.js" type="text/javascript" charset="UTF-8"></script>
-<?php
-	}
-?>	<script src="js/calendar/calendar.js" type="text/javascript" charset="UTF-8"></script>
-<?php
-	if(defined('DEBUG')) {
-?>	<script src="js/mbball.js" type="text/javascript" charset="UTF-8"></script>
+?>	<script src="js/mootools-binddragmove-1.4.0.1.js" type="text/javascript" charset="UTF-8"></script>
+	<script src="js/calendar/calendar.js" type="text/javascript" charset="UTF-8"></script>
+	<script src="js/slider.js" type="text/javascript" charset="UTF-8"></script>
+	<script src="js/mbball.js" type="text/javascript" charset="UTF-8"></script>
 	<script src="js/mbadmin.js" type="text/javascript" charset="UTF-8"></script>
 <?php
-} else {
-?>	<script src="js/mbball-min-<?php include('./inc/version.inc');?>.js" type="text/javascript" charset="UTF-8"></script>
+	} else {
+?>	<script src="js/mootools-binddragmove-1.4.0.1-yc.js" type="text/javascript" charset="UTF-8"></script>
+	<script src="js/calendar/calendar-yc.js" type="text/javascript" charset="UTF-8"></script>
+	<script src="js/slider-min-v1.0.js" type="text/javascript" charset="UTF-8"></script>
+	<script src="js/mbball-min-<?php include('./inc/version.inc');?>.js" type="text/javascript" charset="UTF-8"></script>
 	<script src="js/mbadmin-min-<?php include('./inc/version.inc');?>.js" type="text/javascript" charset="UTF-8"></script>
 <?php
-} 
+	}
 ?>	<script type="text/javascript">
 
 	<!--
@@ -98,7 +95,7 @@ function content_title() {
 }
 function menu_items() {
 ?>		<li><a href="/forum"><span>Return to the Forum</span></a></li>
-		<li><a href="/football"><span>Return to the User Page</span></a></li>
+		<li><a href="index.php"><span>Return to the User Page</span></a></li>
 <?php
 }
 function content() {

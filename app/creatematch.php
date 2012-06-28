@@ -42,20 +42,27 @@ if ($noMatches == 0) {
 	$m->exec();
 	unset($m);
 	$db->exec("COMMIT");
-?><form action="#" >
+?><form action="updatematch.php" >
      <input type="hidden" name="cid" value="<?php echo $cid;?>"/>
      <input type="hidden" name="rid" value="<?php echo $rid;?>"/>
      <input type="hidden" name="aid" value="<?php echo $aid;?>" />
      <input type="hidden" name="hid" />
+     <input type="hidden" name="underdog" value="0" />   <div>
      <div class="aid"><span><?php echo $aid ;?></span></div><div class="at">@</div>
      <div class="hid"><span>---</span></div>
      <div class="open"><label><input type="checkbox" name="open" />Open</label></div>
      <div class="del"></div>
-     <div class="ascore"><input type="text" name="ascore"/></div>
-  <div class="hscore"><input type="text" name="hscore"/></div>
-  <div class="cscore"><input type="text" name="cscore" /></div>
-  <div class="mtime"><input type="hidden" name="mtime"  /></div>
-  <div class="comment"><textarea name="comment"></textarea></div>
+    </div>
+    <div class="clear">
+      <div class="ascore"><input type="text" name="ascore"/></div>
+      <div class="hscore"><input type="text" name="hscore"/></div>
+      <div class="cscore"><input type="text" name="cscore" /></div>
+    </div>
+  <div class="mtime clear"><input type="hidden" name="mtime"  /></div>
+  <div class="comment clear"><textarea name="comment"></textarea></div>
+  <div class="underdog clear">
+    <div class="slider"><div class="knob">0</div></div>
+  </div>
 </form> 
 <div class="clear"></div>
 <?php

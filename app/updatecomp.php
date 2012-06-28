@@ -30,7 +30,7 @@ $u->exec();
 unset($u);
 
 $sql = "UPDATE competition SET description = ?, administrator = ?, condition = ? ";
-$sql .= ", pp_deadline = ? ,gap = ? , open = ?, guest_approval = ? WHERE cid = ?";
+$sql .= ", pp_deadline = ? ,gap = ? , open = ?, guest_approval = ?, results_cache = NULL WHERE cid = ?";
 $c = $db->prepare($sql);
 $c->bindString(1,$_POST['desc']);
 $c->bindInt(2,$_POST['adm']);

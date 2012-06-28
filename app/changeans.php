@@ -33,21 +33,22 @@ $o->bindInt(2,$rid);
 $o->bindInt(3,$opid);
 
 if ($o->fetchValue() != 0) {
-	unset($o);
-	$o = $db->prepare("UPDATE OPTION SET label = ? WHERE cid = ? AND rid = ? AND opid = ? ");
-	$o->bindString(1,$_GET['label']);
-	$o->bindInt(1,$cid);
-	$o->bindInt(2,$rid);
-	$o->bindInt(3,$opid);
-	$o->exec();
-	unset($o);
-	$db->exec("COMMIT");
-	echo '{"cid":'.$cid.',"rid":'.$rid.',"opid":'.$opid.',"label":"'.$_GET['label'].'"}';
+  unset($o);
+  $o = $db->prepare("UPDATE OPTION SET label = ? WHERE cid = ? AND rid = ? AND opid = ? ");
+  $o->bindString(1,$_GET['label']);
+  $o->bindInt(1,$cid);
+  $o->bindInt(2,$rid);
+  $o->bindInt(3,$opid);
+  $o->exec();
+  unset($o);
+
+  $db->exec("COMMIT");
+  echo '{"cid":'.$cid.',"rid":'.$rid.',"opid":'.$opid.',"label":"'.$_GET['label'].'"}';
 } else {
-	unset($o);
+  unset($o);
 ?><p>Option does not exist</p>
 <?php
-	$db->exec("ROLLBACK");
+  $db->exec("ROLLBACK");
 }
 ?>
 
