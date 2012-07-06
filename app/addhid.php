@@ -35,7 +35,7 @@ $m->bindString(3,$aid);
 $row = $m->fetchRow();
 unset($m);
 
-if ($row && is_null($row['aid'])) {
+if ($row && is_null($row['hid'])) {
 	$m = $db->prepare("UPDATE match SET hid = ? WHERE cid = ? AND rid = ? AND aid = ?");
 	$m->bindString(1,$hid);
 	$m->bindInt(2,$cid);
