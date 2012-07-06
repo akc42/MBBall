@@ -38,31 +38,41 @@ if( $cid !=0) {
 	<thead>
 		<tr>
 			<th class="team">TiC</th>
-			<th class="team">Teams</th>
+			<th id="pophead" class="<?php echo ($ticexists)?"team":"team hidden";?>">PO Value</th>
+			<th id="tnichead" class="<?php echo ($ticexists)?"team hidden":"hidden";?>">Teams</th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr>
 			<td id="tic">
 <?php
-	$sql = "SELECT tid,hid,made_playoff AS mp FROM team_in_competition t LEFT JOIN ("; 
- 	$sql .= " SELECT cid, rid, hid FROM match UNION SELECT cid, rid, aid AS hid FROM match ";
-	$sql .= " ) m ON t.cid = m.cid AND rid= ? AND t.tid=m.hid WHERE t.cid = ? ORDER BY tid ";
+	$sql = "SELECT tid,aid,made_playoff AS mp,points FROM team_in_competition t LEFT JOIN ("; 
+ 	$sql .= " SELECT cid, rid, aid FROM match UNION SELECT cid, rid, hid AS aid FROM match ";
+	$sql .= " ) m ON t.cid = m.cid AND rid= ? AND t.tid=m.aid WHERE t.cid = ? ORDER BY tid ";
 	$t = $db->prepare($sql);
 	$t->bindInt(1,$rid);
 	$t->bindInt(2,$cid);
+	$points = Array();
 	while($row = $t->FetchRow()) {
-		$row['tid'] = trim($row['tid']);
-?>	<div id="<?php echo 'T'.$row['tid'];?>" <?php if(!is_null($row['hid']))echo 'class="inmatch"';?>>
+	  $row['tid'] = trim($row['tid']);
+?>	<div id="<?php echo 'T'.$row['tid'];?>" class="tic<?php if(!is_null($row['aid']))echo ' inmatch';?>">
 		<input type="checkbox" name="<?php echo $row['tid'];?>" <?php
 if($row['mp'] == 1) echo 'checked="checked"';?> />
 		<span class="tid"><?php echo $row['tid'];?></span>
 	</div>
 <?php
+	  $points[] = Array('tid' =>$row['tid'],'points' => $row['points']);
 	}
 	unset($t);
 ?>			</td>
-			<td id="tnic">
+			<td id="pop" <?php if (!$ticexists) echo 'class="hidden"';?>>
+<?php
+	foreach($points as $point) {
+?>	<div id="<?php echo 'P'.$point['tid'];?>" class="tic"><div class="pslide"><div class="knob"><?php echo $point['points'];?></div></div></div>
+<?php
+	}
+?>			</td>
+			<td id="tnic" <?php if ($ticexists) echo 'class="hidden"';?>>
 <?php
 	$sql = "SELECT t.tid AS tid FROM team t EXCEPT SELECT c.tid AS tid FROM team_in_competition c WHERE c.cid = ? ORDER BY tid";
 	$t = $db->prepare($sql);
@@ -70,7 +80,7 @@ if($row['mp'] == 1) echo 'checked="checked"';?> />
 	while($row = $t->FetchRow()) {
 		$row['tid'] = trim($row['tid']);
 		
-?>	<div id="<?php echo 'S'.$row['tid'];?>"><span class="tid"><?php echo $row['tid'];?></span></div>
+?>	<div id="<?php echo 'S'.$row['tid'];?>" class="tic"><span class="tid"><?php echo $row['tid'];?></span></div>
 <?php
 	}
 	unset($t);

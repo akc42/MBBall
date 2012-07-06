@@ -21,7 +21,7 @@
 
 var MBBAdmin = new Class({
 	Extends: MBBall,
-	initialize: function(admin,cid,errordiv,messages) {
+	initialize: function(admin,cid,errordiv,messages,maps) {
 		this.parent(errordiv);
 		var params = {'cid':cid, 'rid':0};
 		var emoticons;
@@ -246,14 +246,13 @@ var MBBAdmin = new Class({
 							}
 						});
 						var underdog = div.getElement('input[name=underdog]');
-						var scoreMap = [0,1,2,4,8,12];  //This maps the individual absolute value of the slider to a score increment
 						var AwayUnder = false;	//set true if we need to negate values (because its the array side that is the underdog
 						var inputValue = underdog.value.toInt();
 						if (inputValue < 0) {
 						  AwayUnder = true;
 						  inputValue = - inputValue;
 						}
-						var indexedValue = scoreMap.indexOf(inputValue);  //convert from score to step value
+						var indexedValue = maps.underdog.indexOf(inputValue);  //convert from score to step value
 						if (indexedValue < 0 ) indexedValue = 0;
 						if (AwayUnder && indexedValue > 0){
 						  indexedValue = -indexedValue;
@@ -272,7 +271,7 @@ var MBBAdmin = new Class({
 						  minortick:1,
 						  majortick:10,
 						  onTick: function(step) {
-						    knob.set("text",scoreMap[Math.abs(step)]);
+						    knob.set("text",maps.underdog[Math.abs(step)]);
 						  },
 						  onChange:function(step) {
 						    if (step == 0) {
@@ -284,12 +283,12 @@ var MBBAdmin = new Class({
 						      div.getElement('.aid').getElement('span').addClass('isUnderdog');
 						      div.getElement('.hid').getElement('span').removeClass('isUnderdog');
 						      div.getElement('.open').addClass('isUnderdog');
-						      underdog.value = -scoreMap[-step];
+						      underdog.value = -maps.underdog[-step];
 						    } else {
 						      div.getElement('.hid').getElement('span').addClass('isUnderdog');
 						      div.getElement('.aid').getElement('span').removeClass('isUnderdog');
 						      div.getElement('.open').addClass('isUnderdog');
-						      underdog.value = scoreMap[step];
+						      underdog.value = maps.underdog[step];
 						    }
 						    var updateReq = new MBB.req('updatematch.php',function(response) {
 							//Should not be necessary to update page (but may have effected the user picks part)
@@ -409,11 +408,10 @@ var MBBAdmin = new Class({
 								updateReq.post($('roundform'));
 							}
 						});
-						var scoreMap = [1,2,4,6,8,12,16];
 						var points = div.getElement('input[name=value]');
 						var slider = div.getElement('.slider');
 						var knob = slider.getElement('.knob');
-						var stepValue = scoreMap.indexOf(points.value.toInt());
+						var stepValue = maps.points.indexOf(points.value.toInt()); //map back from points to step
 						if (stepValue < 0) stepValue = 0;
 						new Slider(slider,knob,{
 						  minstep:0,
@@ -422,10 +420,10 @@ var MBBAdmin = new Class({
 						  minortick:1,
 						  majortick:10,
 						  onTick:function(step) {
-						    knob.set("text",scoreMap[step]);
+						    knob.set("text",maps.points[step]);
 						  },
 						  onChange:function(step) {
-						    points.value = scoreMap[step];
+						    points.value = maps.points[step];
 						    var updateReq = new MBB.req('updateround.php', function(response) {
 							    //Should not be necessary to update page
 							    $('userpick').empty(); //but user picks may have changed
@@ -544,7 +542,7 @@ var MBBAdmin = new Class({
 								var team = this;
 								if(!lock.checked) {
 									var remTiC = new MBB.req('remtic.php', function (response) {
-										var div = new Element('div',{'id':'S'+response.tid});
+										var div = new Element('div',{'id':'S'+response.tid,'class':'tic'});
 										var span = new Element('span',{
 											'class':'tid',
 											'events': {'click':tnicClicked},
@@ -560,6 +558,7 @@ var MBBAdmin = new Class({
 											$('tnic').adopt(div);
 										} 
 										team.getParent().dispose();
+										document.id('P'+response.tid).dispose();
 									});
 									remTiC.get({'cid':params.cid,'tid':team.get('text')});	
 								} else {
@@ -601,7 +600,7 @@ var MBBAdmin = new Class({
 								mpReq.get({'cid':params.cid,'tid':this.name,'mp':this.checked});
 							};
 							var makeTeam = function(team) {
-								var div = new Element('div',{'id':'T'+team});
+								var div = new Element('div',{'id':'T'+team,'class':'tic'});
 								var input = new Element('input',
 									{'type':'checkbox','name':team,'events':{'change':changeMpStatus}}
 								).inject(div);
@@ -612,20 +611,58 @@ var MBBAdmin = new Class({
 								}).inject(div);
 								return div;
 							};
+							var makePlayOffSlide = function(slider,knob,initial,team) {
+							  var poff = new Slider(slider,knob,{
+							    minstep:1,
+							    maxstep:5,
+							    initial:initial,
+							    minortick:1,
+							    onTick:function(step) {
+							      knob.set("text",maps.playoff[step-1]);
+							    },
+							    onChange:function(step) {
+							      var setPOScore = new MBB.req('setposcore.php',function(response) {
+								//don't think there is anything to do
+							      });
+							      setPOScore.get({'cid':params.cid,'tid':team,'pscore':maps.playoff[step-1]});
+							    }
+							  });
+							};
+							var makePlayoffDiv= function(team) {
+							  var div = new Element('div',{'id':'P'+team,'class':'tic'});
+							  var slider = new Element('div',{'class':'pslide'});
+							  var knob = new Element('div',{'class':'knob','text':'1'}).inject(slider);
+							  slider.inject(div);
+							  makePlayOffSlide(slider,knob,1);
+							  return div;
+							};
+							//For all teams currently in the compeition we need to create their sliders
+							document.id('pop').getElements('div.tic').each(function(team){
+							  var slider = team.getElement('.pslide');
+							  var knob = slider.getElement('.knob');
+							  makePlayOffSlide(slider,knob,knob.get("text"),team.get('id').substring(1));
+							});
+							  
 							tnicClicked = function(e) {
 								e.stop();
 								if(!lock.checked) {
 									var team=this;
 									var addTiC = new MBB.req('addtic.php', function (response) {
 										var div = makeTeam(response.tid);
+										var pdiv = makePlayoffDiv(response.tid);
+										//go down tics looking for first div with team name greater than
+										//ours and inject before it
 										if($$('#tic div').every(function(item,i) {
-											if(item.getElement('span').get('text') > response.tid) {
+											var ateam = item.getElement('span').get('text') 
+											if( ateam > response.tid) {
 												div.inject(item,'before');
+												pdiv.inject(document.id('P'+ateam),'before');
 												return false;
 											}
 											return true;
 										})) {
 											$('tic').adopt(div);
+											document.id('pop').adopt(pdiv);
 										} 
 										team.getParent().dispose();
 									});
@@ -652,6 +689,21 @@ var MBBAdmin = new Class({
 								} else {
 									$('lock_cell').highlight('#F00');
 								}
+							});
+							//swap over playoff and tnic columns as we move in and out of lock mode
+							lock.addEvent('change',function(e) {
+							  e.stop();
+							  if(lock.checked) {
+							    document.id('tnichead').addClass('hidden');
+							    document.id('tnic').addClass('hidden');
+							    document.id('pophead').removeClass('hidden');
+							    document.id('pop').removeClass('hidden');
+							  } else {
+							    document.id('pophead').addClass('hidden');
+							    document.id('pop').addClass('hidden');
+							    document.id('tnichead').removeClass('hidden');
+							    document.id('tnic').removeClass('hidden');
+							  }
 							});
 						}
 					});

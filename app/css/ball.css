@@ -202,6 +202,12 @@ textarea#condition{height:180px}
     width:30px;
 }
 
+.tic {
+  height:21px;
+  padding:2px;
+  margin:1px 0px;
+}
+
 #addall {
 	background: url(all.gif);
 	border: 0;
@@ -372,6 +378,17 @@ div.match .underdog{
   position:relative;
   top:9px;
 }
+.pslide {
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+  border-radius: 2px;
+  width:100px;
+  height:6px;
+  margin:0 auto;
+  background-color:#41C6FF;
+  position:relative;
+  top:9px;
+}
 
 #pointsslider {
   text-align:left;
@@ -379,7 +396,7 @@ div.match .underdog{
   width:170px;
 }
 /*div.match .underdog*/ 
-.slider .knob {
+.slider .knob , .pslide .knob {
    -moz-border-radius: 6px;
   -webkit-border-radius: 6px;
   border-radius: 6px;

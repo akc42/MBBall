@@ -202,8 +202,13 @@ CREATE VIEW match_score AS
  SELECT m.cid, m.rid, m.aid, u.uid, 
         CASE
             WHEN p.uid IS NULL THEN 0
-            ELSE 1
-        END * r.value AS pscore, 
+            ELSE r.value + 
+	      CASE
+		WHEN p.pid = m.hid AND m.underdog > 0 THEN m.underdog
+		WHEN p.pid = m.aid AND m.underdog < 0 THEN -m.underdog
+		ELSE 0
+	      END
+        END AS pscore, 
         CASE
             WHEN o.uid IS NULL THEN 0
             ELSE 1
@@ -234,7 +239,7 @@ CREATE VIEW playoff_picks AS
 
 -- Score user makes in correctly guessing the playoffs
 CREATE VIEW playoff_score AS
-	SELECT u.cid,u.uid, count(p.uid) AS score, p.confid
+	SELECT u.cid,u.uid, sum(p.points) AS score, p.confid
 		FROM registration u
 		LEFT JOIN (playoff_picks p JOIN team_in_competition t ON p.cid = t.cid AND p.tid = t.tid AND t.made_playoff = 1) AS p
 			USING (cid,uid)
@@ -323,6 +328,10 @@ INSERT INTO settings (name,value) VALUES('emoticon_dir','./images/emoticons');--
 INSERT INTO settings (name,value) VALUES('emoticon_url','images/emoticons');--web based location of emoticons
 INSERT INTO settings (name,value) VALUES('template','./inc/template.inc'); -- page template location in filesystem
 INSERT INTO settings (name,value) VALUES('default_competition',0); -- cid of default competition 0 means we don't know what it is
+--settings used by admin to adjust scores
+INSERT INTO settings (name,value) VALUES('pointsmap','[1,2,4,6,8,12,16]'); -- map of slider position to output result
+INSERT INTO settings (name,value) VALUES('underdogmap','[0,1,2,4,6,8]'); --map of absolute slider positions to underdog points
+INSERT INTO settings (name,value) VALUES('playoffmap','[1,2,4,6,8]'); --map of playoff points slider position to points allocated
 -- Messages used by admin
 INSERT INTO settings (name,value) VALUES('msgdeletecomp','Deleting a Competition will delete all the Rounds and Matches associated with it. Do you wish to Proceed?');
 INSERT INTO settings (name,value) VALUES('msgregister','Click OK to register for the competition and agree to the condition');

@@ -26,14 +26,14 @@ $rid=$_GET['rid'];
 $aid=$_GET['aid'];
 
 $db->exec("BEGIN TRANSACTION");
-$m = $db->prepare("SELECT open FROM match WHERE cid = ? AND rid = ? AND aid = ? ");
+$m = $db->prepare("SELECT open,hid FROM match WHERE cid = ? AND rid = ? AND aid = ? ");
 $m->bindInt(1,$cid);
 $m->bindInt(2,$rid);
 $m->bindString(3,$aid);
-$open = $m->fetchValue();
+$row = $m->fetchRow();
 unset($m);
 
-if ($open) {
+if ($row) {
   $m = $db->prepare("DELETE FROM match WHERE cid = ? AND rid = ? AND aid = ? ");
   $m->bindInt(1,$cid);
   $m->bindInt(2,$rid);
@@ -41,7 +41,7 @@ if ($open) {
   $m->exec();
   unset($m);
 
-  if($open <> 0) {
+  if($row['open'] <> 0) {
     //Need to clear caches if match is open - doesn't matter if not
     $c = $db->prepare("UPDATE competition SET results_cache = NULL  WHERE cid = ?");
     $c->bindInt(1,$cid);
@@ -57,8 +57,11 @@ if ($open) {
   }
 
   $db->exec("COMMIT");
-
-  echo '{"cid":'.$cid.',"rid":'.$rid.', "hid":"'.$hid.'","aid":"'.$aid.'"}';
+  
+  if (is_null($row['hid']))
+     echo '{"cid":'.$cid.',"rid":'.$rid.',"aid":"'.$aid.'"}';
+  else
+    echo '{"cid":'.$cid.',"rid":'.$rid.', "hid":"'.$row['hid'].'","aid":"'.$aid.'"}';
 
 } else {
 ?><p>Match doesn't exist</p>

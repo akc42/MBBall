@@ -39,10 +39,13 @@ $messages['nomatchround'] = $s->fetchSetting('msgnomatchround');
 $messages['deleteround'] = $s->fetchSetting('msgdeleteround');
 $messages['approve'] = $s->fetchSetting('msgapprove');
 $messages['unregister'] = $s->fetchSetting('msgunregister');
+$pointsmap = $s->fetchSetting('pointsmap');
+$underdogmap = $s->fetchSetting('underdogmap');
+$playoffmap = $s->fetchSetting('playoffmap');
 unset($s);
 
 function head_content () {
-	global $messages
+	global $messages,$pointsmap,$underdogmap,$playoffmap;
 
 ?>	<title>Melinda's Backups Football Pool Administration</title>
 	<link rel="stylesheet" type="text/css" href="js/calendar/calendar.css"/>
@@ -69,9 +72,9 @@ function head_content () {
 
 var MBBmgr;
 window.addEvent('domready', function() {
-	MBBmgr = new MBBAdmin(
-						<?php if(isset($_GET['global'])) {echo 'true';} else {echo 'false';}?>,<?php if(isset($_GET['cid'])) {echo $_GET['cid'] ;}else{ echo '0';}?>,$('errormessage'),
-{
+  MBBmgr = new MBBAdmin(
+<?php if(isset($_GET['global'])) {echo 'true';} else {echo 'false';}?>,<?php if(isset($_GET['cid'])) {echo $_GET['cid'] ;}else{ echo '0';}?>,$('errormessage'),
+    {
 <?php 
 //TODO: Go through all the messages in mbbadmin and give them names to be added to the object here.  Read text from settings datatable
 	$donefirst = false;
@@ -81,8 +84,7 @@ window.addEvent('domready', function() {
 		echo "$msgid:'$message'";
 	}
 ?>
-}
-						);
+    },{points:<?php echo "$pointsmap";?>,underdog:<?php echo "$underdogmap";?>,playoff:<?php echo "$playoffmap";?>}	);
 });	
 
 	// -->

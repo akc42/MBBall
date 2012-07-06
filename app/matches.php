@@ -51,10 +51,10 @@ if($rid != 0 && $cid !=0) {
    </div>
    <div class="clear">
       <div class="ascore">
-	<input type="text" name="hscore" value="<?php echo $row['ascore'];?>"/>
+	<input type="text" name="ascore" value="<?php echo $row['ascore'];?>"/>
       </div>
       <div class="hscore">
-	<input type="text" name="Hscore" value="<?php echo $row['hscore'];?>"/>
+	<input type="text" name="hscore" value="<?php echo $row['hscore'];?>"/>
       </div>
       <div class="cscore">
 	<input type="text" name="cscore" value="<?php echo $row['combined_score'];?>" <?php if($_GET['ou'] != 'true') echo 'readonly="readonly"';?> />
