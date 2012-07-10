@@ -44,6 +44,12 @@ if ($row && !is_null($row['hid'])) {
 
 	$hid = $aid;
 	$aid = $row['hid'];
+	$m=$db->prepare("UPDATE match SET aid = hid, hid = aid WHERE cid = ? AND rid = ? AND aid = ?");
+	$m->bindInt(1,$cid);
+	$m->bindInt(2,$rid);
+	$m->bindString(3,$hid); //we have to select it before it has changed
+	$m->exec();
+	unset($m);
 	$db->exec("COMMIT");
 	echo '{"cid":'.$cid.',"rid":'.$rid.',"hid":"'.$hid.'","aid":"'.$aid.'"}';
 } else {
