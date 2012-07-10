@@ -189,7 +189,7 @@ $r->bindInt(1,$uid);
 $r->bindInt(2,$cid);
 if($row = $r->fetchRow()) {
 	$signedup = true;
-	if ($approval_required && $row['approved'] != 1 && $guest) {
+	if ($approval_required && $row['approved'] != 1 && $guest && !$admin) {
 		$registered = false;
 	} else {
 		$registered = true;
@@ -198,7 +198,7 @@ if($row = $r->fetchRow()) {
 	$signedup = false;
 	$registered = false;
 }
-$registration_allowed = ($registration_open && !$signedup && !$admin);
+$registration_allowed = ($registration_open && !$signedup);
 unset($r);
 if (isset($_GET['rid'])) {
 	$r = $db->prepare("SELECT * FROM round WHERE open = 1 AND cid = ? AND rid = ?");
