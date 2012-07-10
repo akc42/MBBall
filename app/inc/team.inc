@@ -40,6 +40,7 @@ while ($row=$t->FetchRow()) {
 		$pick['logo']=$row['logo'];
 		$pick['url']=$row['url'];
 		$pick['mp'] = ($row['made_playoff'] == 1 );
+		$pick['points'] = $row['points']; 
 		$teams[$row['confid']][$row['divid']][] = $pick;
 		$sizes[$row['confid']][$row['divid']]++;
 }

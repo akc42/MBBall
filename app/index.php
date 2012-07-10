@@ -372,24 +372,16 @@ function content() {
 			</tr>
 <?php
 } else {
-?>			<tr><td colspan="2"><div id="summary"><?php require_once ('./inc/summary.inc');?></div>
-<div class="timing"><?php $time_now = microtime(true); printf("With %d queries so far in %.3f secs",$db->getCounts(),$time_now - $time_head);?></div>
-</td></tr>
+?>			<tr><td colspan="2"><div id="summary"><?php require_once ('./inc/summary.inc');?></div></td></tr>
 <?php
 }
-?>			<tr><td colspan="2"><div id="picks"><?php require_once('./inc/picks.inc');?></div>
-<div class="timing"><?php $time_now = microtime(true); printf("With %d queries so far in %.3f secs",$db->getCounts(),$time_now - $time_head);?></div>
-</td></tr>
+?>			<tr><td colspan="2"><div id="picks"><?php require_once('./inc/picks.inc');?></div></td></tr>
 <?php
 if ($playoff_deadline != 0) {
-?>			<tr><td colspan="2"><div id="popicks"><?php require_once('./inc/playoff.inc');?></div>
-<div class="timing"><?php $time_now = microtime(true); printf("With %d queries so far in %.3f secs",$db->getCounts(),$time_now - $time_head);?></div>
-</td></tr>
+?>			<tr><td colspan="2"><div id="popicks"><?php require_once('./inc/playoff.inc');?></div></td></tr>
 <?php
 }
-?>			<tr><td colspan="2"><div id="tics"><?php require_once('./inc/tic.inc');?></div>
-<div class="timing"><?php $time_now = microtime(true); printf("With %d queries so far in %.3f secs",$db->getCounts(),$time_now - $time_head);?></div>
-</td></tr>
+?>			<tr><td colspan="2"><div id="tics"><?php require_once('./inc/tic.inc');?></div></td></tr>
 		</tbody>
 	</table>
 <?php

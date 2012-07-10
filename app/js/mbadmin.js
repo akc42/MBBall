@@ -138,6 +138,7 @@ var MBBAdmin = new Class({
 				this.round = new MBB.subPage(this,'round.php',$('round'),function(div) {
 					var answer;
 					var noopts;
+					var matchUpdateLocked = false;
 					$('userpick').empty();  //if round changes the user picks will need to change also, so just clear it out and let the user reload if he wants to
 					var setMatchEvents = function (div) {
 						var ou = $('ou');
@@ -157,8 +158,8 @@ var MBBAdmin = new Class({
 							return true;
 						}});
 
-						div.getElements('input[type=text]').append(div.getElements('input[type=checkbox]')).append(div.getElements('textarea')).addEvent('change', function(e) {
-						  e.stop();
+						div.getElements('input[type=text]').append(div.getElements('input[type=checkbox]')).append(div.getElements('textarea')).append(div.getElements('input[name=mtime]')).addEvent('change', function(e) {
+						  if(e) e.stop();
 						  var validated = true;
 							if(validated && (this.name == 'cscore'
 									|| this.name == 'ascore' 
@@ -182,7 +183,7 @@ var MBBAdmin = new Class({
 								}
 
 							}
-							if(validated & this.name =='comment') {
+							if(validated && this.name =='comment') {
 								// with emoticons it is possible for the change event on this element to fire twice
 								// this check prevents a round trip to the server when it is not necessary
 								var oldcontent = this.retrieve('old');
@@ -234,16 +235,25 @@ var MBBAdmin = new Class({
 						});
 						div.getElement('.del').addEvent('click',function(e) {
 						  e.stop(); 
-							if(confirm(messages.deletematch)) {
+						  matchUpdateLocked = true;
+						  var referReq = new MBB.req('matchrefers.php',function(response) {
+							if(response.referers == 0 || confirm(messages.deletematch)) {
 								var deleteReq = new MBB.req('deletematch.php',function(response) {
+									matchUpdateLocked = false;
 									div.dispose();
-									$('T'+response.aid).removeClass('inmatch');
-									var hid = $('T'+response.hid);
-									if(hid) hid.removeClass('inmatch'); //only if not null
+									if (response.cid != 0) { //looks like we actually managed to delete it
+									  $('T'+response.aid).removeClass('inmatch');
+									  var hid = $('T'+response.hid);
+									  if(hid) hid.removeClass('inmatch'); //only if not null
+									}
 									$('userpick').empty();
 								});
 								deleteReq.get(Object.merge(params,{'aid':div.getElement('input[name=aid]').value}));
+							} else { 
+							  matchUpdateLocked = false;
 							}
+						  });
+						  referReq.get(Object.merge(params,{'aid':div.getElement('input[name=aid]').value}));
 						});
 						var underdog = div.getElement('input[name=underdog]');
 						var AwayUnder = false;	//set true if we need to negate values (because its the array side that is the underdog
@@ -307,7 +317,7 @@ var MBBAdmin = new Class({
 								answer = response.opid;
 								$('answer').value = answer;
 							});
-					    	changeAnsReq.get(Object.merge(params,{'opid':this.value}));
+							changeAnsReq.get(Object.merge(params,{'opid':this.value}));
 						}
 					};
 					var changeAnswer = function(e) {
@@ -405,7 +415,12 @@ var MBBAdmin = new Class({
 									//Should not be necessary to update page
 									$('userpick').empty(); //but user picks may have changed
 								});
-								updateReq.post($('roundform'));
+								var clearCache = div.getElement('input[name=cache]');
+								if(this.name == 'open')
+								  clearCache.value = true;
+								else
+								  clearCache.value = div.getElement('input[name=open]').checked;
+								updateReq.post(document.id('roundform'));
 							}
 						});
 						var points = div.getElement('input[name=value]');
@@ -536,12 +551,16 @@ var MBBAdmin = new Class({
 					this.teams = new MBB.subPage(this,'teams.php',$('teams'),function (div) {
 						if (params.cid != 0) {
 							var lock = $('lock');
+							var teamUpdateLocked = false;
 							var tnicClicked;
 							var teamClicked = function (e) {
 								e.stop();
 								var team = this;
 								if(!lock.checked) {
+								    if(!teamUpdateLocked) {
+									teamUpdateLocked = true;
 									var remTiC = new MBB.req('remtic.php', function (response) {
+									  if (response.OK) {
 										var div = new Element('div',{'id':'S'+response.tid,'class':'tic'});
 										var span = new Element('span',{
 											'class':'tid',
@@ -558,10 +577,16 @@ var MBBAdmin = new Class({
 											$('tnic').adopt(div);
 										} 
 										team.getParent().dispose();
-										document.id('P'+response.tid).dispose();
+										if(document.id('P'+response.tid))document.id('P'+response.tid).dispose(); //Get rid of playoff stuff if its there
+									  } else {
+									    alert(messages.constraint);
+									  } 
+									  teamUpdateLocked = false;
 									});
-									remTiC.get({'cid':params.cid,'tid':team.get('text')});	
+									remTiC.get({'cid':params.cid,'tid':team.get('text')});
+								    }
 								} else {
+								  if(!matchUpdateLocked) { //we can only do something when we are not doing another
 									//only do something if not already in a match
 									if(!this.getParent().hasClass('inmatch')) {
 										var teamName = this.get('text');
@@ -570,10 +595,14 @@ var MBBAdmin = new Class({
 											if(hidSpan.value == '') {
 												// found a match so we can add this team to it
 												var addhidReq = new MBB.req('addhid.php', function(response) {
+												  if(response.hid != '---') {
 													hidSpan.value = teamName;
 													match.getElement('div.hid').getFirst().set('text',teamName);
 													team.getParent().addClass('inmatch');
+												  }
+												  matchUpdateLocked = false; //release for another click
 												});
+												matchUpdateLocked = true;  //Can't do two of these in parallel, so lock out
 												addhidReq.get(Object.merge(params,{
 													'aid':match.getElement('input[name=aid]').value,
 													'hid':teamName}));
@@ -588,10 +617,13 @@ var MBBAdmin = new Class({
 												if (!$('ou').checked)  match.getElement('input[name=cscore]').readOnly=true;
 												setMatchEvents(match);
 												team.getParent().addClass('inmatch');
+												matchUpdateLocked = false; //Release
 											});
+											matchupdateLocked = true; //prevent any other clicks doing something whilst be build this match
 											matchPage.loadPage(Object.merge(params,{'aid':teamName}));
 										}
 									}
+								  }
 								}
 							};
 							var changeMpStatus = function(e) {
@@ -612,10 +644,12 @@ var MBBAdmin = new Class({
 								return div;
 							};
 							var makePlayOffSlide = function(slider,knob,initial,team) {
+							  var stepValue = maps.playoff.indexOf(initial.toInt()); //map back from points to step
+							  if (stepValue < 0) stepValue = 0;
 							  var poff = new Slider(slider,knob,{
 							    minstep:1,
 							    maxstep:5,
-							    initial:initial,
+							    initial:stepValue+1,
 							    minortick:1,
 							    onTick:function(step) {
 							      knob.set("text",maps.playoff[step-1]);
@@ -628,13 +662,15 @@ var MBBAdmin = new Class({
 							    }
 							  });
 							};
-							var makePlayoffDiv= function(team) {
+							var makePlayoffDiv= function(team,where,el) {
 							  var div = new Element('div',{'id':'P'+team,'class':'tic'});
 							  var slider = new Element('div',{'class':'pslide'});
 							  var knob = new Element('div',{'class':'knob','text':'1'}).inject(slider);
 							  slider.inject(div);
-							  makePlayOffSlide(slider,knob,1);
-							  return div;
+							  if(where == 'b') div.inject(el,'before');
+							  if(where == 'a') el.adopt(div);
+							  makePlayOffSlide(slider,knob,1,team);
+							  return;
 							};
 							//For all teams currently in the compeition we need to create their sliders
 							document.id('pop').getElements('div.tic').each(function(team){
@@ -646,27 +682,30 @@ var MBBAdmin = new Class({
 							tnicClicked = function(e) {
 								e.stop();
 								if(!lock.checked) {
+								  if(!teamUpdateLocked) {
+								    teamUpdateLocked = true;
 									var team=this;
 									var addTiC = new MBB.req('addtic.php', function (response) {
 										var div = makeTeam(response.tid);
-										var pdiv = makePlayoffDiv(response.tid);
 										//go down tics looking for first div with team name greater than
 										//ours and inject before it
 										if($$('#tic div').every(function(item,i) {
 											var ateam = item.getElement('span').get('text') 
 											if( ateam > response.tid) {
 												div.inject(item,'before');
-												pdiv.inject(document.id('P'+ateam),'before');
+												makePlayoffDiv(response.tid,'b',document.id('P'+ateam));
 												return false;
 											}
 											return true;
 										})) {
 											$('tic').adopt(div);
-											document.id('pop').adopt(pdiv);
+											makePlayoffDiv(response.tid,'a',document.id('pop'));
 										} 
 										team.getParent().dispose();
+										teamUpdateLocked = false;
 									});
 									addTiC.get({'cid':params.cid,'tid':team.get('text')});
+								  }
 								} else {
 									$('lock_cell').highlight('#F00');
 								}
@@ -677,15 +716,21 @@ var MBBAdmin = new Class({
 							$('addall').addEvent('click',function(e) {
 								e.stop();
 								if(!lock.checked) {
+								  if(!teamUpdateLocked) {
 									var addAll = new MBB.req('addalltic.php', function (response) {
+										teamUpdateLocked = false;
 										var teams = response.teams;
 										$('tnic').empty();
 										var tic = $('tic').empty();
+										var pop = document.id('pop').empty(); //make empty because all teams will be returned
 										teams.each(function(team,i) {	
 											tic.adopt(makeTeam(team));
+											makePlayoffDiv(team,'a',pop);
 										});
 									});
+									teamUpdateLocked = true;
 									addAll.get({'cid':params.cid});
+								  }
 								} else {
 									$('lock_cell').highlight('#F00');
 								}

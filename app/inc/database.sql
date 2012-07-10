@@ -48,11 +48,11 @@ CREATE TABLE div_winner_pick (
     uid integer NOT NULL, --User ID
     confid character(3) NOT NULL REFERENCES conference(confid) ON UPDATE CASCADE ON DELETE CASCADE, --Conference ID
     divid character(1) NOT NULL REFERENCES division(divid) ON UPDATE CASCADE ON DELETE CASCADE, --Division ID
-    tid character(3) NOT NULL, --Team who will win division
+    tid varchar(3) NOT NULL, --Team who will win division
     submit_time bigint DEFAULT (strftime('%s','now')) NOT NULL, --Time of submission
     PRIMARY KEY (cid,uid,confid,divid),
     FOREIGN KEY (cid,uid) REFERENCES registration(cid,uid) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY (cid,tid) REFERENCES team_in_competition(cid,tid) ON UPDATE CASCADE ON DELETE CASCADE    
+    FOREIGN KEY (cid,tid) REFERENCES team_in_competition(cid,tid)    
 );
 
 --Football Conference Division
@@ -65,8 +65,8 @@ CREATE TABLE division (
 CREATE TABLE match (
     cid integer NOT NULL, -- Competition ID
     rid integer NOT NULL, --Round ID
-    aid character(3) NOT NULL, -- Away Team ID
-    hid character(3) , --Home Team ID
+    aid varchar(3) NOT NULL, -- Away Team ID
+    hid varchar(3) , --Home Team ID
     comment text, --Administrators Comment for the Match
     ascore integer, --Away Team Score
     hscore integer, --Home Team Score
@@ -76,8 +76,8 @@ CREATE TABLE match (
     underdog integer DEFAULT 0 NOT NULL,  -- If 0 then not an underdog game, else if -ve additional points for away team, +ve additional points for home team
     PRIMARY KEY (cid,rid,aid),
     FOREIGN KEY (cid,rid) REFERENCES round(cid,rid) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY (cid,aid) REFERENCES team_in_competition(cid,tid) ON UPDATE CASCADE ON DELETE CASCADE ,   
-    FOREIGN KEY (cid,hid) REFERENCES team_in_competition(cid,tid) ON UPDATE CASCADE ON DELETE SET NULL    
+    FOREIGN KEY (cid,aid) REFERENCES team_in_competition(cid,tid),
+    FOREIGN KEY (cid,hid) REFERENCES team_in_competition(cid,tid)    
 );
 
 -- Holds one possible answer to the round question
@@ -118,16 +118,15 @@ CREATE TABLE pick (
     cid integer NOT NULL, -- Competition ID
     uid integer NOT NULL, --User ID.scha
     rid integer NOT NULL, --Round ID
-    aid character(3) NOT NULL, -- Away Team ID
+    aid varchar(3) NOT NULL, -- Away Team ID
     comment text, --Comment on the pick and why it was chosen
-    pid character(3), --ID of Team Picked to Win (NULL for Draw)
+    pid varchar(3), --ID of Team Picked to Win (NULL for Draw)
     over_selected boolean, --true (=1) if over score is selected
     submit_time bigint DEFAULT (strftime('%s','now')) NOT NULL, --Time of submission
     PRIMARY KEY (cid,uid,rid,aid),
-    FOREIGN KEY (cid,rid) REFERENCES round(cid,rid) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (cid,rid,aid) REFERENCES match(cid,rid,aid) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (cid,uid) REFERENCES registration(cid,uid) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY (cid,aid) REFERENCES team_in_competition(cid,tid) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY (cid,pid) REFERENCES team_in_competition(cid,tid) ON UPDATE CASCADE ON DELETE SET NULL
+    FOREIGN KEY (cid,pid) REFERENCES team_in_competition(cid,tid) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 --Participant registered for particular competition
@@ -164,7 +163,7 @@ CREATE TABLE settings (
 );
 
 CREATE TABLE team (
-    tid character(3) PRIMARY KEY,
+    tid varchar(3) PRIMARY KEY,
     name character varying(50) NOT NULL,
     logo character varying(80) DEFAULT NULL,
     url character varying(100) DEFAULT NULL, 
@@ -173,8 +172,8 @@ CREATE TABLE team (
 );
 
 CREATE TABLE team_in_competition (
-    cid integer NOT NULL REFERENCES competition(cid) ON UPDATE CASCADE ON DELETE CASCADE, -- Competition ID
-    tid character(3) NOT NULL REFERENCES team(tid) ON UPDATE CASCADE ON DELETE CASCADE, --Pick
+    cid integer NOT NULL REFERENCES competition(cid) ON UPDATE CASCADE ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED, -- Competition ID
+    tid varchar(3) NOT NULL REFERENCES team(tid) ON UPDATE CASCADE ON DELETE CASCADE, --TeamID
     made_playoff boolean DEFAULT 0 NOT NULL, --True if team made playoffs
     points integer DEFAULT 1 NOT NULL, -- points to allocate if successfully chose team to make playoff
     PRIMARY KEY (cid,tid)
@@ -186,11 +185,11 @@ CREATE TABLE wildcard_pick (
     uid integer NOT NULL, --User ID
     confid character(3) NOT NULL REFERENCES conference(confid) ON UPDATE CASCADE ON DELETE CASCADE, --Conference ID
     opid smallint DEFAULT 1 NOT NULL, -- Either 1 or 2 depending on which wildcard pick for the conference it is
-    tid character(3) NOT NULL, --Pick
+    tid varchar(3) NOT NULL, --Pick
     submit_time bigint DEFAULT (strftime('%s','now')) NOT NULL, --Time of Submission
     PRIMARY KEY(cid,uid,confid,opid)
     FOREIGN KEY (cid,uid) REFERENCES registration(cid,uid) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY (cid,tid) REFERENCES team_in_competition(cid,tid) ON UPDATE CASCADE ON DELETE CASCADE
+    FOREIGN KEY (cid,tid) REFERENCES team_in_competition(cid,tid)
 );
 
 -- END OF TABLES -------------------------------------------------------------------------------------------------
@@ -239,7 +238,7 @@ CREATE VIEW playoff_picks AS
 
 -- Score user makes in correctly guessing the playoffs
 CREATE VIEW playoff_score AS
-	SELECT u.cid,u.uid, sum(p.points) AS score, p.confid
+	SELECT u.cid,u.uid, sum(CASE WHEN p.points IS NULL THEN 0 ELSE p.points END) AS score, p.confid
 		FROM registration u
 		LEFT JOIN (playoff_picks p JOIN team_in_competition t ON p.cid = t.cid AND p.tid = t.tid AND t.made_playoff = 1) AS p
 			USING (cid,uid)
@@ -287,7 +286,7 @@ INSERT INTO division (divid, name)  VALUES ('E','East');
 INSERT INTO division (divid, name)  VALUES ('S','South');
 INSERT INTO division (divid, name)  VALUES ('W','West');
 
-INSERT INTO team (tid, name, logo,  confid, divid) VALUES('NE ','New England Patriots','NE_logo-50x50.gif','AFC','E');
+INSERT INTO team (tid, name, logo,  confid, divid) VALUES('NE','New England Patriots','NE_logo-50x50.gif','AFC','E');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('NYG','New York Giants','NYG_logo-50x50.gif','NFC','E');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('TEN','Tennessee Titans','TEN_logo-50x50.gif','AFC','S');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('IND','Indianapolis Colts','IND_logo-50x50.gif','AFC','S');
@@ -298,27 +297,27 @@ INSERT INTO team (tid, name, logo,  confid, divid) VALUES('ATL','Atlanta Falcons
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('CIN','Cincinnati Bengals','CIN_logo-50x50.gif','AFC','N');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('MIA','Miami Dolphins','MIA_logo-50x50.gif','AFC','E');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('CAR','Carolina Panthers','CAR_logo-50x50.gif','NFC','S');
-INSERT INTO team (tid, name, logo,  confid, divid) VALUES('TB ','Tampa Bay Buccaneers','TB_logo-50x50.gif','NFC','S');
+INSERT INTO team (tid, name, logo,  confid, divid) VALUES('TB','Tampa Bay Buccaneers','TB_logo-50x50.gif','NFC','S');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('BUF','Buffalo Bills','BUF_logo-50x50.gif','AFC','E');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('PHI','Philadelphia Eagles','PHI_logo-50x50.gif','NFC','E');
-INSERT INTO team (tid, name, logo,  confid, divid) VALUES('NO ','New Orleans Saints','NO_logo-50x50.gif','NFC','S');
+INSERT INTO team (tid, name, logo,  confid, divid) VALUES('NO','New Orleans Saints','NO_logo-50x50.gif','NFC','S');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('CHI','Chicago','CHI_logo-50x50.gif','NFC','N');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('JAC','Jacksonville Jaguars','JAC_logo-50x50.gif','AFC','S');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('HOU','Houston Texans','HOU_logo-50x50.gif','AFC','S');
-INSERT INTO team (tid, name, logo,  confid, divid) VALUES('SF ','San Francisco 49ers','SF_logo-50x50.gif','NFC','W');
+INSERT INTO team (tid, name, logo,  confid, divid) VALUES('SF','San Francisco 49ers','SF_logo-50x50.gif','NFC','W');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('CLE','Cleveland Browns','CLE_logo-50x50.gif','AFC','N');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('PIT','Pittsburgh Steelers','PIT_logo-50x50.gif','AFC','N');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('BAL','Baltimore Ravens','BAL_logo-50x50.gif','AFC','N');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('DET','Detroit Lions','DET_logo-50x50.gif','NFC','N');
-INSERT INTO team (tid, name, logo,  confid, divid) VALUES('GB ','Green Bay Packers','GB_logo-50x50.gif','NFC','N');
-INSERT INTO team (tid, name, logo,  confid, divid) VALUES('SD ','San Diego Chargers','SD_logo-50x50.gif','AFC','W');
+INSERT INTO team (tid, name, logo,  confid, divid) VALUES('GB','Green Bay Packers','GB_logo-50x50.gif','NFC','N');
+INSERT INTO team (tid, name, logo,  confid, divid) VALUES('SD','San Diego Chargers','SD_logo-50x50.gif','AFC','W');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('OAK','Oakland Raiders','OAK_logo-50x50.gif','AFC','W');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('MIN','Minnesota Vikings','MIN_logo-50x50.gif','NFC','N');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('DEN','Denver Broncos','DEN_logo-50x50.gif','AFC','W');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('STL','St. Louis Rams','STL_logo-50x50.gif','NFC','W');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('NYJ','New York Jets','NYJ_logo-50x50.gif','AFC','E');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('ARI','Arizona Cardinals','ARI_logo-50x50.gif','NFC','W');
-INSERT INTO team (tid, name, logo,  confid, divid) VALUES('KC ','Kansas City Chiefs','KC_logo-50x50.gif','AFC','W');
+INSERT INTO team (tid, name, logo,  confid, divid) VALUES('KC','Kansas City Chiefs','KC_logo-50x50.gif','AFC','W');
 
 INSERT INTO settings (name,value) VALUES('version',12); --version of this configuration
 INSERT INTO settings (name,value) VALUES('max_round_display',18); -- max rounds to include in results table
@@ -341,12 +340,13 @@ INSERT INTO settings (name,value) VALUES('msgnoquestion','ERROR - your picks wer
 INSERT INTO settings (name,value) VALUES('msgdeadline','Do you mean to set the deadline before now?');
 INSERT INTO settings (name,value) VALUES('msgmatchtime','Do you mean to set the matchtime before now?');
 INSERT INTO settings (name,value) VALUES('msgnomatchdate','Are you sure you want to open this match without a match date set?');
-INSERT INTO settings (name,value) VALUES('msgdeletematch','This will delete the match.  Are you sure?');
+INSERT INTO settings (name,value) VALUES('msgdeletematch','This match has picks refering to it. Deleting the match will also delete the picks.  Do you still wish to proceed?');
 INSERT INTO settings (name,value) VALUES('msgquesdead','Do you mean to set the question deadline before now?');
 INSERT INTO settings (name,value) VALUES('msgnomatchround','There are no open matches, are you sure you wish to open the round?');
-INSERT INTO settings (name,value) VALUES('msgdeleteround','Deleting a Round will delete all the Matches associated with it. Do you wish to Proceed?');
+INSERT INTO settings (name,value) VALUES('msgdeleteround','Deleting a Round will delete all the Matches and Picks associated with it. Do you wish to Proceed?');
 INSERT INTO settings (name,value) VALUES('msgapprove','You are changing the approval status of a Baby Backup for this Competition. Are you sure you want to do this?');
 INSERT INTO settings (name,value) VALUES('msgunregister','This will Un-Register this User from this Competition. Do you wish to Proceed?');
+INSERT INTO settings (name,value) VALUES('msgconstraint','Cannot remove team from competition, it is used in picks or matches');
 -- END OF STANDARD DATA ----------------------------------------------------------
 -- INDEXES --------------------------------------------------------------
 
@@ -384,6 +384,8 @@ CREATE INDEX registration_cid_idx ON registration(cid);
 -- THIS VERSION Just shows one example commented out 
 
 -- UPDATE settings SET value = '../static/template/template.inc' WHERE name = 'template' ; -- page template location in filesystem
+-- UPDATE settings SET value = '../static/images/emoticons' WHERE name = 'emoticon_dir' ; --filesystem location of emoticons
+-- UPDATE settings SET value = '/static/images/emoticons' wHERE name = 'emoticon_url'; --web based location of emoticons
 
 COMMIT;
 -- set it all up as Write Ahead Log for max performance and minimum contention with other users.

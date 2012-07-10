@@ -39,36 +39,32 @@ if ($noMatch != 0) {
 
   $m = $db->prepare($sql);
   $m->bindInt(1,isset($_POST['open'])?1:0);
-  if(isset($_POST['hscore'])) {
+  if($_POST['hscore'] != '') {
     $m->bindInt(2,$_POST['hscore']);
   }else {
     $m->bindNull(2);
   }
-  if(isset($_POST['ascore'])) {
+  if($_POST['ascore'] != '') {
     $m->bindInt(3,$_POST['ascore']);
   }else {
     $m->bindNull(3);
   }
-  if(isset($_POST['cscore'])) {
+  if($_POST['cscore'] != '') {
     $m->bindInt(4,$_POST['cscore']);
   }else {
     $m->bindNull(4);
   }
-  if(isset($_POST['mtime']) && $_POST['mtime'] != 0) {
+  if($_POST['mtime'] != 0) {
     $m->bindInt(5,$_POST['mtime']);
   }else {
     $m->bindNull(5);
   }
-  if(isset($_POST['comment'])) {
+  if($_POST['comment'] != '') {
     $m->bindString(6,$_POST['comment']);
   }else {
     $m->bindNull(6);
   }
-  if(isset($_POST['underdog'])) {
-    $m->bindInt(7,$_POST['underdog']);
-  } else {
-    $m->bindInt(7,0);
-  }
+  $m->bindInt(7,$_POST['underdog']);
   $m->bindInt(8,$cid);
   $m->bindInt(9,$rid);
   $m->bindString(10,$aid);

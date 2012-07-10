@@ -20,8 +20,9 @@
 */
 require_once('./inc/db.inc');
 if(!(isset($_POST['cid']) && isset($_POST['rid']) && isset($_POST['rname'])
-	&& isset($_POST['deadline']) && isset($_POST['value']) )) forbidden();
-
+	&& isset($_POST['deadline']) && isset($_POST['value']) && isset($_POST['cache']))) forbidden();
+$cid = $_POST['cid'];
+$rid = $_POST['rid'];
 $db->exec("BEGIN TRANSACTION");
 
 $sql = "UPDATE round SET name = ?, value = ?, deadline = ?, open = ?, ou_round = ?, valid_question = ?,answer = ?, ";
@@ -32,25 +33,21 @@ $r->bindInt(2,$_POST['value']);
 $r->bindInt(3,$_POST['deadline']);
 $r->bindInt(4,isset($_POST['open'])?1:0);
 $r->bindInt(5,isset($_POST['ou'])?1:0);
-if (isset($_POST['validquestion'])) {
-	$r->bindInt(7,1);
-	if(isset($_POST['answer'])) {
-		$r->bindInt(8,$_POST['answer']);
-	} else {
-		$r->bindNull(8);
-	}
+$r->bindInt(6,isset($_POST['validquestion'])?1:0);
+
+if(isset($_POST['answer']) && $_POST['answer'] != '') {
+  $r->bindInt(7,$_POST['answer']);
 } else {
-	$r->bindInt(7,0);
-	$r->bindNull(8);
+ $r->bindNull(7);
 }
-$r->bindString(9,isset($_POST['question'])?$_POST['question']:'');
-$r->bindString(10,isset($_POST['bonuscomment'])?$_POST['bonuscomment']:'');
-$r->bindInt(11,$cid);
-$r->bindInt(12,$rid);
+
+$r->bindString(8,isset($_POST['question'])?$_POST['question']:'');
+$r->bindString(9,isset($_POST['bonuscomment'])?$_POST['bonuscomment']:'');
+$r->bindInt(10,$cid);
+$r->bindInt(11,$rid);
 $r->exec();
 unset($r);
-
-if(isset($_POST['open'])) {
+if($_POST['cache'] == 'true') {
   //Only need to break cache if this is an open round
   $c = $db->prepare("UPDATE competition SET results_cache = NULL  WHERE cid = ?");
   $c->bindInt(1,$cid);
@@ -61,5 +58,5 @@ if(isset($_POST['open'])) {
 
 $db->exec("COMMIT");
 
-echo '{"cid":'.$_POST['cid'].',"rid":'.$_POST['rid'].'}';
+echo '{"cid":'.$cid.',"rid":'.$rid.'}';
 ?>

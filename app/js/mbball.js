@@ -130,7 +130,7 @@ MBB = function() {
 		    			this.fireEvent('change',e);
 		    		};
 		    		var key = this.get('alt');
-		    		pageTracker._trackPageview('/football/event/emoticon-click/'+key.substr(1));
+				_gaq.push(['_trackPageview','/football/event/emoticon-click/'+key.substr(1)]);
 		    		that.currentFocus.value += key;
 		    		that.currentFocus.focus();
 		    		that.currentFocus.addEvent('blur',doBlur);

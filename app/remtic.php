@@ -24,11 +24,25 @@ if(!(isset($_GET['cid'])  && isset($_GET['tid']))) forbidden();
 $cid=$_GET['cid'];
 $tid=$_GET['tid'];
 
-$t = $db->prepare("DELETE FROM team_in_competition WHERE cid = ? AND tid = ?");
-$t->bindInt(1,$cid);
-$t->bindString(2,$tid);
-$t->exec();
-unset($t);
+$SQL = "SELECT COUNT(*) FROM (SELECT t.tid FROM team_in_competition t JOIN playoff_picks USING (cid,tid)";
+$SQL .= " WHERE t.cid = ? AND t.tid = ? UNION ALL SELECT t.tid FROM team_in_competition t";
+$SQL .= " JOIN match m ON (t.tid = m.aid OR t.tid = m.hid) WHERE t.cid = ? AND t.tid = ?)";
+$c = $db->prepare($SQL);  //Counts how many records reference the one we want to delete
+$c->bindInt(1,$cid);
+$c->bindString(2,$tid);
+$c->bindInt(3,$cid);
+$c->bindString(4,$cid);
+$references = $c->fetchValue();
+unset($c);
+if($references == 0) {
 
-echo '{"cid":'.$cid.',"tid":"'.$tid.'"}';
+  $t = $db->prepare("DELETE FROM team_in_competition WHERE cid = ? AND tid = ?");
+  $t->bindInt(1,$cid);
+  $t->bindString(2,$tid);
+  $t->exec();
+  echo '{"cid":'.$cid.',"tid":"'.$tid.'","OK":true }';
+  unset($t);
+} else {
+  echo '{"cid":'.$cid.',"tid":"'.$tid.'","OK":false }';
+}
 ?>

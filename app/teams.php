@@ -25,12 +25,12 @@ $cid = $_GET['cid'];
 $rid = $_GET['rid'];
 
 if( $cid !=0) {
-	$t = $db->prepare("SELECT COUNT(*) FROM team_in_competition WHERE cid = ?");
+	$t = $db->prepare(" SELECT COUNT(*) FROM team t LEFT JOIN team_in_competition tic ON t.tid = tic.tid AND tic.cid = ? WHERE tic.tid IS NULL");
 	$t->bindInt(1,$cid);
 	if($t->fetchValue() > 0) {
-		$ticexists = true;
+		$tnicleft = true;
 	} else {
-		$ticexists = false;
+		$tnicleft = false;
 	}
 	unset($t);
 ?><table>
@@ -38,8 +38,8 @@ if( $cid !=0) {
 	<thead>
 		<tr>
 			<th class="team">TiC</th>
-			<th id="pophead" class="<?php echo ($ticexists)?"team":"team hidden";?>">PO Value</th>
-			<th id="tnichead" class="<?php echo ($ticexists)?"team hidden":"hidden";?>">Teams</th>
+			<th id="pophead" class="<?php echo ($tnicleft)?"team hidden":"team";?>">PO Value</th>
+			<th id="tnichead" class="<?php echo ($tnicleft)?"team":"team hidden";?>">Teams</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -65,14 +65,14 @@ if($row['mp'] == 1) echo 'checked="checked"';?> />
 	}
 	unset($t);
 ?>			</td>
-			<td id="pop" <?php if (!$ticexists) echo 'class="hidden"';?>>
+			<td id="pop" <?php if ($tnicleft) echo 'class="hidden"';?>>
 <?php
 	foreach($points as $point) {
 ?>	<div id="<?php echo 'P'.$point['tid'];?>" class="tic"><div class="pslide"><div class="knob"><?php echo $point['points'];?></div></div></div>
 <?php
 	}
 ?>			</td>
-			<td id="tnic" <?php if ($ticexists) echo 'class="hidden"';?>>
+			<td id="tnic" <?php if (!$tnicleft) echo 'class="hidden"';?>>
 <?php
 	$sql = "SELECT t.tid AS tid FROM team t EXCEPT SELECT c.tid AS tid FROM team_in_competition c WHERE c.cid = ? ORDER BY tid";
 	$t = $db->prepare($sql);
@@ -88,7 +88,7 @@ if($row['mp'] == 1) echo 'checked="checked"';?> />
 		</tr>
 		<tr>
 			<td>
-				<label id="lock_cell"><input id="lock" type="checkbox" <?php if($ticexists) echo 'checked="checked"';?> />Lock</label>
+				<label id="lock_cell"><input id="lock" type="checkbox" <?php if(!$tnicleft) echo 'checked="checked"';?> />Lock</label>
 			</td>
 			<td><div id="addall"></div></td>
 		</tr>

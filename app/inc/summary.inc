@@ -18,11 +18,12 @@
     along with MBBall (file COPYING.txt).  If not, see <http://www.gnu.org/licenses/>.
 
 */
-
+$usedCache = false;
 if($rid == MBBALL_MAX_RID) {
   if(!is_null($competitionCache) && ( MBBALL_CACHE_AGE == 0 || (($SERVER['REQUEST_TIME'] - $competitionCacheDate) < MBBALL_CACHE_AGE))) {
     //We have a valid cache so use it
     $summary = unserialize($competitionCache);
+    $usedCache = true;
   }
   unset($c);
 }
@@ -54,13 +55,15 @@ if(!isset($summary)) {
     $r->bindInt(1,$cid);
     $r->bindInt(2,$rid);
   } else {
-    $sql = "SELECT 0 As score,u.uid AS uid, u.name AS name, 0 AS pscore, 0 AS rscore, 0 AS total";
+    $sql = "SELECT 0 As score,u.uid AS uid, u.name AS name, 0 AS pscore, 0 AS rscore, 0 AS tscore";
     $sql .= " FROM participant u JOIN registration r USING (uid) WHERE cid = ? ORDER BY u.name COLLATE NOCASE";
     $r = $db->prepare($sql);
     $r->bindInt(1,$cid);
   }
   $lastuid = 0;
   $first_user = true;
+  $summary['round'] = Array();
+  $summary['user'] = Array();
   while ($row = $r->fetchRow()) {
     if($row['uid'] <> $lastuid) {
       //This is the first time with new user
@@ -87,7 +90,7 @@ if(!isset($summary)) {
       $summary['round'][] = $round;
     }
   }
-  $summary['user'][] = $user; //need to save the last user
+  if(isset($user)) $summary['user'][] = $user; //need to save the last user (provided we have had at least one user)
   unset($user);
   unset($r);
   if($rid == MBBALL_MAX_RID) {
@@ -101,7 +104,7 @@ if(!isset($summary)) {
 }
 
 ?><table>
-	<caption>Overall Results</caption>
+	<caption>Overall Results<?php if(!$usedCache) echo '<span class="without_cache">&nbsp;</span>';?></caption>
 	<thead>
 		<tr><th class="user_name">Name</th>
 <?php

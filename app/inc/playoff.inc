@@ -75,7 +75,7 @@ while(!$alldone){
 		foreach($divs as $divid => $division) {
 			if(isset($teams[$confid][$divid])) {
 				foreach($teams[$confid][$divid] as $team) {
-?>			<th class="tid"><?php if($team['mp']) {echo tick();}echo $team['tid'];?></th>
+?>			<th class="tid"><div style="position:relative;"><?php if($team['mp']) {echo tick();}echo $team['tid']; if($team['points'] <> 1) echo '<div class="xtra">'.($team['points']).'</div>';?></div></th>
 <?php
 				}
 			} else {
@@ -105,8 +105,14 @@ while(!$alldone){
     		if(isset($teams[$confid][$divid])) {
 			    foreach($teams[$confid][$divid] as $team) {
 				    $correct = ($team['mp'] && isset($playoff_selections[$team['tid']]));
-    ?>				<td <?php if($correct) {echo 'class="tid win"';}else{ echo 'class="tid"';}?>>
-					    <?php if(isset($playoff_selections[$team['tid']])) echo '<img src="images/sel.gif" alt="'.$team['tid'].' selected"/>';if($correct) tick();?></td>
+    ?>				<td <?php if($correct) {echo 'class="tid win"';}else{ echo 'class="tid"';}?>><div style="position:relative;">
+					    <?php 
+			      if(isset($playoff_selections[$team['tid']])) echo '<img src="images/sel.gif" alt="'.$team['tid'].' selected"/>';
+			      if($correct) { 
+				tick(); 
+				if ($team['points'] <> 1) echo '<div class="xtra">'.$team['points'].'</div>';
+			      }
+				?></div></td>
 	    <?php
 			    }
     		} else {

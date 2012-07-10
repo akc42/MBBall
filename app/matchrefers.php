@@ -1,6 +1,6 @@
 <?php
 /*
- 	Copyright (c) 2008-2012 Alan Chandler
+ 	Copyright (c) 2012 Alan Chandler
     This file is part of MBBall, an American Football Results Picking
     Competition Management software suite.
 
@@ -19,30 +19,17 @@
 
 */
 require_once('./inc/db.inc');
-if(!(isset($_POST['cid']))) forbidden();
+if(!(isset($_GET['cid']) && isset($_GET['rid']) && isset($_GET['aid']) )) forbidden();
 
-$cid=$_POST['cid'];
-$name=$_POST['name'];
-$email=$_POST['email'];
-$bb=$_POST['bb'];
+$cid=$_GET['cid'];
+$rid=$_GET['rid'];
+$aid=$_GET['aid'];
 
-$db->exec("BEGIN TRANSACTION");
+$c = $db->prepare("SELECT COUNT(*) FROM match m JOIN pick p USING (cid,rid,aid) WHERE m.cid = ? AND rid = ? AND aid=?");
+$c->bindInt(1,$cid);
+$c->bindInt(2,$rid);
+$c->bindString(3,$aid);
 
-$u = $db->prepare("SELECT u.uid AS uuid, r.uid AS ruid FROM participant u LEFT JOIN registration r ON u.uid = r.uid AND r.cid = ? WHERE u.uid = ?");
-$u->bindInt(1,$cid);
-$u->bindInt(2,$uid);
-$row = $u->FetchRow();
-unset($u);
-if ($row && is_null($row['ruid'])) {
-	$r = $db->prepare("INSERT INTO registration(cid,uid) VALUES (?,?)");
-	$r->bindInt(1,$cid);
-	$r->bindInt(2,$uid);
-	$r->exec();
-	unset($r);
-	$db->exec("COMMIT");
-	echo '{"cid":'.$cid.',"uid":"'.$uid.'"}';
-} else {
-	$db->exec("ROLLBACK");
-	echo '<p>Error Registering. Please tell webmaster@melindasbackups.com</p>';
-}
+echo '{"cid":'.$cid.',"rid":'.$rid.',"aid":"'.$aid.'","referers":'.$c->fetchValue().'}';
+unset($c);
 ?>

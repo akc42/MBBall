@@ -37,7 +37,7 @@ if (isset($_POST['bqdeadline']) && $_POST['bqdeadline'] > time()) {
 	$p->bindInt(3,$rid);
 	$p->exec();
 	unset($p);
-	$p = $db->prepare("INSERT INTO option_pick(uid,cid,rid,opid,comment");
+	$p = $db->prepare("INSERT INTO option_pick(uid,cid,rid,opid,comment) VALUES (?,?,?,?,?)");
 	$p->bindInt(1,$uid);
 	$p->bindInt(2,$cid);
 	$p->bindInt(3,$rid);
@@ -60,35 +60,33 @@ if (isset($_POST['bqdeadline']) && $_POST['bqdeadline'] > time()) {
 }
 
 if ($rid != 0) { //only expecting picks from a round if there is one.
-	$m = $db("SELECT aid FROM match WHERE open = 1 AND match_time > ? AND cid = ? AND rid = ? ");
+	$m = $db->prepare("SELECT aid FROM match WHERE open = 1 AND match_time > ? AND cid = ? AND rid = ? ");
 	$m->bindInt(1,time()+$gap);
 	$m->bindInt(2,$cid);
 	$m->bindInt(3,$rid);
-	$p = $db->prepare("INSERT OR REPLACE INTO pick(uid,cid,rid,aid,pid,over_selected,comment) VALUES (?,?,?,?,?,?,?");
+	$p = $db->prepare("INSERT OR REPLACE INTO pick(uid,cid,rid,aid,pid,over_selected,comment) VALUES (?,?,?,?,?,?,?)");
 	$p->bindInt(1,$uid);
 	$p->bindInt(2,$cid);
 	$p->bindInt(3,$rid);
     while($row = $m->FetchRow()) {
-	    $row['aid'] = trim($row['aid']);
-	    if( $pid != 'NULL' || $over != 'NULL' || $comment != 'NULL') {
-	  		if(isset($_POST['M'.$row['aid']])) {
-	  			$p->bindString(4,$_POST['M'.$row['aid']]);
-	  		} else {
-	  			$p->bindNull(4);
-	  		}
-	  		if(isset($_POST['O'.$row['aid']])) {
-	  			$p->bindInt(5,$_POST['O'.$row['aid']] == 'O'?1:0);
-	  		} else {
-	  			$p->bindNull(5);
-	  		}
-	  		if(isset($_POST['C'.$row['haid']])) {
-	  			$p->bindString(6,$_POST['C'.$row['aid']]);
-	  		} else {
-	  			$p->bindNull(6);
-	  		}
-	  		$p->exec();
-	  		$p->close();
+	    $aid = trim($row['aid']);
+	    $p->bindString(4,$aid);
+	    if(isset($_POST['M'.$aid])) {
+		    $p->bindString(5,$_POST['M'.$aid]);
+	    } else {
+		    $p->bindNull(5);
 	    }
+	    if(isset($_POST['O'.$aid])) {
+		    $p->bindInt(6,$_POST['O'.$aid] == 'O'?1:0);
+	    } else {
+		    $p->bindNull(6);
+	    }
+	    if(isset($_POST['C'.$aid]) && $_POST['C'.$aid] != '') {
+		    $p->bindString(7,$_POST['C'.$aid]);
+	    } else {
+		    $p->bindNull(7);
+	    }
+	    $p->exec();
     }
     unset($p);
     unset($m);
@@ -131,7 +129,7 @@ if ($ppd != 0 && $ppd > time()) {
 			$w->close();
 		}
 		foreach($divs as $divid => $division) {
-			$d->bindString(4,$divId);
+			$d->bindString(4,$divid);
 			if (isset($_POST['D'.$divid.$confid])) {
 				$d->bindString(5,$_POST['D'.$divid.$confid]);
 				$d->exec();

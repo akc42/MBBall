@@ -40,6 +40,7 @@ if($rid != 0 && $cid !=0) {
 <form id="roundform" action="updateround.php" >
 	<input type="hidden" name="cid" value="<?php echo $cid;?>" />
 	<input type="hidden" name="rid" value="<?php echo $rid;?>" />
+	<input type="hidden" name="cache" value="<?php echo ($row['open'] == 1)?'true':'false';?>" />
 	<table class="form">
 		<caption>Round Details</caption>
 		<tbody>

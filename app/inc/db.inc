@@ -140,6 +140,8 @@ class STMT {
 	public function exec() {
 		self::$count++;
 		$this->_s->execute();
+$possible_error = $this->_s->errorCode();
+if ($possible_error <> '00000') echo "Database Error Code $possible_error found<br/>";
 		$this->_executed = true;
 	}
 	public function fetchRow() {

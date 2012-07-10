@@ -27,7 +27,7 @@ $aid=$_GET['aid'];
 
 $db->exec("BEGIN TRANSACTION");
 
-$m = $db->prepare("SELECT * FROM match WHERE cid = ? AND rid = ? AND aid = ? ");
+$m = $db->prepare("SELECT * FROM match WHERE cid = ? AND rid = ? AND aid = ?");
 $m->bindInt(1,$cid);
 $m->bindInt(2,$rid);
 $m->bindString(3,$aid);
@@ -46,8 +46,7 @@ if ($row && is_null($row['hid'])) {
 	$db->exec("COMMIT");
     echo '{"cid":'.$cid.',"rid":'.$rid.',"hid":"'.$hid.'","aid":"'.$aid.'"}';
 } else {
-?><p>Match doesn\'t exist or Away Team already Assigned</p>
-<?php
+    echo '{"cid":'.$cid.',"rid":'.$rid.',"hid":'.(isset($row)?$row['hid']:'---').',"aid":"'.$aid.'"}'; //respond with something
 	$db->exec("ROLLBACK");
 }
 ;

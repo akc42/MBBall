@@ -216,8 +216,8 @@ $m=$db->prepare("
 while($r2=dbFetchRow($result)) {
 	$m->bindValue(1,$r2['cid'],PDO::PARAM_INT);
 	$m->bindValue(2,$r2['rid'],PDO::PARAM_INT);
-	$m->bindValue(3,$r2['aid']); //NOTE: These are switched round in new setup
-	$m->bindValue(4,$r2['hid']); //NOTE: These are switched round in new setup
+	$m->bindValue(3,trim($r2['aid'])); //NOTE: These are switched round in new setup
+	$m->bindValue(4,trim($r2['hid'])); //NOTE: These are switched round in new setup
 	$m->bindValue(5,$r2['comment']);
 	$m->bindValue(6,$r2['hscore'],PDO::PARAM_INT);//NOTE: These are switched round in new setup
 	$m->bindValue(7,$r2['ascore'],PDO::PARAM_INT);//NOTE: These are switched round in new setup
@@ -253,7 +253,7 @@ $result=dbQuery("SELECT * FROM team_in_competition ");
 $t=$db->prepare("INSERT INTO team_in_competition(cid,tid,made_playoff) VALUES (?,?,?)");
 while($r2=dbFetchRow($result)) {
 	$t->bindValue(1,$r2['cid'],PDO::PARAM_INT);	
-	$t->bindValue(2,$r2['tid']);
+	$t->bindValue(2,trim($r2['tid']));
 	$t->bindValue(3,($r2['made_playoff'] == 't')?1:0,PDO::PARAM_INT);
 	$t->execute();
 	$t->closeCursor();
@@ -270,9 +270,9 @@ while($r2=dbFetchRow($result)) {
 	$p->bindValue(1,$r2['cid'],PDO::PARAM_INT);
 	$p->bindValue(2,$r2['uid'],PDO::PARAM_INT);
 	$p->bindValue(3,$r2['rid'],PDO::PARAM_INT);
-	$p->bindValue(4,$r2['hid']);//NOTE: These are switched to aid
+	$p->bindValue(4,trim($r2['hid']));//NOTE: These are switched to aid
 	$p->bindValue(5,$r2['comment']);
-	$p->bindValue(6,$r2['pid']);
+	$p->bindValue(6,trim($r2['pid']));
 	$p->bindValue(7,($r2['over_selected'] == 't')?1:0,PDO::PARAM_INT);
 	$p->bindValue(8,$r2['submit_time'],PDO::PARAM_INT);
 	$p->execute();
@@ -291,7 +291,7 @@ while($r2=dbFetchRow($result)) {
 	$p->bindValue(2,$r2['uid'],PDO::PARAM_INT);
 	$p->bindValue(3,$r2['confid']);
 	$p->bindValue(4,$r2['divid']);
-	$p->bindValue(5,$r2['tid']);
+	$p->bindValue(5,trim($r2['tid']));
 	$p->bindValue(6,$r2['submit_time'],PDO::PARAM_INT);
 	$p->execute();
 	$p->closeCursor();
@@ -309,7 +309,7 @@ while($r2=dbFetchRow($result)) {
 	$p->bindValue(2,$r2['uid'],PDO::PARAM_INT);
 	$p->bindValue(3,$r2['confid']);
 	$p->bindValue(4,$r2['opid'],PDO::PARAM_INT);
-	$p->bindValue(5,$r2['tid']);
+	$p->bindValue(5,trim($r2['tid']));
 	$p->bindValue(6,$r2['submit_time'],PDO::PARAM_INT);
 	$p->execute();
 	$p->closeCursor();

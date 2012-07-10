@@ -37,7 +37,7 @@ body, td, th
 }
 
 
-.hidden {display:none;}
+.hidden {display:block;position:absolute;visibility:hidden;} /* this is still to measure the dimension of hidden things */
 .error {background-color:#FF9999;font-weight:bold;}
 [disabled],[readonly] {background-color:#EEEEEE;color:black;}
 .clear {clear:both;float:none;}
@@ -450,4 +450,18 @@ div.match .underdog{
 	font-size:1.2em;
 	background-color:#FFFFCC;
 	color:#000000;
+}
+
+div.xtra {
+  position:absolute;
+  bottom:0;
+  right:0;
+  font-size:0.8em;
+  background-color:#97FFC3;
+    color:black;
+}
+
+
+.without_cache {
+  border:dotted 1px grey;
 }

@@ -22,14 +22,14 @@
 require_once('./inc/bbcode.inc');
 
 
-?><h1>Details of this rounds pick</h1>
-<?php
 if ($rid != 0) {
   //Lets see if we can use the cache
   if(!is_null($rounddata['results_cache']) && ( MBBALL_CACHE_AGE == 0 || (($SERVER['REQUEST_TIME'] - $rounddata['cache_store_date']) < MBBALL_CACHE_AGE))) {
     //yes we can
+    $usedCache = true;
     $picks = unserialize($rounddata['results_cache']);
   } else {
+    $usedCache = false;
     $picks = Array();
 
     // we need to get the users resultant score
@@ -81,6 +81,8 @@ if ($rid != 0) {
     $r->exec();
     unset($r);
   }
+?><h1>Details of this rounds pick<?php if(!$usedCache) echo '<span class="without_cache">&nbsp;</span>';?></h1>
+<?php
 
   $nom = count($picks['matches']);
   $isAQuestion = ($rounddata['valid_question'] == 1);
@@ -145,8 +147,8 @@ if ($rid != 0) {
 /* THE SCORES IN HEADER ------------------------------------------------------------------------------*/
     for($i = $startMatch;($i<$startMatch+8) && $i<$nom;$i++){
       $row = $picks['matches'][$i];
-?>			<th class="score" ><?php if(!is_null($row['ascore'])) echo $row['ascore'];?></th>
-			<th class="score"><?php if(!is_null($row['hscore'])) echo $row['hscore'];?></th>
+?>			<th class="score"><div style="position:relative;"><?php echo is_null($row['ascore'])?'&nbsp;':$row['ascore']; if ($row['underdog'] < 0) echo '<div class="xtra">'.(-$row['underdog']).'</div>';?></div></th>
+			<th class="score"><div style="position:relative;"><?php echo is_null($row['hscore'])?'&nbsp;':$row['hscore']; if ($row['underdog'] > 0) echo '<div class="xtra">'.($row['underdog']).'</div>';?></div></th>
 <?php
     }
 ?>		</tr>
@@ -193,18 +195,22 @@ if ($rid != 0) {
 /* MATCH WINNER PICK ------------------------------------------------------------------------------*/
       for($i = $startMatch;($i<$startMatch+8) && $i<$nom;$i++){
 	$aid = $picks['matches'][$i]['aid'];
+	$underdog = $picks['matches'][$i]['underdog'];
 	if(isset($picks['picks'][$uid2][$aid])) {
 	  $pickdata = $picks['picks'][$uid2][$aid]; 
 	  if($pickdata['pscore'] > 0) {
-?>				<td class="win tid">
+?>				<td class="win tid"><div style="position:relative;">
 <?php
 	    echo $pickdata['pid'];tick();
 	  } else {
-?>				<td class="tid">
+?>				<td class="tid"><div style="position:relative;">
 <?php
 	    if (!is_null($pickdata['pid'])) echo $pickdata['pid'];
 	  }
-?>				</td>
+	  //indicate an underdog pick if there was one
+	  if ($underdog < 0 && $pickdata['pid'] == $aid) echo '<div class="xtra">'.(-$row['underdog']).'</div>';
+	  if ($underdog > 0 && $pickdata['pid'] <> $aid) echo '<div class="xtra">'.($row['underdog']).'</div>';
+?>				</div></td>
 <?php
 /* OVER UNDER PICK --------------------------------------------------------------------------------*/
 	  if($ouRound && !is_null($pickdata['over_selected'])) {
@@ -355,7 +361,9 @@ if ($rid != 0) {
   unset($picks);
   unset($rounddata['results_cache']);
 } else {
-?><p>There are no rounds in this competition to display right now.  Please come back later</p>
+?>
+<h1>Details of this rounds pick</h1>
+<p>There are no rounds in this competition to display right now.  Please come back later</p>
 <?php
 }
 ?>

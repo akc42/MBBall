@@ -34,7 +34,7 @@ $noOpts = $p->fetchValue();
 unset($p);
 
 if ($noOpts > 0) {
-	$p = $db->prepare("DELECT FROM option WHERE cid = ? AND rid = ? AND opid =?");
+	$p = $db->prepare("DELETE FROM option WHERE cid = ? AND rid = ? AND opid =?");
 	$p->bindInt(1,$cid);
 	$p->bindInt(2,$rid);
 	$p->bindInt(3,$opid);

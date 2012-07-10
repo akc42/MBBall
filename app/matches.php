@@ -63,8 +63,8 @@ if($rid != 0 && $cid !=0) {
     <div class="mtime clear">
       <input type="hidden" name="mtime" value="<?php echo $row['match_time'];?>" />
     </div>
-    <div class="comment">
-      <textarea name="comment clear"><?php echo $row['comment'];?></textarea>
+    <div class="comment clear">
+      <textarea name="comment"><?php echo $row['comment'];?></textarea>
     </div>
     <div class="underdog clear">
       <div class="slider"><div class="knob"><?php echo abs($row['underdog']);?></div></div>

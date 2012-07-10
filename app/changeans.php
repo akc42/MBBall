@@ -34,11 +34,11 @@ $o->bindInt(3,$opid);
 
 if ($o->fetchValue() != 0) {
   unset($o);
-  $o = $db->prepare("UPDATE OPTION SET label = ? WHERE cid = ? AND rid = ? AND opid = ? ");
+  $o = $db->prepare("UPDATE option SET label = ? WHERE cid = ? AND rid = ? AND opid = ? ");
   $o->bindString(1,$_GET['label']);
-  $o->bindInt(1,$cid);
-  $o->bindInt(2,$rid);
-  $o->bindInt(3,$opid);
+  $o->bindInt(2,$cid);
+  $o->bindInt(3,$rid);
+  $o->bindInt(4,$opid);
   $o->exec();
   unset($o);
 

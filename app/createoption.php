@@ -31,7 +31,7 @@ $db->exec("BEGIN TRANSACTION");
 $o = $db->prepare("SELECT COUNT(*) FROM option WHERE cid = ? AND rid = ?"); 
 $o->bindInt(1,$cid);
 $o->bindInt(2,$rid);
-$noopts = $o->fetchValue();
+$noOpts = $o->fetchValue();
 unset($o);
 $o = $db->prepare("SELECT COUNT(*) FROM option WHERE cid = ? AND rid = ? AND opid = ? ");
 $o->bindInt(1,$cid);
@@ -49,7 +49,7 @@ if ($currentOpt == 0) {
 	unset($o);
 	if ($noOpts == 0) {
 	  	//This is the first option created for this round
-	  	$r = $db->prepare("UPDATE round SET answer = 0 WHERE cid = ? AND rid ? ");
+	  	$r = $db->prepare("UPDATE round SET answer = 0 WHERE cid = ? AND rid = ? ");
 		$r->bindInt(1,$cid);
 		$r->bindInt(2,$rid);
 		$r->exec();

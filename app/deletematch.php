@@ -64,8 +64,7 @@ if ($row) {
     echo '{"cid":'.$cid.',"rid":'.$rid.', "hid":"'.$row['hid'].'","aid":"'.$aid.'"}';
 
 } else {
-?><p>Match doesn't exist</p>
-<?php
+    echo '{"cid":0}';
   $db->exec("ROLLBACK");
 }
 ?>

@@ -30,8 +30,9 @@ $a = $db->prepare("SELECT answer FROM round WHERE cid = ? AND rid = ? ");
 $a->bindInt(1,$cid);
 $a->bindInt(2,$rid);
 $answer = $a->fetchValue();
+
 unset($a);
-if ($answer) {
+
   if($opid != 0) {
     $o = $db->prepare("SELECT COUNT(*) FROM option WHERE cid = ? AND rid = ? AND opid = ?");
     $o->bindInt(1,$cid);
@@ -75,9 +76,4 @@ if ($answer) {
     $db->exec("COMMIT");
     echo '{"cid":'.$cid.',"rid":'.$rid.',"opid":0}';
   }
-} else {
-?><p>Round does not exist</p>
-<?php
-  $db->exec("ROLLBACK");
-}
 ?>

@@ -19,30 +19,27 @@
 
 */
 require_once('./inc/db.inc');
-if(!(isset($_POST['cid']))) forbidden();
+if(!(isset($_GET['cid'])  && isset($_GET['tid']) && isset($_GET['pscore']))) forbidden();
 
-$cid=$_POST['cid'];
-$name=$_POST['name'];
-$email=$_POST['email'];
-$bb=$_POST['bb'];
+$cid = $_GET['cid'];
+$tid = $_GET['tid'];
+$pscore = $_GET['pscore'];
 
 $db->exec("BEGIN TRANSACTION");
 
-$u = $db->prepare("SELECT u.uid AS uuid, r.uid AS ruid FROM participant u LEFT JOIN registration r ON u.uid = r.uid AND r.cid = ? WHERE u.uid = ?");
-$u->bindInt(1,$cid);
-$u->bindInt(2,$uid);
-$row = $u->FetchRow();
-unset($u);
-if ($row && is_null($row['ruid'])) {
-	$r = $db->prepare("INSERT INTO registration(cid,uid) VALUES (?,?)");
-	$r->bindInt(1,$cid);
-	$r->bindInt(2,$uid);
-	$r->exec();
-	unset($r);
-	$db->exec("COMMIT");
-	echo '{"cid":'.$cid.',"uid":"'.$uid.'"}';
-} else {
-	$db->exec("ROLLBACK");
-	echo '<p>Error Registering. Please tell webmaster@melindasbackups.com</p>';
-}
-?>
+$t=$db->prepare("UPDATE team_in_competition SET points = ? WHERE cid = ? AND tid = ?");
+$t->bindInt(1,$pscore);
+$t->bindInt(2,$cid);
+$t->bindString(3,$tid);
+$t->exec();
+unset($t);
+//Changing this will have screwed up overall results, so invalidate cache
+
+$c = $db->prepare("UPDATE competition SET results_cache = NULL  WHERE cid = ?");
+$c->bindInt(1,$cid);
+$c->exec();
+unset($c);
+
+$db->exec("COMMIT");
+
+echo '{"cid":'.$cid.',"tid":"'.$tid.'","score":'.$pscore.'}';
