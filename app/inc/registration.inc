@@ -31,7 +31,7 @@ if($condition == '') {
 ?>		<input type="submit" value="Register" />
 <?php
 } else {
-	require_once('./bbcode.inc');
+	require_once('./inc/bbcode.inc');
 ?>	<p><?php echo "$name ,".MBBALL_CONDITION;?></p>
 	<p class="condition"><?php echo dbBBcode($condition);?></p>
 		<div id="agree"><input type="submit" value="I Agree" /></div>
