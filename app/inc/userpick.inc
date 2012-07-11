@@ -173,7 +173,7 @@ if ($rid != 0) {
 						<thead>
 <?php
 		if($rounddata['comment'] <> "") {
-?>							<tr><th colspan="3"><?php echo $rounddata['comment']; ?></th></tr>
+?>							<tr><th colspan="3"><?php echo dbBBcode($rounddata['comment']); ?></th></tr>
 <?php
 		}
 ?>							<tr><th class="bq">Question</th><th class="ba">Answer</th><th class="comment">Comment</th></tr>
