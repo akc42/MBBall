@@ -44,7 +44,7 @@ if (isset($_POST['bqdeadline']) && $_POST['bqdeadline'] > time()) {
 	if (isset($_POST['opid']) && $_POST['opid'] != '') {
 		$p->bindInt(4,$_POST['opid']);
 		if (isset($_POST['Cbonus']) && $_POST['Cbonus'] != '') {
-			$p>bindString(5,$_POST['Cbonus']);
+			$p->bindString(5,$_POST['Cbonus']);
 		} else {
 			$p->bindNull(5);
 		}
