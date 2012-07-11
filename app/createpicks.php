@@ -140,6 +140,17 @@ if ($ppd != 0 && $ppd > time()) {
 	unset($w);
 	unset($d);
 }
+// We need to invalidate cache's to ensure our picks are picked up in the results
+$c = $db->prepare("UPDATE competition SET results_cache = NULL  WHERE cid = ?");
+$c->bindInt(1,$cid);
+$c->exec();
+unset($c);
+
+$r = $db->prepare("UPDATE round SET results_cache = NULL WHERE cid =? AND rid = ?");
+$r->bindInt(1,$cid);
+$r->bindInt(2,$rid);
+$r->exec();
+unset($r);
 
 $db->exec("COMMIT");
 
