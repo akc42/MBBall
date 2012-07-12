@@ -139,11 +139,10 @@ table.layout table.layout td#instructions h3{font-weight:normal;}
 }
 table.layout table.layout td#emoticon_cell{width:450px;height:160px;}
 
-#make_picks {
+#make_picks, #cancel_picks {
 	font-size:large;
 	font-weight:bold;
 	margin:10px;
-	float:right;
 	margin-right:100px;
 	background-color:red;
 	color:white;
@@ -152,7 +151,15 @@ table.layout table.layout td#emoticon_cell{width:450px;height:160px;}
 	cursor:pointer;
 }
 
-#make_picks:hover, #make_picks:active {border-style:inset;}
+#make_picks {
+  	float:right;
+}
+
+#cancel_picks {
+	float:left;
+}
+
+#make_picks:hover, #make_picks:active, #cancel_picks:hover, #cancel_picks:active {border-style:inset;}
 
 /* mainly administration stuff below here */
 div.del {
@@ -462,7 +469,8 @@ div.xtra {
 }
 
 .late_pick {
-  font-size:0.5em;
+  font-size:0.6em;
+  margin-right:0.5em;
 }
 
 .without_cache {

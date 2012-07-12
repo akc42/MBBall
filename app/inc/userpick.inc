@@ -65,7 +65,8 @@ if ($rid != 0) {
 						<tbody>
 <?php
 		     // If user is registered and we can do picks then we need to display the  Picks Section
-		    $sql = "SELECT m.aid , m.hid , p.pid , m.combined_score AS cs, p.over_selected , p.comment AS comment, m.comment AS adm_comment, m.match_time,m.underdog";
+		    $sql = "SELECT m.aid , m.hid , p.pid , m.combined_score AS cs, p.over_selected , p.comment AS comment,";
+		    $sql .= " m.comment AS adm_comment, m.match_time,m.underdog,p.admin_made";
 		    $sql .= " FROM match m LEFT JOIN pick p ";
 		    $sql .= "ON m.cid = p.cid AND m.rid = p.rid AND m.aid = p.aid AND p.uid = ? ";
 		    $sql .= " WHERE m.cid = ? AND m.rid = ? AND m.open = 1 AND m.match_time > ?";
@@ -107,7 +108,7 @@ if ($rid != 0) {
 											</tr>
 		 									<tr>
 												<td colspan="2" <?php if (($row['match_time'] - $gap)< ($time_at_top+86400)) echo 'class="limited"' ;?> >
-													<input type="hidden" name="<?php echo 'A'.$row['aid'];?>" value="no" />
+													<input type="hidden" name="<?php echo 'A'.$row['aid'];?>" value="<?php echo ($row['admin_made'] == 1)?'yes':'no';?>" />
 													<span class="time"><?php echo $row['match_time'] - $gap;?></span>
 <?php
     			if (($row['match_time'] - $gap)< ($time_at_top+86400)) {
@@ -243,7 +244,7 @@ if ($rid != 0) {
 ?>							<tr>
 								<td class="question"><?php echo dbBBcode($rounddata['question']);?></td>
 								<td><input id="answer" type="text" name="opid" value="<?php echo $optdata['opid'];?>" class="opt_pick"/>
-								  <input id="admin_answer" name="admin_answer" type="hidden" value="no"/>
+								  <input id="admin_answer" name="admin_answer" type="hidden" value="<?php echo ($optdata['admin_made'] == 1)?'yes':'no';?>"/>
 								</td>
 								<td >
 								    <textarea class="comment" name="Cbonus"><?php echo $optdata['comment'];?></textarea>
@@ -280,20 +281,23 @@ if($playoff_deadline != 0 && $playoff_deadline > $time_at_top) {
 ?>			<tr>
 				<td id="playoff_pick" colspan="2">
 <?php
-	$p = $db->prepare("SELECT tid,divid,confid FROM div_winner_pick WHERE cid = ? AND uid = ?");
+	$admp = Array();
+	$p = $db->prepare("SELECT tid,divid,confid,admin_made FROM div_winner_pick WHERE cid = ? AND uid = ?");
 	$p->bindInt(1,$cid);
 	$p->bindInt(2,$uid);
 	$dw = array(array());
 	while($row = $p->FetchRow()) {
-		$dw[$row['confid']][$row['divid']] = trim($row['tid']);
+		$dw[$row['confid']][$row['divid']] = $row['tid'];
+		$admp[$row['tid']] = ($row['admin_made'] == 1)?'yes':'no';
 	}
 	unset($p);
-	$w = $db->prepare("SELECT tid,opid,confid FROM wildcard_pick WHERE cid = ? AND uid = ?");
+	$w = $db->prepare("SELECT tid,opid,confid,admin_made FROM wildcard_pick WHERE cid = ? AND uid = ?");
 	$w->bindInt(1,$cid);
 	$w->bindInt(2,$uid);
 	$wild = array(array());
 	while($row = $w->FetchRow()) {
-		$wild[$row['confid']][$row['opid']] = trim($row['tid']);
+		$wild[$row['confid']][$row['opid']] = $row['tid'];
+		$admp[$row['tid']] = ($row['admin_made'] == 1)?'yes':'no';
 	}
 ?><h1>Pick divisional winner and wildcard picks for each conference</h1>
 <h2>Deadline : <span class="time"><?php echo $playoff_deadline;?></span><?php
@@ -350,9 +354,9 @@ if($playoff_deadline != 0 && $playoff_deadline > $time_at_top) {
 				if(isset($teams[$confid][$divid][$i])) { //only if this entry is set
 					$tid=$teams[$confid][$divid][$i]['tid'];
 					$points =$teams[$confid][$divid][$i]['points'];
-					$dwtid = (isset($dw[$confid][$divid]))?$dw[$confid][$divid]:'';
+					$dwtid = (isset($dw[$confid][$divid]))?$dw[$confid][$divid]:'';					
 ?>								<td class="tid">
-								  <input type="hidden" name="<?php echo 'P'.$tid;?>" value="no" />
+								  <input type="hidden" name="<?php echo 'P'.$tid;?>" value="<?php echo isset($admp[$tid])?$admp[$tid]:'no';?>" />
 								  <div style="position:relative;"><?php echo $tid; ?><?php if($points <> 1) echo '<div class="xtra">'.$points.'</div>'; ?></div></td>
 								<td class="radio">
 									<input type="radio" class="ppick" 
@@ -391,7 +395,12 @@ if ($roundpicks || $playpicks) { //we need to finish off if either of these
 
 		</tbody>
 	</table>
-	<button id="make_picks"><?php echo ($userPicks <> "")?"Make $userPicks Picks":"Make Your Picks";?></div>
+<?php
+	if($userPicks <> '') {
+?>	<button id="cancel_picks">Cancel</button>
+<?php
+	}
+?>	<button id="make_picks"><?php echo ($userPicks <> "")?"Make Picks for $userPicks":"Make Your Picks";?></button>
 </form>
 <?php
 }

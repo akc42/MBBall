@@ -122,14 +122,14 @@ if (($ppd != 0 && $ppd > time()) || $adminPick) {
 		if(isset($_POST['W1'.$confid])) {
 			$w->bindInt(4,1);
 			$w->bindString(5,$_POST['W1'.$confid]);
-			$w->bindInt(6,(isset($_POST['P'.$_POST['W1'.$config]]) && $_POST['P'.$_POST['W1'.$config]] == 'yes')?1:0);
+			$w->bindInt(6,(isset($_POST['P'.$_POST['W1'.$confid]]) && $_POST['P'.$_POST['W1'.$confid]] == 'yes')?1:0);
 			$w->exec();
 			$w->close();
 		}
 		if(isset($_POST['W2'.$confid])) {
 			$w->bindInt(4,2);
 			$w->bindString(5,$_POST['W2'.$confid]);
-			$w->bindInt(6,(isset($_POST['P'.$_POST['W2'.$config]]) && $_POST['P'.$_POST['W2'.$config]] == 'yes')?1:0);
+			$w->bindInt(6,(isset($_POST['P'.$_POST['W2'.$confid]]) && $_POST['P'.$_POST['W2'.$confid]] == 'yes')?1:0);
 			$w->exec();
 			$w->close();
 		}

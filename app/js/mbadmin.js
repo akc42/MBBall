@@ -860,10 +860,7 @@ var MBBAdmin = new Class({
 									// and take out old values;
 									that.teams[this.value] = this;
 									div.getElement('input[name=P'+this.value+']').value='yes'; //team we just selected
-									if(lastValue) {
-									  delete that.teams[lastValue.value];
-									  div.getElement('input[name=P'+lastValue.value+']').value = 'yes'; //team we just deselected
-									}
+									if(lastValue) delete that.teams[lastValue.value];
 									delete that.lastpick[this.name];
 									that.lastpick[this.name] = this;									
 								}
@@ -879,7 +876,7 @@ var MBBAdmin = new Class({
 							//These items are only there if user has registered
 							$('make_picks').addEvent('click', function(e) {
 								e.stop();
-								var validate = true;
+								var validated = true;
 								var answer = $('answer');
 								if(answer) {
 									//only here if answer is defined (no options to select (in which case Answer must be an integer
@@ -898,6 +895,10 @@ var MBBAdmin = new Class({
 								  }
 								});
 								pickReq.post($('pick'));
+							});
+							document.id('cancel_picks').addEvent('click', function(e) {
+							  e.stop();
+							  document.id('pick').dispose();
 							});
 						}
 					});
