@@ -10,6 +10,5 @@ the match results.
 Players sign on to the football (using the their community forum login
 - currently uses SMF)
 
-All results are stored in a Postgres Database, that can hold multiple
-competitions over several years.
+The software now uses an SQLite database to hold all the results. 
 
