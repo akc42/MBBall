@@ -18,7 +18,8 @@
     along with MBBall (file COPYING.txt).  If not, see <http://www.gnu.org/licenses/>.
 
 */
-$time_at_top = time();
+
+$time_at_top = ($userPicks <> '')?0:time();
 $roundpicks = false;
 $playpicks = false;
 if ($rid != 0) {
@@ -28,7 +29,7 @@ if ($rid != 0) {
     $m->bindInt(3,$time_at_top+$gap);
     $nomatches = $m->fetchValue();
     unset($m);
-    if ($nomatches > 0 || ($rounddata['valid_question'] && $rounddata['deadline'] > $time_at_top) ||($playoff_deadline != 0 && $playoff_deadline > $time_at_top)) {
+    if ($nomatches > 0 || ($rounddata['valid_question'] && $rounddata['deadline'] > $time_at_top) || ($playoff_deadline != 0 && $playoff_deadline > $time_at_top)) {
         $roundpicks = true;
 	require_once('./inc/bbcode.inc');
 
@@ -39,7 +40,7 @@ if ($rid != 0) {
 	<input type="hidden" name="gap" value="<?php echo $gap;?>" />
 	<input type="hidden" name="ppd" value="<?php echo $playoff_deadline ;?>" />
 	<input type="hidden" name="bqdeadline" value="<?php echo $rounddata['deadline'];?>" />
-	<input type="hidden" name="adminpick" value="<?php echo ($userpicks <> '')?'yes':'no';?>" />
+	<input type="hidden" name="adminpick" value="<?php echo ($userPicks <> '')?'yes':'no';?>" />
 	<table class="layout">
 <?php 	if($userPicks <> '') echo "<caption>Entering Picks on behalf of :$userPicks</caption>";
 ?>	<tbody>
@@ -112,7 +113,11 @@ if ($rid != 0) {
     			if (($row['match_time'] - $gap)< ($time_at_top+86400)) {
 ?>													<span>Less than a DAY to pick</span>
 <?php
+    			 } elseif ($time_at_top == 0 && ($row['match_time'] - $gap) < time()) {
+?>													<p>Any Pick made now will be regarded as <b>LATE</b>.<br/>Only adjust those you need to</p>    			     
+<?php
     			 }
+    			 
 ?>												</td>
 											</tr>
 										</tbody>
@@ -174,7 +179,11 @@ if ($rid != 0) {
     		if ($rounddata['deadline'] < ($time_at_top+86400)) {
 ?><h2 class="limited">Less than a DAY to answer</h2>
 <?php
+    		} elseif ($time_at_top == 0 && $roundata['deadline'] < time()) {
+?><h2 class="limited"><p>Any Pick made now will be regarded as <b>LATE</b>.<br/>Only adjust those you need to</p></h2>
+<?php
     		}
+    		
 ?>
 					<table>
 						<thead>
@@ -290,7 +299,11 @@ if($playoff_deadline != 0 && $playoff_deadline > $time_at_top) {
 <h2>Deadline : <span class="time"><?php echo $playoff_deadline;?></span><?php
 	if ($playoff_deadline< ($time_at_top+86400)) {
 ?><span>Less than a DAY to pick</span><?php
+	 } elseif ($time_at_top == 0 && $playoff_deadline < time()) {
+?><p>Any Pick made now will be regarded as <b>LATE</b>.<br/>Only adjust those you need to</p>
+<?php	     
 	 }
+	 
 ?></h2>
 <?php
 	foreach($confs as $confid => $conference) {

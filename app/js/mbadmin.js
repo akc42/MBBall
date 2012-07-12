@@ -833,8 +833,8 @@ var MBBAdmin = new Class({
 					this.adminpick = new MBB.subPage(this,'adminpick.php',$('userpick'),function(div) {
 						if ($('pick')) { //We loaded the page and there is something there 
 							MBB.adjustDates(div);
-							this.teams = $H({});
-							this.lastpick = $H({});
+							this.teams = new Object({});
+							this.lastpick = new Object({});
 							var picks = div.getElements('.ppick');
 							var that =this;
 							// We make a hash of every checked item - which we can then use when an item changes to
