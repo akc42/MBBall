@@ -24,6 +24,10 @@ if(!(isset($_GET['cid']) && isset($_GET['bbar']) )) forbidden();
 $cid = $_GET['cid'];
 
 if ($cid != 0) {
+  $s = $db->prepare("SELECT value FROM settings WHERE name = ?");
+  $isGuestHeading = $s->fetchSetting('headingisguest');
+  $guestApprovedHeading = $s->fetchSetting('headingguestapprove');
+  unset($s);
 	
 	$r = $db->prepare("SELECT * FROM registration r JOIN participant u USING (uid) WHERE r.cid = ? ORDER BY agree_time");
 	$r->bindInt(1,$cid);
@@ -37,8 +41,8 @@ if ($cid != 0) {
 			<th>E-Mail</th>
 			<th>Last Logon</th>
 			<th>When Registered</th>
-			<th>Is a BB</th>
-			<th>BB Approved</th>
+			<th><?php echo $isGuestHeading; ?></th>
+			<th><?php echo $guestApprovedHeading; ?></th>
 			<th>Been Admin</th>
 			<th>DEL</th>
 		</tr>

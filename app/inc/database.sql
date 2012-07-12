@@ -50,6 +50,7 @@ CREATE TABLE div_winner_pick (
     divid character(1) NOT NULL REFERENCES division(divid) ON UPDATE CASCADE ON DELETE CASCADE, --Division ID
     tid varchar(3) NOT NULL, --Team who will win division
     submit_time bigint DEFAULT (strftime('%s','now')) NOT NULL, --Time of submission
+    admin_made boolean DEFAULT 0 NOT NULL, --set if admin made pick on behalf of user
     PRIMARY KEY (cid,uid,confid,divid),
     FOREIGN KEY (cid,uid) REFERENCES registration(cid,uid) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (cid,tid) REFERENCES team_in_competition(cid,tid)    
@@ -97,6 +98,7 @@ CREATE TABLE option_pick (
     opid integer NOT NULL , --ID of Question Option Selected as Correct if multichoice, else value of answer (only if multichoice)
     comment text, --General Comment from user about the round
     submit_time bigint DEFAULT (strftime('%s','now')) NOT NULL, --Time of Submission
+    admin_made boolean DEFAULT 0 NOT NULL, --set if admin made pick on behalf of user
     PRIMARY KEY (cid,uid,rid)
     FOREIGN KEY (cid,rid) REFERENCES round(cid,rid) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (cid,uid) REFERENCES registration(cid,uid) ON UPDATE CASCADE ON DELETE CASCADE
@@ -123,6 +125,7 @@ CREATE TABLE pick (
     pid varchar(3), --ID of Team Picked to Win (NULL for Draw)
     over_selected boolean, --true (=1) if over score is selected
     submit_time bigint DEFAULT (strftime('%s','now')) NOT NULL, --Time of submission
+    admin_made boolean DEFAULT 0 NOT NULL, --set if admin made pick on behalf of user
     PRIMARY KEY (cid,uid,rid,aid),
     FOREIGN KEY (cid,rid,aid) REFERENCES match(cid,rid,aid) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (cid,uid) REFERENCES registration(cid,uid) ON UPDATE CASCADE ON DELETE CASCADE,
@@ -187,6 +190,7 @@ CREATE TABLE wildcard_pick (
     opid smallint DEFAULT 1 NOT NULL, -- Either 1 or 2 depending on which wildcard pick for the conference it is
     tid varchar(3) NOT NULL, --Pick
     submit_time bigint DEFAULT (strftime('%s','now')) NOT NULL, --Time of Submission
+    admin_made boolean DEFAULT 0 NOT NULL, --set if admin made pick on behalf of user
     PRIMARY KEY(cid,uid,confid,opid)
     FOREIGN KEY (cid,uid) REFERENCES registration(cid,uid) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (cid,tid) REFERENCES team_in_competition(cid,tid)
@@ -230,10 +234,10 @@ CREATE VIEW bonus_score AS
 	
 --used to identify teams a user has picked correctly
 CREATE VIEW playoff_picks AS
-	SELECT wildcard_pick.cid,wildcard_pick.tid, wildcard_pick.uid, wildcard_pick.confid
+	SELECT cid,tid, uid, confid,admin_made,submit_time
 		FROM wildcard_pick
-	UNION
-	SELECT div_winner_pick.cid,div_winner_pick.tid, div_winner_pick.uid, div_winner_pick.confid
+	UNION ALL
+	SELECT cid,tid,uid, confid,admin_made,submit_time
 		FROM div_winner_pick;
 
 -- Score user makes in correctly guessing the playoffs
@@ -335,7 +339,7 @@ INSERT INTO settings (name,value) VALUES('playoffmap','[1,2,4,6,8]'); --map of p
 INSERT INTO settings (name,value) VALUES('msgdeletecomp','Deleting a Competition will delete all the Rounds and Matches associated with it. Do you wish to Proceed?');
 INSERT INTO settings (name,value) VALUES('msgregister','Click OK to register for the competition and agree to the condition');
 INSERT INTO settings (name,value) VALUES('msgcondition','In order to enter the competition you must agree to the following condition:-');
-INSERT INTO settings (name,value) VALUES('msgguestnote','Baby Backups require special approval from the competition administrator ($$$). Please contact her/him <i>after registering</i> if you are a Baby Backup');
+INSERT INTO settings (name,value) VALUES('msgguestnote','Guests require special approval from the competition administrator ($$$). Please contact her/him <i>after registering</i> if you are a Guest');
 INSERT INTO settings (name,value) VALUES('msgnoquestion','ERROR - your picks were made, but the bonus question was NOT answered.  It needs to be a whole number (integer)');
 INSERT INTO settings (name,value) VALUES('msgdeadline','Do you mean to set the deadline before now?');
 INSERT INTO settings (name,value) VALUES('msgmatchtime','Do you mean to set the matchtime before now?');
@@ -347,6 +351,9 @@ INSERT INTO settings (name,value) VALUES('msgdeleteround','Deleting a Round will
 INSERT INTO settings (name,value) VALUES('msgapprove','You are changing the approval status of a Baby Backup for this Competition. Are you sure you want to do this?');
 INSERT INTO settings (name,value) VALUES('msgunregister','This will Un-Register this User from this Competition. Do you wish to Proceed?');
 INSERT INTO settings (name,value) VALUES('msgconstraint','Cannot remove team from competition, it is used in picks or matches');
+-- Misc Headings Where it could be different
+INSERT INTO settings (name,value) VALUES('headingisguest','Is Guest');
+INSERT INTO settings (name,value) VALUES('headingguestapproved','Guest Approved');
 -- END OF STANDARD DATA ----------------------------------------------------------
 -- INDEXES --------------------------------------------------------------
 
@@ -383,9 +390,12 @@ CREATE INDEX registration_cid_idx ON registration(cid);
 -- Configuration Settings That are non standard - expect to edit this for each installation
 -- THIS VERSION Just shows one example commented out 
 
--- UPDATE settings SET value = '../static/template/template.inc' WHERE name = 'template' ; -- page template location in filesystem
--- UPDATE settings SET value = '../static/images/emoticons' WHERE name = 'emoticon_dir' ; --filesystem location of emoticons
--- UPDATE settings SET value = '/static/images/emoticons' wHERE name = 'emoticon_url'; --web based location of emoticons
+-- UPDATE settings SET value = '../static/template/template.inc' WHERE name = 'template' ; 
+-- UPDATE settings SET value = '../static/images/emoticons' WHERE name = 'emoticon_dir' ; 
+-- UPDATE settings SET value = '/static/images/emoticons' wHERE name = 'emoticon_url'; 
+-- UPDATE settings SET value = 'Baby Backups require special approval from the competition administrator ($$$). Please contact her/him <i>after registering</i> if you are a Baby Backup' wHERE name = 'msgguestnote';
+-- UPDATE settings SET value = 'BB Approved' WHERE name = 'headingguestapproved'; 
+-- UPDATE settings SET value = 'Is BB' WHERE name='headingisguest';
 
 COMMIT;
 -- set it all up as Write Ahead Log for max performance and minimum contention with other users.

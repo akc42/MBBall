@@ -23,7 +23,7 @@ require_once('./inc/team.inc');
 ?><h1>Players Playoff Picks</h1>
 <?php
 
-$sql = " SELECT u.uid, u.name, p.tid AS tid, COALESCE(s.score,0) AS score,s.confid AS confid";
+$sql = " SELECT u.uid, u.name, p.tid AS tid, COALESCE(s.score,0) AS score,s.confid AS confid,p.admin_made AS admin_made,p.submit_time AS submit_time";
 $sql .= " FROM";
 $sql .= "	registration r";
 $sql .= " 	JOIN participant u USING (uid)";
@@ -97,8 +97,8 @@ while(!$alldone){
 		$playoff_selections = Array();
 		$lastuid = $row['uid'];		
 	}
-	$playoff_selections[trim($row['tid'])] = 1;
-			
+	$playoff_selections[trim($row['tid'])] = ($row['submit_time'] > $playoff_deadline && $row['admin_made'] == 1)?'<span class="late_pick">L</span>':'';
+		
 	if( $alldone ||$newrow['uid'] != $lastuid) {
 	//now we have to close the previous role
 		foreach($divs as $divid => $division) {
@@ -107,7 +107,7 @@ while(!$alldone){
 				    $correct = ($team['mp'] && isset($playoff_selections[$team['tid']]));
     ?>				<td <?php if($correct) {echo 'class="tid win"';}else{ echo 'class="tid"';}?>><div style="position:relative;">
 					    <?php 
-			      if(isset($playoff_selections[$team['tid']])) echo '<img src="images/sel.gif" alt="'.$team['tid'].' selected"/>';
+			      if(isset($playoff_selections[$team['tid']])) echo $playoff_selections[$team['tid']].'<img src="images/sel.gif" alt="'.$team['tid'].' selected"/>';
 			      if($correct) { 
 				tick(); 
 				if ($team['points'] <> 1) echo '<div class="xtra">'.$team['points'].'</div>';

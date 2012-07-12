@@ -33,7 +33,7 @@ if ($rid != 0) {
     $picks = Array();
 
     // we need to get the users resultant score
-    $sql = 'SELECT name, u.uid AS uid , pscore, oscore, mscore,bscore,score, opid, comment';
+    $sql = 'SELECT name, u.uid AS uid , pscore, oscore, mscore,bscore,score, opid, comment,admin_made,submit_time';
     $sql .= ' FROM round_score r JOIN participant u USING (uid)';
     $sql .= ' LEFT JOIN option_pick p USING (cid,rid,uid)';
     $sql .= ' WHERE r.cid = ? AND r.rid = ? ORDER BY score DESC,u.name;';
@@ -53,7 +53,7 @@ if ($rid != 0) {
       $picks['matches'][] = $row;
     }
     unset($m);
-    $sql = "SELECT p.uid AS uid,p.aid AS aid,pid, over_selected, p.comment AS comment, pscore, oscore";
+    $sql = "SELECT p.uid AS uid,p.aid AS aid,pid, over_selected, p.comment AS comment, pscore, oscore,admin_made,submit_time";
     $sql .= " FROM match_score m LEFT JOIN pick p USING (cid,rid,aid,uid)";
     $sql .= " WHERE m.cid = ? AND m.rid = ? ";
     $p = $db->prepare($sql);
@@ -63,7 +63,7 @@ if ($rid != 0) {
       $uid2 = $row['uid'];
       unset($row['uid']);
       $aid = $row['aid'];
-      unset($row['uid']);
+      unset($row['aid']);
       $picks['picks'][$uid2][$aid] = $row;
     }
     unset($p);
@@ -198,14 +198,15 @@ if ($rid != 0) {
 	$underdog = $picks['matches'][$i]['underdog'];
 	if(isset($picks['picks'][$uid2][$aid])) {
 	  $pickdata = $picks['picks'][$uid2][$aid]; 
+	  $late = ($picks['matches'][$i]['match_time'] < $pickdata['submit_time'] && $pickdata['admin_made'] == 1)?'<span class="late_pick">L</span>':''; //was this a late pick by admin
 	  if($pickdata['pscore'] > 0) {
 ?>				<td class="win tid"><div style="position:relative;">
 <?php
-	    echo $pickdata['pid'];tick();
+	    echo $late.$pickdata['pid'];tick();
 	  } else {
 ?>				<td class="tid"><div style="position:relative;">
 <?php
-	    if (!is_null($pickdata['pid'])) echo $pickdata['pid'];
+	    if (!is_null($pickdata['pid'])) echo $late.$pickdata['pid'];
 	  }
 	  //indicate an underdog pick if there was one
 	  if ($underdog < 0 && $pickdata['pid'] == $aid) echo '<div class="xtra">'.(-$row['underdog']).'</div>';
@@ -318,11 +319,12 @@ if ($rid != 0) {
 	  // this is a multichoice question, so get results and output them
 	  foreach($picks['options'] as $opid => $label) {
 	    if($opid == $userdata['opid']) {
+	      $late = ($rounddata['deadline'] < $userdata['submit_time'] && $userdata['admin_made'] == 1)?'<span class="late_pick">L</span>':'';
 	      if($userdata['opid'] == $rounddata['answer']) {
-?>			<td class="win opt_sel"><img src="images/sel.gif" alt="option selected" /><?php tick();?></td>
+?>			<td class="win opt_sel"><?php echo $late;?><img src="images/sel.gif" alt="option selected" /><?php tick();?></td>
 <?php
 	      } else {
-?>			<td class="opt_sel"><img src="images/sel.gif" alt="option selected" /></td>
+?>			<td class="opt_sel"><?php echo $late;?><img src="images/sel.gif" alt="option selected" /></td>
 <?php
 	      }
 	    } else {

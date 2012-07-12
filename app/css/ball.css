@@ -461,6 +461,9 @@ div.xtra {
     color:black;
 }
 
+.late_pick {
+  font-size:0.5em;
+}
 
 .without_cache {
   border:dotted 1px grey;

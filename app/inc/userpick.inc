@@ -22,7 +22,7 @@ $time_at_top = time();
 $roundpicks = false;
 $playpicks = false;
 if ($rid != 0) {
-	$m = $db->prepare("SELECT COUNT(*) FROM match WHERE cid = ? AND rid = ? AND open = 1 AND match_time > ?");
+    $m = $db->prepare("SELECT COUNT(*) FROM match WHERE cid = ? AND rid = ? AND open = 1 AND match_time > ?");
     $m->bindInt(1,$cid);
     $m->bindInt(2,$rid);
     $m->bindInt(3,$time_at_top+$gap);
@@ -39,10 +39,12 @@ if ($rid != 0) {
 	<input type="hidden" name="gap" value="<?php echo $gap;?>" />
 	<input type="hidden" name="ppd" value="<?php echo $playoff_deadline ;?>" />
 	<input type="hidden" name="bqdeadline" value="<?php echo $rounddata['deadline'];?>" />
+	<input type="hidden" name="adminpick" value="<?php echo ($userpicks <> '')?'yes':'no';?>" />
 	<table class="layout">
-		<tbody>
+<?php 	if($userPicks <> '') echo "<caption>Entering Picks on behalf of :$userPicks</caption>";
+?>	<tbody>
 			<tr>	
-				<td id="picks" rowspan="3">
+				<td id="picks" <?php if ($userPicks == '') echo 'rowspan="3"';?>>
 <?php
     	if($nomatches >0) {
 ?>					<table>
@@ -94,16 +96,17 @@ if ($rid != 0) {
 												<td class="<?php if($row['underdog'] < 0 ) echo 'underdog';?>"><div style="position:relative;"><input	type="radio"
 													name="<?php echo 'M'.$row['aid'];?>"
 													value="<?php echo $row['aid'];?>"
-													<?php if ($row['pid'] == $row['aid']) echo 'checked="checked"';?>/><?php 
+													<?php if ($row['pid'] == $row['aid']) echo 'checked="checked"';?> class="match_pick"/><?php 
 			      if($row['underdog'] < 0 ) echo '<div class="xtra">'.(-$row['underdog']).'</div>';?></div></td>
 												<td class="<?php if($row['underdog'] > 0 ) echo 'underdog';?>"><div style="position:relative;"><input	type="radio"
 													name="<?php echo 'M'.$row['aid'];?>"
 													value="<?php echo $row['hid'];?>"
-											 		<?php if ($row['pid'] == $row['hid']) echo 'checked="checked"';?>/><?php 
+											 		<?php if ($row['pid'] == $row['hid']) echo 'checked="checked"';?> class="match_pick"/><?php 
 			      if($row['underdog'] > 0 ) echo '<div class="xtra">'.($row['underdog']).'</div>';?></div></td>
 											</tr>
 		 									<tr>
 												<td colspan="2" <?php if (($row['match_time'] - $gap)< ($time_at_top+86400)) echo 'class="limited"' ;?> >
+													<input type="hidden" name="<?php echo 'A'.$row['aid'];?>" value="no" />
 													<span class="time"><?php echo $row['match_time'] - $gap;?></span>
 <?php
     			if (($row['match_time'] - $gap)< ($time_at_top+86400)) {
@@ -130,11 +133,11 @@ if ($rid != 0) {
 												<td><input	type="radio"
 														name="<?php echo 'O'.$row['aid'];?>"
 														value="U"
-														<?php if ($row['over_selected'] === '0') echo 'checked="checked"';?>/></td>
+														<?php if ($row['over_selected'] === '0') echo 'checked="checked"';?> class="match_pick"/></td>
 												<td><input	type="radio"
 														name="<?php echo 'O'.$row['aid'];?>"
 														value="O"
-														<?php if ($row['over_selected'] == 1) echo 'checked="checked"';?>/></td>
+														<?php if ($row['over_selected'] == 1) echo 'checked="checked"';?> class="match_pick"/></td>
 											</tr>
 										</tbody>
 									</table>
@@ -152,13 +155,17 @@ if ($rid != 0) {
     	}	
     	unset($m);
 ?>				</td>
-				<td id="instructions"><?php require_once('./inc/instructions.html');?></td>
+<?php 
+	if($userPicks == '') { //Only need instructions if not admin doing on behalf of someone else
+?>				<td id="instructions"><?php require_once('./inc/instructions.html');?></td>
 			</tr>
 			<tr>
 				<td id="emoticon_cell"><?php require_once('./inc/emoticons.inc'); ?></td>
 			</tr>
 			<tr>
-				<td id="bonus_pick">
+<?php
+	}
+?>				<td id="bonus_pick">
 <?php
     	if ($rounddata['valid_question'] == 1 && $rounddata['deadline'] > $time_at_top) {
 ?><h1>Bonus Question</h1>
@@ -203,12 +210,13 @@ if ($rid != 0) {
 ?>							<tr>
 <?php
     				if($do_first) {
-?>								<td class="question" rowspan ="<?php echo $noopts ;?>"><?php echo dbBBcode($rounddata['question']);?></td>
+?>								<td class="question" rowspan ="<?php echo $noopts ;?>"><?php echo dbBBcode($rounddata['question']);?><input id="admin_answer" name="admin_answer" type="hidden" value="no" /></td>
 								
 <?php
     				}
 
-?>								<td><input type="radio" name="opid" value="<?php echo $row['opid'];?>" <?php if((int)$optdata['opid'] == (int)$row['opid']) echo 'checked="checked"';?>	/><?php echo $row['label'];?></td>
+?>								<td><input type="radio" name="opid" value="<?php echo $row['opid'];?>" <?php 
+								      if((int)$optdata['opid'] == (int)$row['opid']) echo 'checked="checked"';?> class="opt_pick"/><?php echo $row['label'];?></td>
 <?php
 
 				if($do_first) {
@@ -223,11 +231,15 @@ if ($rid != 0) {
 			    }
 			    unset($o);
 		    } else {
-?>								<td class="question" rowspan ="<?php echo $noopts ;?>"><?php echo dbBBcode($rounddata['question']);?></td>
-								<td><input id="answer" type="text" name="opid" value="<?php	echo $optdata['opid'];?>"	/></td>
-								<td rowspan ="<?php echo $noopts ;?>">
-<textarea class="comment" name="Cbonus"><?php echo $optdata['comment'];?></textarea>
+?>							<tr>
+								<td class="question"><?php echo dbBBcode($rounddata['question']);?></td>
+								<td><input id="answer" type="text" name="opid" value="<?php echo $optdata['opid'];?>" class="opt_pick"/>
+								  <input id="admin_answer" name="admin_answer" type="hidden" value="no"/>
 								</td>
+								<td >
+								    <textarea class="comment" name="Cbonus"><?php echo $optdata['comment'];?></textarea>
+								</td>
+							</tr>
 <?php
     		}
 ?>						</tbody>
@@ -249,6 +261,7 @@ if($playoff_deadline != 0 && $playoff_deadline > $time_at_top) {
 	<input type="hidden" name="rid" value="<?php echo $rid;?>" />
 	<input type="hidden" name="gap" value="<?php echo $gap;?>" />
 	<input type="hidden" name="ppd" value="<?php echo $playoff_deadline ;?>" />
+	<input type="hidden" name="adminpick" value="<?php echo ($userpicks <> '')?'yes':'no';?>" />
 	<table class="layout">
 		<tbody>
 <?php
@@ -325,7 +338,9 @@ if($playoff_deadline != 0 && $playoff_deadline > $time_at_top) {
 					$tid=$teams[$confid][$divid][$i]['tid'];
 					$points =$teams[$confid][$divid][$i]['points'];
 					$dwtid = (isset($dw[$confid][$divid]))?$dw[$confid][$divid]:'';
-?>								<td class="tid"><div style="position:relative;"><?php echo $tid; ?><?php if($points <> 1) echo '<div class="xtra">'.$points.'</div>'; ?></div></td>
+?>								<td class="tid">
+								  <input type="hidden" name="<?php echo 'P'.$tid;?>" value="no" />
+								  <div style="position:relative;"><?php echo $tid; ?><?php if($points <> 1) echo '<div class="xtra">'.$points.'</div>'; ?></div></td>
 								<td class="radio">
 									<input type="radio" class="ppick" 
 											name="<?php echo 'D'.$divid.$confid;?>"
@@ -363,7 +378,7 @@ if ($roundpicks || $playpicks) { //we need to finish off if either of these
 
 		</tbody>
 	</table>
-	<button id="make_picks">Make Your Picks</div>
+	<button id="make_picks"><?php echo ($userPicks <> "")?"Make $userPicks Picks":"Make Your Picks";?></div>
 </form>
 <?php
 }

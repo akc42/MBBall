@@ -348,7 +348,7 @@ function content() {
 ?><script type="text/javascript">
 	_gaq.push(['_trackPageview','/football/user/registered']);
 </script>
-			<tr><td colspan="2"><div id="registered"><?php require_once('./inc/userpick.inc');?></div></td></tr>
+			<tr><td colspan="2"><div id="registered"><?php $userPicks=''; require_once('./inc/userpick.inc');?></div></td></tr>
 <?php
 	} else {
 ?><script type="text/javascript">

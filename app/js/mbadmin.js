@@ -831,7 +831,7 @@ var MBBAdmin = new Class({
 				this.adminreg = new MBB.subPage(this,'adminreg.php',$('registered'),function(div) {
 					var owner = this.owner;
 					this.adminpick = new MBB.subPage(this,'adminpick.php',$('userpick'),function(div) {
-						if ($('pick')) { //We loaded the page and there is something there
+						if ($('pick')) { //We loaded the page and there is something there 
 							MBB.adjustDates(div);
 							this.teams = $H({});
 							this.lastpick = $H({});
@@ -859,25 +859,43 @@ var MBBAdmin = new Class({
 									// This team did not have a selection before, so now set one
 									// and take out old values;
 									that.teams[this.value] = this;
-									if(lastValue) delete that.teams[lastValue.value];
+									div.getElement('input[name=P'+this.value+']').value='yes'; //team we just selected
+									if(lastValue) {
+									  delete that.teams[lastValue.value];
+									  div.getElement('input[name=P'+lastValue.value+']').value = 'yes'; //team we just deselected
+									}
 									delete that.lastpick[this.name];
-									that.lastpick[this.name] = this;
+									that.lastpick[this.name] = this;									
 								}
 							});
-							
+							div.getElements('input.opt_pick').addEvent('change',function(e) {
+							  e.stop();
+							  document.id('admin_answer').value='yes'; //say admin has changed a pick (it might be a single answer or one of a set of options
+							});
+							div.getElements('input.match_pick').addEvent('change',function(e) {
+							  e.stop();
+							  div.getElement('input[name=A'+this.name.substr(1)+']').value='yes'; //say admin changed this match pick for this team
+							});
 							//These items are only there if user has registered
-							$('pick').addEvent('submit', function(e) {
+							$('make_picks').addEvent('click', function(e) {
 								e.stop();
+								var validate = true;
 								var answer = $('answer');
 								if(answer) {
 									//only here if answer is defined (no options to select (in which case Answer must be an integer
 									if(!MBB.intValidate(answer)) {
-										return false; //don't submit
+									  validated = false; //Summit but leave an
+									  answer.value = '';
 									}
 								}
 						
 								var pickReq = new MBB.req('createpicks.php', function(response) {
-									$('userpick').empty();
+								  if (validated) {
+									  _gaq.push(['_trackPageview','/football/picks/adminmade']);
+									  document.id('pick').dispose();
+								  } else {
+									  $('bonus_pick').getElement('textarea').value=messages.noquestion;
+								  }
 								});
 								pickReq.post($('pick'));
 							});

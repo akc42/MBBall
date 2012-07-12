@@ -40,6 +40,7 @@ $messages['deleteround'] = $s->fetchSetting('msgdeleteround');
 $messages['approve'] = $s->fetchSetting('msgapprove');
 $messages['unregister'] = $s->fetchSetting('msgunregister');
 $messages['constraint'] = $s->fetchSetting('msgconstraint');
+$messages['noquestion'] = $s->fetchSetting('msgnoquestion');
 $pointsmap = $s->fetchSetting('pointsmap');
 $underdogmap = $s->fetchSetting('underdogmap');
 $playoffmap = $s->fetchSetting('playoffmap');
