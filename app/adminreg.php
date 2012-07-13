@@ -26,7 +26,7 @@ $cid = $_GET['cid'];
 if ($cid != 0) {
   $s = $db->prepare("SELECT value FROM settings WHERE name = ?");
   $isGuestHeading = $s->fetchSetting('headingisguest');
-  $guestApprovedHeading = $s->fetchSetting('headingguestapprove');
+  $guestApprovedHeading = $s->fetchSetting('headingguestapproved');
   unset($s);
 	
 	$r = $db->prepare("SELECT * FROM registration r JOIN participant u USING (uid) WHERE r.cid = ? ORDER BY agree_time");
