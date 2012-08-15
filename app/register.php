@@ -39,6 +39,11 @@ if ($row && is_null($row['ruid'])) {
 	$r->bindInt(2,$uid);
 	$r->exec();
 	unset($r);
+	// We need to invalidate cache's to ensure our see the new player
+	$c = $db->prepare("UPDATE competition SET results_cache = NULL  WHERE cid = ?");
+	$c->bindInt(1,$cid);
+	$c->exec();
+	unset($c);
 	$db->exec("COMMIT");
 	echo '{"cid":'.$cid.',"uid":"'.$uid.'"}';
 } else {
