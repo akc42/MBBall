@@ -271,7 +271,7 @@ if($playoff_deadline != 0 && $playoff_deadline > $time_at_top) {
 	<input type="hidden" name="rid" value="<?php echo $rid;?>" />
 	<input type="hidden" name="gap" value="<?php echo $gap;?>" />
 	<input type="hidden" name="ppd" value="<?php echo $playoff_deadline ;?>" />
-	<input type="hidden" name="adminpick" value="<?php echo ($userpicks <> '')?'yes':'no';?>" />
+	<input type="hidden" name="adminpick" value="<?php echo ($userPicks <> '')?'yes':'no';?>" />
 	<table class="layout">
 		<tbody>
 <?php
