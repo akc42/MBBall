@@ -21,9 +21,12 @@
 require_once('./inc/db.inc');
 if(!(isset($_GET['cid']) && isset($_GET['rid']) && isset($_GET['aid']) )) forbidden();
 
+
 $cid=$_GET['cid'];
 $rid=$_GET['rid'];
 $aid=$_GET['aid'];
+
+if($cid == 0 || $rid == 0) forbidden(); //Both cid and rid must be non zero
 
 $db->exec("BEGIN TRANSACTION");
 $m = $db->prepare("SELECT COUNT(*) FROM match WHERE cid = ? AND rid = ? AND  aid = ?");
@@ -33,6 +36,7 @@ $m->bindInt(3,$aid);
 
 $noMatches = $m->fetchValue();
 unset($m);
+
 
 if ($noMatches == 0) {
 	$m=$db->prepare("INSERT INTO match(cid,rid,aid) VALUES (?,?,?)");

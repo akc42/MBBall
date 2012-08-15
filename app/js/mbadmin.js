@@ -586,7 +586,7 @@ var MBBAdmin = new Class({
 									remTiC.get({'cid':params.cid,'tid':team.get('text')});
 								    }
 								} else {
-								  if(!matchUpdateLocked) { //we can only do something when we are not doing another
+								  if(!matchUpdateLocked && params.rid != 0) { //we can only do something when we are not doing another and we have a round to work with
 									//only do something if not already in a match
 									if(!this.getParent().hasClass('inmatch')) {
 										var teamName = this.get('text');

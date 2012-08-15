@@ -6,7 +6,7 @@ div.calendar {
 	border:2px inset black;
 }
 span.calendar {
-	font: normal 16px/18px Arial, Helvetica, sans-serif;
+	font: normal 14px/16px Arial, Helvetica, sans-serif;
 }
 
 button.calendar {
