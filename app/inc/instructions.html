@@ -40,8 +40,10 @@ the administrator has defined this to be an round to select over under
 <li>Match Column - a small table in its own right with the following
 	<ul>
 	<li>The two teams - in the blue of a table header</li>
-	<li>The match time - in the blue of the table header<li>
-	<li>Two radio buttons, corresponding to the two teams to make your pick</li>
+	<li>The match time - in the blue of the table header</li>
+	<li>Two radio buttons, corresponding to the two teams to make your pick. If one of the teams is regarded as the underdog for which an additional 
+	    points will be awarded when you pick them then you will see a small marker like this <span style="font-size:0.8em;background-color:#97FFC3;">2</span> showing how
+	    many additional points are available</li>
 	<li>The pick deadline - generally the same for each competition - defaults to an hour before.  This turns red when less than a day to go.</li>
 	</ul></li>
 <li>The Over/Under selection (only for some rounds - as defined by the administrator)
@@ -77,8 +79,9 @@ Against each team are three radio buttons, linked to other radio buttons of the 
 Like all radio buttons, selecting a new team, unselect the previous team in that category.  There is an additional facility, in that if you try to select
 a radio button in one category and the team is already selected in another, you will be prevented.  The radio button in the other category is briefly highlighted
 if you do this, and the radio button is then returned to where it was</p>
-<p><b>NOTE</b>A team selected by any means that makes the playoffs will get the point.  So if you selected a team to be divisional winner, and it makes the
-playoff via a wildcard position you will get the point (although it normally means you wildcard pick was wrong - unless of course that predicted the divisional winner!</p>
+<p><b>NOTE</b>A team selected by any means that makes the playoffs will get points (the number of points default to 1, but if additional points are to be awarded then the value is show with a small
+marker like this <span style="font-size:0.8em;background-color:#97FFC3;">2</span>.  So if you selected a team to be divisional winner, and it makes the
+playoff via a wildcard position you will still get the points (although, of course, it normally means you wildcard pick was wrong - unless that predicted the divisional winner!</p>
 
 			</td>
 		</tr>
@@ -89,5 +92,6 @@ playoff via a wildcard position you will get the point (although it normally mea
 the whole area below your main menu should collapse into a small white rectangle with a spinning wheel in the middle to show the server is busy, and when it has
 added your picks to everyone elses, will redisplay the page with your picks included.<p>
 
-<p>You can adjust your picks at any time up to the deadline.  <b>NOTE:</b> that matches will disappear from the list of matches for which you can pick results a soon
-as the deadline is reached. Even if you leave your page open, so it is not refreshed - if you attempt to make a pick after the deadline it will be ignored</p>
+<p>You can adjust your picks at any time up to the deadline.  <b>NOTE:</b> calling up the page again will mean that after a particular match deadline has passed that match will disappear. 
+Even if you leave your page open, so it is not refreshed - any attempt to make a pick after the deadline will be ignored.</p>
+<p>In special circumstances the Administrator can make picks on your behalf even after the deadline.  In fairness to other players picks set this way will have a small marker against them should they have been added late.</p>
