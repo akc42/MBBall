@@ -37,7 +37,7 @@ if ($noComps != 0) {
 	if(isset($_POST['ou'])) {
 		$r->bindInt(4,1);
 	} else {
-		$r->bindInt(5,0);
+		$r->bindInt(4,0);
 	}
 	$r->exec();
 	unset($r);
