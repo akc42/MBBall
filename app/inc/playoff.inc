@@ -75,7 +75,7 @@ while(!$alldone){
 		foreach($divs as $divid => $division) {
 			if(isset($teams[$confid][$divid])) {
 				foreach($teams[$confid][$divid] as $team) {
-?>			<th class="tid"><div style="position:relative;"><?php if($team['mp']) {echo tick();}echo $team['tid']; if($team['points'] <> 1) echo '<div class="xtra">'.($team['points']).'</div>';?></div></th>
+?>			<th class="tid"><div style="position:relative;height:2em;vertical-align:middle;"><?php if($team['mp']) {echo tick();}echo $team['tid']; if($team['points'] <> 1) echo '<div class="xtra">'.($team['points']).'</div>';?></div></th>
 <?php
 				}
 			} else {
