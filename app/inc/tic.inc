@@ -53,7 +53,7 @@ foreach($confs as $confid => $conference) {
 				if(isset($teams[$confid][$divid][$i])) { //only if this entry is set
 					$row=$teams[$confid][$divid][$i];
 					if($row['mp']) {
-?>			<td class="win"><div style="position:relative;">
+?>			<td class="win"><div style="position:relative;height:2.5em;vertical-align:middle;">
 <?php
 						echo $row['tid'];tick();
 						if($row['points'] <> 1) {
@@ -61,7 +61,7 @@ foreach($confs as $confid => $conference) {
 <?php
 						}
 					} else {
-?>			<td><div style="position:relative;">
+?>			<td><div style="position:relative;height:2.5em;vertical-align:middle;">
 <?php						
 						echo $row['tid'];
 						if($row['points'] <> 1) {
