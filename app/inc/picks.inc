@@ -256,7 +256,7 @@ if ($rid != 0) {
 </table>
 <?php
     $startMatch += 8;
-    $nom -= 8;
+//    $nom -= 8;
   }
   unset($p);
   unset($m);
