@@ -202,15 +202,15 @@ if ($rid != 0) {
 	  if($pickdata['pscore'] > 0) {
 ?>				<td class="win tid"><div style="position:relative;">
 <?php
-	    echo $late.$pickdata['pid'];tick();
+	      echo $late.$pickdata['pid'];tick();
+	    //indicate an underdog pick if there was one
+	    if ($underdog < 0 && $pickdata['pid'] == $aid) echo '<div class="xtra">'.(-$underdog).'</div>';
+	    if ($underdog > 0 && $pickdata['pid'] <> $aid) echo '<div class="xtra">'.($underdog).'</div>';
 	  } else {
 ?>				<td class="tid"><div style="position:relative;">
 <?php
 	    if (!is_null($pickdata['pid'])) echo $late.$pickdata['pid'];
 	  }
-	  //indicate an underdog pick if there was one
-	  if ($underdog < 0 && $pickdata['pid'] == $aid) echo '<div class="xtra">'.(-$row['underdog']).'</div>';
-	  if ($underdog > 0 && $pickdata['pid'] <> $aid) echo '<div class="xtra">'.($row['underdog']).'</div>';
 ?>				</div></td>
 <?php
 /* OVER UNDER PICK --------------------------------------------------------------------------------*/
