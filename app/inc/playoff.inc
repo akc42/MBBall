@@ -49,6 +49,7 @@ if($newrow = $u->fetchRow()) {
 }
 
 while(!$alldone){
+
 	$row = $newrow;
 	if(!($newrow = $u->fetchRow())) {
 		$alldone = true;
@@ -62,7 +63,7 @@ while(!$alldone){
 		<tr><th rowspan="2"><?php echo $conference;?></th>
 <?php
 		foreach($divs as $divid => $division){
-?>			<th colspan="<?php echo $sizes[$confid][$divid];?>">
+?>			<th colspan="<?php echo max(1,$sizes[$confid][$divid]);/* always at least one row */?>">  
 				<?php echo $division; ?></th>
 <?php
 		}
@@ -75,11 +76,11 @@ while(!$alldone){
 		foreach($divs as $divid => $division) {
 			if(isset($teams[$confid][$divid])) {
 				foreach($teams[$confid][$divid] as $team) {
-?>			<th class="tid"><div style="position:relative;><?php if($team['mp']) {echo tick();}echo $team['tid']; if($team['points'] <> 1) echo '<div class="xtra">'.($team['points']).'</div>';?></div></th>
+?>			<th class="tid"><div style="position:relative;"><?php if($team['mp']) {echo tick();} echo $team['tid']; if($team['points'] <> 1) echo '<div class="xtra">'.($team['points']).'</div>';?></div></th>
 <?php
 				}
 			} else {
-?><th class="tid">&nbsp;</th>
+?>			<th class="tid">&nbsp;</th>
 <?php
 	        }
 		}
