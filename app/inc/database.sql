@@ -242,11 +242,14 @@ CREATE VIEW playoff_picks AS
 
 -- Score user makes in correctly guessing the playoffs
 CREATE VIEW playoff_score AS
-	SELECT u.cid,u.uid, sum(CASE WHEN p.points IS NULL THEN 0 ELSE p.points END) AS score, p.confid
-		FROM registration u
-		LEFT JOIN (playoff_picks p JOIN team_in_competition t ON p.cid = t.cid AND p.tid = t.tid AND t.made_playoff = 1) AS p
-			USING (cid,uid)
-		GROUP BY u.cid,u.uid, p.confid;
+	SELECT 
+	    u.cid,u.uid, sum(CASE WHEN p.points IS NULL THEN 0 ELSE p.points END) AS score, c.confid
+	FROM 
+	  registration u,
+	  conference c
+	  LEFT JOIN (playoff_picks p JOIN team_in_competition t ON p.cid = t.cid AND p.tid = t.tid AND t.made_playoff = 1) AS p
+	    USING (cid,uid,confid)
+	  GROUP BY u.cid,u.uid, c.confid;
 
 --  Get total score for the round by user 
 CREATE VIEW round_score AS
