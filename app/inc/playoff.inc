@@ -99,8 +99,8 @@ while(!$alldone){
 		$lastuid = $row['uid'];		
 	}
 	$playoff_selections[trim($row['tid'])] = ($row['submit_time'] > $playoff_deadline && $row['admin_made'] == 1)?'<span class="late_pick">L</span>':'';
-		
-	if( $alldone ||$newrow['uid'] != $lastuid) {
+
+	if( $alldone ||$newrow['confid'] != $lastconfid||$newrow['uid'] != $lastuid) {
 	//now we have to close the previous role
 		foreach($divs as $divid => $division) {
     		if(isset($teams[$confid][$divid])) {
@@ -110,8 +110,8 @@ while(!$alldone){
 					    <?php 
 			      if(isset($playoff_selections[$team['tid']])) echo $playoff_selections[$team['tid']].'<img src="images/sel.gif" alt="'.$team['tid'].' selected"/>';
 			      if($correct) { 
-				tick(); 
-				if ($team['points'] <> 1) echo '<div class="xtra">'.$team['points'].'</div>';
+					tick(); 
+					if ($team['points'] <> 1) echo '<div class="xtra">'.$team['points'].'</div>';
 			      }
 				?></div></td>
 	    <?php
