@@ -269,7 +269,8 @@ if ($rid != 0) {
 		<tr><th rowspan="<?php echo ($isAQuestion)?3:1 ;?>" class="match_data">Round Data<br/><?php echo $rounddata['name'];?></th>
 <?php		
     if($isAQuestion) {
-      //We need to find all the options so we can display them later, but for now we need to know how many for the colspan
+?>		<th rowspan="3" class="score">Points for correct answer</br><?php echo $rounddata['bvalue'];?></th>
+<?php //We need to find all the options so we can display them later, but for now we need to know how many for the colspan
       if ($bqopts > 0) $width = (int) (500/$bqopts); // to style options
 /* THE QUESTION IN HEADER -----------------------------------------------------------------------------*/
 ?>			<th <?php if($bqopts > 0) echo 'colspan="'.$bqopts.'"';?>>Bonus Question</th>
@@ -312,7 +313,7 @@ if ($rid != 0) {
     foreach($picks['users'] as $userdata) {
 /*  BONUS QUESTION ANSWERS ----------------------------------------------------------------------------------------*/
 ?>		<tr>
-			<td rowspan="<?php echo ($isAQuestion)?2:1 ;?>"><?php echo $userdata['name'];?></td>
+			<td colspan="<?php echo ($isAQuestion)?2:1 ;?>" rowspan="<?php echo ($isAQuestion)?2:1 ;?>"><?php echo $userdata['name'];?></td>
 <?php
       if($isAQuestion) {
 	if($bqopts > 0) {

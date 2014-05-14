@@ -53,6 +53,7 @@ if ($rid != 0) {
 						<thead>
 							<tr>
 								<th class="team">Team Pick</th>
+								<th class="score">Points</br><?php echo $rounddata['value']?></th>
 <?php
     		if ($rounddata['ou_round'] == 1) {
 ?>								<th class="score">Combined Score</th>
@@ -81,7 +82,7 @@ if ($rid != 0) {
 			    $row['hid'] = trim($row['hid']);
 			    $row['pid'] = trim($row['pid']);
 ?>							<tr>
-								<td>
+								<td colspan=2>
 									<table>
 										<thead>
 											<tr>
@@ -174,26 +175,26 @@ if ($rid != 0) {
 ?>				<td id="bonus_pick">
 <?php
     	if ($rounddata['valid_question'] == 1 && $rounddata['deadline'] > $time_at_top) {
-?><h1>Bonus Question</h1>
-<h2>(Deadline: <span class="time"><?php echo $rounddata['deadline'];?></span>)</h2>
+?>					<table><caption>Bonus Question</caption>
+						<thead>
+							<tr><th>Bonus Points</br><?php echo $rounddata['bvalue']; ?></th><th colspan="2" class="mtime">Deadline:<span class="time"><?php echo $rounddata['deadline'];?></span></th></tr>
+						</thead>
+						<tbody>
 <?php
     		if ($rounddata['deadline'] < ($time_at_top+86400)) {
-?><h2 class="limited">Less than a DAY to answer</h2>
+?>							<tr><td colspan="3" class="limited">Less than a DAY to answer</th></tr>
 <?php
     		} elseif ($time_at_top == 0 && $roundata['deadline'] < time()) {
-?><h2 class="limited"><p>Any Pick made now will be regarded as <b>LATE</b>.<br/>Only adjust those you need to</p></h2>
+?>							<tr><td colspan="3" class="limited">Any Pick made now will be regarded as <b>LATE</b>.<br/>Only adjust those you need to</th></tr>
 <?php
     		}
-    		
-?>
-					<table>
-						<thead>
-<?php
-		if($rounddata['comment'] <> "") {
-?>							<tr><th colspan="3"><?php echo dbBBcode($rounddata['comment']); ?></th></tr>
+    		if($rounddata['comment'] <> "") {		
+?>							<tr><td colspan="3" class="comment"><?php echo dbBBcode($rounddata['comment']); ?></td></tr>
 <?php
 		}
-?>							<tr><th class="bq">Question</th><th class="ba">Answer</th><th class="comment">Comment</th></tr>
+?>						</tbody>
+						<thead>
+							<tr><th class="bq">Question</th><th class="ba">Answer</th><th class="comment">Comment</th></tr>
 						</thead>
 						<tbody>
 <?php
