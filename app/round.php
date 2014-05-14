@@ -54,7 +54,7 @@ if($rid != 0 && $cid !=0) {
 			<textarea id="question" name="question"><?php echo $row['question'];?></textarea>
 		</label>
 				</td>
-				<td rowspan="5">
+				<td rowspan="4" colspan="2">
 		<label>Comment on Question<br/>
 			<textarea id="bonuscomment" name="bonuscomment"><?php echo $row['comment'];?></textarea>
 		</label>
@@ -70,7 +70,7 @@ if($rid != 0 && $cid !=0) {
 		<label>Points for correct pick<br/>
 			<input id="value" name="value" type="hidden" value="<?php echo $row['value'];?>" />
 			<div id ="pointsslider">
-			  <div class="slider"><div class="knob"><?php echo $row['value'];?></div></slider>
+			  <div class="slider"><div class="knob"><?php echo $row['value'];?></div></div>
 			</div>
 		</label>
 				</td>
@@ -96,6 +96,14 @@ if($rid != 0 && $cid !=0) {
 			<input id="answer" name="answer" value="<?php echo $row['answer'];?>" 
 				<?php if($opts > 0) echo 'disabled="disabled"';?> />
 		</label>
+				</td>
+				<td colspan="2">
+					<label>Points for correct bonus answer<br/>
+						<input id="value" name="bvalue" type="hidden" value="<?php echo $row['bvalue'];?>" />
+						<div id ="bonusslider">
+						  <div class="slider"><div class="knob"><?php echo $row['bvalue'];?></div></div>
+						</div>
+					</label>
 				</td>
                 <td id="option"><p>Add<br/>MultiChoice<br/>Option</p></td>
 			</tr>

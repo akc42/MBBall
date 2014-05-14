@@ -45,12 +45,17 @@ $messages['matchtime'] = $s->fetchSetting('msgmatchtime');
 $pointsmap = $s->fetchSetting('pointsmap');
 $underdogmap = $s->fetchSetting('underdogmap');
 $playoffmap = $s->fetchSetting('playoffmap');
+$bonusmap = $s->fetchSetting('bonusmap');
 unset($s);
 
-function head_content () {
-	global $messages,$pointsmap,$underdogmap,$playoffmap;
+function page_title() {
+	echo "Football Pool Administration";
+}
 
-?>	<title>Melinda's Backups Football Pool Administration</title>
+function head_content () {
+	global $messages,$pointsmap,$underdogmap,$playoffmap,$bonusmap;
+
+?>
 	<link rel="stylesheet" type="text/css" href="js/calendar/calendar.css"/>
 	<link rel="stylesheet" type="text/css" href="css/ball.css"/>
 <?php
@@ -87,7 +92,14 @@ window.addEvent('domready', function() {
 		echo "$msgid:'$message'";
 	}
 ?>
-    },{points:<?php echo "$pointsmap";?>,underdog:<?php echo "$underdogmap";?>,playoff:<?php echo "$playoffmap";?>}	);
+    },
+    {
+    	points:<?php echo "$pointsmap";?>,
+    	underdog:<?php echo "$underdogmap";?>,
+    	playoff:<?php echo "$playoffmap";?>,
+    	bonus:<?php echo "$bonusmap";?>
+    }	
+    );
 });	
 
 	// -->
@@ -103,7 +115,7 @@ function menu_items() {
 		<li><a href="index.php"><span>Return to the User Page</span></a></li>
 <?php
 }
-function content() {
+function main_content() {
 	global $db;
 ?><div id="errormessage"></div>
 <table class="layout">
@@ -124,5 +136,5 @@ function foot_content() {
 ?>	<div id="copyright">MBball <span><?php include('./inc/version.inc');?></span> &copy; 2008-2012 Alan Chandler.  Licenced under the GPL</div>
 <?php
 }
-require_once(MBBALL_TEMPLATE); 
+require_once($_SERVER['DOCUMENT_ROOT'].'/inc/template.inc'); 
 ?>

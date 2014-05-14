@@ -149,7 +149,8 @@ CREATE TABLE round (
     comment text, -- Administrator comment on the bonus question
     valid_question boolean DEFAULT 0, --Set once a valid bonus question has been set up
     answer integer, --If not null an answer to a numeric question or opid of mutichoice question
-    value smallint DEFAULT 1 NOT NULL, --Value given for a correct pick or answer
+    value smallint DEFAULT 1 NOT NULL, --Value given for a correct pick
+    bvalue smallint DEFAULT 2 NOT NULL, --Value given for a correct answer to the bonus question
     name character varying(14), --Name of the Round
     ou_round boolean DEFAULT 0 NOT NULL, --set if over underscores are requested for this round
     deadline bigint, --Time Deadline for submitting answers to bonus questions
@@ -227,7 +228,7 @@ CREATE VIEW match_score AS
 
 -- Points scored in round by user answering the bonus question
 CREATE VIEW bonus_score AS
-    SELECT r.cid,r.rid, u.uid, (CASE WHEN p.uid IS NULL THEN 0 ELSE 1 END * r.value) AS score
+    SELECT r.cid,r.rid, u.uid, (CASE WHEN p.uid IS NULL THEN 0 ELSE 1 END * r.bvalue) AS score
 	FROM ((registration u JOIN round r USING(cid) )
 	LEFT JOIN option_pick p ON ((((p.cid = r.cid) AND (p.rid = r.rid) AND (p.uid = u.uid) AND (p.opid = r.answer)) AND (r.valid_question = 1))))
 	WHERE r.open = 1 ;
@@ -326,7 +327,7 @@ INSERT INTO team (tid, name, logo,  confid, divid) VALUES('NYJ','New York Jets',
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('ARI','Arizona Cardinals','ARI_logo-50x50.gif','NFC','W');
 INSERT INTO team (tid, name, logo,  confid, divid) VALUES('KC','Kansas City Chiefs','KC_logo-50x50.gif','AFC','W');
 
-INSERT INTO settings (name,value) VALUES('version',12); --version of this configuration
+INSERT INTO settings (name,value) VALUES('version',13); --version of this configuration
 INSERT INTO settings (name,value) VALUES('max_round_display',18); -- max rounds to include in results table
 INSERT INTO settings (name,value) VALUES('cache_age',0);--cache age before invalid (in seconds), 0 is infinite
 INSERT INTO settings (name,value) VALUES('home_url','/forum/index.php'); --url used for home menu item
@@ -338,6 +339,8 @@ INSERT INTO settings (name,value) VALUES('default_competition',0); -- cid of def
 INSERT INTO settings (name,value) VALUES('pointsmap','[1,2,4,6,8,12,16]'); -- map of slider position to output result
 INSERT INTO settings (name,value) VALUES('underdogmap','[0,1,2,4,6,8]'); --map of absolute slider positions to underdog points
 INSERT INTO settings (name,value) VALUES('playoffmap','[1,2,4,6,8]'); --map of playoff points slider position to points allocated
+INSERT INTO settings (name,value) VALUES('bonusmap','[1,2,4,6,8,12,16]');--map of bonus question points slider position to points allocated
+INSERT INTO settings (name,value) VALUES('defaultbonus',2); --default value of question bonus when new round created
 -- Messages used by admin
 INSERT INTO settings (name,value) VALUES('msgdeletecomp','Deleting a Competition will delete all the Rounds and Matches associated with it. Do you wish to Proceed?');
 INSERT INTO settings (name,value) VALUES('msgregister','Click OK to register for the competition and agree to the condition');

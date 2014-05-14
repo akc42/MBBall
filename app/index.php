@@ -19,7 +19,7 @@
 
 */
 
-define('MBBALL_DB_VERSION', 12);  //Version of the database this works with
+define('MBBALL_DB_VERSION', 13);  //Version of the database this works with
 define('DEBUG','yes');  //Define this to get an uncompressed form of the mootools core library
 // Show all errors:
 error_reporting(E_ALL);
@@ -28,7 +28,7 @@ define('MBBALL_ICON_PATH',	"images/"); //URL where football Icons may be found
 // SMF membergroup IDs for the groups that we have used to define characteristics which control Chat Group
 define('SMF_FOOTBALL',		21);  //Group that can administer
 define('SMF_BABY',		10);  //Baby backup
-define('MBBALL_AUTH','http://football.home/auth/jsonauth.php');  //This should contain an authorisation script
+define('MBBALL_AUTH','http://apps.home/football/remote/jsonauth.php');  //This should contain an authorisation script
 define('MBBALL_KEY','Football9Key7AID'); //Must match same ones in url above (and change for new installations) - see also inc/db.inc
 define('MBBALL_CHECK','FOOTBILL'); //8 chars must match same ones in url above (and change for new installations)
 
@@ -95,13 +95,19 @@ $db->exec("BEGIN TRANSACTION");  //The whole page will run within one transactio
 $s = $db->prepare("SELECT value FROM settings WHERE name = ?");
 /*
  * Here is where we add update to the database structure when we go to a new release
- * $currentVersion = $s->fetchSettings("version");
- * while ($currentVersion < MBBALL_DB_Version) {
- * 	$db->exec(file_get_contents(dirname(__FILE__).'/inc/update_'.$currentVersion.'.sql');
- *  $currentVersion++;
- * }
  */
-
+ $currentVersion = $s->fetchSetting("version");
+ if ($currentVersion < MBBALL_DB_VERSION) {
+ 	unset($s);  //We need to forget about this statement whilst we alter the database
+	 while ($currentVersion < MBBALL_DB_VERSION) {
+echo dirname(__FILE__).'/inc/update_'.$currentVersion.'.sql';
+ 		if(file_exists(dirname(__FILE__).'/inc/update_'.$currentVersion.'.sql')) 
+	  		$db->exec(file_get_contents(dirname(__FILE__).'/inc/update_'.$currentVersion.'.sql'));
+   		$currentVersion++;
+  	}
+  	$s = $db->prepare("SELECT value FROM settings WHERE name = ?");
+ }
+ 
 $p = $db->prepare($sql);
 $p->bindString(1,$name);
 $p->bindString(2,$email);
@@ -213,11 +219,12 @@ if ($rounddata = $r->fetchRow()) {
 	$rid=0;
 }
 unset($r);
-
+function page_title() {
+	echo "Football Pool";
+}
 function head_content() {
 	global $uid, $registered, $cid, $rid,$messages
-?>	<title>Melinda's Backups Football Pool</title>
-	<link rel="stylesheet" type="text/css" href="css/ball.css"/>
+?>	<link rel="stylesheet" type="text/css" href="css/ball.css"/>
 <?php
 if (defined('DEBUG')) {
 ?>	<script src="js/mbball.js" type="text/javascript" charset="UTF-8"></script>
@@ -336,7 +343,7 @@ function menu_items () {
 	}
 }
 
-function content() {
+function main_content() {
 	global $db,$cid,$rid,$uid,$registered,$signedup,$admName,$registration_allowed,$guest,$time_head,$rounddata,$gap,
 		$playoff_deadline,$approval_required,$email,$global_admin,$name,$condition,$search,$replace,$competitionCache,$competitionCacheDate;
 ?><div id="errormessage"></div>
@@ -392,7 +399,7 @@ function foot_content() {
 	<div id="timing"><?php $time_now = microtime(true); printf("With %d queries, page displayed in %.3f secs",$db->getCounts(),$time_now - $time_head);?></div>
 <?php
 }
-require_once(MBBALL_TEMPLATE); 
+require_once($_SERVER['DOCUMENT_ROOT'].'/inc/template.inc'); 
 $db->exec("COMMIT");  //Time to write back any updates we actually did during the creation of the page
 ?>
 

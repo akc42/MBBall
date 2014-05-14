@@ -30,7 +30,10 @@ $c->bindInt(1,$cid);
 $noComps = $c->fetchValue();
 unset($c);
 if ($noComps != 0) {
-	$r = $db->prepare("INSERT INTO round(cid,rid,name,ou_round) VALUES (?,?,?,?)");
+	$b = $db->prepare("SELECT value FROM settings WHERE name = ?");
+	$defaultbonus = $b->fetchSetting("defaultbonus");
+	unset($b);
+	$r = $db->prepare("INSERT INTO round(cid,rid,name,ou_round,bvalue) VALUES (?,?,?,?,?)");
 	$r->bindInt(1,$cid);
 	$r->bindInt(2,$rid);
 	$r->bindString(3,$_POST['rname']);
@@ -39,6 +42,7 @@ if ($noComps != 0) {
 	} else {
 		$r->bindInt(4,0);
 	}
+	$r->bindInt(5,$defaultbonus);
 	$r->exec();
 	unset($r);
 	$db->exec("COMMIT");

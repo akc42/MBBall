@@ -423,22 +423,46 @@ var MBBAdmin = new Class({
 								updateReq.post(document.id('roundform'));
 							}
 						});
+						
 						var points = div.getElement('input[name=value]');
-						var slider = div.getElement('.slider');
-						var knob = slider.getElement('.knob');
-						var stepValue = maps.points.indexOf(points.value.toInt()); //map back from points to step
-						if (stepValue < 0) stepValue = 0;
-						new Slider(slider,knob,{
+						var pointsslider = document.id('pointsslider').getElement('.slider');
+						var pointsknob = pointsslider.getElement('.knob');
+						var pstepValue = maps.points.indexOf(points.value.toInt()); //map back from points to step
+						if (pstepValue < 0) pstepValue = 0;
+						new Slider(pointsslider,pointsknob,{
 						  minstep:0,
 						  maxstep:6,
-						  initial:stepValue,
+						  initial:pstepValue,
 						  minortick:1,
 						  majortick:10,
 						  onTick:function(step) {
-						    knob.set("text",maps.points[step]);
+						    pointsknob.set("text",maps.points[step]);
 						  },
 						  onChange:function(step) {
 						    points.value = maps.points[step];
+						    var updateReq = new MBB.req('updateround.php', function(response) {
+							    //Should not be necessary to update page
+							    $('userpick').empty(); //but user picks may have changed
+						    });
+						    updateReq.post($('roundform'));
+						  }
+						});
+						var bonus = div.getElement('input[name=bvalue]');
+						var bonusslider = document.id('bonusslider').getElement('.slider');
+						var bonusknob = bonusslider.getElement('.knob');
+						var bstepValue = maps.bonus.indexOf(bonus.value.toInt()); //map back from points to step
+						if (bstepValue < 0) bstepValue = 0;
+						new Slider(bonusslider,bonusknob,{
+						  minstep:0,
+						  maxstep:6,
+						  initial:bstepValue,
+						  minortick:1,
+						  majortick:10,
+						  onTick:function(step) {
+						    bonusknob.set("text",maps.bonus[step]);
+						  },
+						  onChange:function(step) {
+						    bonus.value = maps.bonus[step];
 						    var updateReq = new MBB.req('updateround.php', function(response) {
 							    //Should not be necessary to update page
 							    $('userpick').empty(); //but user picks may have changed

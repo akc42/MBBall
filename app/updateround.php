@@ -19,32 +19,33 @@
 
 */
 require_once('./inc/db.inc');
-if(!(isset($_POST['cid']) && isset($_POST['rid']) && isset($_POST['rname'])
+if(!(isset($_POST['cid']) && isset($_POST['rid']) && isset($_POST['rname']) && isset($_POST['bvalue'])
 	&& isset($_POST['deadline']) && isset($_POST['value']) && isset($_POST['cache']))) forbidden();
 $cid = $_POST['cid'];
 $rid = $_POST['rid'];
 $db->exec("BEGIN TRANSACTION");
 
-$sql = "UPDATE round SET name = ?, value = ?, deadline = ?, open = ?, ou_round = ?, valid_question = ?,answer = ?, ";
+$sql = "UPDATE round SET name = ?, value = ?,bvalue = ? ,deadline = ?, open = ?, ou_round = ?, valid_question = ?,answer = ?, ";
 $sql .= "question = ?,comment = ? , results_cache = NULL WHERE cid = ? AND rid = ?";
 $r = $db->prepare($sql);
 $r->bindString(1,$_POST['rname']);
 $r->bindInt(2,$_POST['value']);
-$r->bindInt(3,$_POST['deadline']);
-$r->bindInt(4,isset($_POST['open'])?1:0);
-$r->bindInt(5,isset($_POST['ou'])?1:0);
-$r->bindInt(6,isset($_POST['validquestion'])?1:0);
+$r->bindInt(3,$_POST['bvalue']);
+$r->bindInt(4,$_POST['deadline']);
+$r->bindInt(5,isset($_POST['open'])?1:0);
+$r->bindInt(6,isset($_POST['ou'])?1:0);
+$r->bindInt(7,isset($_POST['validquestion'])?1:0);
 
 if(isset($_POST['answer']) && $_POST['answer'] != '') {
-  $r->bindInt(7,$_POST['answer']);
+  $r->bindInt(8,$_POST['answer']);
 } else {
- $r->bindNull(7);
+ $r->bindNull(8);
 }
 
-$r->bindString(8,isset($_POST['question'])?$_POST['question']:'');
-$r->bindString(9,isset($_POST['bonuscomment'])?$_POST['bonuscomment']:'');
-$r->bindInt(10,$cid);
-$r->bindInt(11,$rid);
+$r->bindString(9,isset($_POST['question'])?$_POST['question']:'');
+$r->bindString(10,isset($_POST['bonuscomment'])?$_POST['bonuscomment']:'');
+$r->bindInt(11,$cid);
+$r->bindInt(12,$rid);
 $r->exec();
 unset($r);
 if($_POST['cache'] == 'true') {

@@ -19,8 +19,6 @@
 
 */
 
-define('GOOGLE_ACCOUNT','UA-6767755-1');  //Google account of the forum we are requesting details from (chandlerfamily.org.uk)
-
 define('MBBALL_JSON_FILE','./auth.json');
 
 define('MBBALL_KEY','Football9Key7AID'); //Must match index.php of main app (and change for new installations)
@@ -34,43 +32,8 @@ define('MBBALL_CHECK','FOOTBILL'); //8 chars must match index.php of main app (a
 
 
 function forbidden() {
-	header('HTTP/1.0 403 Forbidden');
-	?><html>
-    <head>
-        <style type="text/css">
-            body {
-                font-family: Arial;
-                color: #345;
-            }
-            h1 {
-                border-bottom: 3px solid #345;
-            }
-            a {
-                color: #666;
-            }
-        </style>
-    </head>
-    <body>
-<script type="text/javascript">
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', '<?php echo GOOGLE_ACCOUNT;?>']);
-  _gaq.push(['_trackPageview']);
-</script>        
-<h1>Forbidden</h1>
-        <p>This URL is intended to only be called by authorised applications</p>
-<!-- Google Analytics Tracking Code -->
-  <script type="text/javascript">
-    (function() {
-      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
-    })();
-  </script>
-
-    </body>
-</html>
-<?php
-exit;
+	http_response_code(403);
+	exit;
 }
 
 
@@ -100,23 +63,21 @@ if(substr(simple_decrypt($_GET['name']),0,8) != MBBALL_CHECK ) forbidden();
 
 $user = json_decode(file_get_contents(MBBALL_JSON_FILE),true);
 if(is_null($user)) forbidden();
+if($user['guest']) {
+	/*
+	 * The user is a guest, so we want to direct him to the url that tells him to sign into the forum
+ 	 */
+	echo "window.location = '/football.php';\n";
 
+} else {
 /*
  * The following is javascript run in the context of the index.php page that tried to load us
  * as a result we are setting a cookie in that context ...
  * NOTE: we are assuming mootools is loaded too
  */
 
-echo "var Cookiedata = '".simple_encrypt(serialize($user))."';\n";  //ecrypted serialised version of the user data
-echo "Cookie.write('MBBall',Cookiedata);\n"; //Write the cookie
-//If not logged in to the forum, not allowed any further so redirect to page to say so
-if($user['guest']) {
-	/*
-	 * The user is a guest, so we want to direct him to the url that tells him to sign into the forum
-	 * We need to set the cookie so that we authorise use of the page.  Football.php will remove the cookie again.
- 	 */
-	echo "window.location = 'football.php';\n";
-} else {
+    echo "var Cookiedata = '".simple_encrypt(serialize($user))."';\n";  //ecrypted serialised version of the user data
+    echo "Cookie.write('MBBall',Cookiedata);\n"; //Write the cookie
 	/*
 	 * ... and then reloading the page no that it 
  	 * has the cookie and therefore continues loading the page rather than coming back here

@@ -19,50 +19,15 @@
     see <http://www.gnu.org/licenses/>.
 
 */
-define('GOOGLE_ACCOUNT','UA-6767755-1');  //Google account of the forum we are requesting details from
+
 define('DATA_DIR','/home/alan/dev/football/data/');
 if (!defined('MBBALL_KEY')) define('MBBALL_KEY','Football9Key7AID'); //Must match same ones in index.php (and change for new installations)
 	
 
 
 function forbidden() {
-	header('HTTP/1.0 403 Forbidden');
-	?><html>
-    <head>
-        <style type="text/css">
-            body {
-                font-family: Arial;
-                color: #345;
-            }
-            h1 {
-                border-bottom: 3px solid #345;
-            }
-            a {
-                color: #666;
-            }
-        </style>
-    </head>
-    <body>
-<script type="text/javascript">
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', '<?php echo GOOGLE_ACCOUNT;?>']);
-  _gaq.push(['_trackPageview']);
-</script>        
-<h1>Forbidden</h1>
-        <p>This URL is intended to only be called by authorised applications</p>
-<!-- Google Analytics Tracking Code -->
-  <script type="text/javascript">
-    (function() {
-      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
-    })();
-  </script>
-
-    </body>
-</html>
-<?php
-exit;
+	http_response_code(403);
+	exit;
 }
 function simple_decrypt($text)
 {

@@ -19,8 +19,6 @@
 
 */
 
-define('GOOGLE_ACCOUNT','UA-6767400-1');  //Google account of the forum we are requesting details from (melindasbacksup.com)
-
 define('SMF_FOOTBALL',		21);  //Group that can administer
 define('SMF_BABY',		10);  //Baby backup
 define('MBBALL_KEY','Football9Key7AID'); //Must match index.php of main app (and change for new installations)
@@ -34,42 +32,7 @@ define('MBBALL_CHECK','FOOTBILL'); //8 chars must match index.php of main app (a
 
 
 function forbidden() {
-	header('HTTP/1.0 403 Forbidden');
-	?><html>
-    <head>
-        <style type="text/css">
-            body {
-                font-family: Arial;
-                color: #345;
-            }
-            h1 {
-                border-bottom: 3px solid #345;
-            }
-            a {
-                color: #666;
-            }
-        </style>
-    </head>
-    <body>
-<script type="text/javascript">
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', '<?php echo GOOGLE_ACCOUNT;?>']);
-  _gaq.push(['_trackPageview']);
-</script>        
-<h1>Forbidden</h1>
-        <p>This URL is intended to only be called by authorised applications</p>
-<!-- Google Analytics Tracking Code -->
-  <script type="text/javascript">
-    (function() {
-      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
-    })();
-  </script>
-
-    </body>
-</html>
-<?php
+	http_response_code(403);
 exit;
 }
 
@@ -103,40 +66,34 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/forum/SSI.php');
 $user = Array();
 $user_data = Array();
 
-$groups =& $user_info['groups'];
-if(isset($user_info['id'])) { //check if this is SMFv2
-	$user['uid'] =& $user_info['id'];
+$user['uid'] =& $user_info['id'];
+//guests not allowed
+if ($user_info['is_guest']) {
+    echo "window.location = '/football.php';\n";
 } else {
-	$user['uid'] = $ID_MEMBER;
-}
-$user['name'] =& $user_info['name'];
-$user['email'] =& $user_info['email'];
-$user['admin'] = true; //special setting for everyone to be an admin
-$user['guest'] = false;
-/*
- * The following is javascript run in the context of the index.php page that tried to load us
- * as a result we are setting a cookie in that context ...
- * NOTE: we are assuming mootools is loaded too
- */
+    $groups =& $user_info['groups'];
+    $user['name'] =& $user_info['name'];
+    $user['email'] =& $user_info['email'];
+    $user['admin'] = true; //special setting for everyone to be an admin
+    $user['guest'] = false;
+    /*
+     * The following is javascript run in the context of the index.php page that tried to load us
+     * as a result we are setting a cookie in that context ...
+     * NOTE: we are assuming mootools is loaded too
+     */
 
-echo "var Cookiedata = '".simple_encrypt(serialize($user))."';\n";  //ecrypted serialised version of the user data
-echo "Cookie.write('MBBall',Cookiedata);\n"; //Write the cookie
-//If not logged in to the forum, not allowed any further so redirect to page to say so
-if($user_info['is_guest']) {
-	/*
-	 * The user is a guest, so we want to direct him to the url that tells him to sign into the forum
-	 * We need to set the cookie so that we authorise use of the page.  Football.php will remove the cookie again.
- 	 */
-	echo "window.location = 'football.php';\n";
-} else {
-	/*
-	 * ... and then reloading the page no that it 
- 	 * has the cookie and therefore continues loading the page rather than coming back here
-	 * 
-	 */
-	echo "window.location.reload();\n"; //And reload the page - which now the cookie is set should progress normally
+    echo "var Cookiedata = '".simple_encrypt(serialize($user))."';\n";  //ecrypted serialised version of the user data
+    echo "Cookie.write('MBBall',Cookiedata);\n"; //Write the cookie
+
+    /*
+     * ... and then reloading the page no that it 
+     * has the cookie and therefore continues loading the page rather than coming back here
+     * 
+     */
+    echo "window.location.reload();\n"; //And reload the page - which now the cookie is set should progress normally
+
+    unset($groups);
 }
 unset($user_info);
-unset($groups);
 
 ?>
