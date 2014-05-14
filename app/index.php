@@ -353,18 +353,26 @@ function main_content() {
 
 	if($registered) {
 ?><script type="text/javascript">
-	_gaq.push(['_trackPageview','/football/user/registered']);
+	if (typeof(ga) === "function") { 
+		ga('send','pageview','/football/user/registered');
+	}
 </script>
 			<tr><td colspan="2"><div id="registered"><?php $userPicks=''; require_once('./inc/userpick.inc');?></div></td></tr>
 <?php
 	} else {
 ?><script type="text/javascript">
-	_gaq.push(['_trackPageview','/football/user/unregistered']);
+	if (typeof(ga) === "function") { 
+		ga('send','pageview','/football/user/unregistered');
+	}
+
 </script>
 <?php
 		if($signedup) {
 ?><script type="text/javascript">
-	_gaq.push(['_trackPageview','/football/user/bb-awaiting-approval']);
+	if (typeof(ga) === "function") { 
+		ga('send','pageview','/football/user/bb-awaiting-approval');
+	}
+
 </script>
 	<tr><td colspan="2"><div id="registered"><p>Although you have registered, this competition requires that Baby Backups obtain
 		admistrators approval before being allowed to enter this competition.  If you have not already done so please contact the

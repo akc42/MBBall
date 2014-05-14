@@ -912,7 +912,9 @@ var MBBAdmin = new Class({
 						
 								var pickReq = new MBB.req('createpicks.php', function(response) {
 								  if (validated) {
-									  _gaq.push(['_trackPageview','/football/picks/adminmade']);
+									  if (typeof(ga) === "function") { 
+										  ga('send','pageview','/football/picks/adminmade');
+									  }
 									  document.id('pick').dispose();
 								  } else {
 									  $('bonus_pick').getElement('textarea').value=messages.noquestion;
