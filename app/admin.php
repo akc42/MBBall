@@ -70,7 +70,7 @@ function head_content () {
 ?> 	<script src="js/mootools-core-1.5.0-full-nocompat-yc.js" type="text/javascript" charset="UTF-8"></script>
 	<script src="js/mootools-BindDragMove-1.5.0-yc.js" type="text/javascript" charset="UTF-8"></script>
 	<script src="js/calendar/calendar-yc.js" type="text/javascript" charset="UTF-8"></script>
-	<script src="js/slider-min-v1.0.js" type="text/javascript" charset="UTF-8"></script>
+	<script src="js/slider-min-<?php include('./inc/version.inc');?>.js" type="text/javascript" charset="UTF-8"></script>
 	<script src="js/mbball-min-<?php include('./inc/version.inc');?>.js" type="text/javascript" charset="UTF-8"></script>
 	<script src="js/mbadmin-min-<?php include('./inc/version.inc');?>.js" type="text/javascript" charset="UTF-8"></script>
 <?php
