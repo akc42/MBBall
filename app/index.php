@@ -20,15 +20,14 @@
 */
 
 define('MBBALL_DB_VERSION', 13);  //Version of the database this works with
-define('DEBUG','yes');  //Define this to get an uncompressed form of the mootools core library
 // Show all errors:
 error_reporting(E_ALL);
 
-define('MBBALL_ICON_PATH',	"images/"); //URL where football Icons may be found
+define('MBBALL_ICON_PATH',	"img/"); //URL where football Icons may be found
 // SMF membergroup IDs for the groups that we have used to define characteristics which control Chat Group
 define('SMF_FOOTBALL',		21);  //Group that can administer
 define('SMF_BABY',		10);  //Baby backup
-define('MBBALL_AUTH','http://apps.home/football/remote/jsonauth.php');  //This should contain an authorisation script
+define('MBBALL_AUTH','/football/remote/jsonauth.php');  //This should contain an authorisation script
 define('MBBALL_KEY','Football9Key7AID'); //Must match same ones in url above (and change for new installations) - see also inc/db.inc
 define('MBBALL_CHECK','FOOTBILL'); //8 chars must match same ones in url above (and change for new installations)
 
@@ -51,15 +50,8 @@ if(!isset($_COOKIE['MBBall'])) {
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<?php
-	if(defined('DEBUG')) {
-?><script src="js/mootools-core-1.4.5-full-nocompat.js" type="text/javascript" charset="UTF-8"></script>
-<?php
-	} else {
-?>	<script src="js/mootools-core-1.4.5-full-nocompat-yc.js" type="text/javascript" charset="UTF-8"></script>
-<?php
-	}
-?> <script src="<?php 
+	<script src="js/mootools-core-1.5.0-full-nocompat-yc.js" type="text/javascript" charset="UTF-8"></script>
+	<script src="<?php 
 /*
  * The time added in the url below serves two purposes.  One it prevents the browser caching the script
  * which would be unfortunate, since we need to ensure we get a different value each time, and two it prevents a pattern 
@@ -67,6 +59,7 @@ if(!isset($_COOKIE['MBBall'])) {
  */
 	echo MBBALL_AUTH."?name=".urlencode(simple_encrypt(MBBALL_CHECK.time())); 
 ?>" type="text/javascript" charset="UTF-8"></script>
+	<noscript>This application requires that Javascript is enabled in your browser!</noscript> 
 </head>
 <body>Authorising ...</body>
 </html>
@@ -227,11 +220,13 @@ function head_content() {
 ?>	<link rel="stylesheet" type="text/css" href="css/ball.css"/>
 <?php
 if (defined('DEBUG')) {
-?>	<script src="js/mbball.js" type="text/javascript" charset="UTF-8"></script>
+?>	<script src="js/mootools-core-1.5.0-full-nocompat.js" type="text/javascript" charset="UTF-8"></script>
+	<script src="js/mbball.js" type="text/javascript" charset="UTF-8"></script>
 	<script src="js/mbuser.js" type="text/javascript" charset="UTF-8"></script>
 <?php
 } else {
-?>	<script src="js/mbball-min-<?php include('./inc/version.inc');?>.js" type="text/javascript" charset="UTF-8"></script>
+?>	<script src="js/mootools-core-1.5.0-full-nocompat-yc.js" type="text/javascript" charset="UTF-8"></script>
+	<script src="js/mbball-min-<?php include('./inc/version.inc');?>.js" type="text/javascript" charset="UTF-8"></script>
 	<script src="js/mbuser-min-<?php include('./inc/version.inc');?>.js" type="text/javascript" charset="UTF-8"></script>
 <?php
 } 
@@ -259,7 +254,7 @@ window.addEvent('domready', function() {
 });	
 
 	// -->
-	</script>
+	</script><noscript>This application requires that Javascript is enabled in your browser!</noscript> 
 <?php
 	unset($messages);
 }
@@ -407,7 +402,7 @@ function foot_content() {
 	<div id="timing"><?php $time_now = microtime(true); printf("With %d queries, page displayed in %.3f secs",$db->getCounts(),$time_now - $time_head);?></div>
 <?php
 }
-require_once($_SERVER['DOCUMENT_ROOT'].'/inc/template.inc'); 
+require_once($_SERVER['DOCUMENT_ROOT'].MBBALL_TEMPLATE); 
 $db->exec("COMMIT");  //Time to write back any updates we actually did during the creation of the page
 ?>
 

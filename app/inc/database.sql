@@ -331,8 +331,8 @@ INSERT INTO settings (name,value) VALUES('version',13); --version of this config
 INSERT INTO settings (name,value) VALUES('max_round_display',18); -- max rounds to include in results table
 INSERT INTO settings (name,value) VALUES('cache_age',0);--cache age before invalid (in seconds), 0 is infinite
 INSERT INTO settings (name,value) VALUES('home_url','/forum/index.php'); --url used for home menu item
-INSERT INTO settings (name,value) VALUES('emoticon_dir','./images/emoticons');--filesystem location of emoticons
-INSERT INTO settings (name,value) VALUES('emoticon_url','images/emoticons');--web based location of emoticons
+INSERT INTO settings (name,value) VALUES('emoticon_dir','./img/emoticons');--filesystem location of emoticons
+INSERT INTO settings (name,value) VALUES('emoticon_url','img/emoticons');--web based location of emoticons
 INSERT INTO settings (name,value) VALUES('template','./inc/template.inc'); -- page template location in filesystem
 INSERT INTO settings (name,value) VALUES('default_competition',0); -- cid of default competition 0 means we don't know what it is
 --settings used by admin to adjust scores
@@ -404,6 +404,7 @@ CREATE INDEX registration_cid_idx ON registration(cid);
 -- UPDATE settings SET value = 'Is BB' WHERE name='headingisguest';
 
 COMMIT;
+VACUUM;
 -- set it all up as Write Ahead Log for max performance and minimum contention with other users.
 PRAGMA journal_mode=WAL;
 

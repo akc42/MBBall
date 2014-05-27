@@ -19,8 +19,9 @@
     see <http://www.gnu.org/licenses/>.
 
 */
+define('DEBUG','yes');  //Define this to get an uncompressed form of the mootools core library
 
-define('DATA_DIR','/home/alan/dev/football/data/');
+define('DATA_DIR','/home/alan/dev/test-db/football-dev/');
 if (!defined('MBBALL_KEY')) define('MBBALL_KEY','Football9Key7AID'); //Must match same ones in index.php (and change for new installations)
 	
 
@@ -38,7 +39,7 @@ function simple_decrypt($text)
 }
 
 function tick() {
-	echo '<img src="images/tick.gif" alt="Correct" />';
+	echo '<img src="img/tick.gif" alt="Correct" />';
 }
 
 //Check that call is legit

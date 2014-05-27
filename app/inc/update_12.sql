@@ -17,4 +17,11 @@ CREATE VIEW bonus_score AS
 INSERT INTO settings (name,value) VALUES('bonusmap','[1,2,4,6,8,12,16]');--map of bonus question points slider position to points allocated
 INSERT INTO settings (name,value) VALUES('defaultbonus',2); --default value of question bonus when new round created
 
+UPDATE settings SET value = '/inc/template.inc' WHERE name = 'template'
+UPDATE settings SET value = './img/emoticons' WHERE name = 'emoticon_dir'
+UPDATE settomgs SET value = 'img/emoticons' WHERE name = 'emoticon_url'
+
 UPDATE settings SET value = 13 WHERE name = 'version';
+
+VACUUM;
+

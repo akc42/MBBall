@@ -19,7 +19,6 @@
     see <http://www.gnu.org/licenses/>.
 
 */
-define('DEBUG','yes'); //define debug mode to get uncompressed mootools loaded
 
 require_once('./inc/db.inc'); //This will also validate user
 if (!(isset($_GET['global']) || isset($_GET['cid']))) forbidden();
@@ -60,14 +59,16 @@ function head_content () {
 	<link rel="stylesheet" type="text/css" href="css/ball.css"/>
 <?php
 	if(defined('DEBUG')) {
-?>	<script src="js/mootools-binddragmove-1.4.0.1.js" type="text/javascript" charset="UTF-8"></script>
+?> 	<script src="js/mootools-core-1.4.5-full-nocompat.js" type="text/javascript" charset="UTF-8"></script>
+	<script src="js/mootools-binddragmove-1.4.0.1.js" type="text/javascript" charset="UTF-8"></script>
 	<script src="js/calendar/calendar.js" type="text/javascript" charset="UTF-8"></script>
 	<script src="js/slider.js" type="text/javascript" charset="UTF-8"></script>
 	<script src="js/mbball.js" type="text/javascript" charset="UTF-8"></script>
 	<script src="js/mbadmin.js" type="text/javascript" charset="UTF-8"></script>
 <?php
 	} else {
-?>	<script src="js/mootools-binddragmove-1.4.0.1-yc.js" type="text/javascript" charset="UTF-8"></script>
+?> 	<script src="js/mootools-core-1.4.5-full-nocompat-yc.js" type="text/javascript" charset="UTF-8"></script>
+	<script src="js/mootools-binddragmove-1.4.0.1-yc.js" type="text/javascript" charset="UTF-8"></script>
 	<script src="js/calendar/calendar-yc.js" type="text/javascript" charset="UTF-8"></script>
 	<script src="js/slider-min-v1.0.js" type="text/javascript" charset="UTF-8"></script>
 	<script src="js/mbball-min-<?php include('./inc/version.inc');?>.js" type="text/javascript" charset="UTF-8"></script>
