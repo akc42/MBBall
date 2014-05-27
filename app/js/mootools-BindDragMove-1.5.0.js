@@ -1,6 +1,16 @@
-// MooTools: the javascript framework.
-// Load this file's selection again by visiting: http://mootools.net/more/d03cae8355c22f08b1d93d277be4b27b 
-// Or build this file again with packager using: packager build More/Class.Binds More/Drag More/Drag.Move
+/*
+---
+MooTools: the javascript framework
+
+web build:
+ - http://mootools.net/more/97292ce5e5ddf0e1ff07f0b156e056f4
+
+packager build:
+ - packager build More/Class.Binds More/Drag.Move
+
+...
+*/
+
 /*
 ---
 
@@ -31,8 +41,8 @@ provides: [MooTools.More]
 */
 
 MooTools.More = {
-	'version': '1.4.0.1',
-	'build': 'a4244edf2aa97ac8a196fc96082dd35af1abab87'
+	version: '1.5.0',
+	build: '73db5e24e6e9c5c87b3a27aebef2248053f7db37'
 };
 
 
@@ -52,7 +62,7 @@ authors:
 
 requires:
   - Core/Class
-  - /MooTools.More
+  - MooTools.More
 
 provides: [Class.Binds]
 
@@ -97,7 +107,7 @@ requires:
   - Core/Element.Event
   - Core/Element.Style
   - Core/Element.Dimensions
-  - /MooTools.More
+  - MooTools.More
 
 provides: [Drag]
 ...
@@ -143,10 +153,10 @@ var Drag = new Class({
 		this.mouse = {'now': {}, 'pos': {}};
 		this.value = {'start': {}, 'now': {}};
 
-		this.selection = (Browser.ie) ? 'selectstart' : 'mousedown';
+		this.selection = 'selectstart' in document ? 'selectstart' : 'mousedown';
 
 
-		if (Browser.ie && !Drag.ondragstartFixed){
+		if ('ondragstart' in document && !('FileReader' in window) && !Drag.ondragstartFixed){
 			document.ondragstart = Function.from(false);
 			Drag.ondragstartFixed = true;
 		}
@@ -331,7 +341,7 @@ authors:
 
 requires:
   - Core/Element.Dimensions
-  - /Drag
+  - Drag
 
 provides: [Drag.Move]
 
@@ -358,10 +368,7 @@ Drag.Move = new Class({
 		element = this.element;
 
 		this.droppables = $$(this.options.droppables);
-		this.container = document.id(this.options.container);
-
-		if (this.container && typeOf(this.container) != 'element')
-			this.container = document.id(this.container.getDocument().body);
+		this.setContainer(this.options.container);
 
 		if (this.options.style){
 			if (this.options.modifiers.x == 'left' && this.options.modifiers.y == 'top'){
@@ -377,6 +384,13 @@ Drag.Move = new Class({
 
 		this.addEvent('start', this.checkDroppables, true);
 		this.overed = null;
+	},
+	
+	setContainer: function(container) {
+		this.container = document.id(container);
+		if (this.container && typeOf(this.container) != 'element'){
+			this.container = document.id(this.container.getDocument().body);
+		}
 	},
 
 	start: function(event){
@@ -442,7 +456,9 @@ Drag.Move = new Class({
 
 			if (container != offsetParent){
 				left += containerMargin.left + offsetParentPadding.left;
-				top += ((Browser.ie6 || Browser.ie7) ? 0 : containerMargin.top) + offsetParentPadding.top;
+				if (!offsetParentPadding.left && left < 0) left = 0;
+				top += offsetParent == document.body ? 0 : containerMargin.top + offsetParentPadding.top;
+				if (!offsetParentPadding.top && top < 0) top = 0;
 			}
 		} else {
 			left -= elementMargin.left;
