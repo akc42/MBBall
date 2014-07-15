@@ -108,7 +108,7 @@ while(!$alldone){
 				    $correct = ($team['mp'] && isset($playoff_selections[$team['tid']]));
     ?>				<td <?php if($correct) {echo 'class="tid win"';}else{ echo 'class="tid"';}?>><div style="position:relative;">
 					    <?php 
-			      if(isset($playoff_selections[$team['tid']])) echo $playoff_selections[$team['tid']].'<img src="images/sel.gif" alt="'.$team['tid'].' selected"/>';
+			      if(isset($playoff_selections[$team['tid']])) echo $playoff_selections[$team['tid']].'<img src="img/sel.gif" alt="'.$team['tid'].' selected"/>';
 			      if($correct) { 
 					tick(); 
 					if ($team['points'] <> 1) echo '<div class="xtra">'.$team['points'].'</div>';
