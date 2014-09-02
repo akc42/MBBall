@@ -51,21 +51,21 @@ if(!isset($_COOKIE['MBBall'])) {
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<script src="js/mootools-core-1.5.0-full-nocompat-yc.js" type="text/javascript" charset="UTF-8"></script>
-	<script src="<?php 
+	<script src="<?php
 /*
  * The time added in the url below serves two purposes.  One it prevents the browser caching the script
- * which would be unfortunate, since we need to ensure we get a different value each time, and two it prevents a pattern 
+ * which would be unfortunate, since we need to ensure we get a different value each time, and two it prevents a pattern
  * emerging for that parameter which sniffers could monitor and replicate.
  */
-	echo MBBALL_AUTH."?name=".urlencode(simple_encrypt(MBBALL_CHECK.time())); 
+	echo MBBALL_AUTH."?name=".urlencode(simple_encrypt(MBBALL_CHECK.time()));
 ?>" type="text/javascript" charset="UTF-8"></script>
-	<noscript>This application requires that Javascript is enabled in your browser!</noscript> 
+	<noscript>This application requires that Javascript is enabled in your browser!</noscript>
 </head>
 <body>Authorising ...</body>
 </html>
 <?php
 	exit;
-}	
+}
 
 require_once('./inc/db.inc');
 if($uid == 0) forbidden(); //Extra guard against guests who having gone to football, login again
@@ -75,7 +75,7 @@ $name = $user['name'];
 //Update participant record with this user
 $sql = "UPDATE participant SET name = ?, email = ?, is_guest = ?, last_logon = strftime('%s','now')";
 if ($user['admin']) {
-	$sql .= ", admin_experience = 1,is_global_admin = 1 WHERE uid = ?"; 
+	$sql .= ", admin_experience = 1,is_global_admin = 1 WHERE uid = ?";
 	$sql2 = "INSERT INTO participant(uid,name,email,is_guest,last_logon,admin_experience,is_global_admin) VALUES(?,?,?,?,strftime('%s','now'),1,1)";
 	$global_admin = true;
 } else {
@@ -94,13 +94,13 @@ $s = $db->prepare("SELECT value FROM settings WHERE name = ?");
  	unset($s);  //We need to forget about this statement whilst we alter the database
 	 while ($currentVersion < MBBALL_DB_VERSION) {
 echo dirname(__FILE__).'/inc/update_'.$currentVersion.'.sql';
- 		if(file_exists(dirname(__FILE__).'/inc/update_'.$currentVersion.'.sql')) 
+ 		if(file_exists(dirname(__FILE__).'/inc/update_'.$currentVersion.'.sql'))
 	  		$db->exec(file_get_contents(dirname(__FILE__).'/inc/update_'.$currentVersion.'.sql'));
    		$currentVersion++;
   	}
   	$s = $db->prepare("SELECT value FROM settings WHERE name = ?");
  }
- 
+
 $p = $db->prepare($sql);
 $p->bindString(1,$name);
 $p->bindString(2,$email);
@@ -162,14 +162,14 @@ if(!$row = $c->fetchRow()) {
 	};
 	$db->exec("ROLLBACK");
 	exit;
-}	
+}
 $admin = false;
 if ($uid == $row['administrator']) {
 	//User is administrator of this competition
 	$admin = true;
 	$a = $db->prepare("UPDATE participant SET admin_experience = 1 WHERE uid = ?");
 	$a->bindInt(1,$uid);
-	$a->exec();	
+	$a->exec();
 	unset($a);
 }
 $gap = $row['gap'];   //difference from match time that picks close
@@ -229,7 +229,7 @@ if (defined('DEBUG')) {
 	<script src="js/mbball-min-<?php include('./inc/version.inc');?>.js" type="text/javascript" charset="UTF-8"></script>
 	<script src="js/mbuser-min-<?php include('./inc/version.inc');?>.js" type="text/javascript" charset="UTF-8"></script>
 <?php
-} 
+}
 ?>	<script type="text/javascript">
 
 	<!--
@@ -240,7 +240,7 @@ window.addEvent('domready', function() {
 				{cid: <?php echo $cid;?>, rid: <?php echo $rid;?>},
                              $('errormessage'),
 {
-<?php 
+<?php
 	$donefirst = false;
 	foreach($messages as $msgid => $message){
 		if($donefirst) echo ",\n";
@@ -251,10 +251,10 @@ window.addEvent('domready', function() {
 }
                              );
 	MBB.adjustDates($('content'));
-});	
+});
 
 	// -->
-	</script><noscript>This application requires that Javascript is enabled in your browser!</noscript> 
+	</script><noscript>This application requires that Javascript is enabled in your browser!</noscript>
 <?php
 	unset($messages);
 }
@@ -278,7 +278,7 @@ function menu_items () {
 ?>		<li><a href="#"><span class="down">Rounds</span><!--[if gte IE 7]><!--></a><!--<![endif]-->
 		<!--[if lte IE 6]><table><tr><td><![endif]-->
 			<ul>
-<?php 
+<?php
 		}
 		$do_first = false;
 ?>				<li><a href="index.php?<?php echo 'cid='.$cid.'&rid='.$row['rid']; ?>"><?php echo $row['name'] ;?></a></li>
@@ -309,11 +309,11 @@ function menu_items () {
 ?>		<li><a href="#"><span class="down">Competitions</span><!--[if gte IE 7]><!--></a><!--<![endif]-->
 		<!--[if lte IE 6]><table><tr><td><![endif]-->
 			<ul>
-<?php 
+<?php
 		}
 		$do_first = false;
 ?>				<li><a href="index.php?<?php echo 'cid='.$row['cid'] ; ?>"><?php echo $row['name'] ;?></a></li>
-<?php	
+<?php
 	}
 	if(!$do_first) {
 ?>			</ul>
@@ -323,18 +323,18 @@ function menu_items () {
 <?php
 	}
 	unset($c);
-		
+
 	if($global_admin) {
 // Am Global Administrator - let me also do Admin things
 ?>		<li><a href="admin.php?<?php echo 'uid='.$uid.'&global=true&cid='.$cid;?>"><span>Global Admin</span></a></li>
 
 <?php
-	}else {	
+	}else {
 		if($admin) {
 	// Am Administrator of this competition - let me also do Admin things
 		?>		<li><a href="admin.php?<?php echo 'uid='.$uid.'&cid='.$cid;?>"><span>Administration</span></a></li>
-	<?php 
-		} 
+	<?php
+		}
 	}
 }
 
@@ -348,7 +348,7 @@ function main_content() {
 
 	if($registered) {
 ?><script type="text/javascript">
-	if (typeof(ga) === "function") { 
+	if (typeof(ga) === "function") {
 		ga('send','pageview','/football/user/registered');
 	}
 </script>
@@ -356,7 +356,7 @@ function main_content() {
 <?php
 	} else {
 ?><script type="text/javascript">
-	if (typeof(ga) === "function") { 
+	if (typeof(ga) === "function") {
 		ga('send','pageview','/football/user/unregistered');
 	}
 
@@ -364,7 +364,7 @@ function main_content() {
 <?php
 		if($signedup) {
 ?><script type="text/javascript">
-	if (typeof(ga) === "function") { 
+	if (typeof(ga) === "function") {
 		ga('send','pageview','/football/user/bb-awaiting-approval');
 	}
 
@@ -395,14 +395,14 @@ if ($playoff_deadline != 0) {
 		</tbody>
 	</table>
 <?php
-}	
+}
 function foot_content() {
 	global $db,$time_head;
-?>	<div id="copyright">MBball <span><?php include('./inc/version.inc');?></span> &copy; 2008-2012 Alan Chandler.  Licenced under the GPL</div>
+?>	<div id="copyright">MBball <span><?php include('./inc/version.inc');?></span> &copy; 2008-2014 Alan Chandler.  Licenced under the GPL</div>
 	<div id="timing"><?php $time_now = microtime(true); printf("With %d queries, page displayed in %.3f secs",$db->getCounts(),$time_now - $time_head);?></div>
 <?php
 }
-require_once($_SERVER['DOCUMENT_ROOT'].MBBALL_TEMPLATE); 
+require_once($_SERVER['DOCUMENT_ROOT'].MBBALL_TEMPLATE);
 $db->exec("COMMIT");  //Time to write back any updates we actually did during the creation of the page
 ?>
 

@@ -15,7 +15,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with MBBall (file supporting/COPYING.txt).  If not, 
+    along with MBBall (file supporting/COPYING.txt).  If not,
     see <http://www.gnu.org/licenses/>.
 
 */
@@ -84,7 +84,7 @@ window.addEvent('domready', function() {
   MBBmgr = new MBBAdmin(
 <?php if(isset($_GET['global'])) {echo 'true';} else {echo 'false';}?>,<?php if(isset($_GET['cid'])) {echo $_GET['cid'] ;}else{ echo '0';}?>,$('errormessage'),
     {
-<?php 
+<?php
 //TODO: Go through all the messages in mbbadmin and give them names to be added to the object here.  Read text from settings datatable
 	$donefirst = false;
 	foreach($messages as $msgid => $message){
@@ -99,9 +99,9 @@ window.addEvent('domready', function() {
     	underdog:<?php echo "$underdogmap";?>,
     	playoff:<?php echo "$playoffmap";?>,
     	bonus:<?php echo "$bonusmap";?>
-    }	
+    }
     );
-});	
+});
 
 	// -->
 	</script>
@@ -134,8 +134,8 @@ function main_content() {
 <?php
 }
 function foot_content() {
-?>	<div id="copyright">MBball <span><?php include('./inc/version.inc');?></span> &copy; 2008-2012 Alan Chandler.  Licenced under the GPL</div>
+?>	<div id="copyright">MBball <span><?php include('./inc/version.inc');?></span> &copy; 2008-2014 Alan Chandler.  Licenced under the GPL</div>
 <?php
 }
-require_once($_SERVER['DOCUMENT_ROOT'].'/inc/template.inc'); 
+require_once($_SERVER['DOCUMENT_ROOT'].'/inc/template.inc');
 ?>
