@@ -91,7 +91,7 @@ if ($rid != 0) {
   $startMatch = 0;
   $bqopts = 0;
   if (isset($picks['options'])) $bqopts = count($picks['options']);
-	
+
   while ($startMatch < $nom) {
 /* GROUPS OF 8 MATCHES ----------------------------------------------------------------------------*/
 ?><table>
@@ -197,7 +197,7 @@ if ($rid != 0) {
 	$aid = $picks['matches'][$i]['aid'];
 	$underdog = $picks['matches'][$i]['underdog'];
 	if(isset($picks['picks'][$uid2][$aid])) {
-	  $pickdata = $picks['picks'][$uid2][$aid]; 
+	  $pickdata = $picks['picks'][$uid2][$aid];
 	  $late = ($picks['matches'][$i]['match_time'] < $pickdata['submit_time'] && $pickdata['admin_made'] == 1)?'<span class="late_pick">L</span>':''; //was this a late pick by admin
 	  if($pickdata['pscore'] > 0) {
 ?>				<td class="win tid"><div style="position:relative;">
@@ -229,9 +229,9 @@ if ($rid != 0) {
 	} else {
 ?>				<td colspan="2"></td>
 <?php
-	}							
+	}
       }
-		
+
 /* TOTAL SCORE (if we are doing it here) -------------------------------------------------------------*/
       if($totalHasBeenOutput) {
 ?>				<td class="score" rowspan="<?php echo ($nom == 0)?1:2 ;?>"><?php echo $userdata['score'];?></td>
@@ -267,7 +267,7 @@ if ($rid != 0) {
 ?><table>
 	<thead>
 		<tr><th rowspan="<?php echo ($isAQuestion)?3:1 ;?>" class="match_data">Round Data<br/><?php echo $rounddata['name'];?></th>
-<?php		
+<?php
     if($isAQuestion) {
 ?>		<th rowspan="3" class="score">Points for correct answer</br><?php echo $rounddata['bvalue'];?></th>
 <?php //We need to find all the options so we can display them later, but for now we need to know how many for the colspan
@@ -293,10 +293,10 @@ if ($rid != 0) {
 	  foreach($picks['options'] as $opid => $label) {
 	    if(!is_null($rounddata['answer']) && $rounddata['answer'] == $opid) {
 ?>			<th style="<?php echo 'width:'.$width.'px';?>" class="win opt_ans"><?php echo $label; tick();?></th>
-<?php 
+<?php
 	    } else {
 ?> 			<th style="<?php echo 'width:'.$width.'px';?>" class="opt_ans"><?php echo $label;?></th>
-<?php 		
+<?php
 	    }
 	  }
 	} else {
@@ -322,10 +322,10 @@ if ($rid != 0) {
 	    if($opid == $userdata['opid']) {
 	      $late = ($rounddata['deadline'] < $userdata['submit_time'] && $userdata['admin_made'] == 1)?'<span class="late_pick">L</span>':'';
 	      if($userdata['opid'] == $rounddata['answer']) {
-?>			<td class="win opt_sel"><?php echo $late;?><img src="images/sel.gif" alt="option selected" /><?php tick();?></td>
+?>			<td class="win opt_sel"><?php echo $late;?><img src="img/sel.gif" alt="option selected" /><?php tick();?></td>
 <?php
 	      } else {
-?>			<td class="opt_sel"><?php echo $late;?><img src="images/sel.gif" alt="option selected" /></td>
+?>			<td class="opt_sel"><?php echo $late;?><img src="img/sel.gif" alt="option selected" /></td>
 <?php
 	      }
 	    } else {
