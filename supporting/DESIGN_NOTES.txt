@@ -18,7 +18,6 @@
 
 */
 
-NOTES _ THIS FILE NEEDS TO BE REPLACED BY A TIDDLY WIKI
 
  This is just some random comments on the design and implementation as I come to them so that they are noted for the future.
 

@@ -5327,7 +5327,7 @@ var Request = this.Request = new Class({
 		onComplete: function(){},
 		onCancel: function(){},
 		onSuccess: function(responseText, responseXML){},
-		onFailure: function(xhr){},
+		onFailure: function(xhb){},
 		onException: function(headerName, value){},
 		onTimeout: function(){},
 		user: '',
